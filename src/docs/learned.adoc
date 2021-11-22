@@ -1,0 +1,87 @@
+// * create a new table for each day
+// * use the avatar images to make the file nicer
+// * create a new line for each use
+// a| means that you can use asciidoc syntax in this cell
+
+//some attributes to make the file more readable
+
+:rdmueller: image:https://avatars2.githubusercontent.com/u/1856308?s=40[link=https://github.com/rdmueller]
+:anoff: image:https://avatars2.githubusercontent.com/u/7142618?s=40[link=https://github.com/anoff]
+:robertwalter83: image:https://avatars2.githubusercontent.com/u/5462981?s=40[link=https://github.com/robertwalter83]
+:gysel: image:https://avatars0.githubusercontent.com/u/1065960?s=40[link=https://github.com/gysel]
+:tschulte: image:https://avatars1.githubusercontent.com/u/203910?s=40[link=https://github.com/tschulte]
+:olithissen: image:https://avatars1.githubusercontent.com/u/13063051?s=40[link=https://github.com/olithissen]
+:RJPlog: image:https://avatars3.githubusercontent.com/u/44948239?s=40[link=https://github.com/RJPlog]
+:sancho1241: image:https://avatars0.githubusercontent.com/u/24798802?s=40[link=https://github.com/sancho1241]
+:corneil: image:https://avatars0.githubusercontent.com/u/466422?s=40[link=https://github.com/corneil]
+
+== Today I learned..
+
+A collection of everyones daily learnings.
+
+You can add your own content at https://github.com/docToolchain/aoc-2020/blob/master/src/docs/learned.adoc[/src/docs/learned.adoc]
+
+=== Day 00
+
+[cols="1,10"]
+|====
+
+a|{rdmueller}
+a| as you can clearly see, I just noticed that I am not a web designer - at least not for an X-Mas theme ;-) 🎅 🎄 🤣 +
+  you can do test driven development with bash!
+
+a|{RJPlog}
+a|  eagerly waiting for day01, today I tried to use gitpod.io. After some difficulties at staring, I managend to contribute my day00 solution completely via gitpod.io.
+ It's an amazing solution with many features making (my) work more easy.
+ Many thanks to Ralf, how took the time to help me over the first hurdles!
+
+
+|====
+
+=== Day 01
+
+[cols="1,10"]
+|====
+
+a|{rdmueller}
+a| http://openjdk.java.net/jeps/330[JEP330] lets you execute Java like a script... finally, we've got Java-Script :-D
+
+|====
+
+=== Day 06
+
+[cols="1,10"]
+|====
+
+a|{anoff}
+a| Using an explicit `return` in a ruby `map{}` lambda causes the entire function to return, not just the lambda 😔
+a| You can remove duplicate (adjacent) word characters using regex `.gsub(/(\w)\1+/, '\1')`
+|====
+
+=== Day 09
+
+[cols="1,10"]
+|====
+
+a|{anoff}
+a| Indexing an `Array` in Ruby is only possible with single integer indexes or a `Range` object. Using an `Array` to index an `Array` is not possible.
+a| Ruby has fun `Vector` and `Matrix` operators that would have been fun to play with if you need multiplications instead of sums.
+a| TDD or die! When I don't test stuff I always overlook details in the puzzle that are hard to debug later on. Test early, test often.
+|====
+
+=== Day 16
+|====
+
+a|{anoff}
+a| Setting up a debugger is worth ith.
+a| There is an important difference between `Array.fill(<value>)` and `Array.map{|v| <value>}` if your value is an empty Array. The first one creates an Array where each element refers to the same new Array (_fill by reference_), whereas the latter creates a new Array for each element in the parent Array - what you usually want.
+|====
+
+=== Day 19
+|====
+
+a|{anoff}
+a| Tests lie! Even if everything is green your code might still be doing the wrong thing.
+a| Regular Expressions are powerful..and more performance efficient than I thought.
+|====
+
