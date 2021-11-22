@@ -3,7 +3,7 @@
 
 https://adventofcode.com[Advent of Code Website]
 
-https://github.com/docToolchain/aoc-2020/[Github Repository]
+https://github.com/docToolchain/aoc-2021/[Github Repository]
 
 WARNING: Spoiler Alert! If you want to solve the aoc problems on your own, do not read any further.
 This repository contains solutions for the problems in several languages.

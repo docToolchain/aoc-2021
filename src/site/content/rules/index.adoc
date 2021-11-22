@@ -31,7 +31,7 @@ Coding together is much more fun and that is what this site and repository is ab
 Share your code and check out the shared code.
 You will notice that there is a lot to learn from other people's solutions!
 
-Don't be shy and follow our inventation to our https://join.slack.com/t/aoc-2020/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[aoc-2020 Slack channel].
+Don't be shy and follow our inventation to our https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[aoc-2021 Slack channel].
 It is the place to hang around, talk about different solutions and language and get help if you are stuck.
 
 ## The Goal of this repository
@@ -43,9 +43,9 @@ It is the place to hang around, talk about different solutions and language and 
 
 ### How do we ensure that all examples run out of the box?
 
-The best solution will be to use https://gitpod.io. Just prefix the URL of your GitHub fork with `https://gitpod.io#` e.g. `https://gitpod.io#https://github.com/rdmueller/aoc-2020` or click the button:
+The best solution will be to use https://gitpod.io. Just prefix the URL of your GitHub fork with `https://gitpod.io#` e.g. `https://gitpod.io#https://github.com/rdmueller/aoc-2021` or click the button:
 
-image:https://gitpod.io/button/open-in-gitpod.svg[link="https://gitpod.io#https://github.com/rdmueller/aoc-2020", title="Open in Gitpod"] [small]#(if you've forked the repository, the button will still open the master)#
+image:https://gitpod.io/button/open-in-gitpod.svg[link="https://gitpod.io#https://github.com/rdmueller/aoc-2021", title="Open in Gitpod"] [small]#(if you've forked the repository, the button will still open the master)#
 
 
 A webbased IDE will open with the repository already cloned in a docker container.
@@ -85,7 +85,7 @@ Then there is one fodler with your github handle which then contains your soluti
 The file structure is quite important, because the build needs it to pick up the day, language and name in order to generate the webpage you currently read.
 The build will also look for the `README.adoc` file in each folder which you can use to document your solution.
 
-Please, take a look at the https://github.com/docToolchain/aoc-2020/tree/master/day00[`day00`] examples.
+Please, take a look at the https://github.com/docToolchain/aoc-2021/tree/master/day00[`day00`] examples.
 Feel free to submit any kind of `hello world` code to `day00` to see what happens.
 
 If you want to build the web page locally, just make sure that you have java installed ( 8 <= version <13 ) and run
@@ -113,7 +113,7 @@ Have fun!
 
 Ralf
 
-PS: if you like adventofcode.com, consider to https://adventofcode.com/2020/support[sponsor Eric Wastl]
+PS: if you like adventofcode.com, consider to https://adventofcode.com/2021/support[sponsor Eric Wastl]
 
 PS PS: you might have noticed the TIL (Today I Learned) section.
 Feel free to add a daily statement about your experience. And if you want to, you can also explore the `src/site/content/news` section and add a blog post!

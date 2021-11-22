@@ -15,7 +15,7 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'aoc-2020'
+rootProject.name = 'aoc-2021'
 
 include 'docToolchain'
 

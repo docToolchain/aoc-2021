@@ -23,7 +23,7 @@ endif::[]
 
 === About me
 
-Nothing here yet. Update your profile at https://github.com/docToolchain/aoc-2020/blob/master/profiles/docToolchain.adoc[/profiles/docToolchain.adoc]
+Nothing here yet. Update your profile at https://github.com/docToolchain/aoc-2021/blob/master/profiles/docToolchain.adoc[/profiles/docToolchain.adoc]
 
 //end::free-form[]
 

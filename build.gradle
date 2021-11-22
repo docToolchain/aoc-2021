@@ -153,7 +153,7 @@ include::${file.canonicalPath-(currentFolder.canonicalPath+'/')}[]
 """
             if (day!="day00") {
                 dayIndex += """
-The riddle for day ${day - "day"} can be found at https://adventofcode.com/2020/day/${(day - "day").replaceAll("^0", "")}.
+The riddle for day ${day - "day"} can be found at https://adventofcode.com/2021/day/${(day - "day").replaceAll("^0", "")}.
 """
             }
             dayIndex += """
@@ -315,7 +315,7 @@ endif::[]
 
 === About me
 
-Nothing here yet. Update your profile at https://github.com/docToolchain/aoc-2020/blob/master/profiles/${coder}.adoc[/profiles/${coder}.adoc] 
+Nothing here yet. Update your profile at https://github.com/docToolchain/aoc-2021/blob/master/profiles/${coder}.adoc[/profiles/${coder}.adoc] 
 
 //end::free-form[]
 

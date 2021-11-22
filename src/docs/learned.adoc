@@ -19,7 +19,7 @@
 
 A collection of everyones daily learnings.
 
-You can add your own content at https://github.com/docToolchain/aoc-2020/blob/master/src/docs/learned.adoc[/src/docs/learned.adoc]
+You can add your own content at https://github.com/docToolchain/aoc-2021/blob/master/src/docs/learned.adoc[/src/docs/learned.adoc]
 
 === Day 00
 

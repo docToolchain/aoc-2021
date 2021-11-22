@@ -1,19 +1,19 @@
-= aoc-2020
+= aoc-2021
 
 WARNING: Spoiler Alert! If you want to solve the aoc problems on your own, do not read any further.
 This repository contains solutions for the problems in several languages.
 
-NOTE: Result can be found on https://aoc-2020.netlify.com/[aoc-2020.netlify.com] powered by netlify.
+NOTE: Result can be found on https://aoc-2021.netlify.com/[aoc-2021.netlify.com] powered by netlify.
 
-In this repository, we will collect the code for the solutions of https://adventofcode.com[adventofcode] for the 2020 event.
+In this repository, we will collect the code for the solutions of https://adventofcode.com[adventofcode] for the 2021 event.
 
-If you want to join the discussions, here is the invitation for our https://join.slack.com/t/aoc-2020/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[slack channel].
+If you want to join the discussions, here is the invitation for our https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[slack channel].
 
-image::https://img.shields.io/badge/Slack-Invitation-orange.svg?style=for-the-badge[link=https://join.slack.com/t/aoc-2020/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg]
+image::https://img.shields.io/badge/Slack-Invitation-orange.svg?style=for-the-badge[link=https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg]
 
-The slack channel itself is https://aoc-2020.slack.com/[aoc-2020]
+The slack channel itself is https://aoc-2021.slack.com/[aoc-2021]
 
-The id of the https://adventofcode.com/2020/leaderboard/private/view/117454[shared leaderboard] is `117454-7d5aa225` .
+The id of the https://adventofcode.com/2021/leaderboard/private/view/117454[shared leaderboard] is `117454-7d5aa225` .
 
 == The Goal of this repository
 
@@ -26,7 +26,7 @@ The id of the https://adventofcode.com/2020/leaderboard/private/view/117454[shar
 
 The best solution will be to use https://gitpod.io. Just prefix the URL with `gitpod.io#` or click the button:
 
-image:https://gitpod.io/button/open-in-gitpod.svg[link="https://gitpod.io#https://github.com/docToolchain/aoc-2020", title="Open in Gitpod"]
+image:https://gitpod.io/button/open-in-gitpod.svg[link="https://gitpod.io#https://github.com/docToolchain/aoc-2021", title="Open in Gitpod"]
 
 
 A webbased IDE will open with the repository already cloned in a docker container.
@@ -66,4 +66,4 @@ It would be great if everybody could explain their solution with a short descrip
 
 == Questions?
 
-=> see you on Slack: https://aoc-2020.slack.com/[aoc-2020]
+=> see you on Slack: https://aoc-2021.slack.com/[aoc-2021]

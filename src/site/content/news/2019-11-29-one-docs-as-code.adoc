@@ -62,7 +62,7 @@ readInput -> input.txt : reads file
 There is no second star.
 -----
 
-and it is rendered https://aoc-2020.netlify.com/generated/coder/doctoolchain/generateddays#_day_00_groovy[on the webpage].
+and it is rendered https://aoc-2021.netlify.com/generated/coder/doctoolchain/generateddays#_day_00_groovy[on the webpage].
 
 == About AsciiDoc
 

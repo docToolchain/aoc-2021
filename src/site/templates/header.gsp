@@ -1,6 +1,6 @@
   <head>
     <meta charset="utf-8"/>
-    <title><%if (content.title) {%>${"Aoc 2020: "+content.title}<% } else { %>AoC 2020<% }%></title>
+    <title><%if (content.title) {%>${"Aoc 2021: "+content.title}<% } else { %>AoC 2021<% }%></title>
     <meta charset="UTF-8">
 <meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
