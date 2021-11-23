@@ -5,7 +5,6 @@
         entries: [
           'Rules': 'rules/',
           'Solutions': 'solutions/',
-          'TIL': 'til/',
 
           'About': 'about/',
         ]

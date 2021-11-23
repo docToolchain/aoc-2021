@@ -9,7 +9,7 @@
           <p>This website is a fan-site for the famous <a href="https://adventofcode.com">Advent of Code 2021</a>.</p>
           <p>You might already have experienced that coding together is more fun. So let's solve the AoC riddles together!</p>
           <p>Feel free to contribute - send a pull request with your solution for each day to <a href="https://github.com/docToolchain/aoc-2021"> our github.com/docToolchain/aoc-2021 repository</a>.</p>
-          <p>Join our <a href="https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg">aoc-2021 slack channel</a> and help or be helped when a solution is not too obvious 😎</p>
+          <p>Join our <a href="https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg">aoc-2021 slack channel</a> and help or be helped when a solution is not too obvious 😎</p>
 
       </div>
     </div>
@@ -44,7 +44,7 @@
                 <a href="https://github.com/docToolchain/aoc-2021"><img src="images/githublogo.png" style="max-width: 70%"/></a>
             </div>
             <div class="col-md-4 text-center">
-                <a href="https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg"><img src="/images/slacklogo.png"  style="max-width: 70%"/></a>
+                <a href="https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg"><img src="/images/slacklogo.png"  style="max-width: 70%"/></a>
             </div>
             <div class="col-md-2">&nbsp;
             </div>

@@ -1,7 +1,7 @@
 
     <div id="footer">
       <div class="container">
-        <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | Baked with JBake ${version}</p>
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake ${version}</p>
       </div>
     </div>
     

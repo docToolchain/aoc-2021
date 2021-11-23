@@ -7,9 +7,9 @@ NOTE: Result can be found on https://aoc-2021.netlify.com/[aoc-2021.netlify.com]
 
 In this repository, we will collect the code for the solutions of https://adventofcode.com[adventofcode] for the 2021 event.
 
-If you want to join the discussions, here is the invitation for our https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[slack channel].
+If you want to join the discussions, here is the invitation for our https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg[slack channel].
 
-image::https://img.shields.io/badge/Slack-Invitation-orange.svg?style=for-the-badge[link=https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg]
+image::https://img.shields.io/badge/Slack-Invitation-orange.svg?style=for-the-badge[link=https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg]
 
 The slack channel itself is https://aoc-2021.slack.com/[aoc-2021]
 

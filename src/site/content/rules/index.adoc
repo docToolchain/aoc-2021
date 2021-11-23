@@ -31,7 +31,7 @@ Coding together is much more fun and that is what this site and repository is ab
 Share your code and check out the shared code.
 You will notice that there is a lot to learn from other people's solutions!
 
-Don't be shy and follow our inventation to our https://join.slack.com/t/aoc-2021/shared_invite/zt-jpb3ukqo-t5amJownVL82CoRrrPNjEg[aoc-2021 Slack channel].
+Don't be shy and follow our invitation to our https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg[aoc-2021 Slack channel].
 It is the place to hang around, talk about different solutions and language and get help if you are stuck.
 
 ## The Goal of this repository
@@ -91,13 +91,15 @@ Feel free to submit any kind of `hello world` code to `day00` to see what happen
 If you want to build the web page locally, just make sure that you have java installed ( 8 <= version <13 ) and run
 
 ```
-./gradlew generateIndex bake bakePreviw
+./gradlew generateIndex
+./dtcw generateSite
+./dtcw previewSite
 ```
 
 to generate the site and start a small webserver.
+It should also be possible to just view the generated site by opening the `build/microsite/output/index.html` file in your browser.
 
 //Contributing
-include::../../../../.github/CONTRIBUTING.md[]
 
 == This is not a Competition
 
@@ -115,5 +117,3 @@ Ralf
 
 PS: if you like adventofcode.com, consider to https://adventofcode.com/2021/support[sponsor Eric Wastl]
 
-PS PS: you might have noticed the TIL (Today I Learned) section.
-Feel free to add a daily statement about your experience. And if you want to, you can also explore the `src/site/content/news` section and add a blog post!
