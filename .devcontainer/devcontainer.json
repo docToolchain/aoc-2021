@@ -1,0 +1,4 @@
+{
+  "build": { "dockerfile" :  "../.gitpod.dockerfile" },
+  "extensions" : ["asciidoctor.asciidoctor-vscode", "hediet.vscode-drawio"]
+}
