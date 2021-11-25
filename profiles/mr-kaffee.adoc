@@ -1,0 +1,20 @@
+
+:mr-kaffee-avatar: https://avatars0.githubusercontent.com/u/73745454?v=4
+:mr-kaffee-realName: Peter Wieland
+
+:icons: font
+
+[cols="1,5"]
+|===
+| image:{mr-kaffee-avatar}[width=100px]
+a| **mr-kaffee** +
+{mr-kaffee-realName} +
+Github: https://github.com/mr-kaffee[mr-kaffee],
+Strava: https://www.strava.com/athletes/89256720[Peter Wieland]
+|===
+
+=== About me
+
+I am a curious amateur coder (lots of Java, MATLAB, recently Rust), I like cycling on and off roads and much more ...
+
+https://www.zusammengegencorona.de/impfen/[Corona sucks - let's stop it!]
