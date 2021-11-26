@@ -1,0 +1,38 @@
+== Day 00: Hello World ==
+
+I am still undecided what language to use this year.
+I'll start with https://www.rust-lang.org/[Rust].
+
+=== General structure ===
+
+Generally, my solutions will contain a `src/main.rs` file which reads inputs, calls the solution functions and measures time
+
+[source,rust,numbered]
+----
+include::src/main.rs[tags=read_input]
+----
+
+[source,rust,numbered]
+----
+include::src/main.rs[tags=main]
+----
+
+The actual solution will be implemented in a `lib.rs` file
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=function]
+----
+
+The `lib.rs` file also contains the tests in a separate submodule.
+I will use this for test-driven development, e.g., based on the examples given in the puzzles.
+
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Run Solutions ===
+
+Run solution with `cargo run` (or `cargo run --release` to see the effect of compiler optimization)
+
+Run tests with `cargo test`
