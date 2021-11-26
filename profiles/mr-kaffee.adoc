@@ -4,6 +4,8 @@
 
 :icons: font
 
+//tag::free-form[]
+
 [cols="1,5"]
 |===
 | image:{mr-kaffee-avatar}[width=100px]
@@ -18,3 +20,5 @@ Strava: https://www.strava.com/athletes/89256720[Peter Wieland]
 I am a curious amateur coder (lots of Java, MATLAB, recently Rust), I like cycling on and off roads and much more ...
 
 https://www.zusammengegencorona.de/impfen/[Corona sucks - let's stop it!]
+
+//end::free-form[]
