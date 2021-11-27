@@ -37,7 +37,7 @@ ENV PATH="/home/vscode/.cargo/bin:${PATH}"
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
     && cargo install wasm-pack cargo-watch
 
-RUN npm install ts-node elm -g 
+RUN npm install -g node-dev ts-node elm 
 
 SHELL ["/bin/bash", "-c"]
 
