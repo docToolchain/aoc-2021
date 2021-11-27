@@ -1,0 +1,9 @@
+== Day 00: Hello World ==
+
+I'll keep it simple this year to fully enjoy solving the puzzles. In my case, this means pure JavaScript hacking fun with no guardrails 😇
+
+=== Run Solutions ===
+
+Run solution with `node solution.js`
+
+Develop solution with `node-dev --respawn solution.js`
