@@ -1,0 +1,19 @@
+== Day 00: Getting started  ==
+
+As in the past years I will get more into kotlin. Here in gitpod solutions will run with kotlin script.
+
+For execution enter _kotlin day2100.kts_ in the command line.
+
+Read the input file is done via a function call:
+
+[source, kotlin, numbered]
+....
+include::day2100.kts[tags=read_input]
+....
+
+Output is printed in main:app-name: 
+
+[source, kotlin, numbered]
+....
+include::day2100.kts[tags=output]
+....
