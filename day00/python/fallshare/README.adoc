@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+I decided to go with python for another year since I did not do much with it since the last AoC.
+Might also have a look at go or rust. We will see :)
+
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
