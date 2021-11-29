@@ -1,0 +1,36 @@
+== Day 00: Hello World ==
+
+Maybe I'll try out some https://www.ruby-lang.org/[Ruby] this year. At least a hello world is done ;)
+
+=== Solution ===
+
+The actual solution resides in `solution.rb`
+
+It will define classes, methods and similar to calculate the solution, e.g., 
+
+[source,ruby,numbered]
+----
+include::solution.rb[tags=say_hello]
+----
+
+And a section to run the actual solution and measure time, like
+
+[source,ruby,numbered]
+----
+include::solution.rb[tags=run]
+----
+
+The part `if __FILE__ == $0` is taken from https://www.ruby-lang.org/en/documentation/quickstart/4/[Ruby in Twenty Minutes]
+
+The solution is executed with `ruby solution.rb`
+
+=== Test ===
+
+To test my code, there will be a `solution_test.rb` file which defines a test class derived from `Test::Unit::TestCase`:
+
+[source,ruby,numbered]
+----
+include::solution_test.rb[tags=test_class]
+----
+
+Tests are executed with `ruby solution_test.rb`
