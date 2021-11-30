@@ -1,0 +1,56 @@
+== Day 00: Hello World ==
+
+Have used https://adventofcode.com/2018/day/2 for first steps on day zero.
+
+=== Tldr; ===
+[source,bash]
+....
+cargo run
+....
+
+=== Installation ===
+
+Open Project in VS Code Devcontainer
+https://code.visualstudio.com/docs/remote/containers
+
+=== Usage ===
+
+src/main.rs
+[source,rust,numbered]
+....
+include::src/main.rs[]
+....
+
+
+==== Build application ====
+[source,bash]
+....
+cargo build
+....
+
+==== Run application ====
+....
+./target/debug/dfrieden_day00
+....
+
+==== Tests ====
+[source,rust,numbered]
+....
+include::src/lib.rs[]
+....
+
+[source,bash]
+....
+cargo build
+....
+
+
+=== Authors and acknowledgment ===
+
+- https://www.rust-lang.org/learn
+- https://gitignore.io
+
+=== License ===
+[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
+
+
