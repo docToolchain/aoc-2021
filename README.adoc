@@ -49,11 +49,11 @@ The structure we start with is the following:
 │   ├── groovy
 │   |   └── rdmueller
 │   |       ├── solution.groovy
-│   |       └── description.adoc
+│   |       └── README.adoc
 │   └── [language]
 │       └── [githubhandle]
 │           ├── solution.[extension]
-│           └── description.adoc
+│           └── README.adoc
 ├── day03
 ├── day04
 ├── ...
@@ -61,8 +61,8 @@ The structure we start with is the following:
 
 == Documentation
 
-As you can see in the above repository structure, each folder contains a `description.adoc`.
-It would be great if everybody could explain their solution with a short description.
+As you can see in the above repository structure, each folder contains a `README.adoc`.
+It would be great if everybody could explain their solution with a short description inside this 'README.adoc'.
 
 == Questions?
 
