@@ -62,7 +62,7 @@ The structure we start with is the following:
 == Documentation
 
 As you can see in the above repository structure, each folder contains a `README.adoc`.
-It would be great if everybody could explain their solution with a short description inside this 'README.adoc'.
+It would be great if everybody could explain their solution with a short description inside this `README.adoc`.
 
 == Questions?
 

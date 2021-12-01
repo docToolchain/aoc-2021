@@ -1,0 +1,34 @@
+==  Day 1: Sonar Sweep  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/2
+
+For execution enter _kotlin day2102_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+Inside function _sonar_sweep_ the puzzle input will be read into a list. Afterwards within a loop each value is compared to it's previous value. If the current value is higher than the previous, the variable _result_ is increased. After finishing the loop, _result_ is returned.
+[source, kotlin, numbered]
+....
+include::day2102_1_2.kts[tags=sonar_sweep]
+....
+
+
+=== Second Star
+
+How does it work: +
+
+Inside function _sonar_sweep_noise_ the puzzle input will be read into a list as in solution for part 1. Afterwards within a loop a variable _prev_sum_ and _curr_sum_ is calculated out of the last and current 3 samples. Both are compared, if the current value is higher than the previous, the variable _result_ is increased. After finishing the loop, _result_ is returned.
+[source, kotlin, numbered]
+....
+include::day2102_1_2.kts[tags=sonar_sweep_noise]
+....
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2102_1_2.kts[tags=output]
+....
