@@ -1,0 +1,50 @@
+== Day1 of Advent of Code
+
+Done with TDD in Groovy.
+
+=== Part 1
+
+First we create a test with an assumption
+
+[source,groovy]
+----
+include::SonarSweepTest.groovy[tags=part1]
+----
+
+Then we create the production code and start here with the method `countIfNextMeasurementIncreased(def list)`
+We iterate over two pairs from the list and compare it with each other. If the second is greater than the first, count it.
+
+[source,groovy]
+----
+include::SonarSweep.groovy[tags=iterate-over-list;count]
+----
+
+After we check that the test succeed, we read the input and pass it to the method.
+
+[source,groovy]
+----
+include::SonarSweep.groovy[tags=collect-data;part1]
+----
+
+=== Part 2
+
+We start with a test and the assumption from the puzzle description.
+
+[source,groovy]
+----
+include::SonarSweepTest.groovy[tags=part2]
+----
+
+Then we start implement the production code. We iterate over the list and create for each iteration two sub lists with each 3 elements. We sum these sub lists each separate and call the count method to compare these sums.
+
+[source,groovy]
+----
+include::SonarSweep.groovy[tags=iterate-over-list-and-create-sub-lists;count]
+----
+
+Finally we pass the input to the method and print the solution.
+
+[source,groovy]
+----
+include::SonarSweep.groovy[tags=collect-data;part2]
+----
