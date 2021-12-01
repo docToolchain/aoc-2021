@@ -1,0 +1,33 @@
+== Day 01: Sonar Sweep ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/1[AoC|2021|01].
+
+=== Part 1 ===
+Parse the input
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+And count how often consecutive inputs increase (test is part of documentation)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=count_increase]
+----
+
+=== Part 2 ===
+
+Create sliding sums over three consecutive numbers (again with test as part of documentation)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sliding_sums]
+----
+
+and use function ``count_increase`` from part 1 again
+
+=== Today I learned ===
+
+The ``zip`` function on iterators is useful.

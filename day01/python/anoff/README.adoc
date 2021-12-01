@@ -1,0 +1,23 @@
+== Day 1: Sonar Sweep
+
+Done with TDD in Python.
+
+=== First Star
+
+Opted to create a function that just creates deltas and then use list concatenation to identify those with positive deltas (increasing).
+
+=== Second Star
+
+Create windowed sum and then feed into function for star 1.
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

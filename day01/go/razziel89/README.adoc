@@ -1,0 +1,31 @@
+== Day 01: Sonar Sweep ==
+
+This is my implementation for the sonar sweep puzzle.
+It is implemented in Golang.
+I will try to start out developing in a modular way, hoping to re-use much of
+one implementation for the next one.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+It will likely be split into several modules over the course of this year's AOC.
+
+[source,go,numbered]
+----
+include::solutio.go[tags=main]
+----
+
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+There are currently no tests.
+I will add them as needed to simplify debugging for more complex puzzles.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution.
