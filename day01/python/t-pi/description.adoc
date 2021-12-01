@@ -1,0 +1,32 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-01: Sonar Sweep
+https://adventofcode.com/2021/day/1
+
+=== Info
+
+Sweep list
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line.
+List compare for *.
+Sliding window compare for **.
+
+=== Learned today
+
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
