@@ -1,0 +1,46 @@
+== Day1 of Advent of Code
+
+Le'ts do the first star in python.
+
+=== Part 1
+
+First, I need to get the input.
+
+[source,python]
+----
+include::solution.py[tags=read_input]
+----
+
+Then iterate over the input and compare each number to the previous one.
+
+Finally, I need to sum up the differences.
+
+[source,python]
+----
+include::solution.py[tags=sum_increasing_numbers]
+----
+
+=== Part 2
+
+Now I switch back to groovy.
+
+First, read the input.
+
+[source,groovy]
+----
+include::solution.groovy[tags=read_input]
+----
+
+Then iterate over the input and create the output of the sliding windows.
+
+[source,groovy]
+----
+include::solution.groovy[tags=sliding_windows]
+----
+
+Now count the steps as in the python part 1.
+
+[source,groovy]
+----
+include::solution.groovy[tags=part1]
+----
