@@ -1,3 +1,5 @@
+import java.io.File
+
 // tag::sonar_sweep[]
 fun sonar_sweep(): Int {
 	
