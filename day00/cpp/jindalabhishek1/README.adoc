@@ -1,0 +1,9 @@
+== Day 00: Hello World ==
+
+I'll keep it simple this year to fully enjoy solving the puzzles. I will try multiple languages to solve the problems. Mostly I will use C++ and Python.
+
+=== Run Solutions ===
+
+Compile the solution with `g++ -o hello hello.cpp`
+
+Run the solution with `./hello`
