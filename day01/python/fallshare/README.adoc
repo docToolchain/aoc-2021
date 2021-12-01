@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+Using Gitpod + VSCode Remote plugin.
+Nice developer experience.
+
+[source, python]
+....
+include::solution.py[]
+....
