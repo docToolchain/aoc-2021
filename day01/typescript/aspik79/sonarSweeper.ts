@@ -46,7 +46,15 @@ export class SonarSweeper {
 
     
     Read() : string[] {
-        const input = fs.readFileSync('day01/typescript/aspik79/input.txt','utf8');
+        let input: string;
+
+        if (fs.existsSync('day01/typescript/aspik79/input.txt')) {
+            input = fs.readFileSync('day01/typescript/aspik79/input.txt','utf8');
+        }
+        else {
+            input = fs.readFileSync('input.txt','utf8');
+        }
+
         return input.split('\r\n')
     }    
 }
