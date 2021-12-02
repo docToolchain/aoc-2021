@@ -6,7 +6,7 @@ fun dive_1(): Int {
 	var depth: Int = 0
 	var horizontal: Int = 0
 	
-	File("day2102_puzzle_input.txt").forEachLine {
+	File("day2103_puzzle_input.txt").forEachLine {
 
 		var instruction = it.split(' ')
 		
@@ -29,7 +29,7 @@ fun dive_2(): Int {
 	var horizontal: Int = 0
 	var aim: Int = 0
 	
-	File("day2102_puzzle_input.txt").forEachLine {
+	File("day2103_puzzle_input.txt").forEachLine {
 
 		var instruction = it.split(' ')
 		
