@@ -36,7 +36,7 @@ func ReadLinesAsInts() ([]int, error) {
 	}
 }
 
-// tag::main[]
+// tag::utils[]
 
 // Sum computes the sum of all values in an int slice. This is a possible reduction function for
 // SlidingWindow.
