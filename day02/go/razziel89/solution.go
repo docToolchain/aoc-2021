@@ -13,7 +13,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot read movement values from stdin due to %v", err.Error())
 	}
-	pos := State{Disp: 0, Depth: 0}
+	pos := State{Disp: 0, Depth: 0, Aim: 0}
 	for _, mov := range movements {
 		pos = pos.Displace(mov)
 	}
