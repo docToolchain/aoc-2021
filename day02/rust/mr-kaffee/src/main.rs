@@ -11,11 +11,11 @@ fn main() {
     let content = &read_input();
     let sol_1 = calc_position(content);
     println!("Solved part 1 in {:?}: {:?}", instant_1.elapsed(), sol_1.0 * sol_1.1);
-    assert_eq!(2120749, sol_1.0 * sol_1.1);
+    assert_eq!(2_120_749, sol_1.0 * sol_1.1);
 
     // solve part 2
     let instant_2 = Instant::now();
     let sol_2 = calc_position_with_aim(content);
     println!("Solved part 2 in {:?}: {:?}", instant_2.elapsed(), sol_2.0 * sol_2.1);
-    assert_eq!(2138382217, sol_2.0 * sol_2.1);
+    assert_eq!(2_138_382_217, sol_2.0 * sol_2.1);
 }
