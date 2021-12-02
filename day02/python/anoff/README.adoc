@@ -11,6 +11,13 @@ Rest was pretty straight forward, three test cases and done.
 
 === Second Star
 
+Managing too many states gets annoying so I decided to introduce a `Submarine` class.
+It has three integer states:
+* aim
+* x (forward position)
+* y (depth position)
+
+Input parsing is the same as before but if `y` value is passed the aim is adjusted, otherwise the sub is moved forward/down.
 
 === Source
 

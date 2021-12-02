@@ -1,13 +1,36 @@
 from typing import List
 
 
+class Submarine:
+    aim: int = 0
+    x: int = 0
+    y: int = 0
+
+    def __init__(self):
+        pass
+
+    def parse_command(self, cmd):
+        (dir, value) = cmd
+        if dir == "y":
+            self.aim += value
+        else:
+            self.move(value)
+
+    def move(self, value):
+        self.x += value
+        self.y += self.aim * value
+
+
 def star1(puzzle_in):
     pos = drive_sub(puzzle_in)
     return pos[0] * pos[1]
 
 
 def star2(puzzle_in):
-    pass
+    s = Submarine()
+    for c in puzzle_in:
+        s.parse_command(c)
+    return s.x * s.y
 
 
 def read_input(filepath):

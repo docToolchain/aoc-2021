@@ -20,3 +20,18 @@ def test_star1():
     cmd = read_input("input_test.txt")
     score = star1(cmd)
     assert score == 150
+
+
+def test_sub():
+    s = Submarine()
+    cmd = read_input("input_test.txt")
+    for c in cmd:
+        s.parse_command(c)
+    assert s.x == 15
+    assert s.y == 60
+
+
+def test_star1():
+    cmd = read_input("input_test.txt")
+    score = star2(cmd)
+    assert score == 900
