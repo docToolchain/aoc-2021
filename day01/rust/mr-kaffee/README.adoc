@@ -31,3 +31,13 @@ and use function ``count_increase`` from part 1 again
 === Today I learned ===
 
 The ``zip`` function on iterators is useful.
+
+Later, looking at other solutions, I felt stupid: Obviously ```a[k] + a[k + 1] + a[k + 2] < a[k + 1] + a[k + 2] + a[k + 3]``` 
+if and only if ```a[k] < a[k + 3]``` and thus there is no need at all to calculate the sliding sums for part 2. 
+
+This is a generic solution with ```offset = 1``` for part 1 and ```offset = 3``` for part 2:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=generic_solution]
+----
