@@ -1,0 +1,9 @@
+Advent of Code 2021
+
+== Python
+Not much to say. Finding proper names for variables is hard.
+
+[source, python]
+....
+include::solution.py[]
+....
