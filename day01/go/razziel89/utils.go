@@ -8,28 +8,6 @@ import (
 	"strings"
 )
 
-// Sum computes the sum of all values in an int slice. This is a possible reduction function for
-// SlidingWindow.
-func Sum(vals []int) int {
-	result := 0
-	for _, val := range vals {
-		result += val
-	}
-	return result
-}
-
-// SlidingWindow converts an int slice into one that results from applying a reduction function to
-// each sliding window of size `size`.
-func SlidingWindow(sli []int, size int, reductionFn func([]int) int) []int {
-	result := make([]int, 0, len(sli)-size+1)
-	for startIdx := range sli[:len(sli)-size+1] {
-		window := sli[startIdx : startIdx+size]
-		windowSum := reductionFn(window)
-		result = append(result, windowSum)
-	}
-	return result
-}
-
 var reader = bufio.NewReader(os.Stdin)
 
 // Function readLine reads one line from stdin via a global reader instance.
@@ -58,6 +36,30 @@ func ReadLinesAsInts() ([]int, error) {
 	}
 }
 
+// tag::main[]
+
+// Sum computes the sum of all values in an int slice. This is a possible reduction function for
+// SlidingWindow.
+func Sum(vals []int) int {
+	result := 0
+	for _, val := range vals {
+		result += val
+	}
+	return result
+}
+
+// SlidingWindow converts an int slice into one that results from applying a reduction function to
+// each sliding window of size `size`.
+func SlidingWindow(sli []int, size int, reductionFn func([]int) int) []int {
+	result := make([]int, 0, len(sli)-size+1)
+	for startIdx := range sli[:len(sli)-size+1] {
+		window := sli[startIdx : startIdx+size]
+		windowSum := reductionFn(window)
+		result = append(result, windowSum)
+	}
+	return result
+}
+
 // CountIncrements counts how often an int in an int slice is larger than its predecessor.
 func CountIncrements(sli []int) int {
 	var increments int
@@ -73,3 +75,5 @@ func CountIncrements(sli []int) int {
 	}
 	return increments
 }
+
+// end::utils[]

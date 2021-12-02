@@ -13,6 +13,8 @@ const (
 	windowEnvVarName  = "WINDOW_SIZE"
 )
 
+// tag::main[]
+
 func main() {
 	windowSize := defaultWindowSize
 	if windowFromEnv, err := strconv.Atoi(os.Getenv(windowEnvVarName)); err == nil {
@@ -30,3 +32,5 @@ func main() {
 	increments := CountIncrements(depthsWithoutNoise)
 	fmt.Printf("Counted %d increments.\n", increments)
 }
+
+// end::main[]

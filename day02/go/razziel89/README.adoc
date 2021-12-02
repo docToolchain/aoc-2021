@@ -1,16 +1,14 @@
-== Day 01: Sonar Sweep ==
+== Day 02: Dive ==
 
-This is my implementation for the sonar sweep puzzle.
-It is implemented in Golang.
-I will try to start out developing in a modular way, hoping to re-use much of
-one implementation for the next one.
+This is my implementation for the second round of the dive puzzle.
 
 === Oveview ===
 
 This solution contains a `solution.go`, which defines the main executable.
 There is also a `utils.go`, which is currently where all helper functions that
 might be re-used later on reside.
-It will likely be split into several modules over the course of this year's AOC.
+There is also a `vec.go`, which contains specifications and manipulation
+for the submarine's movement and positioning.
 
 [source,go,numbered]
 ----
@@ -20,6 +18,11 @@ include::solution.go[tags=main]
 [source,go,numbered]
 ----
 include::utils.go[tags=utils]
+----
+
+[source,go,numbered]
+----
+include::vec.go[tags=vec]
 ----
 
 There are currently no tests.
