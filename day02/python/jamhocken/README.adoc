@@ -1,0 +1,21 @@
+
+Day 2 of year 2021
+https://adventofcode.com/2021/day/2
+
+== What I learned
+
+. Straightforward. :-)
+
+== Approach
+
+. I parse the file and put the command as a string and the value as an int in a list of tuples.
+. For both stars, you go through the list and do what the instructions say to do.
+. Star 2 is then not any more complicated than star 1, just different instructions.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
