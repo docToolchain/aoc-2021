@@ -1,4 +1,4 @@
-== Day 03: Binary Diagnostig ==
+== Day 03: Binary Diagnostic ==
 
 This is my implementation for the second round of the binary diagnostic puzzle.
 
