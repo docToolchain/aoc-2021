@@ -1,0 +1,34 @@
+== Day 03: ___ ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/3[AoC|2021|03].
+
+=== Part 1 ===
+
+As always, first challenge is to parse the input. I decided to read the input into integers. That caused some headaches later on to get the bit ordering correct. After I realized that the line length in the example differs from the line length in the puzzle input, I also return the length from my parse function.
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Part 1 is then solved with the help of a function that counts for every position, how often the bit is set in the input. Another function then calculates epsilon by setting all the bits in the positions where most of the input values have bits set and gamma as the inverse
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+As the puzzle states, part 2 is the trickier one. 
+
+I wrote a filter function to reduce the list of values step by step until only one is left. Whether oxygen or co2 ratings are calculated is controlled with a ```invert``` flag
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
