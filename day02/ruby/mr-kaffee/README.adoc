@@ -1,0 +1,42 @@
+== Day 02: Dive! ==
+
+https://www.ruby-lang.org[Ruby] solution to https://adventofcode.com/2021/day/2[AoC|2021|02].
+
+=== Part 1 ===
+
+Generic function to calculate the position.
+Takes the input string, an initial value and a hash of lambdas updating the position
+
+The function iterates through the lines of the ``input``. Each ``line`` is split in the command part ``cmd`` and the value part ``v`` (single space as separator). The command is used to select a lambda from the ``steps`` hash which is then called with the accumulator ``acc`` and the value ``v`` to udpate the accumulator.
+
+[source,ruby,numbered]
+----
+include::solution.rb[tags=calc_position]
+----
+
+For part 1, this function is called as follows:
+
+[source,ruby,numbered]
+----
+include::solution.rb[tags=calc_position_1]
+----
+
+=== Part 2 === 
+
+For part 2, the aim has to be considered as additional value and the update rules are changed:
+
+[source,ruby,numbered]
+----
+include::solution.rb[tags=calc_position_2]
+----
+
+=== Tests ===
+
+[source,ruby,numbered]
+----
+include::solution_test.rb[tags=test_class]
+----
+
+=== Today I learned ===
+
++...+ that I don't know how to set up VS Code for decent Ruby development :(

@@ -15,7 +15,7 @@ pub fn parse(content: &str) -> Vec<usize> {
 
 //tag::count_increase[]
 /// count how often consecutive numbers increase
-/// 
+///
 /// # Examples
 /// ```
 /// let data: Vec<usize> = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
@@ -47,6 +47,23 @@ pub fn sliding_sums(data: &[usize]) -> Vec<usize> {
         .collect()
 }
 //end::sliding_sums[]
+
+//tag::generic_solution[]
+/// count how often numbers with distance `offset` increase
+///
+/// # Examples
+/// ```
+/// let data: Vec<usize> = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+/// assert_eq!(7, mr_kaffee_2021_01::count_increase_with_offset(&data, 1));
+/// assert_eq!(5, mr_kaffee_2021_01::count_increase_with_offset(&data, 3));
+/// ```
+pub fn count_increase_with_offset(data: &[usize], offset: usize) -> usize {
+    data.iter()
+        .zip(data[offset..].iter())
+        .filter(|(a, b)| b > a)
+        .count()
+}
+//end::generic_solution[]
 
 //tag::tests[]
 #[cfg(test)]

@@ -1,0 +1,27 @@
+== Day 02: Dive! ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/2[AoC|2021|02].
+
+=== Part 1 ===
+
+The most difficult part today was to parse the input. My rust knowledge obviously is slightly rusty...
+
+The solution then is done with a simple fold operation on an iterator accumulating depth (y) and horizontal position (x)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=calc_position]
+----
+
+=== Part 2 ===
+
+The second part was an easy extension to the first part. Just add a third accumulator state for the aim (small trap: my horizontal position is called 'x' which is not the same as the 'X' in the puzzle description)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=calc_position_with_aim]
+----
+
+=== Today I learned ===
+
+Parsing simple inputs does not require regular expressions.

@@ -1,0 +1,34 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-02: Dive!
+https://adventofcode.com/2021/day/2
+
+=== Info
+
+Calculate coordinates
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line.
+Simple tracking of depth and position for *.
+Add aim and the corresponding change for depth calculation for **.
+
+=== Learned today
+
+"Wer lesen kann, ist klar im Vorteil..." 🙄
+(--> Reading helps 😁)
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
