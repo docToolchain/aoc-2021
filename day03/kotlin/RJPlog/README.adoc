@@ -1,19 +1,19 @@
-==  Day 3: xxx  ==
+==  Day 3: Binary Diagnostic  ==
 
 This solution is written in Kotlin.
 
 The original puzzle can be found at https://adventofcode.com/2021/day/3
 
-For execution enter _kotlin day2102_1_2.kts_ in the command line.
+For execution enter _kotlin day2103_1_2.kts_ in the command line.
 
 === First Star
 
 How does it work: +
 
-Inside function _dive_ the puzzle input will be read line by line and split into the instruction part _instruction[0]_ and the value _instruction[1]_. The varibles _depth_ and _horizontal_ are increased or decreased within a if/else instruction according to their instructions. After going through the complete input file _depth_ multiplied by _horizontal_ is returned
+Inside function _diagnostic_power_ the puzzle input will be read line by line and within a loop over all elements of the string a counter for each position will be increased, if the string contains a ´1´ at this position. Afterwards there are strings for gamma and epsilon set up and converted to dezimal integers. The result of the multiplication of gamma and epsilon is returned as solution for part one
 [source, kotlin, numbered]
 ....
-include::day2103_1_2.kts[tags=dive_1]
+include::day2103_1_2.kts[tags=diagnostic_power]
 ....
 
 
@@ -21,10 +21,10 @@ include::day2103_1_2.kts[tags=dive_1]
 
 How does it work: +
 
-Inside function _dive_2_ the puzzle input will be read line by line and split into the instruction part _instruction[0]_ and the value _instruction[1]_. The varibles _depth_, _horizontal_ and _aim_ are increased or decreased within a if/else instruction according to their instructions. After going through the complete input file _depth_ multiplied by _horizontal_ is returned
+Inside function _diagnostic_life_ the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part thw
 [source, kotlin, numbered]
 ....
-include::day2103_1_2.kts[tags=dive_2]
+include::day2103_1_2.kts[tags=diagnostic_life]
 ....
 
 At the end, both solutions are printed out. 
