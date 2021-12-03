@@ -21,7 +21,7 @@ include::day2103_1_2.kts[tags=diagnostic_power]
 
 How does it work: +
 
-Inside function _diagnostic_life_ the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part thw
+Inside function _diagnostic_life_ the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part tho
 [source, kotlin, numbered]
 ....
 include::day2103_1_2.kts[tags=diagnostic_life]
