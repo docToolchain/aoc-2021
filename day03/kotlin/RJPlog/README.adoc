@@ -10,7 +10,7 @@ For execution enter _kotlin day2103_1_2.kts_ in the command line.
 
 How does it work: +
 
-Inside function _diagnostic_power_ the puzzle input will be read line by line and within a loop over all elements of the string a counter for each position will be increased, if the string contains a ´1´ at this position. Afterwards there are strings for gamma and epsilon set up and converted to dezimal integers. The result of the multiplication of gamma and epsilon is returned as solution for part one
+Inside function _diagnostic_power_ the puzzle input will be read line by line and within a loop over all elements of the string a counter for each position will be increased, if the string contains a ´1´ at this position. Afterwards there are strings for gamma and epsilon set up and converted to dezimal integers. The result of the multiplication of gamma and epsilon is returned as solution for part one:
 [source, kotlin, numbered]
 ....
 include::day2103_1_2.kts[tags=diagnostic_power]
@@ -21,7 +21,7 @@ include::day2103_1_2.kts[tags=diagnostic_power]
 
 How does it work: +
 
-Inside function _diagnostic_life_ the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part tho
+Inside function _diagnostic_life_ the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part two:
 [source, kotlin, numbered]
 ....
 include::day2103_1_2.kts[tags=diagnostic_life]
