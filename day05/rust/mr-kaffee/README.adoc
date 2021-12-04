@@ -1,0 +1,19 @@
+== Day 05: ___ ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/5[AoC|2021|05].
+
+=== Part 1 ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[]
+----
+
+[source,rust,numbered]
+----
+include::src/main.rs[]
+----
+
+=== Part 2 ===
+
+=== Today I learned ===
