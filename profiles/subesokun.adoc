@@ -1,0 +1,20 @@
+
+:subesokun-avatar: https://avatars.githubusercontent.com/u/6920421?v=4
+
+:icons: font
+
+//tag::free-form[]
+
+[cols="1,5"]
+|===
+| image:{subesokun-avatar}[width=100px]
+a| **subesokun** +
+Github: https://github.com/subesokun[subesokun],
+|===
+
+=== This year's motto
+
+I'll keep it simple this year to fully enjoy solving the puzzles. In my case, this means vanilla JavaScript hacking fun with no guardrails 😇
+
+//end::free-form[]
+

@@ -1,0 +1,34 @@
+== Day 02: Dive ==
+
+This is my implementation for the second round of the dive puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `vec.go`, which contains specifications and manipulation
+for the submarine's movement and positioning.
+
+[source,go,numbered]
+----
+include::solution.go[tags=main]
+----
+
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+[source,go,numbered]
+----
+include::vec.go[tags=vec]
+----
+
+There are currently no tests.
+I will add them as needed to simplify debugging for more complex puzzles.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution.

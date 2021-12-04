@@ -2,11 +2,13 @@
 import * as fs from 'fs';
 
 export class SonarSweeper {
-    private lines: string[] = [];
+    private lines: string[];
+
+    public constructor(){
+        this.lines = this.Read();
+    }
 
     public RunSilver(){
-        this.lines = this.Read();
-
         let previous: number = 0;
         let count: number = 0;
 
@@ -23,8 +25,6 @@ export class SonarSweeper {
     }
 
     public RunGold(){
-        this.lines = this.Read();
-
         let sumPrevious: number = 0;
         let count: number = 0;
 

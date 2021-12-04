@@ -14,7 +14,7 @@ It will likely be split into several modules over the course of this year's AOC.
 
 [source,go,numbered]
 ----
-include::solutio.go[tags=main]
+include::solution.go[tags=main]
 ----
 
 [source,go,numbered]

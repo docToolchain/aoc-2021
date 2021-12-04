@@ -1,0 +1,18 @@
+== Day 2: Dive!
+
+=== Part 1
+
+just iterate over the input and update coordinates
+
+[source,groovy]
+----
+include::solution.groovy[]
+----
+
+now, slightly change the solution for part 1
+
+[source,groovy]
+----
+include::solution2.groovy[]
+----
+

@@ -1,0 +1,32 @@
+== Day 2: Dive!
+
+Done with TDD in Python.
+
+=== First Star
+
+Decided to immediately translate to 2D coordinates x/y and parse input to tuple representing dimension and value.
+This means y (depth) gets a negative sign if going up.
+
+Rest was pretty straight forward, three test cases and done.
+
+=== Second Star
+
+Managing too many states gets annoying so I decided to introduce a `Submarine` class.
+It has three integer states:
+* aim
+* x (forward position)
+* y (depth position)
+
+Input parsing is the same as before but if `y` value is passed the aim is adjusted, otherwise the sub is moved forward/down.
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

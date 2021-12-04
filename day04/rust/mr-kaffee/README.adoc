@@ -1,0 +1,46 @@
+== Day 04: Giant Squid ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/4[AoC|2021|04].
+
+So let's play Bingo (I don't remember when I last did...)
+
+=== Part 1 & 2 ===
+
+After I solved part 1 today, there was very little to add for part 2, so I just added it for a joint solution for both parts.
+
+I created a ```struct``` for a bingo board with a function to apply draws until a row or a column is complete and a function to sum the numbers not drawn:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=board]
+----
+
+The I created a function which parses the input to a vector of boards and a vector of numbers drawn
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Next, we are ready to play bingo. I play all the boards one by one and then look for the one which wins first and the one which wins last
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=play]
+----
+
+Finally, I calculate the scores for these two boards
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=get_scores]
+----
+
+=== Tests ===
+
+I kind of did TDD ;)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----

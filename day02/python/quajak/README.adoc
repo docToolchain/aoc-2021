@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Straightforward approach for the first and second star.
+
+[source, python]
+....
+include::two.py[]
+....

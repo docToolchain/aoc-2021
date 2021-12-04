@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Straightforward approach for first star. For the second star, I use an inefficent smaller buffer to store the values of the sliding window.
+
+[source, python]
+....
+include::one.py[]
+....

@@ -1,0 +1,51 @@
+== Day 2: Dive!
+
+Navigate never without a test case. Doit with TDD and groovy.
+
+=== Part 1
+
+just create a test that fails for the provided example course
+
+[source,groovy]
+----
+include::NavigationTest.groovy[tags=part1]
+----
+
+iterate over the planned steps and extract speed and direction.
+Update coordinates and return multiplied result of depth and horizontalPosition.
+
+[source,groovy]
+----
+include::Navigation.groovy[tags=courseEnum;part1]
+----
+
+Finally we read the specific input and let navigator do the rest.
+
+[source,groovy]
+----
+include::Navigation.groovy[tags=readInput;part1-solve]
+----
+
+=== Part2
+
+just create a test that fails for the provided example course
+
+[source,groovy]
+----
+include::NavigationTest.groovy[tags=part2]
+----
+
+iterate over the planned steps and extract speed and direction.
+Update coordinates and return multiplied result of depth and horizontalPosition.
+
+[source,groovy]
+----
+include::Navigation.groovy[tags=courseEnum;part2]
+----
+
+Finally we read the specific input and let navigator do the rest.
+
+[source,groovy]
+----
+include::Navigation.groovy[tags=readInput;part2-solve]
+----
