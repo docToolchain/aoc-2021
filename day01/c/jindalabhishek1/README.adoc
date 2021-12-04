@@ -1,0 +1,19 @@
+== Day 01 ==
+
+Implemented in C
+* Learned
+    - How to handle files in C
+
+Pre-requisite: A file `input.txt` with the data in it
+
+== Part 01 ==
+
+Compile the solution with `gcc -o part1 part1.c`
+
+Run the solution with `./part1`
+
+=== Part 02 ===
+
+Compile the solution with `gcc -o part2 part2.c`
+
+Run the solution with `./part2 input.txt`
