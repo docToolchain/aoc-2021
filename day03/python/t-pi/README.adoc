@@ -1,0 +1,37 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-03: Binary Diagnostic 
+https://adventofcode.com/2021/day/3
+
+=== Info
+
+Check health of sub.
+*: Get max_count('0'/'1') and min_count in transposed input list and multiply the two (decimal) numbers
+**: Filter input list from (recalculated) max/min_counts to single element and multiply
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line.
+Transpose list.
+Get most common bit-status per (transposed) position.
+*: Invert binary and multiply
+**: Filter list and iterate
+
+=== Learned today
+
+Took me too long to clear out the algo... 🙄
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

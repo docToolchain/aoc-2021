@@ -1,0 +1,48 @@
+== Day 03: Binary Diagnostic
+
+=== Part1 calculate power consumption rating
+
+Let start creating a test.
+
+[source, groovy]
+----
+include::BinaryDiagnosticTest.groovy[tags=part1]
+----
+
+We iterate over the input and count for each position the bit equals `1`. If the sum is greater than the half over all input lines we set the bit `1` for the gamma rate and `0` fir the epsilon rate. After all positions are processed we can multiply the decimal values for gamma rating and epsilon rating to get the power consumption rating.
+
+[source, groovy]
+----
+include::BinaryDiagnostic.groovy[tags=calculatePowerConsumption]
+----
+
+Run the calculation with our puzzle input.
+
+[source, groovy]
+----
+include::BinaryDiagnostic.groovy[tags=main;part1;!part2]
+----
+
+=== Part2 calculate life support rating
+
+1. The same we start with a test for the example input.
++
+[source, groovy]
+----
+include::BinaryDiagnosticTest.groovy[tags=part2]
+----
+
+2. So for this we have to count the bits on each position multiple times, so we create some help method `countBitsOnPosition`. We define another help method `filterByCriteria` to filter our input list for the criteria (oxygen and co2). The last method `calculateLifeSupportRating` is our main method to start the calculation based on out puzzle input. We call `filterByCriteria` two times with different closures for the filter criteria (oxygen and CO2)
++
+[source, groovy]
+----
+include::BinaryDiagnostic.groovy[tags=calculateLifeSupportRating]
+----
+
+3. Run the calculation with our puzzle input.
++
+[source, groovy]
+----
+include::BinaryDiagnostic.groovy[tags=main;!part1;part2]
+----
+
