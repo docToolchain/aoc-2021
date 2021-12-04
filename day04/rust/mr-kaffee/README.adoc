@@ -8,7 +8,7 @@ So let's play Bingo (I don't remember when I last did...)
 
 After I solved part 1 today, there was very little to add for part 2. Hence, there is only one solution for both parts.
 
-I created a ```struct``` for a bingo board with a function ```new``` to create new boards, ```apply_draws``` to apply draws until a row or a column is complete, and a function ```get_score``` to calculate the final score:
+I created a ``struct`` for a bingo board with a function ``new`` to create new boards, ``apply_draws`` to apply draws until a row or a column is complete, and a function ``get_score`` to calculate the final score:
 
 [source,rust,numbered]
 ----
