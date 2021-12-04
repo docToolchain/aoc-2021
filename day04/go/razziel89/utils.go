@@ -15,7 +15,10 @@ func readLine() (string, error) {
 	return reader.ReadString('\n')
 }
 
+// tag::utils[]
+
 func strSliceToIntSlice(sli []string) ([]int, error) {
+	// I wish Go had a map function...
 	result := make([]int, 0, len(sli))
 	for _, val := range sli {
 		conv, err := strconv.Atoi(val)
@@ -69,7 +72,5 @@ func ReadLinesAsPicksOrBoards() ([]int, []Board, error) {
 		}
 	}
 }
-
-// tag::utils[]
 
 // end::utils[]

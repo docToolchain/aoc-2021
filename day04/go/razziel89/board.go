@@ -6,12 +6,22 @@ import (
 
 // tag::board[]
 
+// Code in this file likely performs quite a few unnecessary copy operations on data. Performance
+// doesn't matter much here, though.
+
 // Field is a field of a bingo board.
 type Field struct {
 	val    int
 	marked bool
 }
 
+// Board is a bingo board.
+type Board struct {
+	fields [][]Field
+	last   int
+}
+
+// Convert an int slice into a field slice, initialising all fields as unmarked.
 func fieldsFromInts(ints []int) []Field {
 	fields := make([]Field, 0, len(ints))
 	for _, val := range ints {
@@ -24,6 +34,8 @@ func fieldsFromInts(ints []int) []Field {
 	return fields
 }
 
+// Determine whether a set of fields is a winning set, i.e. whether all fields in the set (actually
+// a slice) are marked.
 func winningSet(fields []Field) bool {
 	for _, f := range fields {
 		if !f.marked {
@@ -33,13 +45,8 @@ func winningSet(fields []Field) bool {
 	return true
 }
 
-// Board is a bingo board.
-type Board struct {
-	fields [][]Field
-	last   int
-}
-
-// IsComplete determines whether a board has as many rows as cols.
+// IsComplete determines whether a board has as many rows as cols. Such a board is complete since
+// bingo boards are square.
 func (b Board) IsComplete() bool {
 	if len(b.fields) == 0 {
 		return false
@@ -132,12 +139,13 @@ func (b Board) Score() int {
 	return -1
 }
 
-// Pretty makes a pretty string representation for this board.
+// Pretty makes a pretty string representation for this board. A marked field is followed by the
+// letter "X". An unmarked field is represented by its number alone followed by a space.
 func (b Board) Pretty() string {
 	// Hard-code formatting helper strings.
-	pre := " "
-	post := " "
-	sep := " "
+	pre := "> "
+	post := " <"
+	sep := " | "
 	marker := "X"
 	clear := " "
 	formatter := "%-4s"
@@ -145,7 +153,7 @@ func (b Board) Pretty() string {
 	result := ""
 	for _, row := range b.fields {
 		result += pre
-		for _, field := range row {
+		for colIdx, field := range row {
 			fieldRep := fmt.Sprintf("%d", field.val)
 			if field.marked {
 				fieldRep += marker
@@ -153,10 +161,12 @@ func (b Board) Pretty() string {
 				fieldRep += clear
 			}
 			fieldRep = fmt.Sprintf(formatter, fieldRep)
-			result += sep + fieldRep
+			if colIdx > 0 {
+				result += sep
+			}
+			result += fieldRep
 		}
-		result += post
-		result += "\n"
+		result += post + "\n"
 	}
 	return result
 }

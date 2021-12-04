@@ -22,6 +22,8 @@ func findFirstWinner(picks []int, boards []Board) (Board, error) {
 
 //nolint: funlen
 func main() {
+	// -1 means no score assigned yet.
+	firstWinningScore, lastWinningScore := -1, -1
 	// Read input.
 	picks, boards, err := ReadLinesAsPicksOrBoards()
 	if err != nil {
@@ -38,7 +40,13 @@ func main() {
 				return
 			}
 		}
-		fmt.Printf("Next winner follows, winning score is %d\n", winner.Score())
+		score := winner.Score()
+		if firstWinningScore < 0 {
+			firstWinningScore = score
+		} else {
+			lastWinningScore = score
+		}
+		fmt.Printf("Next winner follows, winning score is %d\n", score)
 		fmt.Println(winner.Pretty())
 		// Remove all winners, find next winner, and repeat.
 		newBoards := make([]Board, 0, len(boards))
@@ -49,7 +57,10 @@ func main() {
 		}
 		boards = newBoards
 	}
-	fmt.Println("All done")
+	fmt.Printf(
+		"All done, first (last) winning score is %d (%d).\n",
+		firstWinningScore, lastWinningScore,
+	)
 }
 
 // end::solution[]
