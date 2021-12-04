@@ -8,6 +8,18 @@ import (
 
 // tag::solution[]
 
+func findWinner(picks []int, boards []Board) (Board, error) {
+	for _, pick := range picks {
+		for boardIdx := range boards {
+			board := &boards[boardIdx]
+			if board.Mark(pick) && board.Score() > 0 {
+				return *board, nil
+			}
+		}
+	}
+	return Board{}, fmt.Errorf("no winner found")
+}
+
 //nolint: funlen
 func main() {
 	// Read input.
@@ -15,22 +27,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot read in: %s", err.Error())
 	}
-	var winner Board
-	for _, pick := range picks {
-		for _, board := range boards {
-			fmt.Println(board.Pretty())
-			if board.Mark(pick) && board.Score() > 0 {
-				winner = board
-			}
-		}
-		fmt.Println()
+	winner, err := findWinner(picks, boards)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
-	if score := winner.Score(); score > 0 {
-		fmt.Printf("Winner follows, winning score is %d\n", score)
-		fmt.Println(winner.Pretty())
-	} else {
-		log.Fatal("no winner found")
-	}
+	fmt.Printf("Winner follows, winning score is %d\n", winner.Score())
+	fmt.Println(winner.Pretty())
 }
 
 // end::solution[]

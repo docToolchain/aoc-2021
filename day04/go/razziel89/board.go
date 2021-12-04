@@ -91,10 +91,12 @@ func (b Board) Col(idx int) []Field {
 // Mark marks a number and returns whether the board had the number. All occurrences are marked.
 func (b *Board) Mark(num int) bool {
 	found := false
-	for _, row := range b.fields {
-		for _, field := range row {
+	for rowIdx := range b.fields {
+		for fieldIdx := range b.fields {
+			field := &b.fields[rowIdx][fieldIdx]
 			if field.val == num {
 				field.marked = true
+				found = true
 			}
 		}
 	}
