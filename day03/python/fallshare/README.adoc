@@ -1,0 +1,9 @@
+Advent of Code 2021
+
+== Python
+Groundhog day. Pass by value vs. pass by reference.
+
+[source, python]
+....
+include::solution.py[]
+....
