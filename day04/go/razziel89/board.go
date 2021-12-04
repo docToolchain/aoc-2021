@@ -121,7 +121,7 @@ func (b Board) Sum(marked bool) int {
 }
 
 // Score determines whether this is a winning board by returning the score. A non-winning board has
-// score zero.
+// -1 score. That way, we can distinguish winning with a zero from non-winning boards.
 func (b Board) Score() int {
 	for idx := 0; idx < len(b.fields); idx++ {
 		if winningSet(b.Row(idx)) || winningSet(b.Col(idx)) {
@@ -129,7 +129,7 @@ func (b Board) Score() int {
 			return score
 		}
 	}
-	return 0
+	return -1
 }
 
 // Pretty makes a pretty string representation for this board.
