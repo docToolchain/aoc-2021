@@ -1,0 +1,40 @@
+== Day 3: Binary Diagnostic
+
+TIP: Find the full puzzle https://adventofcode.com/2021/day/3
+
+=== Problem Star 1
+[quote]
+....
+The score of the winning board can now be calculated. Start by finding the sum of all unmarked numbers on that board; in this case, the sum is 188. Then, multiply that sum by the number that was just called when the board won, 24, to get the final score, 188 * 24 = 4512.
+
+To guarantee victory against the giant squid, figure out which board will win first. What will your final score be if you choose that board?
+....
+=== Test
+[source,rust,numbered]
+....
+include::src/lib.rs[tag=testdata]
+....
+==== Testcase
+[source,rust,numbered]
+....
+include::src/lib.rs[tag=test1]
+....
+
+=== Solution
+[source,rust,numbered]
+....
+include::src/util.rs[tag=play-game-until-first-bingo]
+....
+
+=== Problem Star 2
+[quote]
+....
+Figure out which board will win last. Once it wins, what would its final score be?
+....
+
+For this we need to adjust the algorithm just a little bit.
+=== Solution
+[source,rust,numbered]
+....
+include::src/util.rs[tag=all-boards-ready]
+....
