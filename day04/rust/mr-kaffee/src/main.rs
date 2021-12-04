@@ -9,7 +9,7 @@ fn main() {
     // solve part 1 & 2
     let instant_1 = Instant::now();
     let (mut boards, draws) = parse(&read_input());
-    let (sol_1, sol_2) = get_scores(&mut boards, &draws);
+    let (sol_1, sol_2) = play(&mut boards, &draws);
     println!(
         "Solved part 1 & 2 in {:?}: {:?} / {:?}",
         instant_1.elapsed(),
