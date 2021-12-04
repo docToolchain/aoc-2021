@@ -1,4 +1,4 @@
-== Day 03: ___ ==
+== Day 03: Binary Diagnostic ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/3[AoC|2021|03].
 
@@ -20,7 +20,7 @@ include::src/lib.rs[tags=part1]
 
 As the puzzle states, part 2 is the trickier one. 
 
-I wrote a filter function to reduce the list of values step by step until only one is left. Whether oxygen or co2 ratings are calculated is controlled with a ```invert``` flag
+I wrote a filter function to reduce the list of values step by step until only one is left. Whether oxygen or co2 ratings are calculated is controlled with a ```invert``` flag. The filter function uses a new ``count_ones`` function that only counts the specific bit we are interested in
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=part2]
