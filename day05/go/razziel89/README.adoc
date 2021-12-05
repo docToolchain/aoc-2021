@@ -33,4 +33,6 @@ There are currently no tests.
 === How to run ===
 
 Assuming the required input is in a file `input.dat`, you only need to execute
-`cat input.dat | go run .` to run the solution.
+`cat input.dat | go run .` to run the solution for part 2.
+You can run the solution for part 1 using `cat input.dat | PART=1 go run .` or
+in general by setting the environment variable `PART` to `1`.

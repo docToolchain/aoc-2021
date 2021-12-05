@@ -15,7 +15,13 @@ func readLine() (string, error) {
 	return reader.ReadString('\n')
 }
 
-// tag::utils[]
+func trimStrings(sli []string) []string {
+	result := make([]string, 0, len(sli))
+	for _, val := range sli {
+		result = append(result, strings.TrimSpace(val))
+	}
+	return result
+}
 
 func strSliceToIntSlice(sli []string) ([]int, error) {
 	// I wish Go had a map function...
@@ -30,46 +36,26 @@ func strSliceToIntSlice(sli []string) ([]int, error) {
 	return result, nil
 }
 
-const pickSep = ","
+// tag::utils[]
 
-// ReadLinesAsPicksOrBoards reads all lines from stdin as picks or boards.
-func ReadLinesAsPicksOrBoards() ([]int, []Board, error) {
-	var picks []int
-	var boards []Board
-	var board Board
+// ReadLinesAsLines reads all lines from stdin as Line structs.
+func ReadLinesAsLines() ([]Line, error) {
+	var result []Line
 	for {
 		line, err := readLine()
 		if err == io.EOF {
 			// Success case, no more input to read.
-			return picks, boards, nil
+			return result, nil
 		}
 		if err != nil {
-			return []int{}, []Board{}, err
+			return []Line{}, err
 		}
 		line = strings.TrimSpace(line)
-		if strings.Contains(line, pickSep) {
-			// This is a line with picks.
-			fields := strings.Split(line, pickSep)
-			newPicks, err := strSliceToIntSlice(fields)
-			if err != nil {
-				return []int{}, []Board{}, err
-			}
-			picks = append(picks, newPicks...)
-		} else {
-			// This is a line with boards.
-			row, err := strSliceToIntSlice(strings.Fields(line))
-			if err != nil {
-				return []int{}, []Board{}, err
-			}
-			err = board.AddRow(row)
-			if err != nil {
-				return []int{}, []Board{}, err
-			}
+		parsed, err := LineFromStr(line)
+		if err != nil {
+			return []Line{}, err
 		}
-		if board.IsComplete() {
-			boards = append(boards, board)
-			board = Board{}
-		}
+		result = append(result, parsed)
 	}
 }
 

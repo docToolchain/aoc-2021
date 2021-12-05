@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"os"
 	"strings"
 )
 
@@ -13,30 +13,14 @@ const (
 	tokensPerLine  = 2
 )
 
-func trimStrings(sli []string) []string {
-	result := make([]string, 0, len(sli))
-	for _, val := range result {
-		result = append(result, strings.TrimSpace(val))
-	}
-	return result
-}
-
-func strSliceToIntSlice(sli []string) ([]int, error) {
-	// I wish Go had a map function...
-	result := make([]int, 0, len(sli))
-	for _, val := range sli {
-		conv, err := strconv.Atoi(val)
-		if err != nil {
-			return []int{}, err
-		}
-		result = append(result, conv)
-	}
-	return result, nil
-}
+var (
+	// Set PART to "1" to select only part 1.
+	partSelect = os.Getenv("PART")
+)
 
 // tag::set[]
 
-// Vec is a 2D vector.
+// Vec is a 2D vector. Most of it has been taken from a previous solution.
 type Vec struct {
 	x, y int
 }
@@ -49,7 +33,7 @@ func VecFromStr(str string) (Vec, error) {
 	}
 	ints, err := strSliceToIntSlice(fields)
 	if err != nil {
-		return Vec{}, fmt.Errorf("cannot parse %v as vector, %v", str, err.Error)
+		return Vec{}, fmt.Errorf("cannot parse %s as vector, %s", str, err.Error())
 	}
 	result := Vec{
 		x: ints[0],
@@ -86,16 +70,39 @@ func (v Vec) Sub(delta Vec) Vec {
 	return v.Add(delta.Inv())
 }
 
+func abs(num int) int {
+	if num < 0 {
+		return -num
+	}
+	return num
+}
+
+func max(i1, i2 int) int {
+	if i1 > i2 {
+		return i1
+	}
+	return i2
+}
+
 // Normalize returns a unit vector with the same direction as the original vector. For now, this
 // does not support diagonals.
 func (v Vec) Normalize() (Vec, error) {
-	if v.y == 0 {
-		return Vec{x: 1}, nil
-	} else if v.x == 0 {
-		return Vec{y: 1}, nil
+	if partSelect == "1" {
+		if v.x != 0 && v.y != 0 {
+			return Vec{}, fmt.Errorf("cannot normalize %v", v)
+		}
 	} else {
-		return Vec{}, fmt.Errorf("cannot normalize %v", v)
+		// Default to part 2.
+		if v.x != 0 && v.y != 0 && abs(v.x) != abs(v.y) {
+			return Vec{}, fmt.Errorf("cannot normalize %v", v)
+		}
 	}
+	length := max(abs(v.x), abs(v.y))
+	norm := Vec{
+		x: v.x / length,
+		y: v.y / length,
+	}
+	return norm, nil
 }
 
 // Line is a line in 2D with a start and an end.
@@ -129,7 +136,8 @@ func (l Line) Points() ([]Vec, error) {
 	result := []Vec{}
 	direction, err := l.end.Sub(l.start).Normalize()
 	if err != nil {
-		return []Vec{}, err
+		// We ignore lines whose direction we cannot determine.
+		return []Vec{}, nil
 	}
 	pos := l.start
 	for pos != l.end {
@@ -140,10 +148,11 @@ func (l Line) Points() ([]Vec, error) {
 	return result, nil
 }
 
-// Grid is a lazily evaluated grid that supports marking points on it.
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
 type Grid map[Vec]int
 
-// Mark makrs a point on the grid once.
+// Mark marks a point on the grid once.
 func (g *Grid) Mark(entry Vec) {
 	// We don't have to handle non-existing values here since Go returns the zero value (0 for
 	// integers) for such entries.
@@ -163,7 +172,7 @@ func (g *Grid) RemoveAll(entry Vec) {
 // FilterFn is a type that can be used for FilterCounts to filter counts that fulfil a predicate.
 type FilterFn = func(int) bool
 
-// FilterCounts allow to filter counts using a FilterFn.
+// FilterCounts allow to filter points based counts using a FilterFn.
 func (g *Grid) FilterCounts(filterFn FilterFn) []Vec {
 	result := []Vec{}
 	for point, count := range *g {
