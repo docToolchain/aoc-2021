@@ -51,7 +51,25 @@
           height: 60px; /* fixed header height*/
           margin: -60px 0 0; /* negative fixed header height */
       }
+      .navbar {
+          background-image: url(${config.site_contextPath}images/treeback.png);
+          background-size: contain;
+          background-repeat: repeat-x;
+          border-bottom: 0;
+          padding-bottom: 20px;
+          background-color: transparent;
+          box-shadow: none;
+      }
+      html {
+          background: url(${config.site_contextPath}images/snowback.png) no-repeat center center fixed;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size: cover;
+      }
+
       </style>
+<!-- ${config.site_contextPath} -->
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
