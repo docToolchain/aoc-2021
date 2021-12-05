@@ -67,11 +67,6 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/jindalabhishek1/generatedDays.html</loc>
-    	<lastmod>2021-12-05</lastmod>
-    </url>
-
-    <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/mr-kaffee/generatedDays.html</loc>
     	<lastmod>2021-12-05</lastmod>
     </url>
@@ -83,6 +78,11 @@
 
     <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/docToolchain/generatedDays.html</loc>
+    	<lastmod>2021-12-05</lastmod>
+    </url>
+
+    <url>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/jindalabhishek1/generatedDays.html</loc>
     	<lastmod>2021-12-05</lastmod>
     </url>
 
