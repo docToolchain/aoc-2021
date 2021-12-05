@@ -20,7 +20,7 @@ include::src/lib.rs[tags=bbox]
 
 The solution is then build by iterating over all lines and for each line iterating over all points it contains and increment a counter for the coordinate of that point. Then count all coordinates which belong to more than one line (have counter value greater than 1).
 
-To iterate over the points, I calculate deltas ``dx`` and ``dy`` that define the difference int the x and y coordinate from one point to the next. They can be one of 0, 1, or -1. 
+To iterate over the points, I calculate deltas ``dx`` and ``dy`` that define the difference in the x and y coordinate from one point to the next. They can be one of 0, 1, or -1. 
 
 [source,rust,numbered]
 ----
