@@ -1,4 +1,60 @@
-use std::cmp::{self, Ordering};
+use std::{
+    cmp::{self, Ordering},
+    collections::HashMap,
+};
+
+/// to allow using the same code with counts stored in a vector or in a hash map, the interface is modeled as a trait
+pub trait VentsCount {
+    /// increment count at given coordinate
+    fn increment(&mut self, coord: (isize, isize));
+    /// count number of coordinates with count > 1
+    fn count_dangerous(&self) -> usize;
+}
+
+impl VentsCount for HashMap<(isize, isize), usize> {
+    fn increment(&mut self, coord: (isize, isize)) {
+        // get entry, create and initialize with value 0 if not yet present
+        let count = self.entry(coord).or_insert(0);
+        // increment
+        *count += 1;
+    }
+
+    fn count_dangerous(&self) -> usize {
+        self.values().filter(|count| **count > 1).count()
+    }
+}
+
+/// structure to count vents based on a vector
+pub struct VecVentsCount {
+    counts: Vec<usize>,
+    width: isize,
+    x_min: isize,
+    y_min: isize,
+}
+
+impl VecVentsCount {
+    /// create new ``VecVentsCount`` for bounding box
+    pub fn new((x_min, y_min, x_max, y_max): (isize, isize, isize, isize)) -> Self {
+        let width = x_max - x_min;
+        let counts = vec![0usize; (width * (y_max - y_min)) as usize];
+        VecVentsCount {
+            counts,
+            width,
+            x_min,
+            y_min,
+        }
+    }
+}
+
+impl VentsCount for VecVentsCount {
+    fn increment(&mut self, (x, y): (isize, isize)) {
+        self.counts[(x - self.x_min + self.width * (y - self.y_min)) as usize] += 1;
+    }
+
+    fn count_dangerous(&self) -> usize {
+        self.counts.iter().filter(|count| **count > 1).count()
+    }
+}
 
 //tag::parse[]
 /// parse lines ``"x1,y1 -> x2,y2"`` to tuples ``(x1, y1, x2, y2)``
@@ -58,10 +114,11 @@ pub fn get_bbox(lines: &[(isize, isize, isize, isize)]) -> (isize, isize, isize,
 
 //tag::count_overlaps[]
 pub fn count_overlaps(lines: &[(isize, isize, isize, isize)], incl_diagonal: bool) -> usize {
-    let (x_min, y_min, x_max, y_max) = get_bbox(lines);
-
-    let width = x_max - x_min;
-    let mut counts = vec![0usize; (width * (y_max - y_min)) as usize];
+    let mut counts: Box<dyn VentsCount> = if cfg!(feature = "hash_counters") {
+        Box::new(HashMap::new())
+    } else {
+        Box::new(VecVentsCount::new(get_bbox(lines)))
+    };
 
     for (x1, y1, x2, y2) in lines {
         if incl_diagonal || x1 == x2 || y1 == y2 {
@@ -77,12 +134,12 @@ pub fn count_overlaps(lines: &[(isize, isize, isize, isize)], incl_diagonal: boo
             };
             let len = cmp::max((x2 - x1) * dx, (y2 - y1) * dy) + 1;
             for k in 0..len {
-                counts[(x1 + k * dx - x_min + width * (y1 + k * dy - y_min)) as usize] += 1;
+                counts.increment((x1 + k * dx, y1 + k * dy));
             }
         }
     }
 
-    counts.iter().filter(|count| **count > 1).count()
+    counts.count_dangerous()
 }
 //end::count_overlaps[]
 
