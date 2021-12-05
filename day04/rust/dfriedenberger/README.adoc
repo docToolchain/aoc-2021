@@ -1,6 +1,6 @@
-== Day 3: Binary Diagnostic
+== Day 4: Giant Squid
 
-TIP: Find the full puzzle https://adventofcode.com/2021/day/3
+TIP: Find the full puzzle https://adventofcode.com/2021/day/4
 
 === Problem Star 1
 [quote]
