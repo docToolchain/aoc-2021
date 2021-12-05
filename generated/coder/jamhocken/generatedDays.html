@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: jamhocken</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_jamhocken">jamhocken</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_01_python">Day 01: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned">What I learned</a></li>
+<li><a href="#_approach">Approach</a></li>
+<li><a href="#_run_script">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_02_python">Day 02: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_2">What I learned</a></li>
+<li><a href="#_approach_2">Approach</a></li>
+<li><a href="#_run_script_2">Run script</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_jamhocken"><a class="anchor" href="#_jamhocken"></a><a class="link" href="#_jamhocken">jamhocken</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/75045692?v=4" alt="75045692?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>jamhocken</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/jamhocken">jamhocken</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/jamhocken.adoc">/profiles/jamhocken.adoc</a></p>
+</div>
+<a id="day01" />
+</div>
+<div class="sect2">
+<h3 id="_day_01_python"><a class="anchor" href="#_day_01_python"></a><a class="link" href="#_day_01_python">Day 01: python</a></h3>
+<div class="paragraph">
+<p>Day 1 of year 2021
+<a href="https://adventofcode.com/2021/day/1" class="bare">https://adventofcode.com/2021/day/1</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned"><a class="anchor" href="#_what_i_learned"></a><a class="link" href="#_what_i_learned">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I forgot that Python also can do string comparisons. Now, I remember.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach"><a class="anchor" href="#_approach"></a><a class="link" href="#_approach">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>For star 1, I just go through the whole list comparing the values pair-wise.</p>
+</li>
+<li>
+<p>For star 2, I created a list with the 3 value window. And then compared that list pair-wise.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script"><a class="anchor" href="#_run_script"></a><a class="link" href="#_run_script">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [int(line.strip()) for line in file_contents]
+
+    return lines_stripped
+
+def main():
+    with open("input.txt",'r') as depths_file:
+        file_lines = depths_file.readlines()
+
+    depths = process_input(file_lines)
+
+    count = 0
+
+    for i in range(len(depths)-1):
+        if depths[i+1]&gt;depths[i]:
+            count += 1
+
+    print(count)
+
+    window = []
+    for i in range(len(depths)-2):
+        window.append(depths[i]+depths[i+1]+depths[i+2])
+
+    count = 0
+    for i in range(len(window)-1):
+        if window[i+1]&gt;window[i]:
+            count += 1
+
+    print(count)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_python"><a class="anchor" href="#_day_02_python"></a><a class="link" href="#_day_02_python">Day 02: python</a></h3>
+<div class="paragraph">
+<p>Day 2 of year 2021
+<a href="https://adventofcode.com/2021/day/2" class="bare">https://adventofcode.com/2021/day/2</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_2"><a class="anchor" href="#_what_i_learned_2"></a><a class="link" href="#_what_i_learned_2">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Straightforward. :-)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_2"><a class="anchor" href="#_approach_2"></a><a class="link" href="#_approach_2">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and put the command as a string and the value as an int in a list of tuples.</p>
+</li>
+<li>
+<p>For both stars, you go through the list and do what the instructions say to do.</p>
+</li>
+<li>
+<p>Star 2 is then not any more complicated than star 1, just different instructions.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_2"><a class="anchor" href="#_run_script_2"></a><a class="link" href="#_run_script_2">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    lines_split = []
+    for lines in lines_stripped:
+        line = lines.split()
+        lines_split.append((line[0], int(line[1])))
+
+    return lines_split
+
+def main():
+    with open("input.txt",'r') as course_file:
+        course_lines = course_file.readlines()
+
+    course = process_input(course_lines)
+
+    horizontal = 0
+    depth = 0
+
+    for directions in course:
+        if directions[0] == 'forward':
+            horizontal += directions[1]
+        elif directions[0] == 'up':
+            depth -= directions[1]
+        else:
+            depth += directions[1]
+
+    print(horizontal, depth, depth*horizontal)
+
+    horizontal = 0
+    aim = 0
+    depth = 0
+
+    for directions in course:
+        if directions[0] == 'forward':
+            horizontal += directions[1]
+            depth += aim*directions[1]
+        elif directions[0] == 'up':
+            aim -= directions[1]
+        else:
+            aim += directions[1]
+
+    print(horizontal, depth, depth*horizontal)
+
+main()</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: ONE: Docs-as-Code</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/asciidoctor.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/prettify.css" rel="stylesheet">
+      <link href="../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<div class="page-header">
+		<h1>ONE: Docs-as-Code</h1>
+<div>Tags:
+    
+    <span><a href="/tags/asciidoc.html">asciidoc</a></span>
+
+    
+    <span><a href="/tags/docs-as-code.html">docs-as-code</a></span>
+
+    
+
+</div>
+	</div>
+
+	<p><em>29 November 2019</em></p>
+
+	<p><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>Docs-as-Code</em> is the approach where you treat your documentation as code which means you store it along with your code and you "compile" it from a plain text format to HTML.</p>
+</div>
+<div class="paragraph">
+<p>Within this repository, you can give this approach a try.
+Whenever you store a <code>README.adoc</code> along with your code, the build will pick it up and render it on the website.</p>
+</div>
+<div class="paragraph">
+<p>To give it a try on your local machine, just execute</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>./gradlew  generateIndex bake bakePreview</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the build will generate the website and start a server for you.
+You can also get a powerful preview of your docs if you install the AsciiDoc plugin for your favourite Editor or IDE.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example">Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As an example, the <code>README.adoc</code> for the JavaScript "Hello World" example created by <code>docToolchain</code> looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">/day00/groovy/docToolchain/README.adoc</div>
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-aciidoc" data-lang="aciidoc">== Hello World
+
+This solution is written in Groovy.
+
+I will use my helper to read the input from a file:
+
+[source, groovy, numbered]
+....
+include::solution.groovy[tags=helper]
+....
+
+=== First Star
+
+The solutions shall print out a greeting.
+I will wrap this in a simple `helloWorld` method.
+
+[source, groovy, numbered]
+....
+include::solution.groovy[tags=starOne,!starTwo]
+....
+
+&lt;1&gt; this is where I call the helper method to read my input
+
+[plantuml]
+----
+file input.txt
+component readInput
+component helloWorld
+helloWorld -&gt; readInput : calls
+readInput -&gt; input.txt : reads file
+----
+
+=== Second Star
+
+There is no second star.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and it is rendered <a href="https://aoc-2021.netlify.com/generated/coder/doctoolchain/generateddays#_day_00_groovy">on the webpage</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_about_asciidoc">About AsciiDoc</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>.adoc</code> format is just plain text but quite powerful.
+Here are some examples:</p>
+</div>
+<div class="sect2">
+<h3 id="_headlines">Headlines</h3>
+<div class="paragraph">
+<p>Just add some <code>=</code> in front of your line to get a headline</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="literal"><pre>== Level 1
+=== Level 2
+==== Level 3</pre></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="sect1">
+<h2 id="_level_1">Level 1</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_level_2">Level 2</h3>
+<div class="sect3">
+<h4 id="_level_3">Level 3</h4>
+
+</div>
+</div>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_basic_formatting">Basic Formatting</h3>
+<div class="paragraph">
+<p>There are several text formatting styles available.
+Here are three examples:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="literal"><pre>This is *bold*, _kursive_, `monospaced`</pre></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>This is <strong>bold</strong>, <em>kursive</em>, <code>monospaced</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_include_source">Include Source</h3>
+<div class="paragraph">
+<p>You don&#8217;t have to copy &amp; paste your source to your docs, just reference them:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="literal"><pre>[source, groovy, numbered]
+----
+Unresolved directive in &lt;stdin&gt; - include::helloWorld.groovy[]
+----</pre></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">println "*"*20
+println "Hello World".center(20)
+println "*"*20</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_diagrams">Diagrams</h3>
+<div class="paragraph">
+<p>And you even have <a href="https://plantuml.com/">plantUML</a> at hand - a powerful library which converts text into diagrams:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="literal"><pre>[plantuml]
+----
+[a] -&gt; [b]
+[b] -&gt; [c]
+[c] -&gt; [a]
+----</pre></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="imageblock">
+<div class="content">
+<img src="diag-0ced7fda6d113cb233f3e4a124e91d49.png" alt="diag 0ced7fda6d113cb233f3e4a124e91d49" width="170" height="90">
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You can read more about AsciiDoc in the the <a href="https://asciidoctor.org/docs/user-manual/">AsciiDoc User Manual</a> and more about the Docs-as-Code approach at <a href="https://docs-as-co.de" class="bare">https://docs-as-co.de</a></p>
+</div>
+<div class="paragraph">
+<p>Now try to document your solution with your own <code>README.adoc</code>!</p>
+</div>
+</div>
+</div>
+</div></p>
+
+</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

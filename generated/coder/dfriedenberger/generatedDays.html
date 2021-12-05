@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: dfriedenberger</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_dfriedenberger">dfriedenberger</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_00_rust">Day 00: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_00_hello_world">Day 00: Hello World</a>
+<ul class="sectlevel4">
+<li><a href="#_tldr">Tldr;</a></li>
+<li><a href="#_installation">Installation</a></li>
+<li><a href="#_usage">Usage</a></li>
+<li><a href="#_authors_and_acknowledgment">Authors and acknowledgment</a></li>
+<li><a href="#_license">License</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_01_rust">Day 01: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_one">Problem One</a></li>
+<li><a href="#_solution">Solution</a></li>
+<li><a href="#_test">Test</a></li>
+<li><a href="#_problem_two">Problem Two</a></li>
+<li><a href="#_solution_2">Solution</a></li>
+<li><a href="#_test_2">Test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_rust">Day 02: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_2_dive">Day 2: Dive!</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1">Problem Star 1</a></li>
+<li><a href="#_solution_3">Solution</a></li>
+<li><a href="#_test_3">Test</a></li>
+<li><a href="#_solution_4">Solution</a></li>
+<li><a href="#_problem_two_2">Problem Two</a></li>
+<li><a href="#_solution_5">Solution</a></li>
+<li><a href="#_test_4">Test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_rust">Day 03: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_2">Problem Star 1</a></li>
+<li><a href="#_test_5">Test</a></li>
+<li><a href="#_solution_6">Solution</a></li>
+<li><a href="#_result">Result</a></li>
+<li><a href="#_problem_star_2">Problem Star 2</a></li>
+<li><a href="#_test_6">Test</a></li>
+<li><a href="#_solution_7">Solution</a></li>
+<li><a href="#_result_2">Result</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_rust">Day 04: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_giant_squid">Day 4: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_3">Problem Star 1</a></li>
+<li><a href="#_test_7">Test</a></li>
+<li><a href="#_solution_8">Solution</a></li>
+<li><a href="#_problem_star_2_2">Problem Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_rust">Day 05: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_4">Problem Star 1</a></li>
+<li><a href="#_test_8">Test</a></li>
+<li><a href="#_solution_9">Solution</a></li>
+<li><a href="#_problem_star_2_3">Problem Star 2</a></li>
+<li><a href="#_solution_10">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_dfriedenberger"><a class="anchor" href="#_dfriedenberger"></a><a class="link" href="#_dfriedenberger">dfriedenberger</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>dfriedenberger</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/dfriedenberger">dfriedenberger</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/dfriedenberger.adoc">/profiles/dfriedenberger.adoc</a></p>
+</div>
+<a id="day00" />
+</div>
+<div class="sect2">
+<h3 id="_day_00_rust"><a class="anchor" href="#_day_00_rust"></a><a class="link" href="#_day_00_rust">Day 00: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_00_hello_world"><a class="anchor" href="#_day_00_hello_world"></a><a class="link" href="#_day_00_hello_world">Day 00: Hello World</a></h4>
+<div class="paragraph">
+<p>Have used <a href="https://adventofcode.com/2018/day/2" class="bare">https://adventofcode.com/2018/day/2</a> for first steps on day zero.</p>
+</div>
+<div class="sect4">
+<h5 id="_tldr"><a class="anchor" href="#_tldr"></a><a class="link" href="#_tldr">Tldr;</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">cargo run</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_installation"><a class="anchor" href="#_installation"></a><a class="link" href="#_installation">Installation</a></h5>
+<div class="paragraph">
+<p>Open Project in VS Code Devcontainer
+<a href="https://code.visualstudio.com/docs/remote/containers" class="bare">https://code.visualstudio.com/docs/remote/containers</a></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_usage"><a class="anchor" href="#_usage"></a><a class="link" href="#_usage">Usage</a></h5>
+<div class="paragraph">
+<p>src/main.rs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">use std::fs::File;
+use std::io::{self,BufRead};
+use std::path::Path;
+
+use dfrieden_day00::parser::Parser;
+
+fn main() {
+
+    let path = Path::new("input.txt");
+    let display = path.display();
+
+    // Open the path in read-only mode, returns `io::Result&lt;File&gt;`
+    let file = match File::open(&amp;path) {
+        Err(why) =&gt; panic!("couldn't open {}: {}", display, why),
+        Ok(file) =&gt; file,
+    };
+
+    let lines = io::BufReader::new(file).lines();
+
+    let p = Parser {};
+
+    let mut two = 0;
+    let mut three = 0;
+
+    for line in lines {
+        match line {
+            Err(why) =&gt; panic!("couldn't read line: {}", why),
+            Ok(l) =&gt; {
+                let (a,b) = p.parse(&amp;l);
+                two += a;
+                three += b;
+            }
+        }
+    };
+    println!("{}",two * three);
+
+}</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_build_application"><a class="anchor" href="#_build_application"></a><a class="link" href="#_build_application">Build application</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">cargo build</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_run_application"><a class="anchor" href="#_run_application"></a><a class="link" href="#_run_application">Run application</a></h6>
+<div class="literalblock">
+<div class="content">
+<pre>./target/debug/dfrieden_day00</pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_tests"><a class="anchor" href="#_tests"></a><a class="link" href="#_tests">Tests</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub mod parser;
+
+
+#[cfg(test)]
+mod tests {
+
+    use crate::parser::Parser;
+
+    #[test]
+    fn it_works() {
+        let p = Parser {};
+        assert_eq!(p.parse("abcdef"), (0,0));
+        assert_eq!(p.parse("bababc"), (1,1));
+        assert_eq!(p.parse("abbcde"), (1,0));
+        assert_eq!(p.parse("abcccd"), (0,1));
+        assert_eq!(p.parse("aabcdd"), (1,0));
+        assert_eq!(p.parse("abcdee"), (1,0));
+        assert_eq!(p.parse("ababab"), (0,1));
+
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">cargo build</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_authors_and_acknowledgment"><a class="anchor" href="#_authors_and_acknowledgment"></a><a class="link" href="#_authors_and_acknowledgment">Authors and acknowledgment</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.rust-lang.org/learn" class="bare">https://www.rust-lang.org/learn</a></p>
+</li>
+<li>
+<p><a href="https://gitignore.io" class="bare">https://gitignore.io</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_license"><a class="anchor" href="#_license"></a><a class="link" href="#_license">License</a></h5>
+<div class="paragraph">
+<p>[GNU GPLv3](<a href="https://choosealicense.com/licenses/gpl-3.0/" class="bare">https://choosealicense.com/licenses/gpl-3.0/</a>)</p>
+</div>
+<a id="day01" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_01_rust"><a class="anchor" href="#_day_01_rust"></a><a class="link" href="#_day_01_rust">Day 01: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_1_sonar_sweep"><a class="anchor" href="#_day_1_sonar_sweep"></a><a class="link" href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/1" class="bare">https://adventofcode.com/2021/day/1</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_one"><a class="anchor" href="#_problem_one"></a><a class="link" href="#_problem_one">Problem One</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>As the submarine drops below the surface of the ocean, it automatically performs a sonar sweep of the nearby sea floor. On a small screen, the sonar sweep report (your puzzle input) appears: each line is a measurement of the sea floor depth as the sweep looks further and further away from the submarine.
+
+For example, suppose you had the following report:</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            199,
+            200,
+            208,
+            210,
+            200,
+            207,
+            240,
+            269,
+            260,
+            263
+        ];</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>This report indicates that, scanning outward from the submarine, the sonar sweep found depths of 199, 200, 208, 210, and so on.
+
+The first order of business is to figure out how quickly the depth increases, just so you know what you're dealing with - you never know if the keys will get carried into deeper water by an ocean current or a fish or something.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution"><a class="anchor" href="#_solution"></a><a class="link" href="#_solution">Solution</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>To do this, count the number of times a depth measurement increases from the previous measurement. (There is no measurement before the first measurement.)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn calculate_increases(data : &amp;Vec&lt;i32&gt;) -&gt; std::io::Result&lt;i32&gt;
+{
+    let mut sum = 0;
+    let l = data.len();
+    for ix in 1..l {
+        if data[ix] &gt; data[ix-1] { sum+= 1; }
+    }
+    return Ok(sum);
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test"><a class="anchor" href="#_test"></a><a class="link" href="#_test">Test</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>In the example above, the changes are as follows:</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">199 (N/A - no previous measurement)
+200 (increased)
+208 (increased)
+210 (increased)
+200 (decreased)
+207 (increased)
+240 (increased)
+269 (increased)
+260 (decreased)
+263 (increased)</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>In this example, there are 7 measurements that are larger than the previous measurement.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        assert_eq!(calculate_increases(&amp;vec1).unwrap(), 7);</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>How many measurements are larger than the previous measurement?</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data = read_file("input.txt").unwrap();
+    println!("star1 {}",calculate_increases(&amp;data).unwrap());</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_two"><a class="anchor" href="#_problem_two"></a><a class="link" href="#_problem_two">Problem Two</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Considering every single measurement isn't as useful as you expected: there's just too much noise in the data.
+
+Instead, consider sums of a three-measurement sliding window.
+
+Again considering the above example:</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">199  A
+200  A B
+208  A B C
+210    B C D
+200  E   C D
+207  E F   D
+240  E F G
+269    F G H
+260      G H
+263        H</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Start by comparing the first and second three-measurement windows. The measurements in the first window are marked A (199, 200, 208); their sum is 199 + 200 + 208 = 607. The second window is marked B (200, 208, 210); its sum is 618. The sum of measurements in the second window is larger than the sum of the first, so this first comparison increased.</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Start by comparing the first and second three-measurement windows. The measurements in the first window are marked A (199, 200, 208); their sum is 199 + 200 + 208 = 607. The second window is marked B (200, 208, 210); its sum is 618. The sum of measurements in the second window is larger than the sum of the first, so this first comparison increased.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_2"><a class="anchor" href="#_solution_2"></a><a class="link" href="#_solution_2">Solution</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Your goal now is to count the number of times the sum of measurements in this sliding window increases from the previous sum. So, compare A with B, then compare B with C, then C with D, and so on. Stop when there aren't enough measurements left to create a new three-measurement sum.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn calculate_window(data : &amp;Vec&lt;i32&gt;) -&gt;  std::io::Result&lt;Vec&lt;i32&gt;&gt;
+{
+    let l = data.len();
+    let mut data2 = Vec::new();
+    for ix in 2..l {
+        let window = data[ix] + data[ix-1] + data[ix-2];
+        data2.push(window)
+    }
+    return Ok(data2);
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_2"><a class="anchor" href="#_test_2"></a><a class="link" href="#_test_2">Test</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>In the above example, the sum of each three-measurement window is as follows:</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">A: 607 (N/A - no previous sum)
+B: 618 (increased)
+C: 618 (no change)
+D: 617 (decreased)
+E: 647 (increased)
+F: 716 (increased)
+G: 769 (increased)
+H: 792 (increased)</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>In this example, there are 5 sums that are larger than the previous sum.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec2 = calculate_window(&amp;vec1).unwrap();
+        assert_eq!(calculate_increases(&amp;vec2).unwrap(), 5);</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Consider sums of a three-measurement sliding window. How many sums are larger than the previous sum?</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data2 = calculate_window(&amp;data).unwrap();
+    println!("star2 {}",calculate_increases(&amp;data2).unwrap());</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_rust"><a class="anchor" href="#_day_02_rust"></a><a class="link" href="#_day_02_rust">Day 02: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_2_dive"><a class="anchor" href="#_day_2_dive"></a><a class="link" href="#_day_2_dive">Day 2: Dive!</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/2" class="bare">https://adventofcode.com/2021/day/2</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1"><a class="anchor" href="#_problem_star_1"></a><a class="link" href="#_problem_star_1">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Now, you need to figure out how to pilot this thing.
+
+It seems like the submarine can take a series of commands like forward 1, down 2, or up 3:
+
+forward X increases the horizontal position by X units.
+down X increases the depth by X units.
+up X decreases the depth by X units.
+Note that since you're on a submarine, down and up affect your depth, and so they have the opposite result of what you might expect.
+
+The submarine seems to already have a planned course (your puzzle input). You should probably figure out where it's going. For example:</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_3"><a class="anchor" href="#_solution_3"></a><a class="link" href="#_solution_3">Solution</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Calculate the horizontal position and depth you would have after following the planned course.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_3"><a class="anchor" href="#_test_3"></a><a class="link" href="#_test_3">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            String::from("forward 5"),
+            String::from("down 5"),
+            String::from("forward 8"),
+            String::from("up 3"),
+            String::from("down 8"),
+            String::from("forward 2")
+        ];</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Your horizontal position and depth both start at 0. The steps above would then modify them as follows:
+
+forward 5 adds 5 to your horizontal position, a total of 5.
+down 5 adds 5 to your depth, resulting in a value of 5.
+forward 8 adds 8 to your horizontal position, a total of 13.
+up 3 decreases your depth by 3, resulting in a value of 2.
+down 8 adds 8 to your depth, resulting in a value of 10.
+forward 2 adds 2 to your horizontal position, a total of 15.
+After following these instructions, you would have a horizontal position of 15 and a depth of 10. (Multiplying these together produces 150.)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let parsed = parse(&amp;vec1).unwrap();
+        let (position,deep) = course(&amp;parsed).unwrap();
+        assert_eq!(position, 15);
+        assert_eq!(deep, 10);
+        assert_eq!(position * deep, 150);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_4"><a class="anchor" href="#_solution_4"></a><a class="link" href="#_solution_4">Solution</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Calculate the horizontal position and depth you would have after following the planned course.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn course(data: &amp;Vec&lt;(String,i32)&gt;) -&gt; std::io::Result&lt;(i32,i32)&gt; {
+
+    let mut deep = 0;
+    let mut position = 0;
+
+    let l = data.len();
+    for i in 0..l {
+
+        let step = data.get(i).unwrap();
+
+        if step.0 == "forward" { position += step.1 }
+        if step.0 == "up" { deep -= step.1; }
+        if step.0 == "down" { deep += step.1; }
+
+    }
+
+    return Ok((position,deep))
+
+}</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>What do you get if you multiply your final horizontal position by your final depth?</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data = read_file("input.txt").unwrap();
+    let parsed = parse(&amp;data).unwrap();
+    let (position,deep) = course(&amp;parsed).unwrap();
+    println!("star 1 {}",position * deep);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_two_2"><a class="anchor" href="#_problem_two_2"></a><a class="link" href="#_problem_two_2">Problem Two</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+
+In addition to horizontal position and depth, you'll also need to track a third value, aim, which also starts at 0. The commands also mean something entirely different than you first thought:
+
+down X increases your aim by X units.
+up X decreases your aim by X units.
+forward X does two things:
+It increases your horizontal position by X units.
+It increases your depth by your aim multiplied by X.
+Again note that since you're on a submarine, down and up do the opposite of what you might expect: "down" means aiming in the positive direction.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_5"><a class="anchor" href="#_solution_5"></a><a class="link" href="#_solution_5">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn course2(data: &amp;Vec&lt;(String,i32)&gt;) -&gt; std::io::Result&lt;(i32,i32)&gt; {
+
+    let mut deep = 0;
+    let mut position = 0;
+    let mut aim = 0;
+
+    let l = data.len();
+    for i in 0..l {
+
+        let step = data.get(i).unwrap();
+
+        if step.0 == "forward" { position += step.1; deep += aim * step.1; }
+        if step.0 == "up" { aim -= step.1; }
+        if step.0 == "down" { aim += step.1; }
+
+    }
+
+    return Ok((position,deep))
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_4"><a class="anchor" href="#_test_4"></a><a class="link" href="#_test_4">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">Now, the above example does something different:
+
+forward 5 adds 5 to your horizontal position, a total of 5. Because your aim is 0, your depth does not change.
+down 5 adds 5 to your aim, resulting in a value of 5.
+forward 8 adds 8 to your horizontal position, a total of 13. Because your aim is 5, your depth increases by 8*5=40.
+up 3 decreases your aim by 3, resulting in a value of 2.
+down 8 adds 8 to your aim, resulting in a value of 10.
+forward 2 adds 2 to your horizontal position, a total of 15. Because your aim is 10, your depth increases by 2*10=20 to a total of 60.
+After following these new instructions, you would have a horizontal position of 15 and a depth of 60. (Multiplying these produces 900.)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         let (position,deep) = course2(&amp;parsed).unwrap();
+         assert_eq!(position, 15);
+         assert_eq!(deep, 60);
+         assert_eq!(position * deep, 900);</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let (position,deep) = course2(&amp;parsed).unwrap();
+    println!("star 2 {}",position * deep);</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_rust"><a class="anchor" href="#_day_03_rust"></a><a class="link" href="#_day_03_rust">Day 03: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_3_binary_diagnostic"><a class="anchor" href="#_day_3_binary_diagnostic"></a><a class="link" href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/3" class="bare">https://adventofcode.com/2021/day/3</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_2"><a class="anchor" href="#_problem_star_1_2"></a><a class="link" href="#_problem_star_1_2">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>The diagnostic report (your puzzle input) consists of a list of binary numbers which, when decoded properly, can tell you many useful things about the conditions of the submarine. The first parameter to check is the power consumption.
+
+You need to use the binary numbers in the diagnostic report to generate two new binary numbers (called the gamma rate and the epsilon rate). The power consumption can then be found by multiplying the gamma rate by the epsilon rate.
+
+Each bit in the gamma rate can be determined by finding the most common bit in the corresponding position of all numbers in the diagnostic report. For example, given the following diagnostic report:</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_5"><a class="anchor" href="#_test_5"></a><a class="link" href="#_test_5">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            String::from("00100"),
+            String::from("11110"),
+            String::from("10110"),
+            String::from("10111"),
+            String::from("10101"),
+            String::from("01111"),
+            String::from("00111"),
+            String::from("11100"),
+            String::from("10000"),
+            String::from("11001"),
+            String::from("00010"),
+            String::from("01010")
+        ];</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Considering only the first bit of each number, there are five 0 bits and seven 1 bits. Since the most common bit is 1, the first bit of the gamma rate is 1.
+
+The most common second bit of the numbers in the diagnostic report is 0, so the second bit of the gamma rate is 0.
+
+The most common value of the third, fourth, and fifth bits are 1, 1, and 0, respectively, and so the final three bits of the gamma rate are 110.
+
+So, the gamma rate is the binary number 10110, or 22 in decimal.
+The epsilon rate is calculated in a similar way; rather than use the most common bit, the least common bit from each position is used. So, the epsilon rate is 01001, or 9 in decimal. Multiplying the gamma rate (22) by the epsilon rate (9) produces the power consumption, 198.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let bits = count_bits(&amp;vec1).unwrap();
+        let (gamma , epsilon) = power_consumption(&amp;bits,vec1.len()).unwrap();
+        assert_eq!(gamma, 22);
+        assert_eq!(epsilon, 9);
+        assert_eq!(gamma * epsilon, 198);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_6"><a class="anchor" href="#_solution_6"></a><a class="link" href="#_solution_6">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn count_bits(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;Vec&lt;i32&gt;&gt; {
+
+
+    let mut bits = Vec::new();
+
+    let l = data.len();
+    let size = data.get(0).unwrap().len();
+    for _p in 0..size {
+        bits.push(0);
+    }
+
+
+    for i in 0..l {
+        let line = data.get(i).unwrap();
+        let b: &amp;[u8] = line.as_bytes();
+        for p in 0..size {
+            let c: char = b[p] as char;
+            match c {
+                '1' =&gt; bits[p] += 1,
+                '0' =&gt; (),
+                _ =&gt; panic!("unknown char {}",c)
+            }
+        }
+
+
+    }
+
+    return Ok(bits)
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn power_consumption(bits: &amp;Vec&lt;i32&gt;,numbers : usize) -&gt; std::io::Result&lt;(i32,i32)&gt; {
+
+    let mut gamma : i32 = 0;
+    let mut epsilon : i32 = 0;
+
+    let l = bits.len();
+
+    for ix in 0..l {
+
+        gamma &lt;&lt;= 1;
+        epsilon &lt;&lt;= 1;
+
+        let cnt1 = *bits.get(ix).unwrap();
+        if cnt1 &gt; ((numbers as i32)/2)
+        {
+            //'1' is the most common bit
+            gamma += 1;
+        }
+        else
+        {
+            //'0' is the most common bit
+            epsilon += 1;
+        }
+
+    }
+
+    Ok((gamma,epsilon))
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_result"><a class="anchor" href="#_result"></a><a class="link" href="#_result">Result</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. What is the power consumption of the submarine? (Be sure to represent your answer in decimal, not binary.)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data = read_file("input.txt").unwrap();
+    let bits = count_bits(&amp;data).unwrap();
+    let (gamma , epsilon) = power_consumption(&amp;bits,data.len()).unwrap();
+    println!("start 1 {}",gamma * epsilon);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2"><a class="anchor" href="#_problem_star_2"></a><a class="link" href="#_problem_star_2">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Next, you should verify the life support rating, which can be determined by multiplying the oxygen generator rating by the CO2 scrubber rating.
+
+Both the oxygen generator rating and the CO2 scrubber rating are values that can be found in your diagnostic report - finding them is the tricky part. Both values are located using a similar process that involves filtering out values until only one remains. Before searching for either rating value, start with the full list of binary numbers from your diagnostic report and consider just the first bit of those numbers. Then:
+
+Keep only numbers selected by the bit criteria for the type of rating value for which you are searching. Discard numbers which do not match the bit criteria.
+If you only have one number left, stop; this is the rating value for which you are searching.
+Otherwise, repeat the process, considering the next bit to the right.
+The bit criteria depends on which type of rating value you want to find:
+
+To find oxygen generator rating, determine the most common value (0 or 1) in the current bit position, and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 1 in the position being considered.
+To find CO2 scrubber rating, determine the least common value (0 or 1) in the current bit position, and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 0 in the position being considered.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_6"><a class="anchor" href="#_test_6"></a><a class="link" href="#_test_6">Test</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>For example, to determine the oxygen generator rating value using the same example diagnostic report from above:
+
+Start with all 12 numbers and consider only the first bit of each number. There are more 1 bits (7) than 0 bits (5), so keep only the 7 numbers with a 1 in the first position: 11110, 10110, 10111, 10101, 11100, 10000, and 11001.
+Then, consider the second bit of the 7 remaining numbers: there are more 0 bits (4) than 1 bits (3), so keep only the 4 numbers with a 0 in the second position: 10110, 10111, 10101, and 10000.
+In the third position, three of the four numbers have a 1, so keep those three: 10110, 10111, and 10101.
+In the fourth position, two of the three numbers have a 1, so keep those two: 10110 and 10111.
+In the fifth position, there are an equal number of 0 bits and 1 bits (one each). So, to find the oxygen generator rating, keep the number with a 1 in that position: 10111.
+As there is only one number left, stop; the oxygen generator rating is 10111, or 23 in decimal.
+Then, to determine the CO2 scrubber rating value from the same example above:
+
+Start again with all 12 numbers and consider only the first bit of each number. There are fewer 0 bits (5) than 1 bits (7), so keep only the 5 numbers with a 0 in the first position: 00100, 01111, 00111, 00010, and 01010.
+Then, consider the second bit of the 5 remaining numbers: there are fewer 1 bits (2) than 0 bits (3), so keep only the 2 numbers with a 1 in the second position: 01111 and 01010.
+In the third position, there are an equal number of 0 bits and 1 bits (one each). So, to find the CO2 scrubber rating, keep the number with a 0 in that position: 01010.
+As there is only one number left, stop; the CO2 scrubber rating is 01010, or 10 in decimal.
+Finally, to find the life support rating, multiply the oxygen generator rating (23) by the CO2 scrubber rating (10) to get 230.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         let (oxygen_generator_rating , co2_scrubber_rating) = filter(&amp;vec1).unwrap();
+         assert_eq!(oxygen_generator_rating, 23);
+         assert_eq!(co2_scrubber_rating, 10);
+         assert_eq!(oxygen_generator_rating * co2_scrubber_rating, 230);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_7"><a class="anchor" href="#_solution_7"></a><a class="link" href="#_solution_7">Solution</a></h5>
+<div class="paragraph">
+<p>For each type of rating value we filter the list until one element is left.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn filter_by_strategy(data: &amp;Vec&lt;String&gt;,filterStrategy : FilterStrategy) -&gt; std::io::Result&lt;i32&gt; {
+
+    let mut ref_data : Vec&lt;String&gt; = data.to_vec();
+    let ll = data.get(0).unwrap().len();
+
+    for p in 0..ll {
+
+        match ref_data.len() {
+            0 =&gt; panic!("something went wrong"),
+            1 =&gt; /* ready */ break,
+            _ =&gt; (),
+        }
+
+        //reduce
+        let bit = count_bit(&amp;ref_data,p,filterStrategy).unwrap();
+        let bl = ref_data.len();
+        ref_data = filter_by_criteria(&amp;ref_data,bit,p).unwrap();
+        let al = ref_data.len();
+
+    }
+
+    if ref_data.len() != 1 {
+        panic!("Something went wrong")
+    }
+
+    let number = convert2number(ref_data.get(0).unwrap()).unwrap();
+
+    return Ok(number);
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_result_2"><a class="anchor" href="#_result_2"></a><a class="link" href="#_result_2">Result</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Use the binary numbers in your diagnostic report to calculate the oxygen generator rating and CO2 scrubber rating, then multiply them together. What is the life support rating of the submarine? (Be sure to represent your answer in decimal, not binary.)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let (oxygen_generator_rating , co2_scrubber_rating) = filter(&amp;data).unwrap();
+    println!("start 2 {}",oxygen_generator_rating * co2_scrubber_rating);</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_rust"><a class="anchor" href="#_day_04_rust"></a><a class="link" href="#_day_04_rust">Day 04: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_4_giant_squid"><a class="anchor" href="#_day_4_giant_squid"></a><a class="link" href="#_day_4_giant_squid">Day 4: Giant Squid</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/4" class="bare">https://adventofcode.com/2021/day/4</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_3"><a class="anchor" href="#_problem_star_1_3"></a><a class="link" href="#_problem_star_1_3">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>The score of the winning board can now be calculated. Start by finding the sum of all unmarked numbers on that board; in this case, the sum is 188. Then, multiply that sum by the number that was just called when the board won, 24, to get the final score, 188 * 24 = 4512.
+
+To guarantee victory against the giant squid, figure out which board will win first. What will your final score be if you choose that board?</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_7"><a class="anchor" href="#_test_7"></a><a class="link" href="#_test_7">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            String::from("7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1"),
+            String::from(""),
+            String::from("22 13 17 11  0"),
+            String::from(" 8  2 23  4 24"),
+            String::from("21  9 14 16  7"),
+            String::from(" 6 10  3 18  5"),
+            String::from(" 1 12 20 15 19"),
+            String::from(""),
+            String::from(" 3 15  0  2 22"),
+            String::from(" 9 18 13 17  5"),
+            String::from("19  8  7 25 23"),
+            String::from("20 11 10 24  4"),
+            String::from("14 21 16 12  6"),
+            String::from(""),
+            String::from("14 21 17 24  4"),
+            String::from("10 16 15  9 19"),
+            String::from("18  8 23 26 20"),
+            String::from("22 11 13  6  5"),
+            String::from(" 2  0 12  3  7"),
+
+        ];</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase"><a class="anchor" href="#_testcase"></a><a class="link" href="#_testcase">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let (unmarked_numbers,called_number) = play_game_util_first_bingo(&amp;numbers,&amp;mut boards).unwrap();
+        assert_eq!(unmarked_numbers,188);
+        assert_eq!(called_number,24);
+        assert_eq!(unmarked_numbers * called_number,4512);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_8"><a class="anchor" href="#_solution_8"></a><a class="link" href="#_solution_8">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn play_game_util_first_bingo(numbers: &amp;Vec&lt;i32&gt;,boards : &amp;mut Vec&lt;Board&gt;) -&gt; std::io::Result&lt;(i32,i32)&gt;
+{
+    for &amp;n in numbers {
+        let l = boards.len();
+        for i in 0..l {
+            boards[i].mark_number(n);
+            if boards[i].has_bingo() {
+                return Ok((boards[i].summarize_unmarked_numbers(),n))
+            }
+        }
+    }
+
+    Err(Error::new(ErrorKind::Other, "oh no!"))
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_2"><a class="anchor" href="#_problem_star_2_2"></a><a class="link" href="#_problem_star_2_2">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Figure out which board will win last. Once it wins, what would its final score be?</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For this we need to adjust the algorithm just a little bit.
+=== Solution</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">            if boards[i].has_bingo() {
+                if all_boards_ready(boards) {
+                    return Ok((boards[i].summarize_unmarked_numbers(),n))
+                }
+            }</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_rust"><a class="anchor" href="#_day_05_rust"></a><a class="link" href="#_day_05_rust">Day 05: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_5_hydrothermal_venture"><a class="anchor" href="#_day_5_hydrothermal_venture"></a><a class="link" href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/5" class="bare">https://adventofcode.com/2021/day/5</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_4"><a class="anchor" href="#_problem_star_1_4"></a><a class="link" href="#_problem_star_1_4">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>You come across a field of hydrothermal vents on the ocean floor! These vents constantly produce large, opaque clouds, so it would be best to avoid them if possible.
+
+They tend to form in lines; the submarine helpfully produces a list of nearby lines of vents (your puzzle input) for you to review. For example:</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_8"><a class="anchor" href="#_test_8"></a><a class="link" href="#_test_8">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            String::from("0,9 -&gt; 5,9"),
+            String::from("8,0 -&gt; 0,8"),
+            String::from("9,4 -&gt; 3,4"),
+            String::from("2,2 -&gt; 2,1"),
+            String::from("7,0 -&gt; 7,4"),
+            String::from("6,4 -&gt; 2,0"),
+            String::from("0,9 -&gt; 2,9"),
+            String::from("3,4 -&gt; 1,4"),
+            String::from("0,0 -&gt; 8,8"),
+            String::from("5,5 -&gt; 8,2")
+        ];</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_2"><a class="anchor" href="#_testcase_2"></a><a class="link" href="#_testcase_2">Testcase</a></h6>
+<div class="literalblock">
+<div class="content">
+<pre>To avoid the most dangerous areas, you need to determine the number of points where at least two lines overlap. In the above example, this is anywhere in the diagram with a 2 or larger - a total of 5 points.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let board = create_game(&amp;vec1,false).unwrap();
+        board.dump(10,10);
+        assert_eq!(board.count_crossing(), 5);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_9"><a class="anchor" href="#_solution_9"></a><a class="link" href="#_solution_9">Solution</a></h5>
+<div class="paragraph">
+<p>The diagram (here it is called Board, because the class was allready created yesterday :-) ) was implemented.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub struct Board {
+    field : HashMap&lt;String, i32&gt;
+}
+
+impl Board {
+    pub fn new() -&gt; Board
+    {
+        Board {
+            field : HashMap::new()
+        }
+    }
+
+    pub fn set(&amp;mut self,x : i32,y : i32)
+    {
+        let key = format!("{},{}", x,y);
+
+        let val = match self.field.get(&amp;key) {
+            Some(cnt) =&gt; *cnt,
+            None =&gt; 0
+        };
+        self.field.insert(key,val+1);
+    }
+
+    pub fn count_crossing(&amp;self) -&gt; i32
+    {
+        let mut sum = 0;
+        for (_key, val) in self.field.iter() {
+            if *val &gt; 1 { sum += 1;}
+        }
+        return sum;
+    }
+
+    pub fn dump(&amp;self,width : usize,height : usize)
+    {
+        for y in 0..height {
+
+            let mut line = String::new();
+            for x in 0..width {
+                let key = format!("{},{}", x,y);
+                let val = match self.field.get(&amp;key) {
+                    Some(cnt) =&gt; format!("{}",*cnt),
+                    None =&gt; ".".to_string()
+                };
+                line.push_str(&amp;val);
+            }
+            println!("{}",line);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, the horizontal and vertical lines were simply drawn on the board. Ohhh. There are also lines that go from bottom to top and from left to right.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">                if x1 &gt; x2 {
+                    let xs = x1;
+                    x1 = x2;
+                    x2 = xs;
+                }
+                if y1 &gt; y2 {
+                    let ys = y1;
+                    y1 = y2;
+                    y2 = ys;
+                }
+                for x in x1..x2+1 {
+                    for y in y1..y2+1 {
+                        board.set(x,y);
+                    }
+                }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_3"><a class="anchor" href="#_problem_star_2_3"></a><a class="link" href="#_problem_star_2_3">Problem Star 2</a></h5>
+<div class="paragraph">
+<p>Same problem and solution, but consider also diagonals.</p>
+</div>
+<div class="sect5">
+<h6 id="_testcase_3"><a class="anchor" href="#_testcase_3"></a><a class="link" href="#_testcase_3">Testcase</a></h6>
+<div class="literalblock">
+<div class="content">
+<pre>You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         let board = create_game(&amp;vec1,true).unwrap();
+         board.dump(10,10);
+         assert_eq!(board.count_crossing(), 12);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_10"><a class="anchor" href="#_solution_10"></a><a class="link" href="#_solution_10">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">                let mut x = x1;
+                let mut y = y1;
+
+                let xo = if x1 &lt; x2 { 1 } else { -1};
+                let yo = if y1 &lt; y2 { 1 } else { -1};
+
+                let cnt = if x1 &lt; x2 { x2 - x1 + 1 } else { x1 - x2 + 1 };
+
+                for _i in 0..cnt {
+                    board.set(x,y);
+                    x += xo;
+                    y += yo;
+                }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

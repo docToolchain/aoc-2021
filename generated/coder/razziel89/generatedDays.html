@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: razziel89</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_razziel89">razziel89</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_01_go">Day 01: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_01_sonar_sweep">Day 01: Sonar Sweep</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview">Oveview</a></li>
+<li><a href="#_how_to_run">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_go">Day 02: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_02_dive">Day 02: Dive</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_2">Oveview</a></li>
+<li><a href="#_how_to_run_2">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_go">Day 03: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_3">Oveview</a></li>
+<li><a href="#_how_to_run_3">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_go">Day 04: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_04_giant_squid">Day 04: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_4">Oveview</a></li>
+<li><a href="#_how_to_run_4">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_go">Day 05: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_05_thermal_vents">Day 05: Thermal Vents</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_5">Oveview</a></li>
+<li><a href="#_how_to_run_5">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_razziel89"><a class="anchor" href="#_razziel89"></a><a class="link" href="#_razziel89">razziel89</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>razziel89</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/razziel89">razziel89</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/razziel89.adoc">/profiles/razziel89.adoc</a></p>
+</div>
+<a id="day01" />
+</div>
+<div class="sect2">
+<h3 id="_day_01_go"><a class="anchor" href="#_day_01_go"></a><a class="link" href="#_day_01_go">Day 01: go</a></h3>
+<div class="sect3">
+<h4 id="_day_01_sonar_sweep"><a class="anchor" href="#_day_01_sonar_sweep"></a><a class="link" href="#_day_01_sonar_sweep">Day 01: Sonar Sweep</a></h4>
+<div class="paragraph">
+<p>This is my implementation for the sonar sweep puzzle.
+It is implemented in Golang.
+I will try to start out developing in a modular way, hoping to re-use much of
+one implementation for the next one.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview"><a class="anchor" href="#_oveview"></a><a class="link" href="#_oveview">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+It will likely be split into several modules over the course of this year&#8217;s AOC.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">func main() {
+	windowSize := defaultWindowSize
+	if windowFromEnv, err := strconv.Atoi(os.Getenv(windowEnvVarName)); err == nil {
+		log.Printf("Using window size %d from env var %s.", windowFromEnv, windowEnvVarName)
+		windowSize = windowFromEnv
+	}
+	depths, err := ReadLinesAsInts()
+	if err != nil {
+		log.Fatalf("cannot read depth values from stdin due to %v", err.Error())
+	}
+	if len(depths) &lt; windowSize {
+		log.Fatalf("cannot process fewer numbers than %d but got %d", windowSize, len(depths))
+	}
+	depthsWithoutNoise := SlidingWindow(depths, windowSize, Sum)
+	increments := CountIncrements(depthsWithoutNoise)
+	fmt.Printf("Counted %d increments.\n", increments)
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Sum computes the sum of all values in an int slice. This is a possible reduction function for
+// SlidingWindow.
+func Sum(vals []int) int {
+	result := 0
+	for _, val := range vals {
+		result += val
+	}
+	return result
+}
+
+// SlidingWindow converts an int slice into one that results from applying a reduction function to
+// each sliding window of size `size`.
+func SlidingWindow(sli []int, size int, reductionFn func([]int) int) []int {
+	result := make([]int, 0, len(sli)-size+1)
+	for startIdx := range sli[:len(sli)-size+1] {
+		window := sli[startIdx : startIdx+size]
+		windowSum := reductionFn(window)
+		result = append(result, windowSum)
+	}
+	return result
+}
+
+// CountIncrements counts how often an int in an int slice is larger than its predecessor.
+func CountIncrements(sli []int) int {
+	var increments int
+	if len(sli) == 0 {
+		return 0
+	}
+	last := sli[0]
+	for _, val := range sli[1:] {
+		if val &gt; last {
+			increments++
+		}
+		last = val
+	}
+	return increments
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.
+I will add them as needed to simplify debugging for more complex puzzles.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run"><a class="anchor" href="#_how_to_run"></a><a class="link" href="#_how_to_run">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_go"><a class="anchor" href="#_day_02_go"></a><a class="link" href="#_day_02_go">Day 02: go</a></h3>
+<div class="sect3">
+<h4 id="_day_02_dive"><a class="anchor" href="#_day_02_dive"></a><a class="link" href="#_day_02_dive">Day 02: Dive</a></h4>
+<div class="paragraph">
+<p>This is my implementation for the second round of the dive puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_2"><a class="anchor" href="#_oveview_2"></a><a class="link" href="#_oveview_2">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>vec.go</code>, which contains specifications and manipulation
+for the submarine&#8217;s movement and positioning.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">func main() {
+	movements, err := ReadLinesAsStates()
+	if err != nil {
+		log.Fatalf("cannot read movement values from stdin due to %v", err.Error())
+	}
+	pos := State{Disp: 0, Depth: 0, Aim: 0}
+	for _, mov := range movements {
+		pos = pos.Displace(mov)
+	}
+	fmt.Printf("Area under total movement is %d\n", pos.Area())
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// TokensInInstruction specifies how many token are needed to describe one movement.
+const TokensInInstruction = 2
+
+// StateFromString converts an instructions string to a movement.
+func StateFromString(str string) (State, error) {
+	splitStr := strings.Fields(str)
+	if len(splitStr) != TokensInInstruction {
+		return State{}, fmt.Errorf("wrong number %d of tokens in '%s'", len(splitStr), str)
+	}
+	unit, ok := Units[splitStr[0]]
+	if !ok {
+		return State{}, fmt.Errorf("cannot understand %s as unit vector name", splitStr[0])
+	}
+	repeats, err := strconv.Atoi(splitStr[1])
+	if err != nil {
+		return State{}, fmt.Errorf("cannot convert repeats in %s to int: %s", str, err.Error())
+	}
+	return unit.Mul(repeats), nil
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// This file contains vector manipulation routines. All of the methods here always return a new
+// vector, they never modify the original.
+
+// DepthT describes the depth. To avoid intermingling depth and displacement, they are separate
+// types.
+type DepthT int
+
+// DispT describes the depth. To avoid intermingling depth and displacement, they are separate
+// types.
+type DispT int
+
+// AimT describes the aim.
+type AimT int
+
+// State describes the subs overall state, i.e. position and aim. It has depth, displacement, and
+// aim.
+type State struct {
+	Depth DepthT
+	Disp  DispT
+	Aim   AimT
+}
+
+// Units contains unit vectors and name assignments.
+var Units = map[string]State{
+	"up": State{
+		Depth: 0,
+		Disp:  0,
+		Aim:   -1,
+	},
+	"down": State{
+		Depth: 0,
+		Disp:  0,
+		Aim:   +1,
+	},
+	"forward": State{
+		// The depth change implicitly depends on the current aim.
+		Depth: +1,
+		Disp:  +1,
+		Aim:   0,
+	},
+}
+
+// Displace Displaces one vector by the distance specified by another. This takes the current aim
+// into account. The new aim does not influence the depth change.
+func (s State) Displace(delta State) State {
+	result := State{
+		Depth: s.Depth + delta.Depth*DepthT(s.Aim),
+		Disp:  s.Disp + delta.Disp,
+		Aim:   s.Aim + delta.Aim,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (s State) Mul(factor int) State {
+	result := State{
+		Depth: DepthT(factor) * s.Depth,
+		Disp:  DispT(factor) * s.Disp,
+		Aim:   AimT(factor) * s.Aim,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (s State) Inv() State {
+	return s.Mul(-1)
+}
+
+// Sub subtracts a vector's data from another one's.
+func (s State) Sub(delta State) State {
+	return s.Displace(delta.Inv())
+}
+
+// Area returns the area spanned by a vector. The aim does not matter for this compuation.
+func (s State) Area() int {
+	return int(s.Depth) * int(s.Disp)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.
+I will add them as needed to simplify debugging for more complex puzzles.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_2"><a class="anchor" href="#_how_to_run_2"></a><a class="link" href="#_how_to_run_2">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_go"><a class="anchor" href="#_day_03_go"></a><a class="link" href="#_day_03_go">Day 03: go</a></h3>
+<div class="sect3">
+<h4 id="_day_03_binary_diagnostic"><a class="anchor" href="#_day_03_binary_diagnostic"></a><a class="link" href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a></h4>
+<div class="paragraph">
+<p>This is my implementation for the second round of the binary diagnostic puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_3"><a class="anchor" href="#_oveview_3"></a><a class="link" href="#_oveview_3">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>set.go</code>, which contains specifications of a string set that
+also knows how often individual entries have been added to it.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	base = 2
+)
+
+func filterForGenerator(sli []string, set CountingSet) []bool {
+	filter := set.MostCommon("1")
+	return FilterBy(sli, filter)
+}
+
+func filterForScrubber(sli []string, set CountingSet) []bool {
+	filter := set.LeastCommon("0")
+	return FilterBy(sli, filter)
+}
+
+// This function fatals if an error is detected.
+func mustConvertBinarySliceToInt(sli []string) int {
+	str := strings.Join(sli, "")
+	return mustConvertBinaryToInt(str)
+}
+
+// This function fatals if an error is detected.
+func mustConvertBinaryToInt(str string) int {
+	val, err := strconv.ParseInt(str, base, 0)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	return int(val)
+}
+
+//nolint: funlen
+func main() {
+	// Read input.
+	binaryNumsAsStrings, err := ReadLines()
+	if err != nil {
+		log.Fatalf("cannot read binary numbers from stdin due to %v", err.Error())
+	}
+	if len(binaryNumsAsStrings) == 0 {
+		log.Fatal("no input provided")
+	}
+	counts, err := CountTokens(binaryNumsAsStrings)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// First part.
+	epsilonSli := make([]string, 0, len(counts))
+	gammaSli := make([]string, 0, len(counts))
+	// Map the least common and most common operators to the obtained counting sets.
+	for _, sli := range counts {
+		// Epsilon
+		newEpsilonDigit := sli.LeastCommon("0")
+		epsilonSli = append(epsilonSli, newEpsilonDigit)
+		// Gamma
+		newGammaDigit := sli.MostCommon("1")
+		gammaSli = append(gammaSli, newGammaDigit)
+	}
+	epsilon := mustConvertBinarySliceToInt(epsilonSli)
+	gamma := mustConvertBinarySliceToInt(gammaSli)
+	fmt.Printf("Counts are %v\n", counts)
+	fmt.Printf("Gamma is %v and %d\n", gammaSli, gamma)
+	fmt.Printf("Epsilon is %v and %d\n", epsilonSli, epsilon)
+	fmt.Printf("Product of both numbers is %d\n", epsilon*gamma)
+
+	// Second part. Here comes the fun.
+	generatorRatingStr, err := FilterCounts(binaryNumsAsStrings, filterForGenerator)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	scrubberRatingStr, err := FilterCounts(binaryNumsAsStrings, filterForScrubber)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	generatorRating := mustConvertBinaryToInt(generatorRatingStr)
+	scrubberRating := mustConvertBinaryToInt(scrubberRatingStr)
+	fmt.Printf("Generator rating is %d\n", generatorRating)
+	fmt.Printf("Scrubber rating is %d\n", scrubberRating)
+	fmt.Printf("Product of both ratings is %d\n", generatorRating*scrubberRating)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// CountTokens counts the tokens at each position of each string and returns one CountingSet per
+// position. All strings must be of equal length.
+func CountTokens(input []string) ([]CountingSet, error) {
+	if len(input) == 0 {
+		return []CountingSet{}, fmt.Errorf("empty string slice obtained")
+	}
+	length := len(input[0])
+	for idx, str := range input {
+		if len(str) != length {
+			err := fmt.Errorf("string '%s' of unexpected length at index %d, expected %d got %d",
+				str, idx+1, length, len(str),
+			)
+			return []CountingSet{}, err
+		}
+	}
+	result := make([]CountingSet, length)
+	for idx := range result {
+		result[idx] = make(CountingSet)
+	}
+	for _, str := range input {
+		for idx, char := range str {
+			err := result[idx].Add(string(char))
+			if err != nil {
+				return []CountingSet{}, err
+			}
+		}
+	}
+	return result, nil
+}
+
+// Function sliceByIndex returns a slice of length-one strings that have been taken from the given
+// index of each slice. An error is returned if a string in the slice is too short. This would be
+// very easy in, say, NumPy, but it requires iteration in plain Go.
+func sliceByIndex(sli []string, idx int) ([]string, error) {
+	reqLength := idx + 1
+	result := make([]string, 0, len(sli))
+	for _, str := range sli {
+		if len(str) &lt; reqLength {
+			err := fmt.Errorf(
+				"entry '%s' too short, need at least %d but got %d",
+				str, reqLength, len(str),
+			)
+			return []string{}, err
+		}
+		result = append(result, string(str[idx]))
+	}
+	return result, nil
+}
+
+// FilterFunc is a type needed to filter counts out. Based on values in a counting set, it
+// determines which entries of a string slice to keep. For each value to keep, the resulting boolean
+// array contains true, false otherwise.
+type FilterFunc = func([]string, CountingSet) []bool
+
+// FilterBy contains true in the resulting boolean array for every entry in sli that is equal to
+// filter.
+func FilterBy(sli []string, filter string) []bool {
+	// The initial value of a boolean array is all false. Thus, only set those to true we wish to
+	// keep.
+	result := make([]bool, len(sli))
+	for idx, val := range sli {
+		if val == filter {
+			result[idx] = true
+		}
+	}
+	return result
+}
+
+// FilterCounts filters out inputs that are assigned true by filterFunc until exactly one remains.
+// If none remains at the end, an error is returned.
+func FilterCounts(inputs []string, filterFunc FilterFunc) (string, error) {
+	allGoneErr := fmt.Errorf("everything was filtered out")
+	copied := make([]string, len(inputs))
+	_ = copy(copied, inputs)
+	for idx := 0; len(copied) &gt; 1; idx++ {
+		counts, err := CountTokens(copied)
+		if err != nil {
+			return "", err
+		}
+		if len(counts) &lt; idx+1 {
+			return "", allGoneErr
+		}
+		sliced, err := sliceByIndex(copied, idx)
+		if err != nil {
+			return "", err
+		}
+		filtered := filterFunc(sliced, counts[idx])
+		newCopy := make([]string, 0, len(filtered))
+		for idx, include := range filtered {
+			if include {
+				newCopy = append(newCopy, copied[idx])
+			}
+		}
+		copied = newCopy
+	}
+	if len(copied) == 0 {
+		return "", allGoneErr
+	}
+	return copied[0], nil
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>set.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// CountingSet is a set that also knows how often each element has been added. It does support
+// non-empty strings only.
+type CountingSet map[string]int
+
+// Add adds an entry to the set. The empty string is not supported!
+func (c *CountingSet) Add(entry string) error {
+	if len(entry) == 0 {
+		return fmt.Errorf("empty string not supported in counting set")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*c)[entry] = (*c)[entry] + 1
+	return nil
+}
+
+// Count determines how often an entry has been added to the set.
+func (c *CountingSet) Count(entry string) int {
+	return (*c)[entry]
+}
+
+// RemoveAll removes all counts for a specific key.
+func (c *CountingSet) RemoveAll(entry string) {
+	delete(*c, entry)
+}
+
+// MostCommon determines the most common entry in the set. If the set is empty, this returns the
+// empty string! A non-empty tie breaker will be returned in case there are multiple most common
+// entries. If the tie breaker is empty but there are duplicates, an empty string will be returned.
+func (c *CountingSet) MostCommon(tieBreaker string) string {
+	return c.filter(
+		tieBreaker,
+		func(i1, i2 int) bool {
+			return i1 &gt; i2
+		},
+	)
+}
+
+// LeastCommon determines the least common entry in the set. If the set is empty, this returns the
+// empty string! A non-empty tie breaker will be returned in case there are multiple least common
+// entries. If the tie breaker is empty but there are duplicates, an empty string will be returned.
+func (c *CountingSet) LeastCommon(tieBreaker string) string {
+	return c.filter(
+		tieBreaker,
+		func(i1, i2 int) bool {
+			return i1 &lt; i2
+		},
+	)
+}
+
+type comparisonFunc = func(int, int) bool
+
+func (c *CountingSet) filter(tieBreaker string, cmpFn comparisonFunc) string {
+	var result string
+	var resultCount int
+	foundOne := false
+	for entry, count := range *c {
+		if !foundOne || cmpFn(count, resultCount) {
+			foundOne = true
+			result = entry
+			resultCount = count
+		}
+	}
+	// Check whether there are any duplicate findings and handle appropriately.
+	for entry, count := range *c {
+		if count == resultCount &amp;&amp; entry != result {
+			return tieBreaker
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_3"><a class="anchor" href="#_how_to_run_3"></a><a class="link" href="#_how_to_run_3">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_go"><a class="anchor" href="#_day_04_go"></a><a class="link" href="#_day_04_go">Day 04: go</a></h3>
+<div class="sect3">
+<h4 id="_day_04_giant_squid"><a class="anchor" href="#_day_04_giant_squid"></a><a class="link" href="#_day_04_giant_squid">Day 04: Giant Squid</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the giant squid puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_4"><a class="anchor" href="#_oveview_4"></a><a class="link" href="#_oveview_4">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>board.go</code>, which contains specifications of a bingo board.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">func findFirstWinner(picks []int, boards []Board) (Board, error) {
+	for _, pick := range picks {
+		for boardIdx := range boards {
+			board := &amp;boards[boardIdx]
+			if board.Mark(pick) &amp;&amp; board.Score() &gt;= 0 {
+				return *board, nil
+			}
+		}
+	}
+	return Board{}, fmt.Errorf("no winner found")
+}
+
+//nolint: funlen
+func main() {
+	// -1 means no score assigned yet.
+	firstWinningScore, lastWinningScore := -1, -1
+	// Read input.
+	picks, boards, err := ReadLinesAsPicksOrBoards()
+	if err != nil {
+		log.Fatalf("cannot read in: %s", err.Error())
+	}
+	// Both parts.
+	for len(boards) &gt; 0 {
+		winner, err := findFirstWinner(picks, boards)
+		if err != nil {
+			if len(boards) &gt; 0 {
+				log.Fatal(err.Error())
+			} else {
+				fmt.Println("All done")
+				return
+			}
+		}
+		score := winner.Score()
+		if firstWinningScore &lt; 0 {
+			firstWinningScore = score
+		} else {
+			lastWinningScore = score
+		}
+		fmt.Printf("Next winner follows, winning score is %d\n", score)
+		fmt.Println(winner.Pretty())
+		// Remove all winners, find next winner, and repeat.
+		newBoards := make([]Board, 0, len(boards))
+		for _, board := range boards {
+			if board.Score() &lt; 0 {
+				newBoards = append(newBoards, board)
+			}
+		}
+		boards = newBoards
+	}
+	fmt.Printf(
+		"All done, first (last) winning score is %d (%d).\n",
+		firstWinningScore, lastWinningScore,
+	)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">func strSliceToIntSlice(sli []string) ([]int, error) {
+	// I wish Go had a map function...
+	result := make([]int, 0, len(sli))
+	for _, val := range sli {
+		conv, err := strconv.Atoi(val)
+		if err != nil {
+			return []int{}, err
+		}
+		result = append(result, conv)
+	}
+	return result, nil
+}
+
+const pickSep = ","
+
+// ReadLinesAsPicksOrBoards reads all lines from stdin as picks or boards.
+func ReadLinesAsPicksOrBoards() ([]int, []Board, error) {
+	var picks []int
+	var boards []Board
+	var board Board
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return picks, boards, nil
+		}
+		if err != nil {
+			return []int{}, []Board{}, err
+		}
+		line = strings.TrimSpace(line)
+		if strings.Contains(line, pickSep) {
+			// This is a line with picks.
+			fields := strings.Split(line, pickSep)
+			newPicks, err := strSliceToIntSlice(fields)
+			if err != nil {
+				return []int{}, []Board{}, err
+			}
+			picks = append(picks, newPicks...)
+		} else {
+			// This is a line with boards.
+			row, err := strSliceToIntSlice(strings.Fields(line))
+			if err != nil {
+				return []int{}, []Board{}, err
+			}
+			err = board.AddRow(row)
+			if err != nil {
+				return []int{}, []Board{}, err
+			}
+		}
+		if board.IsComplete() {
+			boards = append(boards, board)
+			board = Board{}
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>board.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Code in this file likely performs quite a few unnecessary copy operations on data. Performance
+// doesn't matter much here, though.
+
+// Field is a field of a bingo board.
+type Field struct {
+	val    int
+	marked bool
+}
+
+// Board is a bingo board.
+type Board struct {
+	fields [][]Field
+	last   int
+}
+
+// Convert an int slice into a field slice, initialising all fields as unmarked.
+func fieldsFromInts(ints []int) []Field {
+	fields := make([]Field, 0, len(ints))
+	for _, val := range ints {
+		newField := Field{
+			val:    val,
+			marked: false,
+		}
+		fields = append(fields, newField)
+	}
+	return fields
+}
+
+// Determine whether a set of fields is a winning set, i.e. whether all fields in the set (actually
+// a slice) are marked.
+func winningSet(fields []Field) bool {
+	for _, f := range fields {
+		if !f.marked {
+			return false
+		}
+	}
+	return true
+}
+
+// IsComplete determines whether a board has as many rows as cols. Such a board is complete since
+// bingo boards are square.
+func (b Board) IsComplete() bool {
+	if len(b.fields) == 0 {
+		return false
+	}
+	// A square board is considered complete.
+	return len(b.fields) == len(b.fields[0])
+}
+
+// AddRow adds a row to a board.
+func (b *Board) AddRow(input []int) error {
+	if len(input) == 0 {
+		// Ignore empty lines as a convenience feature.
+		return nil
+	}
+	if len(b.fields) &gt; 0 &amp;&amp; len(input) != len(b.fields[0]) {
+		return fmt.Errorf("cannot process row of length %d, require %d", len(input), len(b.fields))
+	}
+	fields := fieldsFromInts(input)
+	b.fields = append(b.fields, fields)
+	return nil
+}
+
+// Row gets the row with the specified index. If the index is out of range, an empty slice is
+// returned.
+func (b Board) Row(idx int) []Field {
+	if idx &lt; 0 || idx+1 &gt; len(b.fields) {
+		return []Field{}
+	}
+	// This is easy.
+	result := make([]Field, len(b.fields))
+	_ = copy(result, b.fields[idx])
+	return result
+}
+
+// Col gets the column with the specified index. If the index is out of range, an empty slice is
+// returned.
+func (b Board) Col(idx int) []Field {
+	if idx &lt; 0 || idx+1 &gt; len(b.fields) {
+		return []Field{}
+	}
+	// This is less easy.
+	result := make([]Field, 0, len(b.fields))
+	for _, row := range b.fields {
+		result = append(result, row[idx])
+	}
+	return result
+}
+
+// Mark marks a number and returns whether the board had the number. All occurrences are marked.
+func (b *Board) Mark(num int) bool {
+	found := false
+	for rowIdx := range b.fields {
+		for fieldIdx := range b.fields {
+			field := &amp;b.fields[rowIdx][fieldIdx]
+			if field.val == num {
+				field.marked = true
+				found = true
+			}
+		}
+	}
+	if found {
+		b.last = num
+	}
+	return found
+}
+
+// Sum sums up all numbers. The value of `marked` determines whether marked or unmarked unes are
+// summed up.
+func (b Board) Sum(marked bool) int {
+	sum := 0
+	for _, row := range b.fields {
+		for _, field := range row {
+			if field.marked == marked {
+				sum += field.val
+			}
+		}
+	}
+	return sum
+}
+
+// Score determines whether this is a winning board by returning the score. A non-winning board has
+// -1 score. That way, we can distinguish winning with a zero from non-winning boards.
+func (b Board) Score() int {
+	for idx := 0; idx &lt; len(b.fields); idx++ {
+		if winningSet(b.Row(idx)) || winningSet(b.Col(idx)) {
+			score := b.last * b.Sum(false)
+			return score
+		}
+	}
+	return -1
+}
+
+// Pretty makes a pretty string representation for this board. A marked field is followed by the
+// letter "X". An unmarked field is represented by its number alone followed by a space.
+func (b Board) Pretty() string {
+	// Hard-code formatting helper strings.
+	pre := "&gt; "
+	post := " &lt;"
+	sep := " | "
+	marker := "X"
+	clear := " "
+	formatter := "%-4s"
+	// Actually build the representation.
+	result := ""
+	for _, row := range b.fields {
+		result += pre
+		for colIdx, field := range row {
+			fieldRep := fmt.Sprintf("%d", field.val)
+			if field.marked {
+				fieldRep += marker
+			} else {
+				fieldRep += clear
+			}
+			fieldRep = fmt.Sprintf(formatter, fieldRep)
+			if colIdx &gt; 0 {
+				result += sep
+			}
+			result += fieldRep
+		}
+		result += post + "\n"
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_4"><a class="anchor" href="#_how_to_run_4"></a><a class="link" href="#_how_to_run_4">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_go"><a class="anchor" href="#_day_05_go"></a><a class="link" href="#_day_05_go">Day 05: go</a></h3>
+<div class="sect3">
+<h4 id="_day_05_thermal_vents"><a class="anchor" href="#_day_05_thermal_vents"></a><a class="link" href="#_day_05_thermal_vents">Day 05: Thermal Vents</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the thermal vents puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_5"><a class="anchor" href="#_oveview_5"></a><a class="link" href="#_oveview_5">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>grid.go</code>, which contains specifications of a grid and other
+geometrical functionality.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	dangerThreshold = 2
+)
+
+func filterDanger(num int) bool {
+	return num &gt;= dangerThreshold
+}
+
+//nolint: funlen
+func main() {
+	grid := make(Grid)
+	lines, err := ReadLinesAsLines()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	for _, line := range lines {
+		points, err := line.Points()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		for _, point := range points {
+			grid.Mark(point)
+		}
+	}
+	danger := grid.FilterCounts(filterDanger)
+	fmt.Printf("There are %d dangerous spots.\n", len(danger))
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsLines reads all lines from stdin as Line structs.
+func ReadLinesAsLines() ([]Line, error) {
+	var result []Line
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []Line{}, err
+		}
+		line = strings.TrimSpace(line)
+		parsed, err := LineFromStr(line)
+		if err != nil {
+			return []Line{}, err
+		}
+		result = append(result, parsed)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go"></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_5"><a class="anchor" href="#_how_to_run_5"></a><a class="link" href="#_how_to_run_5">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for part 2.
+You can run the solution for part 1 using <code>cat input.dat | PART=1 go run .</code> or
+in general by setting the environment variable <code>PART</code> to <code>1</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

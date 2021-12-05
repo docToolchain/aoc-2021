@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: anoff</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_anoff">anoff</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_00_python">Day 00: python</a>
+<ul class="sectlevel3">
+<li><a href="#_hello_world">Hello World</a></li>
+</ul>
+</li>
+<li><a href="#_day_01_python">Day 01: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star">First Star</a></li>
+<li><a href="#_second_star">Second Star</a></li>
+<li><a href="#_source">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_python">Day 02: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_2_dive">Day 2: Dive!</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_2">First Star</a></li>
+<li><a href="#_second_star_2">Second Star</a></li>
+<li><a href="#_source_2">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_python">Day 03: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_3">First Star</a></li>
+<li><a href="#_second_star_3">Second Star</a></li>
+<li><a href="#_source_3">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_python">Day 04: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_giant_squid">Day 4: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_4">First Star</a></li>
+<li><a href="#_second_star_4">Second Star</a></li>
+<li><a href="#_source_4">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_python">Day 05: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a>
+<ul class="sectlevel4">
+<li><a href="#_til">TIL</a></li>
+<li><a href="#_first_star_5">First Star</a></li>
+<li><a href="#_second_star_5">Second Star</a></li>
+<li><a href="#_source_5">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_anoff"><a class="anchor" href="#_anoff"></a><a class="link" href="#_anoff">anoff</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>anoff</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/anoff">anoff</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/anoff.adoc">/profiles/anoff.adoc</a></p>
+</div>
+<a id="day00" />
+</div>
+<div class="sect2">
+<h3 id="_day_00_python"><a class="anchor" href="#_day_00_python"></a><a class="link" href="#_day_00_python">Day 00: python</a></h3>
+<div class="sect3">
+<h4 id="_hello_world"><a class="anchor" href="#_hello_world"></a><a class="link" href="#_hello_world">Hello World</a></h4>
+<div class="paragraph">
+<p>This will be the best advented code ever!
+Trying to use test driven development and typed python.</p>
+</div>
+<div class="paragraph">
+<p>Code auto-formatted with black</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">print("hello world")
+
+
+def get_message() -&gt; str:
+    return "hello world"
+
+
+def star_1() -&gt; None:
+    print(get_message())
+
+
+def star_2() -&gt; None:
+    pass
+
+
+if __name__ == "__main__":
+    star_1()
+    star_2()</code></pre>
+</div>
+</div>
+<a id="day01" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_01_python"><a class="anchor" href="#_day_01_python"></a><a class="link" href="#_day_01_python">Day 01: python</a></h3>
+<div class="sect3">
+<h4 id="_day_1_sonar_sweep"><a class="anchor" href="#_day_1_sonar_sweep"></a><a class="link" href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a></h4>
+<div class="paragraph">
+<p>Done with TDD in Python.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star"><a class="anchor" href="#_first_star"></a><a class="link" href="#_first_star">First Star</a></h5>
+<div class="paragraph">
+<p>Opted to create a function that just creates deltas and then use list concatenation to identify those with positive deltas (increasing).</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star"><a class="anchor" href="#_second_star"></a><a class="link" href="#_second_star">Second Star</a></h5>
+<div class="paragraph">
+<p>Create windowed sum and then feed into function for star 1.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source"><a class="anchor" href="#_source"></a><a class="link" href="#_source">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def calc_deltas(numbers) -&gt; list:
+    """Calculate the delta between each point and the next."""
+    deltas = list()
+    for n in range(len(numbers) - 1):
+        d = numbers[n + 1] - numbers[n]
+        deltas.append(d)
+    return deltas
+
+
+def windowed_sum(numbers, window_size=3):
+    sums = list()
+    assert window_size % 2 == 1, "window_size should be an uneven number"
+    for n in range(len(numbers) - window_size + 1):
+        s = sum(numbers[n : n + window_size])
+        sums.append(s)
+    return sums
+
+
+def star1(puzzle_in):
+    deltas = calc_deltas(puzzle_in)
+    return sum([1 for d in deltas if d &gt; 0])
+
+
+def star2(puzzle_in):
+    sums = windowed_sum(puzzle_in)
+    deltas = calc_deltas(sums)
+    return sum([1 for d in deltas if d &gt; 0])
+
+
+def read_input(filepath):
+    numbers = list()
+    with open(filepath, "r") as f:
+        for line in f:
+            numbers.append(int(line))
+    return numbers
+
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    print(f"Result for first star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import calc_deltas, read_input, star1, star2, windowed_sum
+
+
+def test_calc_deltas():
+    assert calc_deltas([0, 4, 2, 6]) == [4, -2, 4]
+
+
+def test_star1():
+    numbers = read_input("input_test.txt")
+    assert star1(numbers) == 7
+
+
+def test_windowed_sum():
+    assert windowed_sum([0, 1, 0, 2, 5, 0, 3]) == [1, 3, 7, 7, 8]
+    numbers = read_input("input_test.txt")
+    assert windowed_sum(numbers) == [607, 618, 618, 617, 647, 716, 769, 792]
+
+
+def test_star2():
+    numbers = read_input("input_test.txt")
+    assert star2(numbers) == 5</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_python"><a class="anchor" href="#_day_02_python"></a><a class="link" href="#_day_02_python">Day 02: python</a></h3>
+<div class="sect3">
+<h4 id="_day_2_dive"><a class="anchor" href="#_day_2_dive"></a><a class="link" href="#_day_2_dive">Day 2: Dive!</a></h4>
+<div class="paragraph">
+<p>Done with TDD in Python.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_2"><a class="anchor" href="#_first_star_2"></a><a class="link" href="#_first_star_2">First Star</a></h5>
+<div class="paragraph">
+<p>Decided to immediately translate to 2D coordinates x/y and parse input to tuple representing dimension and value.
+This means y (depth) gets a negative sign if going up.</p>
+</div>
+<div class="paragraph">
+<p>Rest was pretty straight forward, three test cases and done.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_2"><a class="anchor" href="#_second_star_2"></a><a class="link" href="#_second_star_2">Second Star</a></h5>
+<div class="paragraph">
+<p>Managing too many states gets annoying so I decided to introduce a <code>Submarine</code> class.
+It has three integer states:
+* aim
+* x (forward position)
+* y (depth position)</p>
+</div>
+<div class="paragraph">
+<p>Input parsing is the same as before but if <code>y</code> value is passed the aim is adjusted, otherwise the sub is moved forward/down.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_2"><a class="anchor" href="#_source_2"></a><a class="link" href="#_source_2">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from typing import List
+
+
+class Submarine:
+    aim: int = 0
+    x: int = 0
+    y: int = 0
+
+    def __init__(self):
+        pass
+
+    def parse_command(self, cmd):
+        (dir, value) = cmd
+        if dir == "y":
+            self.aim += value
+        else:
+            self.move(value)
+
+    def move(self, value):
+        self.x += value
+        self.y += self.aim * value
+
+
+def star1(puzzle_in):
+    pos = drive_sub(puzzle_in)
+    return pos[0] * pos[1]
+
+
+def star2(puzzle_in):
+    s = Submarine()
+    for c in puzzle_in:
+        s.parse_command(c)
+    return s.x * s.y
+
+
+def read_input(filepath):
+    """Create input and parse it.
+
+    Returns:
+     (direction, value) tuple where direction = "x" or "y" and value is an integer
+    """
+    commands = list()
+    with open(filepath, "r") as f:
+        for line in f:
+            (dir, value) = line.split(" ")
+            value = int(value)
+            if dir == "forward":
+                commands.append(("x", value))
+            elif dir == "down":
+                commands.append(("y", value))
+            elif dir == "up":
+                commands.append(("y", -value))
+            else:
+                raise ValueError(f"Unknown direction encountered: {dir} in line {line}")
+    return commands
+
+
+def move_sub(command, start_position=(0, 0)):
+    """Move the submarine for one step.
+
+    Args:
+        start_position: tuple of (x, y)
+
+    Returns:
+        position: tuple of (x, y)
+    """
+    (dir, value) = command
+    (x, y) = start_position
+    if dir == "x":
+        x += value
+    else:
+        y += value
+    return (x, y)
+
+
+def drive_sub(command_list: List, start_position=(0, 0)):
+    """Move the sub for multiple steps."""
+    pos = start_position
+    for c in command_list:
+        pos = move_sub(c, pos)
+    return pos
+
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    print(f"Result for first star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import *
+
+
+def test_input_parser():
+    cmd = read_input("input_test.txt")
+    assert cmd[0] == ("x", 5)
+    assert cmd[1] == ("y", 5)
+    assert cmd[3] == ("y", -3)
+
+
+def test_move_sub():
+    cmd = read_input("input_test.txt")
+    pos = (0, 0)
+    for c in cmd:
+        pos = move_sub(c, pos)
+    assert pos == (15, 10)
+
+
+def test_star1():
+    cmd = read_input("input_test.txt")
+    score = star1(cmd)
+    assert score == 150
+
+
+def test_sub():
+    s = Submarine()
+    cmd = read_input("input_test.txt")
+    for c in cmd:
+        s.parse_command(c)
+    assert s.x == 15
+    assert s.y == 60
+
+
+def test_star1():
+    cmd = read_input("input_test.txt")
+    score = star2(cmd)
+    assert score == 900</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_python"><a class="anchor" href="#_day_03_python"></a><a class="link" href="#_day_03_python">Day 03: python</a></h3>
+<div class="sect3">
+<h4 id="_day_3_binary_diagnostic"><a class="anchor" href="#_day_3_binary_diagnostic"></a><a class="link" href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a></h4>
+<div class="paragraph">
+<p>Done without TDD in Python.</p>
+</div>
+<div class="paragraph">
+<p>This time I just tried to be as quick as possible, no clean design, no modularity, no tests just code.</p>
+</div>
+<div class="paragraph">
+<p>Possible speed improvements: use proper debugging setup instead</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_3"><a class="anchor" href="#_first_star_3"></a><a class="link" href="#_first_star_3">First Star</a></h5>
+<div class="paragraph">
+<p>It was clear that we need to step through the input numbers <em>column-wise</em> so I split the inputs already in the preprocessing.
+Disregarding any planning for most / least common I just started typing the code I had in mind to identify the most common number by strongly relying on list concatenation and writing one liners.</p>
+</div>
+<div class="paragraph">
+<p>The main idea is to identify the most common number by just summing up all "1" and "0" per column.
+If the sum of all "1" is greater than the <em>line count / 2</em> it means "1" is more common.</p>
+</div>
+<div class="paragraph">
+<p>Finally just use python to convert the resulting binary number (string) into integer using <code>int(x, 2)</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_3"><a class="anchor" href="#_second_star_3"></a><a class="link" href="#_second_star_3">Second Star</a></h5>
+<div class="paragraph">
+<p>At first I regretted not having a modular code to reuse.
+But it turns out that I did not copy&amp;paste any code from the first star.
+So reuse would have been limited unless having exactly the right function already defined in star1.</p>
+</div>
+<div class="paragraph">
+<p>Even though my head was going <em>this will be recursive</em> I ended up just looping through the list from left-most to right-most digit, adding a condition to stop early in case there is only one entry remaining.</p>
+</div>
+<div class="paragraph">
+<p>For finding the most common digit I used the same approach as described for the first star.
+Then filtered using list concatenation.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_3"><a class="anchor" href="#_source_3"></a><a class="link" href="#_source_3">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star1(puzzle_in):
+    digit_count = len(puzzle_in[0])
+    line_count = len(puzzle_in)
+    # sum up all digits per column
+    sum = [0] * digit_count
+    for digits in puzzle_in:
+        for n in range(digit_count):
+            sum[n] += digits[n]
+    # if "1" is the most common number in one position -&gt; the sum should be &gt; half line count
+    more_than_half = [d &gt;= (line_count / 2) for d in sum]
+    gamma_binary_str = "".join(["1" if d else "0" for d in more_than_half])
+    gamma = int(gamma_binary_str, 2)
+
+    epsilon_binary_str = "".join(["0" if d else "1" for d in more_than_half])
+    epsilon = int(epsilon_binary_str, 2)
+    return epsilon * gamma
+
+
+def star2(puzzle_in):
+    digit_count = len(puzzle_in[0])
+    line_count = len(puzzle_in)
+
+    def filter_by_most_common(lines, position, invert=False):
+        total_sum = sum([l[position] for l in lines])
+        most_common = "1" if total_sum &gt;= (len(lines) / 2) else "0"
+        if invert:
+            most_common = "0" if most_common == "1" else "1"
+        filtered = [l for l in lines if l[position] == int(most_common)]
+        return filtered
+
+    lines = puzzle_in
+    pos = 0
+    while len(lines) &gt; 1 and pos &lt; digit_count:
+        lines = filter_by_most_common(lines, pos)
+        pos += 1
+    oxygen = int("".join([str(d) for d in lines[0]]), 2)
+
+    lines = puzzle_in
+    pos = 0
+    while len(lines) &gt; 1 and pos &lt; digit_count:
+        lines = filter_by_most_common(lines, pos, True)
+        pos += 1
+    co2 = int("".join([str(d) for d in lines[0]]), 2)
+
+    return co2 * oxygen
+
+
+def read_input(filepath):
+    """Create input and parse it."""
+    values = list()
+    with open(filepath, "r") as f:
+        for line in f:
+            digits = list(line.strip())
+            digits = [int(d) for d in digits]
+            values.append(digits)
+    return values
+
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    print(f"Result for first star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">Unresolved directive in ../../../../../../day03/python/anoff/README.adoc - include::solution_test.py[]</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_python"><a class="anchor" href="#_day_04_python"></a><a class="link" href="#_day_04_python">Day 04: python</a></h3>
+<div class="sect3">
+<h4 id="_day_4_giant_squid"><a class="anchor" href="#_day_4_giant_squid"></a><a class="link" href="#_day_4_giant_squid">Day 4: Giant Squid</a></h4>
+<div class="paragraph">
+<p>Done once in a hacky way, took me ~40 minutes to get the right answer.
+Had issues with parsing the input data in the beginning (creating empty boards) and later in second star due to the fact that I did not consider multiple boards winning in one turn.</p>
+</div>
+<div class="paragraph">
+<p>Want to redo it with TDD later.</p>
+</div>
+<div class="paragraph">
+<p>later..
+With TDD it took me same time even though I already had put some thought into it earlier.
+However ~10 minutes were wasted into researching how to do things prettier, aliasing types etc.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_4"><a class="anchor" href="#_first_star_4"></a><a class="link" href="#_first_star_4">First Star</a></h5>
+<div class="paragraph">
+<p>With TDD I first created test cases for the individual functions that will be needed (test case always using the provided example):
+. test my input parser to return numbers and boards in correct number and type converted
+. test <code>play_board</code> function that should always play one board with one number
+. <code>score_board</code> to calculate the score based on unmarked numbers
+. <code>is_complete_board</code> to identify if a board is completed or not
+. a final test case validating that star1 function returns the correct value for example input</p>
+</div>
+<div class="paragraph">
+<p>Using these tests the first star was super simple.
+The only thing that took a bit of thinking and decision making was how to mark the already seen numbers.
+I decided to keep it simple (maybe?) and just convert the seen numbers into string format, so unseen numbers are integers and seen ones are strings.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star1(puzzle_in):
+    (numbers, boards) = puzzle_in
+    for number in numbers:
+        for board in boards:
+            play_board(board, number)
+            if is_complete_board(board):
+                return score_board(board) * number
+    return None</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_4"><a class="anchor" href="#_second_star_4"></a><a class="link" href="#_second_star_4">Second Star</a></h5>
+<div class="paragraph">
+<p>Second star was pretty much the same as the first one until I ran into an issue with the loop handling in case you modify the looped variables elements.
+I had to introduce a second loop; go once over all boards and play them, then check if they are complete and remove the complete ones.</p>
+</div>
+<div class="paragraph">
+<p>I figured this issue out with my star2 test case because it happened to not give the correct output.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Modifying loop variables is bad</div>
+<div class="paragraph">
+<p>When you <code>for element in mylist</code> loop over a list</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>you can modify the <code>element</code> during the loop as it acts as a reference to <code>mylist</code></p>
+</li>
+<li>
+<p>if you remove an element from <code>mylist</code> this causes the <code>for</code> loop to misbehave, similar to removing an element in a while loop without adjusting the loop pointer</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star2(puzzle_in):
+    (numbers, boards) = puzzle_in
+    last_score = 0
+    for number in numbers:
+        for board in boards:
+            play_board(board, number)
+        # loop twice because otherwise removing leads to broken loop
+        for board in boards:
+            if is_complete_board(board):
+                last_score = score_board(board) * number
+                boards.remove(board)
+    return last_score</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_4"><a class="anchor" href="#_source_4"></a><a class="link" href="#_source_4">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from typing import List, Tuple
+
+Board = List[List[int]]
+
+
+def read_input(filepath) -&gt; Tuple[List[int], List[Board]]:
+    """Create input and parse it.
+
+    Returns:
+     (numbers, boards) tuple of bingo numbers and bingo boards
+    """
+    with open(filepath, "r") as f:
+        lines = f.readlines()
+    numbers = [int(n) for n in lines.pop(0).split(",")]
+
+    lines_per_board = 6
+    n_boards = int(len(lines) / lines_per_board)
+    boards = list()
+    for n in range(n_boards):
+        board = lines[n * lines_per_board + 1 : (n + 1) * lines_per_board]
+        for row_ix in range(len(board)):
+            row = [s.strip() for s in board[row_ix].split(" ")]
+            row = [int(s) for s in row if len(s)]
+            board[row_ix] = row
+        boards.append(board)
+    return (numbers, boards)
+
+
+def play_board(board: Board, number: int) -&gt; Board:
+    """Play a single number on a board. Modifies board."""
+    n_rows = len(board)
+    n_cols = len(board[0])
+
+    for c_row in range(n_rows):
+        for c_col in range(n_cols):
+            if board[c_row][c_col] == number:
+                board[c_row][c_col] = str(number)
+    return board
+
+
+def score_board(board: Board) -&gt; int:
+    """Calculate board score."""
+    score = 0
+    for row in board:
+        row_sum = sum([n for n in row if type(n) == int])
+        score += row_sum
+    return score
+
+
+def is_complete_board(board: Board) -&gt; bool:
+    """Check if a board is compelete."""
+    for row in board:
+        int_elements = [n for n in row if type(n) == int]
+        if len(int_elements) == 0:
+            return True
+    for col_ix in range(len(board[0])):
+        col = [row[col_ix] for row in board]
+        int_elements = [n for n in col if type(n) == int]
+        if len(int_elements) == 0:
+            return True
+    return False
+
+
+# tag::star1[]
+def star1(puzzle_in):
+    (numbers, boards) = puzzle_in
+    for number in numbers:
+        for board in boards:
+            play_board(board, number)
+            if is_complete_board(board):
+                return score_board(board) * number
+    return None
+
+
+# end::star1[]
+
+# tag::star2[]
+def star2(puzzle_in):
+    (numbers, boards) = puzzle_in
+    last_score = 0
+    for number in numbers:
+        for board in boards:
+            play_board(board, number)
+        # loop twice because otherwise removing leads to broken loop
+        for board in boards:
+            if is_complete_board(board):
+                last_score = score_board(board) * number
+                boards.remove(board)
+    return last_score
+
+
+# end::star2[]
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import *
+
+
+def test_parse_input():
+    puzzle_in = read_input("input_test.txt")
+    (numbers, boards) = puzzle_in
+    assert len(numbers) &gt; 20
+    assert type(numbers[0]) == int
+    assert len(boards) == 3
+    assert len(boards[0]) == 5
+    assert len(boards[0][0]) == 5
+    assert type(boards[0][0][0]) == int
+
+
+def test_play_board():
+    puzzle_in = read_input("input_test.txt")
+    (numbers, boards) = puzzle_in
+    board = boards[0]
+    play_board(board, 7)
+    assert board[2][4] == "7"
+    play_board(board, 11)
+    assert board[2][4] == "7"
+    assert board[0][3] == "11"
+
+
+def test_score_board():
+    puzzle_in = read_input("input_test.txt")
+    (numbers, boards) = puzzle_in
+    board = boards[2]
+    for n in [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24]:
+        play_board(board, n)
+    assert score_board(board) == 188
+
+
+def test_is_complete_board():
+    puzzle_in = read_input("input_test.txt")
+    (numbers, boards) = puzzle_in
+    board = boards[2]
+    for n in [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21]:
+        play_board(board, n)
+    assert is_complete_board(board) == False
+    play_board(board, 24)
+    assert is_complete_board(board) == True
+
+
+def test_star1():
+    puzzle_in = read_input("input_test.txt")
+    score = star1(puzzle_in)
+    assert score == 4512
+
+
+def test_star2():
+    puzzle_in = read_input("input_test.txt")
+    score = star2(puzzle_in)
+    assert score == 1924</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_python"><a class="anchor" href="#_day_05_python"></a><a class="link" href="#_day_05_python">Day 05: python</a></h3>
+<div class="sect3">
+<h4 id="_day_5_hydrothermal_venture"><a class="anchor" href="#_day_5_hydrothermal_venture"></a><a class="link" href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a></h4>
+<div class="paragraph">
+<p>Today I wanted to do another TDD vs hacky comparison.
+This time doing TDD (and initial thinking) first and then later see how fast I can hack it knowing the way forward.
+TDD approach took me 80 minutes T_T, partially due to initial design error, see explanation for first star.</p>
+</div>
+<div class="sect4">
+<h5 id="_til"><a class="anchor" href="#_til"></a><a class="link" href="#_til">TIL</a></h5>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>underestimated how big this puzzles get&#8230;&#8203;again</p>
+</li>
+<li>
+<p>when tracking objects try to create a map that can be indexed easily rather than relying on searching items in a list with every iteration</p>
+</li>
+<li>
+<p><code>== 2</code> is not the same as <code>&gt;= 2</code></p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_5"><a class="anchor" href="#_first_star_5"></a><a class="link" href="#_first_star_5">First Star</a></h5>
+<div class="paragraph">
+<p>At first I was focused only on the example and led astray by its small numbers - as it happens every year.</p>
+</div>
+<div class="paragraph">
+<p>My first approach was to just create points for each entry in the input list and if these points already exist, increase their counter.</p>
+</div>
+<div class="paragraph">
+<p>For this purpose I introduced two classes, one for plain two-dimension points and another that contains a counter for vents on this point using P2D as base class.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="diag-d604901899c31eb9a86f2f3074cda8e6.png" alt="diag d604901899c31eb9a86f2f3074cda8e6" width="307" height="209">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="diag-ee6d952008648cb80529d6aa7c4e19cb.png" alt="diag ee6d952008648cb80529d6aa7c4e19cb" width="579" height="883">
+</div>
+</div>
+<div class="paragraph">
+<p>This approach worked fine for the test example but already became a performance nightmare even when using only 20% of the real input.
+The main issue was that individual vents are way bigger than initially anticipated, so relying on the <code>vent point is already in spots</code> operation was way too inefficient.</p>
+</div>
+<div class="paragraph">
+<p>I decided to opt for another design that went for creating a map of the area - similar as proposed through the challenge description.</p>
+</div>
+<div class="paragraph">
+<p>My new design looked like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="diag-a1f56b64789168ec1e001f280737174d.png" alt="diag a1f56b64789168ec1e001f280737174d" width="481" height="953">
+</div>
+</div>
+<div class="paragraph">
+<p>Luckily a lot of functions I had written for my initial approach could be reused.
+With all these operations put into neat little functions the function for star1 was easy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star1(puzzle_in):
+    remove_diagonal_entries(puzzle_in)
+    p = get_board_size(puzzle_in)
+    spots = create_map(p.x, p.y)
+    for entry in puzzle_in:
+        mark_spots(spots, entry)
+    # print_map(spots)
+    spots_with_two_vents = 0
+    for row in spots:
+        for point in row:
+            if point &gt;= 2:
+                spots_with_two_vents += 1
+    return spots_with_two_vents</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_5"><a class="anchor" href="#_second_star_5"></a><a class="link" href="#_second_star_5">Second Star</a></h5>
+<div class="paragraph">
+<p>What needed to be done here is refactor the existing code to work with diagonal lines, in particular the <em>get all points between these two points</em> portion of my <code>P2D</code> class.</p>
+</div>
+<div class="paragraph">
+<p>There was one issue initially that was not covered by my test cases but discovered when testing for the example output for star2.
+I debugged a little and realized my geometric approach to finding all points on a vent worked only in certain cases.
+I added another test case for the <em>broken scenario</em> and vent on to refactor my functions.</p>
+</div>
+<div class="paragraph">
+<p>After this was done star2 was basically the same code as star1 without removing the diagonal points.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star2(puzzle_in):
+    p = get_board_size(puzzle_in)
+    spots = create_map(p.x, p.y)
+    for entry in puzzle_in:
+        mark_spots(spots, entry)
+    # print_map(spots)
+    spots_with_two_vents = 0
+    for row in spots:
+        for point in row:
+            if point &gt;= 2:
+                spots_with_two_vents += 1
+    return spots_with_two_vents</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_5"><a class="anchor" href="#_source_5"></a><a class="link" href="#_source_5">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">def star1(puzzle_in):
+    remove_diagonal_entries(puzzle_in)
+    p = get_board_size(puzzle_in)
+    spots = create_map(p.x, p.y)
+    for entry in puzzle_in:
+        mark_spots(spots, entry)
+    # print_map(spots)
+    spots_with_two_vents = 0
+    for row in spots:
+        for point in row:
+            if point &gt;= 2:
+                spots_with_two_vents += 1
+    return spots_with_two_vents</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import *
+
+
+def test_parse_input():
+    puzzle_in = read_input("input_test.txt")
+    assert len(puzzle_in) == 10
+    e1 = puzzle_in[0]
+    assert len(e1) == 2
+    assert e1[0] == P2D(0, 9)
+
+
+def test_remove_diagonal_entries():
+    puzzle_in = read_input("input_test.txt")
+    remove_diagonal_entries(puzzle_in)
+    assert len(puzzle_in) == 6, "Should modify list in place"
+
+
+def test_p2d_points_to():
+    p1 = P2D(0, 0)
+    points = p1.points_to(P2D(3, 0))
+    assert len(points) == 4
+    assert p1 in points
+    assert P2D(3, 0) in points
+    assert len(p1.points_to(p1)) == 1, "Should return single point when going to itself"
+
+
+def test_create_map():
+    m = create_map(5, 2)
+    assert len(m) == 3
+    assert len(m[0]) == 6
+    assert m[1][2] == 0
+
+
+def test_star1():
+    puzzle_in = read_input("input_test.txt")
+    score = star1(puzzle_in)
+    assert score == 5
+
+
+def test_get_board_size():
+    puzzle_in = read_input("input_test.txt")
+    puzzle_in.append([P2D(4, 2), P2D(4, 11)])
+    p = get_board_size(puzzle_in)
+    assert p.x == 9
+    assert p.y == 11
+
+
+# part 2
+def test_p2d_points_to_diagonal():
+    p1 = P2D(1, 1)
+    points = p1.points_to(P2D(3, 3))
+    assert len(points) == 3
+    assert p1 in points
+    assert P2D(2, 2) in points
+    assert P2D(3, 3) in points
+
+    points = P2D(9, 7).points_to(P2D(7, 9))
+    assert len(points) == 3
+    assert P2D(8, 8) in points
+
+
+def test_p2d_points_to_diagonal_error_case():
+    p1 = P2D(8, 0)
+    points = p1.points_to(P2D(0, 8))
+    assert P2D(7, 1) in points
+    assert P2D(6, 2) in points
+    assert P2D(5, 3) in points
+    assert P2D(4, 4) in points
+    assert P2D(3, 5) in points
+    assert P2D(2, 6) in points
+    assert P2D(1, 7) in points
+    assert P2D(0, 8) in points
+    assert len(points) == 9
+
+
+def test_star2():
+    puzzle_in = read_input("input_test.txt")
+    score = star2(puzzle_in)
+    assert score == 12</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

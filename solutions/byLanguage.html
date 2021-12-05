@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: Solutions by Language</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/asciidoctor.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/prettify.css" rel="stylesheet">
+      <link href="../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_solutions_by_language">Solutions by Language</a>
+<ul class="sectlevel2">
+<li><a href="#_alphabetical_order">Alphabetical Order</a>
+<ul class="sectlevel3">
+<li><a href="#_c">c</a></li>
+<li><a href="#_cpp">cpp</a></li>
+<li><a href="#_go">go</a></li>
+<li><a href="#_groovy">groovy</a></li>
+<li><a href="#_javascript">javascript</a></li>
+<li><a href="#_kotlin">kotlin</a></li>
+<li><a href="#_python">python</a></li>
+<li><a href="#_ruby">ruby</a></li>
+<li><a href="#_rust">rust</a></li>
+<li><a href="#_typescript">typescript</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_solutions_by_language"><a class="anchor" href="#_solutions_by_language"></a><a class="link" href="#_solutions_by_language">Solutions by Language</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This overview lists all solutions by programming language.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4482%;">
+<col style="width: 3.4504%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-bottom" rowspan="2"><p class="tableblock">Language</p></td>
+<td class="tableblock halign-center valign-top" colspan="26"><p class="tableblock">Day</p></td>
+<td class="tableblock halign-center valign-bottom" rowspan="2"><p class="tableblock">#Days</p></td>
+<td class="tableblock halign-center valign-bottom" rowspan="2"><p class="tableblock">#Sol</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">9</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">11</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">12</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">13</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">14</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">15</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">16</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">17</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">18</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">19</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">21</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">22</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">23</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">24</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">25</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>groovy</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/docToolchain/generatedDays.html#_day_00_groovy"><img src="https://avatars3.githubusercontent.com/u/32174902?v=4" alt="32174902?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/uniqueck/generatedDays.html#_day_01_groovy"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/uniqueck/generatedDays.html#_day_02_groovy"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_02_groovy"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/uniqueck/generatedDays.html#_day_03_groovy"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_03_groovy"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/uniqueck/generatedDays.html#_day_04_groovy"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_04_groovy"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/uniqueck/generatedDays.html#_day_05_groovy"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_05_groovy"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>python</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_00_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/quajak/generatedDays.html#_day_00_python"><img src="https://avatars.githubusercontent.com/u/8559822?v=4" alt="8559822?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_00_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/fallshare/generatedDays.html#_day_00_python"><img src="https://avatars.githubusercontent.com/u/52582314?v=4" alt="52582314?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_01_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/ojuaf/generatedDays.html#_day_01_python"><img src="https://avatars.githubusercontent.com/u/13800528?v=4" alt="13800528?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/quajak/generatedDays.html#_day_01_python"><img src="https://avatars.githubusercontent.com/u/8559822?v=4" alt="8559822?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_01_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_01_python"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/jamhocken/generatedDays.html#_day_01_python"><img src="https://avatars.githubusercontent.com/u/75045692?v=4" alt="75045692?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/fallshare/generatedDays.html#_day_01_python"><img src="https://avatars.githubusercontent.com/u/52582314?v=4" alt="52582314?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_02_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/ojuaf/generatedDays.html#_day_02_python"><img src="https://avatars.githubusercontent.com/u/13800528?v=4" alt="13800528?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/quajak/generatedDays.html#_day_02_python"><img src="https://avatars.githubusercontent.com/u/8559822?v=4" alt="8559822?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_02_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/jamhocken/generatedDays.html#_day_02_python"><img src="https://avatars.githubusercontent.com/u/75045692?v=4" alt="75045692?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/fallshare/generatedDays.html#_day_02_python"><img src="https://avatars.githubusercontent.com/u/52582314?v=4" alt="52582314?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_03_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/ojuaf/generatedDays.html#_day_03_python"><img src="https://avatars.githubusercontent.com/u/13800528?v=4" alt="13800528?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_03_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/fallshare/generatedDays.html#_day_03_python"><img src="https://avatars.githubusercontent.com/u/52582314?v=4" alt="52582314?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_04_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/ojuaf/generatedDays.html#_day_04_python"><img src="https://avatars.githubusercontent.com/u/13800528?v=4" alt="13800528?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_04_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/t-pi/generatedDays.html#_day_05_python"><img src="https://avatars3.githubusercontent.com/u/33703265?v=4" alt="33703265?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/ojuaf/generatedDays.html#_day_05_python"><img src="https://avatars.githubusercontent.com/u/13800528?v=4" alt="13800528?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/anoff/generatedDays.html#_day_05_python"><img src="https://avatars.githubusercontent.com/u/7142618?v=4" alt="7142618?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">27</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>kotlin</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_00_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_01_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_02_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_03_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_04_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/RJPlog/generatedDays.html#_day_05_kotlin"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>rust</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_00_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_00_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_01_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_01_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_02_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_02_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_03_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_03_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_04_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_04_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/dfriedenberger/generatedDays.html#_day_05_rust"><img src="https://avatars.githubusercontent.com/u/4932168?v=4" alt="4932168?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_05_rust"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">12</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>go</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/razziel89/generatedDays.html#_day_01_go"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/razziel89/generatedDays.html#_day_02_go"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/razziel89/generatedDays.html#_day_03_go"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/razziel89/generatedDays.html#_day_04_go"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/razziel89/generatedDays.html#_day_05_go"><img src="https://avatars.githubusercontent.com/u/10134766?v=4" alt="10134766?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>typescript</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/aspik79/generatedDays.html#_day_01_typescript"><img src="https://avatars.githubusercontent.com/u/14370166?v=4" alt="14370166?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/aspik79/generatedDays.html#_day_02_typescript"><img src="https://avatars.githubusercontent.com/u/14370166?v=4" alt="14370166?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/aspik79/generatedDays.html#_day_03_typescript"><img src="https://avatars.githubusercontent.com/u/14370166?v=4" alt="14370166?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>javascript</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/subesokun/generatedDays.html#_day_00_javascript"><img src="https://avatars.githubusercontent.com/u/6920421?v=4" alt="6920421?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/subesokun/generatedDays.html#_day_01_javascript"><img src="https://avatars.githubusercontent.com/u/6920421?v=4" alt="6920421?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/subesokun/generatedDays.html#_day_02_javascript"><img src="https://avatars.githubusercontent.com/u/6920421?v=4" alt="6920421?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>ruby</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_00_ruby"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span> <span class="image"><a class="image" href="/generated/coder/rdmueller/generatedDays.html#_day_00_ruby"><img src="https://avatars3.githubusercontent.com/u/1856308?v=4" alt="1856308?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/mr-kaffee/generatedDays.html#_day_02_ruby"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>c</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/jindalabhishek1/generatedDays.html#_day_01_c"><img src="https://avatars.githubusercontent.com/u/32256963?v=4" alt="32256963?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>cpp</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><a class="image" href="/generated/coder/jindalabhishek1/generatedDays.html#_day_00_cpp"><img src="https://avatars.githubusercontent.com/u/32256963?v=4" alt="32256963?v=4" width="32"></a></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_alphabetical_order"><a class="anchor" href="#_alphabetical_order"></a><a class="link" href="#_alphabetical_order">Alphabetical Order</a></h3>
+<div class="sect3">
+<h4 id="_c"><a class="anchor" href="#_c"></a><a class="link" href="#_c">c</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/jindalabhishek1/generatedDays.html#_day_01_c">jindalabhishek1</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_cpp"><a class="anchor" href="#_cpp"></a><a class="link" href="#_cpp">cpp</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/jindalabhishek1/generatedDays.html#_day_00_cpp">jindalabhishek1</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_go"><a class="anchor" href="#_go"></a><a class="link" href="#_go">go</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/razziel89/generatedDays.html#_day_01_go">razziel89</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/razziel89/generatedDays.html#_day_02_go">razziel89</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/razziel89/generatedDays.html#_day_03_go">razziel89</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 04</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/razziel89/generatedDays.html#_day_04_go">razziel89</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 05</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/razziel89/generatedDays.html#_day_05_go">razziel89</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_groovy"><a class="anchor" href="#_groovy"></a><a class="link" href="#_groovy">groovy</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/docToolchain/generatedDays.html#_day_00_groovy">docToolchain</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/uniqueck/generatedDays.html#_day_01_groovy">uniqueck</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/uniqueck/generatedDays.html#_day_02_groovy">uniqueck</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_02_groovy">rdmueller</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/uniqueck/generatedDays.html#_day_03_groovy">uniqueck</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_03_groovy">rdmueller</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 04</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/uniqueck/generatedDays.html#_day_04_groovy">uniqueck</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_04_groovy">rdmueller</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 05</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/uniqueck/generatedDays.html#_day_05_groovy">uniqueck</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_05_groovy">rdmueller</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_javascript"><a class="anchor" href="#_javascript"></a><a class="link" href="#_javascript">javascript</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/subesokun/generatedDays.html#_day_00_javascript">subesokun</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/subesokun/generatedDays.html#_day_01_javascript">subesokun</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/subesokun/generatedDays.html#_day_02_javascript">subesokun</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_kotlin"><a class="anchor" href="#_kotlin"></a><a class="link" href="#_kotlin">kotlin</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_00_kotlin">RJPlog</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_01_kotlin">RJPlog</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_02_kotlin">RJPlog</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_03_kotlin">RJPlog</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 04</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_04_kotlin">RJPlog</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 05</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/RJPlog/generatedDays.html#_day_05_kotlin">RJPlog</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_python"><a class="anchor" href="#_python"></a><a class="link" href="#_python">python</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_00_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/quajak/generatedDays.html#_day_00_python">quajak</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_00_python">anoff</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/fallshare/generatedDays.html#_day_00_python">fallshare</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_01_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/ojuaf/generatedDays.html#_day_01_python">ojuaf</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/quajak/generatedDays.html#_day_01_python">quajak</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_01_python">anoff</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_01_python">rdmueller</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/jamhocken/generatedDays.html#_day_01_python">jamhocken</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/fallshare/generatedDays.html#_day_01_python">fallshare</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_02_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/ojuaf/generatedDays.html#_day_02_python">ojuaf</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/quajak/generatedDays.html#_day_02_python">quajak</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_02_python">anoff</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/jamhocken/generatedDays.html#_day_02_python">jamhocken</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/fallshare/generatedDays.html#_day_02_python">fallshare</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_03_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/ojuaf/generatedDays.html#_day_03_python">ojuaf</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_03_python">anoff</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/fallshare/generatedDays.html#_day_03_python">fallshare</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 04</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_04_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/ojuaf/generatedDays.html#_day_04_python">ojuaf</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_04_python">anoff</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 05</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/t-pi/generatedDays.html#_day_05_python">t-pi</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/ojuaf/generatedDays.html#_day_05_python">ojuaf</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/anoff/generatedDays.html#_day_05_python">anoff</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_ruby"><a class="anchor" href="#_ruby"></a><a class="link" href="#_ruby">ruby</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_00_ruby">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/rdmueller/generatedDays.html#_day_00_ruby">rdmueller</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_02_ruby">mr-kaffee</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_rust"><a class="anchor" href="#_rust"></a><a class="link" href="#_rust">rust</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 00</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_00_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_00_rust">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_01_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_01_rust">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_02_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_02_rust">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_03_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_03_rust">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 04</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_04_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_04_rust">mr-kaffee</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 05</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/dfriedenberger/generatedDays.html#_day_05_rust">dfriedenberger</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/mr-kaffee/generatedDays.html#_day_05_rust">mr-kaffee</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_typescript"><a class="anchor" href="#_typescript"></a><a class="link" href="#_typescript">typescript</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 01</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/aspik79/generatedDays.html#_day_01_typescript">aspik79</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/aspik79/generatedDays.html#_day_02_typescript">aspik79</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Day 03</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="/generated/coder/aspik79/generatedDays.html#_day_03_typescript">aspik79</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

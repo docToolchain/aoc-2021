@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: mr-kaffee</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_mr_kaffee">mr-kaffee</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_00_ruby">Day 00: ruby</a>
+<ul class="sectlevel3">
+<li><a href="#_day_00_hello_world">Day 00: Hello World</a>
+<ul class="sectlevel4">
+<li><a href="#_solution">Solution</a></li>
+<li><a href="#_test">Test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_00_rust">Day 00: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_00_hello_world_2">Day 00: Hello World</a>
+<ul class="sectlevel4">
+<li><a href="#_general_structure">General structure</a></li>
+<li><a href="#_run_solutions">Run Solutions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_01_rust">Day 01: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_01_sonar_sweep">Day 01: Sonar Sweep</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1">Part 1</a></li>
+<li><a href="#_part_2">Part 2</a></li>
+<li><a href="#_today_i_learned">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_ruby">Day 02: ruby</a>
+<ul class="sectlevel3">
+<li><a href="#_day_02_dive">Day 02: Dive!</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_2">Part 1</a></li>
+<li><a href="#_part_2_2">Part 2</a></li>
+<li><a href="#_tests">Tests</a></li>
+<li><a href="#_today_i_learned_2">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_rust">Day 02: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_02_dive_2">Day 02: Dive!</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_3">Part 1</a></li>
+<li><a href="#_part_2_3">Part 2</a></li>
+<li><a href="#_today_i_learned_3">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_rust">Day 03: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_4">Part 1</a></li>
+<li><a href="#_part_2_4">Part 2</a></li>
+<li><a href="#_tests_2">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_rust">Day 04: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_04_giant_squid">Day 04: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_2_2">Part 1 &amp; 2</a></li>
+<li><a href="#_tests_3">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_rust">Day 05: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_05_hydrothermal_venture">Day 05: Hydrothermal Venture</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_2_3">Part 1 &amp; 2</a></li>
+<li><a href="#_tests_4">Tests</a></li>
+<li><a href="#_today_i_learned_4">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_mr_kaffee"><a class="anchor" href="#_mr_kaffee"></a><a class="link" href="#_mr_kaffee">mr-kaffee</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars0.githubusercontent.com/u/73745454?v=4" alt="73745454?v=4" width="100px"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>mr-kaffee</strong><br>
+Peter Wieland<br>
+Github: <a href="https://github.com/mr-kaffee">mr-kaffee</a>,
+Strava: <a href="https://www.strava.com/athletes/89256720">Peter Wieland</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>I am a curious amateur coder (lots of Java, MATLAB, recently Rust), I like cycling on and off roads and much more &#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.zusammengegencorona.de/impfen/">Corona sucks - let&#8217;s stop it!</a></p>
+</div>
+<a id="day00" />
+</div>
+<div class="sect2">
+<h3 id="_day_00_ruby"><a class="anchor" href="#_day_00_ruby"></a><a class="link" href="#_day_00_ruby">Day 00: ruby</a></h3>
+<div class="sect3">
+<h4 id="_day_00_hello_world"><a class="anchor" href="#_day_00_hello_world"></a><a class="link" href="#_day_00_hello_world">Day 00: Hello World</a></h4>
+<div class="paragraph">
+<p>Maybe I&#8217;ll try out some <a href="https://www.ruby-lang.org/">Ruby</a> this year. At least a hello world is done ;)</p>
+</div>
+<div class="sect4">
+<h5 id="_solution"><a class="anchor" href="#_solution"></a><a class="link" href="#_solution">Solution</a></h5>
+<div class="paragraph">
+<p>The actual solution resides in <code>solution.rb</code></p>
+</div>
+<div class="paragraph">
+<p>It will define classes, methods and similar to calculate the solution, e.g.,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def say_hello(name = "World")
+  "Hello, #{name}!"
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And a section to run the actual solution and measure time, like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">if __FILE__ == $0
+  b = Benchmark.measure { puts say_hello }
+  puts "Solved in #{b.real}s"
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The part <code>if <em>FILE</em> == $0</code> is taken from <a href="https://www.ruby-lang.org/en/documentation/quickstart/4/">Ruby in Twenty Minutes</a></p>
+</div>
+<div class="paragraph">
+<p>The solution is executed with <code>ruby solution.rb</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test"><a class="anchor" href="#_test"></a><a class="link" href="#_test">Test</a></h5>
+<div class="paragraph">
+<p>To test my code, there will be a <code>solution_test.rb</code> file which defines a test class derived from <code>Test::Unit::TestCase</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
+  def test_say_hello
+    assert_equal "Hello, World!", say_hello
+    assert_equal "Hello, Eric Wastl!", say_hello("Eric Wastl")
+  end
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Tests are executed with <code>ruby solution_test.rb</code></p>
+</div>
+<a id="day00" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_00_rust"><a class="anchor" href="#_day_00_rust"></a><a class="link" href="#_day_00_rust">Day 00: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_00_hello_world_2"><a class="anchor" href="#_day_00_hello_world_2"></a><a class="link" href="#_day_00_hello_world_2">Day 00: Hello World</a></h4>
+<div class="paragraph">
+<p>I am still undecided what language to use this year.
+I&#8217;ll start with <a href="https://www.rust-lang.org/">Rust</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_general_structure"><a class="anchor" href="#_general_structure"></a><a class="link" href="#_general_structure">General structure</a></h5>
+<div class="paragraph">
+<p>Generally, my solutions will contain a <code>src/main.rs</code> file which reads inputs, calls the solution functions and measures time</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">fn read_input() -&gt; String {
+    fs::read_to_string("input.txt").expect("Could not read from file")
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">fn main() {
+    let instant = Instant::now();
+    write_output(&amp;read_input());
+    println!("Done in {:?}", instant.elapsed());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The actual solution will be implemented in a <code>lib.rs</code> file</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Write string to console
+///
+/// # Examples
+///
+/// ```
+/// // running documentation examples as tests is a great idea in general; in this specific case
+/// // there might be little value in the code and test
+/// let s = "Hello World!";
+/// mr_kaffee_2021_00::write_output(&amp;s);
+/// ```
+pub fn write_output(s: &amp;str) {
+    println!("{}", s);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>lib.rs</code> file also contains the tests in a separate submodule.
+I will use this for test-driven development, e.g., based on the examples given in the puzzles.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_write_output() {
+        // very stupid test
+        write_output("Hello World!");
+    }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_run_solutions"><a class="anchor" href="#_run_solutions"></a><a class="link" href="#_run_solutions">Run Solutions</a></h5>
+<div class="paragraph">
+<p>Run solution with <code>cargo run</code> (or <code>cargo run --release</code> to see the effect of compiler optimization)</p>
+</div>
+<div class="paragraph">
+<p>Run tests with <code>cargo test</code></p>
+</div>
+<a id="day01" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_01_rust"><a class="anchor" href="#_day_01_rust"></a><a class="link" href="#_day_01_rust">Day 01: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_01_sonar_sweep"><a class="anchor" href="#_day_01_sonar_sweep"></a><a class="link" href="#_day_01_sonar_sweep">Day 01: Sonar Sweep</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/1">AoC|2021|01</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1"><a class="anchor" href="#_part_1"></a><a class="link" href="#_part_1">Part 1</a></h5>
+<div class="paragraph">
+<p>Parse the input</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse each line into a number
+pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
+    content
+        .lines()
+        .into_iter()
+        .map(|line| line.parse().expect("Could not parse line"))
+        .collect()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And count how often consecutive inputs increase (test is part of documentation)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// count how often consecutive numbers increase
+///
+/// # Examples
+/// ```
+/// let data: Vec&lt;usize&gt; = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+/// assert_eq!(7, mr_kaffee_2021_01::count_increase(&amp;data));
+/// ```
+pub fn count_increase(data: &amp;[usize]) -&gt; usize {
+    data.iter()
+        .zip(data[1..].iter())
+        .filter(|(a, b)| b &gt; a)
+        .count()
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2"><a class="anchor" href="#_part_2"></a><a class="link" href="#_part_2">Part 2</a></h5>
+<div class="paragraph">
+<p>Create sliding sums over three consecutive numbers (again with test as part of documentation)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// calculate sliding sums over three elements
+///
+/// # Examples
+///
+/// ```
+/// let data: Vec&lt;usize&gt; = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+/// let sums: Vec&lt;usize&gt; = vec![607, 618, 618, 617, 647, 716, 769, 792];
+/// assert_eq!(sums, mr_kaffee_2021_01::sliding_sums(&amp;data));
+/// ```
+pub fn sliding_sums(data: &amp;[usize]) -&gt; Vec&lt;usize&gt; {
+    data.iter()
+        .zip(data[1..].iter())
+        .zip(data[2..].iter())
+        .map(|((a, b), c)| a + b + c)
+        .collect()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and use function <code>count_increase</code> from part 1 again</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned"><a class="anchor" href="#_today_i_learned"></a><a class="link" href="#_today_i_learned">Today I learned</a></h5>
+<div class="paragraph">
+<p>The <code>zip</code> function on iterators is useful.</p>
+</div>
+<div class="paragraph">
+<p>Later, looking at other solutions, I felt stupid: Obviously <code><code>a[k] + a[k + 1] + a[k + 2] &lt; a[k + 1] + a[k + 2] + a[k + 3]</code></code>
+if and only if <code><code>a[k] &lt; a[k + 3]</code></code> and thus there is no need at all to calculate the sliding sums for part 2.</p>
+</div>
+<div class="paragraph">
+<p>This is a generic solution with <code><code>offset = 1</code></code> for part 1 and <code><code>offset = 3</code></code> for part 2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// count how often numbers with distance `offset` increase
+///
+/// # Examples
+/// ```
+/// let data: Vec&lt;usize&gt; = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+/// assert_eq!(7, mr_kaffee_2021_01::count_increase_with_offset(&amp;data, 1));
+/// assert_eq!(5, mr_kaffee_2021_01::count_increase_with_offset(&amp;data, 3));
+/// ```
+pub fn count_increase_with_offset(data: &amp;[usize], offset: usize) -&gt; usize {
+    data.iter()
+        .zip(data[offset..].iter())
+        .filter(|(a, b)| b &gt; a)
+        .count()
+}</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_ruby"><a class="anchor" href="#_day_02_ruby"></a><a class="link" href="#_day_02_ruby">Day 02: ruby</a></h3>
+<div class="sect3">
+<h4 id="_day_02_dive"><a class="anchor" href="#_day_02_dive"></a><a class="link" href="#_day_02_dive">Day 02: Dive!</a></h4>
+<div class="paragraph">
+<p><a href="https://www.ruby-lang.org">Ruby</a> solution to <a href="https://adventofcode.com/2021/day/2">AoC|2021|02</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_2"><a class="anchor" href="#_part_1_2"></a><a class="link" href="#_part_1_2">Part 1</a></h5>
+<div class="paragraph">
+<p>Generic function to calculate the position.
+Takes the input string, an initial value and a hash of lambdas updating the position</p>
+</div>
+<div class="paragraph">
+<p>The function iterates through the lines of the <code>input</code>. Each <code>line</code> is split in the command part <code>cmd</code> and the value part <code>v</code> (single space as separator). The command is used to select a lambda from the <code>steps</code> hash which is then called with the accumulator <code>acc</code> and the value <code>v</code> to udpate the accumulator.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position(input, init, steps)
+  input.split("\n")
+       .map { |line| line.split(' ') }
+       .inject(init) { |acc, cmd| steps[cmd.first].call acc, cmd.last.to_i }
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For part 1, this function is called as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_1(input)
+  calc_position(input, [0, 0], {
+    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1] - v] },
+    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1] + v] },
+    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1]] }
+  })
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_2"><a class="anchor" href="#_part_2_2"></a><a class="link" href="#_part_2_2">Part 2</a></h5>
+<div class="paragraph">
+<p>For part 2, the aim has to be considered as additional value and the update rules are changed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_2(input)
+  calc_position(input, [0, 0, 0], {
+    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] - v] },
+    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] + v] },
+    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1] + acc[2] * v, acc[2]] }
+  })
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests"><a class="anchor" href="#_tests"></a><a class="link" href="#_tests">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
+  CONTENT = %(forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2).freeze
+
+  def test_calc_position_1
+    assert_equal [15, 10], calc_position_1(CONTENT)
+  end
+
+  def test_calc_position_2
+    assert_equal [15, 60, 10], calc_position_2(CONTENT)
+  end
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_2"><a class="anchor" href="#_today_i_learned_2"></a><a class="link" href="#_today_i_learned_2">Today I learned</a></h5>
+<div class="paragraph">
+<p>... that I don&#8217;t know how to set up VS Code for decent Ruby development :(</p>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_rust"><a class="anchor" href="#_day_02_rust"></a><a class="link" href="#_day_02_rust">Day 02: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_02_dive_2"><a class="anchor" href="#_day_02_dive_2"></a><a class="link" href="#_day_02_dive_2">Day 02: Dive!</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/2">AoC|2021|02</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_3"><a class="anchor" href="#_part_1_3"></a><a class="link" href="#_part_1_3">Part 1</a></h5>
+<div class="paragraph">
+<p>The most difficult part today was to parse the input. My rust knowledge obviously is slightly rusty&#8230;&#8203;
+Eventually I created an enum with a <code>parse</code> function as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Command {
+    Up(isize),
+    Down(isize),
+    Forward(isize),
+}
+
+impl Command {
+    /// parse command
+    ///
+    /// # Examples
+    /// ```
+    /// # use mr_kaffee_2021_02::*;
+    /// assert_eq!(Command::Up(5), Command::parse("up 5"));
+    /// assert_eq!(Command::Down(6), Command::parse("down 6"));
+    /// assert_eq!(Command::Forward(-2), Command::parse("forward -2"));
+    /// ```
+    ///
+    /// ```should_panic
+    /// # use mr_kaffee_2021_02::*;
+    /// // this will panic since the first part is not a valid command
+    /// let cmd = Command::parse("invalid-command 7");
+    /// ```
+    ///
+    /// ```should_panic
+    /// # use mr_kaffee_2021_02::*;
+    /// // this will panic since the two parts are not separated by a single blank
+    /// let cmd = Command::parse("up\t7");
+    /// ```
+    ///
+    /// ```should_panic
+    /// # use mr_kaffee_2021_02::*;
+    /// // this will panic since the second part is not a number
+    /// let cmd = Command::parse("down not-a-number");
+    /// ```
+    pub fn parse(line: &amp;str) -&gt; Self {
+        let (cmd, v) = line.split_once(' ').expect("Invalid line");
+        let v = v.parse().expect("Could not parse value");
+        match cmd {
+            "up" =&gt; Command::Up(v),
+            "down" =&gt; Command::Down(v),
+            "forward" =&gt; Command::Forward(v),
+            _ =&gt; panic!("Unexpected command"),
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The solution then is done with a simple fold operation on an iterator accumulating depth (y) and horizontal position (x)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Calculate positions
+///
+/// # Example
+/// ```
+/// # use mr_kaffee_2021_02::*;
+/// assert_eq!((5, 0), calc_position("forward 5"));
+/// assert_eq!((0, 5), calc_position("down 5"));
+/// assert_eq!((3, -5), calc_position("up 5\nforward 3"));
+/// assert_eq!((0, 0), calc_position(""));
+/// ```
+pub fn calc_position(input: &amp;str) -&gt; (isize, isize) {
+    input
+        .lines()
+        .map(|line| Command::parse(line))
+        .fold((0, 0), |(x, y), cmd| match cmd {
+            Command::Up(v) =&gt; (x, y - v),
+            Command::Down(v) =&gt; (x, y + v),
+            Command::Forward(v) =&gt; (x + v, y),
+        })
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_3"><a class="anchor" href="#_part_2_3"></a><a class="link" href="#_part_2_3">Part 2</a></h5>
+<div class="paragraph">
+<p>The second part was an easy extension to the first part. Just add a third accumulator state for the aim (small trap: my horizontal position is called 'x' which is not the same as the 'X' in the puzzle description)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Calculate positions with aim
+///
+/// # Example
+/// ```
+/// # use mr_kaffee_2021_02::*;
+/// assert_eq!((5, 0, 0), calc_position_with_aim("forward 5"));
+/// assert_eq!((5, 0, 5), calc_position_with_aim("forward 5\ndown 5"));
+/// assert_eq!((13, 40, 5), calc_position_with_aim("forward 5\ndown 5\nforward 8"));
+/// ```
+pub fn calc_position_with_aim(input: &amp;str) -&gt; (isize, isize, isize) {
+    input
+        .lines()
+        .map(|line| Command::parse(line))
+        .fold((0, 0, 0), |(x, y, aim), cmd| match cmd {
+            Command::Up(v) =&gt; (x, y, aim - v),
+            Command::Down(v) =&gt; (x, y, aim + v),
+            Command::Forward(v) =&gt; (x + v, y + aim * v, aim),
+        })
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_3"><a class="anchor" href="#_today_i_learned_3"></a><a class="link" href="#_today_i_learned_3">Today I learned</a></h5>
+<div class="paragraph">
+<p>Parsing simple inputs does not require regular expressions &amp; creating enums with parse functions leads to a bit more code but looks much prettier</p>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_rust"><a class="anchor" href="#_day_03_rust"></a><a class="link" href="#_day_03_rust">Day 03: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_03_binary_diagnostic"><a class="anchor" href="#_day_03_binary_diagnostic"></a><a class="link" href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/3">AoC|2021|03</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_4"><a class="anchor" href="#_part_1_4"></a><a class="link" href="#_part_1_4">Part 1</a></h5>
+<div class="paragraph">
+<p>As always, first challenge is to parse the input. I decided to read the input into integers. That caused some headaches later on to get the bit ordering correct. After I realized that the line length in the example differs from the line length in the puzzle input, I also return the length from my parse function.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse input into integers
+/// return bit-length of values in addition
+pub fn parse(input: &amp;str) -&gt; (Vec&lt;usize&gt;, usize) {
+    let len = input
+        .lines()
+        .map(|line| line.len())
+        .next()
+        .expect("No lines");
+    let values = input
+        .lines()
+        .map(|line| usize::from_str_radix(line, 2).expect("Could not parse line"))
+        .collect();
+    (values, len)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Part 1 is then solved with the help of a function that counts for every position, how often the bit is set in the input. Another function then calculates epsilon by setting all the bits in the positions where most of the input values have bits set and gamma as the inverse</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Count how often bits are set in the values.
+///
+/// returns vector of counts with first element indicating how often least significant
+/// bit is set and last element indicating how often most significant bit is set
+pub fn count_all_ones(values: &amp;[usize], len: usize) -&gt; Vec&lt;usize&gt; {
+    values.iter().fold(vec![0; len], |counts, value| {
+        counts
+            .iter()
+            .enumerate()
+            .map(|(k, one)| *one + ((*value &gt;&gt; k) &amp; 1))
+            .collect()
+    })
+}
+
+/// calculate the gamma and epsilon values
+///
+/// gamma is the value of all the most common bits
+/// epsilon is the value of all the least common bits
+///
+/// returns ``(gamma, epsilon, gamma * epsilon)``
+pub fn calc_gamma_epsilon(values: &amp;[usize], len: usize) -&gt; (usize, usize, usize) {
+    let counts = count_all_ones(values, len);
+    let gamma = (0..len).fold(0, |gamma, bit| {
+        gamma + (((2 * counts[bit] &gt;= values.len()) as usize) &lt;&lt; bit)
+    });
+    let epsilon = !gamma &amp; ((1 &lt;&lt; len) - 1);
+    (gamma, epsilon, gamma * epsilon)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_4"><a class="anchor" href="#_part_2_4"></a><a class="link" href="#_part_2_4">Part 2</a></h5>
+<div class="paragraph">
+<p>As the puzzle states, part 2 is the trickier one.</p>
+</div>
+<div class="paragraph">
+<p>I wrote a filter function to reduce the list of values step by step until only one is left. Whether oxygen or co2 ratings are calculated is controlled with a <code><code>invert</code></code> flag. The filter function uses a new <code>count_ones</code> function that only counts the specific bit we are interested in</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Count how often specific bit is set in the values.
+pub fn count_ones(values: &amp;[usize], bit: usize) -&gt; usize {
+    values
+        .iter()
+        .fold(0, |count, value| count + ((value &gt;&gt; bit) &amp; 1))
+}
+
+/// filter out all the values whos given bit is not equal to the most common
+/// bit in that position.
+///
+/// If invert is true, do the opposite and keep all the values whos given bit
+/// is not equal to the most common bit in that position.
+pub fn filter(values: Vec&lt;usize&gt;, bit: usize, invert: bool) -&gt; Vec&lt;usize&gt; {
+    // determin expected value (xor with invert)
+    let exp = ((2 * count_ones(&amp;values, bit) &gt;= values.len()) ^ invert) as usize;
+    values
+        .into_iter()
+        .filter(|value| (*value &gt;&gt; bit) &amp; 1 == exp)
+        .collect()
+}
+
+/// calc oxygen (``invert = false``) or co2 (``invert = true``) ratings
+pub fn calc_rating(values: &amp;[usize], len: usize, invert: bool) -&gt; usize {
+    let mut values = values.to_vec();
+    let mut bit = Some(len - 1);
+    while values.len() &gt; 1 &amp;&amp; bit.is_some() {
+        values = filter(values, bit.unwrap(), invert);
+        bit = match bit {
+            Some(v) if v &gt; 0 =&gt; Some(v - 1),
+            _ =&gt; None,
+        };
+    }
+    *values.first().expect("No value left")
+}
+
+/// calc oxygen and co2 ratings
+///
+/// returns ``(oxygen, co2, oxygen * co2)``
+pub fn calc_ratings(vals: &amp;[usize], len: usize) -&gt; (usize, usize, usize) {
+    let oxygen = calc_rating(vals, len, false);
+    let co2 = calc_rating(vals, len, true);
+    (oxygen, co2, oxygen * co2)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_2"><a class="anchor" href="#_tests_2"></a><a class="link" href="#_tests_2">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010";
+
+    const EXP_VALUES: &amp;'static [usize] = &amp;[
+        0b00100, 0b11110, 0b10110, 0b10111, 0b10101, 0b01111, 0b00111, 0b11100, 0b10000, 0b11001,
+        0b00010, 0b01010,
+    ];
+
+    const EXP_LEN: usize = 5;
+
+    #[test]
+    fn test_parse() {
+        let (vals, len) = parse(CONTENT);
+        assert_eq!(EXP_LEN, len);
+        assert_eq!(EXP_VALUES, vals);
+    }
+
+    #[test]
+    fn test_count_all_ones() {
+        assert_eq!(vec![5, 7, 8, 5, 7], count_all_ones(EXP_VALUES, EXP_LEN));
+    }
+
+    #[test]
+    fn test_calc_gamma_epsilon() {
+        assert_eq!((22, 9, 22 * 9), calc_gamma_epsilon(EXP_VALUES, EXP_LEN));
+    }
+
+    #[test]
+    fn test_filter() {
+        let values = filter(EXP_VALUES.to_vec(), EXP_LEN - 1, false);
+        assert_eq!(
+            vec![0b11110, 0b10110, 0b10111, 0b10101, 0b11100, 0b10000, 0b11001],
+            values
+        );
+
+        let values = filter(EXP_VALUES.to_vec(), EXP_LEN - 1, true);
+        assert_eq!(vec![0b00100, 0b01111, 0b00111, 0b00010, 0b01010], values);
+    }
+
+    #[test]
+    fn test_calc_rating() {
+        let (values, len) = parse(CONTENT);
+        assert_eq!(23, calc_rating(&amp;values, len, false));
+        assert_eq!(10, calc_rating(&amp;values, len, true));
+    }
+
+    #[test]
+    fn test_calc_ratings() {
+        let (values, len) = parse(CONTENT);
+        assert_eq!((23, 10, 230), calc_ratings(&amp;values, len));
+    }
+}</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_rust"><a class="anchor" href="#_day_04_rust"></a><a class="link" href="#_day_04_rust">Day 04: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_04_giant_squid"><a class="anchor" href="#_day_04_giant_squid"></a><a class="link" href="#_day_04_giant_squid">Day 04: Giant Squid</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/4">AoC|2021|04</a>.</p>
+</div>
+<div class="paragraph">
+<p>So let&#8217;s play Bingo (I don&#8217;t remember when I last did&#8230;&#8203;)</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_2_2"><a class="anchor" href="#_part_1_2_2"></a><a class="link" href="#_part_1_2_2">Part 1 &amp; 2</a></h5>
+<div class="paragraph">
+<p>After I solved part 1 today, there was very little to add for part 2. Hence, there is only one solution for both parts.</p>
+</div>
+<div class="paragraph">
+<p>I created a <code>struct</code> for a bingo board with a function <code>new</code> to create new boards, <code>apply_draws</code> to apply draws until a row or a column is complete, and a function <code>get_score</code> to calculate the final score:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// structure for a bingo board with ``data`` containing numbers, ``marked`` containing
+/// flags which numbers have been drawn, ``draws_count`` holding the count af draws
+/// (including draws that did not match), ``last`` holding the last number drawn, and
+/// ``bingo`` is a flag indicating whether the board has at least one row or column completely
+/// marked
+pub struct Board {
+    data: Vec&lt;usize&gt;,
+    marked: Vec&lt;bool&gt;,
+    count: usize,
+    last: Option&lt;usize&gt;,
+    bingo: bool,
+}
+
+impl Board {
+    /// dimension of the boad
+    pub const N: usize = 5;
+
+    /// crate new board from data vector
+    pub fn new(data: Vec&lt;usize&gt;) -&gt; Self {
+        if data.len() != Self::N * Self::N {
+            panic!("Illegal data length: {}", data.len());
+        }
+        Board {
+            data,
+            marked: vec![false; Self::N * Self::N],
+            count: 0,
+            last: None,
+            bingo: false,
+        }
+    }
+
+    /// apply draws to board, stops applying draws if a row or column is entirely marked
+    pub fn apply_draws(&amp;mut self, draws: &amp;[usize]) {
+        if self.bingo {
+            return;
+        }
+
+        for draw in draws {
+            self.count += 1;
+            self.last = Some(*draw);
+            if let Some((idx, _)) = self.data.iter().enumerate().find(|(_, v)| *v == draw) {
+                self.marked[idx] = true;
+
+                let x0 = idx % Self::N;
+                let y0 = idx / Self::N;
+
+                if (0..5).all(|x| self.marked[x + Self::N * y0])
+                    || (0..5).all(|y| self.marked[x0 + Self::N * y])
+                {
+                    self.bingo = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    /// get score (sum of numbers not marked multiplied by last number drawn)
+    pub fn get_score(&amp;self) -&gt; usize {
+        if !self.bingo {
+            panic!("Board not solved.");
+        }
+
+        self.data
+            .iter()
+            .zip(self.marked.iter())
+            .filter(|(_, marked)| !*marked)
+            .map(|(v, _)| v)
+            .sum::&lt;usize&gt;()
+            * self.last.expect("No draws")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, I created a function which parses the input to a vector of boards and a vector of numbers drawn</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(input: &amp;str) -&gt; (Vec&lt;Board&gt;, Vec&lt;usize&gt;) {
+    let mut lines = input.lines();
+
+    // parse drawn numbers
+    let draws = lines
+        .next()
+        .expect("No draws")
+        .split(',')
+        .map(|part| part.parse().expect("Could not parse number"))
+        .collect();
+
+    // parse boards
+    let mut boards = Vec::new();
+    let mut data = Vec::with_capacity(Board::N * Board::N);
+    loop {
+        let (eof, line) = lines.next().map(|line| (false, line)).unwrap_or((true, ""));
+        if line.trim().len() == 0 &amp;&amp; data.len() &gt; 0 {
+            // block complete
+            boards.push(Board::new(data));
+            data = Vec::with_capacity(Board::N * Board::N);
+        } else {
+            // add data to block
+            line.split_whitespace()
+                .map(|v| v.parse().expect("Could not parse number"))
+                .for_each(|v| data.push(v));
+        }
+
+        if eof {
+            // no more lines
+            return (boards, draws);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, we are ready to play bingo. I play all the boards one by one and then look for the one which wins first and the one which wins last and return their scores</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play bingo
+///
+/// returns scores of winning and loosing board
+pub fn play&lt;'a&gt;(boards: &amp;'a mut [Board], draws: &amp;[usize]) -&gt; (usize, usize) {
+    // boards that wins first and board that wins last with draw index
+    let mut winner: Option&lt;&amp;Board&gt; = None;
+    let mut looser: Option&lt;&amp;Board&gt; = None;
+    for board in boards {
+        board.apply_draws(&amp;draws);
+
+        winner = winner
+            .filter(|winner| board.count &gt;= winner.count)
+            .or(Some(board));
+        looser = looser
+            .filter(|looser| board.count &lt;= looser.count)
+            .or(Some(board));
+    }
+
+    // unwrap results
+    (
+        winner.expect("No winner").get_score(),
+        looser.expect("No looser").get_score(),
+    )
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_3"><a class="anchor" href="#_tests_3"></a><a class="link" href="#_tests_3">Tests</a></h5>
+<div class="paragraph">
+<p>I kind of did TDD ;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+
+22 13 17 11  0
+ 8  2 23  4 24
+21  9 14 16  7
+ 6 10  3 18  5
+ 1 12 20 15 19
+
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
+
+14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+ 2  0 12  3  7";
+
+    const EXP_DRAWS: &amp;'static [usize] = &amp;[
+        7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19, 3,
+        26, 1,
+    ];
+
+    const DATA_0: &amp;'static [usize] = &amp;[
+        22, 13, 17, 11, 0, 8, 2, 23, 4, 24, 21, 9, 14, 16, 7, 6, 10, 3, 18, 5, 1, 12, 20, 15, 19,
+    ];
+
+    #[test]
+    fn test_board_new() {
+        let board = Board::new(DATA_0.to_owned());
+        assert_eq!(DATA_0, board.data);
+        assert_eq!(vec![false; Board::N * Board::N], board.marked);
+        assert_eq!(false, board.bingo);
+        assert_eq!(0, board.count);
+        assert_eq!(None, board.last);
+    }
+
+    #[test]
+    fn test_parse() {
+        let (boards, draws) = parse(CONTENT);
+        assert_eq!(EXP_DRAWS, draws);
+        assert_eq!(3, boards.len());
+        assert_eq!(DATA_0, boards[0].data);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_get_score_panics() {
+        let (boards, _) = parse(CONTENT);
+        // this fails since no bingo yet
+        boards[0].get_score();
+    }
+
+    #[test]
+    fn test_board_apply_draws() {
+        let (mut boards, draws) = parse(CONTENT);
+
+        // 15th number (24) wins for board at index 2
+        boards[1].apply_draws(&amp;draws);
+        assert_eq!(15, boards[1].count);
+        assert_eq!(Some(13), boards[1].last);
+        assert!(boards[1].bingo);
+
+        // 12th number (13) wins for board at index 2
+        boards[2].apply_draws(&amp;draws);
+        assert_eq!(12, boards[2].count);
+        assert_eq!(Some(24), boards[2].last);
+        assert!(boards[2].bingo);
+    }
+
+    #[test]
+    fn test_play() {
+        let (mut boards, draws) = parse(CONTENT);
+        assert_eq!((4512, 1924), play(&amp;mut boards, &amp;draws));
+    }
+}</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_rust"><a class="anchor" href="#_day_05_rust"></a><a class="link" href="#_day_05_rust">Day 05: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_05_hydrothermal_venture"><a class="anchor" href="#_day_05_hydrothermal_venture"></a><a class="link" href="#_day_05_hydrothermal_venture">Day 05: Hydrothermal Venture</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/5">AoC|2021|05</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_2_3"><a class="anchor" href="#_part_1_2_3"></a><a class="link" href="#_part_1_2_3">Part 1 &amp; 2</a></h5>
+<div class="paragraph">
+<p>I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples <code><code>(x1, y1, x2, y2)</code></code>. When parsing the inputs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse lines ``"x1,y1 -&gt; x2,y2"`` to tuples ``(x1, y1, x2, y2)``
+pub fn parse(content: &amp;str) -&gt; Vec&lt;(isize, isize, isize, isize)&gt; {
+    content
+        .lines()
+        .map(|line| {
+            let mut parts = line.split(" -&gt; ");
+            let mut xy1 = parts.next().expect("No first point").split(',');
+            let x1 = xy1
+                .next()
+                .expect("No x1")
+                .parse()
+                .expect("Could not parse x1");
+            let y1 = xy1
+                .next()
+                .expect("No y1")
+                .parse()
+                .expect("Could not parse y1");
+            let mut xy2 = parts.next().expect("NO second point").split(',');
+            let x2 = xy2
+                .next()
+                .expect("No x2")
+                .parse()
+                .expect("Could not parse x2");
+            let y2 = xy2
+                .next()
+                .expect("No y2")
+                .parse()
+                .expect("Could not parse y2");
+
+            (x1, y1, x2, y2)
+        })
+        .collect()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To understand the playground, I have a function to determine the bounding box of all lines.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// get bounding box over lines
+///
+/// returns ``(x_min, y_min, x_max, y_max)`` so that all points ``(x, y)`` on
+/// any line satisfy ``x_min &lt;= x &lt; x_max`` and ``y_min &lt;= y &lt; y_max``
+pub fn get_bbox(lines: &amp;[(isize, isize, isize, isize)]) -&gt; (isize, isize, isize, isize) {
+    lines.iter().fold(
+        (isize::MAX, isize::MAX, isize::MIN, isize::MIN),
+        |(x_min, y_min, x_max, y_max), (x1, y1, x2, y2)| {
+            (
+                cmp::min(cmp::min(x_min, *x1), *x2),
+                cmp::min(cmp::min(y_min, *y1), *y2),
+                cmp::max(cmp::max(x_max, *x1 + 1), *x2 + 1),
+                cmp::max(cmp::max(y_max, *y1 + 1), *y2 + 1),
+            )
+        },
+    )
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The solution is then build by iterating over all lines and for each line iterating over all points it contains and increment a counter for the coordinate of that point. Then count all coordinates which belong to more than one line (have counter value greater than 1).</p>
+</div>
+<div class="paragraph">
+<p>To iterate over the points, I calculate deltas <code>dx</code> and <code>dy</code> that define the difference in the x and y coordinate from one point to the next. They can be one of 0, 1, or -1.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn count_overlaps(lines: &amp;[(isize, isize, isize, isize)], incl_diagonal: bool) -&gt; usize {
+    let (x_min, y_min, x_max, y_max) = get_bbox(lines);
+
+    let width = x_max - x_min;
+    let mut counts = vec![0usize; (width * (y_max - y_min)) as usize];
+
+    for (x1, y1, x2, y2) in lines {
+        if incl_diagonal || x1 == x2 || y1 == y2 {
+            let dx = match x1.cmp(&amp;x2) {
+                Ordering::Equal =&gt; 0,
+                Ordering::Greater =&gt; -1,
+                Ordering::Less =&gt; 1,
+            };
+            let dy = match y1.cmp(&amp;y2) {
+                Ordering::Equal =&gt; 0,
+                Ordering::Greater =&gt; -1,
+                Ordering::Less =&gt; 1,
+            };
+            let len = cmp::max((x2 - x1) * dx, (y2 - y1) * dy) + 1;
+            for k in 0..len {
+                counts[(x1 + k * dx - x_min + width * (y1 + k * dy - y_min)) as usize] += 1;
+            }
+        }
+    }
+
+    counts.iter().filter(|count| **count &gt; 1).count()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Whether or not to include diagonal lines is controlled with a flag <code><code>include_diagonal</code></code> which is set to <code><code>false</code></code> for part 1 and <code><code>true</code></code> for part 2.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_4"><a class="anchor" href="#_tests_4"></a><a class="link" href="#_tests_4">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "0,9 -&gt; 5,9
+8,0 -&gt; 0,8
+9,4 -&gt; 3,4
+2,2 -&gt; 2,1
+7,0 -&gt; 7,4
+6,4 -&gt; 2,0
+0,9 -&gt; 2,9
+3,4 -&gt; 1,4
+0,0 -&gt; 8,8
+5,5 -&gt; 8,2";
+
+    const LINES: &amp;'static [(isize, isize, isize, isize)] = &amp;[
+        (0, 9, 5, 9),
+        (8, 0, 0, 8),
+        (9, 4, 3, 4),
+        (2, 2, 2, 1),
+        (7, 0, 7, 4),
+        (6, 4, 2, 0),
+        (0, 9, 2, 9),
+        (3, 4, 1, 4),
+        (0, 0, 8, 8),
+        (5, 5, 8, 2),
+    ];
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(LINES, parse(CONTENT));
+    }
+
+    #[test]
+    fn test_get_bbox() {
+        assert_eq!((0, 0, 10, 10), get_bbox(LINES));
+    }
+
+    #[test]
+    fn test_count_overlaps_straight() {
+        assert_eq!(5, count_overlaps(LINES, false));
+    }
+
+    #[test]
+    fn test_count_overlaps() {
+        assert_eq!(12, count_overlaps(LINES, true));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_4"><a class="anchor" href="#_today_i_learned_4"></a><a class="link" href="#_today_i_learned_4">Today I learned</a></h5>
+<div class="paragraph">
+<p>A range is empty, if the upper bound is less than the lower bound.</p>
+</div>
+<div class="paragraph">
+<p>It is not easy to write functions in rust that return iterators, since the actual type of the iterator depends on how it is constructed. Implementing an iterator on your own is not always worth the effort.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes, it is a good idea to use signed types even if all the results are positive. This allows to deal with negative increments much more directly.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

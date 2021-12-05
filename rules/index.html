@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: Rules</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/asciidoctor.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/prettify.css" rel="stylesheet">
+      <link href="../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_rules">Rules</a></li>
+<li><a href="#_prerequisites">Prerequisites</a></li>
+<li><a href="#_spoiler_alert">Spoiler Alert!</a></li>
+<li><a href="#_never_walk_alone">Never walk alone</a></li>
+<li><a href="#_the_goal_of_this_repository">The Goal of this repository</a>
+<ul class="sectlevel2">
+<li><a href="#_how_do_we_ensure_that_all_examples_run_out_of_the_box">How do we ensure that all examples run out of the box?</a></li>
+</ul>
+</li>
+<li><a href="#_repository_structure">Repository structure</a></li>
+<li><a href="#_this_is_not_a_competition">This is not a Competition</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_rules">Rules</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>maybe more of a manual&#8230;&#8203;</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites">Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t know about <a href="https://Adventofcode.com">AdventOfCode.com</a> (short aoc) yet, please head over to the website and check it out.
+It is basically an advent calendar for geeks which reveals an algorithmic challenge for each day.</p>
+</div>
+<div class="paragraph">
+<p>Here is a video of Eric Wastle himself talking about Advent of Code:</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<iframe src="https://www.youtube.com/embed/bS9882S0ZHs?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_spoiler_alert">Spoiler Alert!</h2>
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+If you want to solve the aoc problems on your own, do not read any further. This repository contains solutions for the problems in several languages.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_never_walk_alone">Never walk alone</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Coding together is much more fun and that is what this site and repository is about.
+Share your code and check out the shared code.
+You will notice that there is a lot to learn from other people&#8217;s solutions!</p>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t be shy and follow our invitation to our <a href="https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg">aoc-2021 Slack channel</a>.
+It is the place to hang around, talk about different solutions and language and get help if you are stuck.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_goal_of_this_repository">The Goal of this repository</h2>
+<div class="sectionbody">
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>is to</p>
+<div class="ulist">
+<ul>
+<li>
+<p>have a shared code base. It will be interesting to see how the same problem is solved in different languages with different approaches</p>
+</li>
+<li>
+<p>have a development environment in which all examples run out of the box</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_how_do_we_ensure_that_all_examples_run_out_of_the_box">How do we ensure that all examples run out of the box?</h3>
+<div class="paragraph">
+<p>The best solution will be to use <a href="https://gitpod.io" class="bare">https://gitpod.io</a>. Just prefix the URL of your GitHub fork with <code><a href="https://gitpod.io#" class="bare">https://gitpod.io#</a></code> e.g. <code><a href="https://gitpod.io#https://github.com/rdmueller/aoc-2021" class="bare">https://gitpod.io#https://github.com/rdmueller/aoc-2021</a></code> or click the button:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><a class="image" href="https://gitpod.io#https://github.com/rdmueller/aoc-2021"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="open in gitpod" title="Open in Gitpod"></a></span> <span class="small">(if you&#8217;ve forked the repository, the button will still open the master)</span></p>
+</div>
+<div class="paragraph">
+<p>A webbased IDE will open with the repository already cloned in a docker container.</p>
+</div>
+<div class="paragraph">
+<p>It would be awesome if we manage to get all solutions up and running in this container!</p>
+</div>
+<div class="paragraph">
+<p>The standard <a href="https://gitpod.io">gitpod.io</a> docker container supports JavaScript, TypeScript, Java, Groovy, Ruby, Python, Go, C, C++, Rust, Perl out of the box.</p>
+</div>
+<div class="paragraph">
+<p>At least Make, Gradle and Maven are available as build tools.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_repository_structure">Repository structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The structure we start with is the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>.
+├── README.adoc
+├── day00
+├── day01
+├── day02
+│   ├── groovy
+│   |   └── rdmueller
+│   |       ├── solution.groovy
+│   |       └── README.adoc
+│   └── [language]
+│       └── [githubhandle]
+│           ├── solution.[extension]
+│           └── README.adoc
+├── day03
+├── day04
+├── ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, there is one folder per day (create one if you are the first for the day) and underneath there is one folder per language used.
+Then there is one fodler with your github handle which then contains your solution.</p>
+</div>
+<div class="paragraph">
+<p>The file structure is quite important, because the build needs it to pick up the day, language and name in order to generate the webpage you currently read.
+The build will also look for the <code>README.adoc</code> file in each folder which you can use to document your solution.</p>
+</div>
+<div class="paragraph">
+<p>Please, take a look at the <a href="https://github.com/docToolchain/aoc-2021/tree/master/day00"><code>day00</code></a> examples.
+Feel free to submit any kind of <code>hello world</code> code to <code>day00</code> to see what happens.</p>
+</div>
+<div class="paragraph">
+<p>If you want to build the web page locally, just make sure that you have java installed ( 8 &#8656; version &lt;13 ) and run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>./gradlew generateIndex
+./dtcw generateSite
+./dtcw previewSite</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to generate the site and start a small webserver.
+It should also be possible to just view the generated site by opening the <code>build/microsite/output/index.html</code> file in your browser.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_this_is_not_a_competition">This is not a Competition</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Solving riddles is fun but it is X-Mas Time and you probably have more important things to do.
+So please, don&#8217;t get too involved.
+That&#8217;s why I don&#8217;t create a private leader board this year.
+Have fun in solving some puzzles, but please remember it is not a competition and you don&#8217;t have to solve all problems.</p>
+</div>
+<div class="paragraph">
+<p>and now, get you keyboard ready and start coding!
+If you just want to check out the repository, there is a day00 where you can place your <code>hello world</code> code just to give it a try.</p>
+</div>
+<div class="paragraph">
+<p>Have fun!</p>
+</div>
+<div class="paragraph">
+<p>Ralf</p>
+</div>
+<div class="paragraph">
+<p>PS: if you like adventofcode.com, consider to <a href="https://adventofcode.com/2021/support">sponsor Eric Wastl</a></p>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

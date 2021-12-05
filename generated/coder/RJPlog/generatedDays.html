@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: RJPlog</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_rjplog">RJPlog</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_00_kotlin">Day 00: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_00_getting_started">Day 00: Getting started</a></li>
+</ul>
+</li>
+<li><a href="#_day_01_kotlin">Day 01: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star">First Star</a></li>
+<li><a href="#_second_star">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_kotlin">Day 02: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_2_dive">Day 2: Dive</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_2">First Star</a></li>
+<li><a href="#_second_star_2">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_kotlin">Day 03: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_3">First Star</a></li>
+<li><a href="#_second_star_3">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_kotlin">Day 04: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_giant_squid">Day 4: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_today_i_learned">Today I learned</a></li>
+<li><a href="#_first_star_4">First Star</a></li>
+<li><a href="#_second_star_4">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_kotlin">Day 05: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_5">First Star</a></li>
+<li><a href="#_second_star_5">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_rjplog"><a class="anchor" href="#_rjplog"></a><a class="link" href="#_rjplog">RJPlog</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/44948239?v=4" alt="44948239?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>RJPlog</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/RJPlog">RJPlog</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/RJPlog.adoc">/profiles/RJPlog.adoc</a></p>
+</div>
+<a id="day00" />
+</div>
+<div class="sect2">
+<h3 id="_day_00_kotlin"><a class="anchor" href="#_day_00_kotlin"></a><a class="link" href="#_day_00_kotlin">Day 00: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_00_getting_started"><a class="anchor" href="#_day_00_getting_started"></a><a class="link" href="#_day_00_getting_started">Day 00: Getting started</a></h4>
+<div class="paragraph">
+<p>As in the past years I will get more into kotlin. Here in gitpod solutions will run with kotlin script.</p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2100.kts</em> in the command line.</p>
+</div>
+<div class="paragraph">
+<p>Read the input file is done via a function call:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun read(): String {
+    var result: String = ""
+    File("day2100_puzzle_input.txt").forEachLine {
+        result = it
+    }
+    return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output is printed in main:app-name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">//main (args: Arrary&lt;String&gt;) {
+    var solution_1 = read()
+    println(" I like $solution_1")
+//}</code></pre>
+</div>
+</div>
+<a id="day01" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_01_kotlin"><a class="anchor" href="#_day_01_kotlin"></a><a class="link" href="#_day_01_kotlin">Day 01: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_1_sonar_sweep"><a class="anchor" href="#_day_1_sonar_sweep"></a><a class="link" href="#_day_1_sonar_sweep">Day 1: Sonar Sweep</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/1" class="bare">https://adventofcode.com/2021/day/1</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2101_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star"><a class="anchor" href="#_first_star"></a><a class="link" href="#_first_star">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>sonar_sweep</em> the puzzle input will be read into a list. Afterwards within a loop each value is compared to it&#8217;s previous value. If the current value is higher than the previous, the variable <em>result</em> is increased. After finishing the loop, <em>result</em> is returned.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun sonar_sweep(): Int {
+
+	var result: Int = 0
+	var samples = mutableListOf&lt;Int&gt;()
+
+	File("day2101_puzzle_input.txt").forEachLine {
+		samples.add(it.toInt())
+	}
+
+	for (i in 1..samples.size-1) {
+		if (samples[i] &gt; samples[i-1]){
+			result++
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star"><a class="anchor" href="#_second_star"></a><a class="link" href="#_second_star">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>sonar_sweep_noise</em> the puzzle input will be read into a list as in solution for part 1. Afterwards within a loop a variable <em>prev_sum</em> and <em>curr_sum</em> is calculated out of the last and current 3 samples. Both are compared, if the current value is higher than the previous, the variable <em>result</em> is increased. After finishing the loop, <em>result</em> is returned.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun sonar_sweep_noise(): Int {
+
+	var result: Int = 0
+	var samples = mutableListOf&lt;Int&gt;()
+
+	File("day2101_puzzle_input.txt").forEachLine {
+		samples.add(it.toInt())
+	}
+
+	for (i in 1..samples.size-1-2) {
+
+		var prev_sum: Int = samples[i-1]+samples[i]+ samples[i+1]
+		var cur_sum: Int = samples[i]+samples[i+1]+ samples[i+2]
+
+		if (cur_sum &gt; prev_sum){
+			result++
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("**************************")
+	println("--- Day 1: Sonar Sweep ---")
+	println("**************************")
+	println("Solution for part1")
+	println("   $solution1 are larger than the previous measurement ")
+	println()
+// print solution for part 2
+	println("**************************")
+	println("Solution for part2")
+	println("   $solution2 sums are larger than the previous measurement")
+	println()</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_kotlin"><a class="anchor" href="#_day_02_kotlin"></a><a class="link" href="#_day_02_kotlin">Day 02: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_2_dive"><a class="anchor" href="#_day_2_dive"></a><a class="link" href="#_day_2_dive">Day 2: Dive</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/2" class="bare">https://adventofcode.com/2021/day/2</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2102_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_2"><a class="anchor" href="#_first_star_2"></a><a class="link" href="#_first_star_2">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>dive</em> the puzzle input will be read line by line and split into the instruction part <em>instruction[0]</em> and the value <em>instruction[1]</em>. The varibles <em>depth</em> and <em>horizontal</em> are increased or decreased within a if/else instruction according to their instructions. After going through the complete input file <em>depth</em> multiplied by <em>horizontal</em> is returned</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun dive_1(): Int {
+
+	var depth: Int = 0
+	var horizontal: Int = 0
+
+	File("day2102_puzzle_input.txt").forEachLine {
+
+		var instruction = it.split(' ')
+
+		if (instruction[0].equals("forward")) {
+			horizontal = horizontal + instruction[1].toInt()
+		} else if (instruction[0].equals("down")) {
+			depth = depth + instruction[1].toInt()
+		} else if (instruction[0].equals("up")) {
+			depth = depth - instruction[1].toInt()
+		}
+	}
+	return depth*horizontal
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_2"><a class="anchor" href="#_second_star_2"></a><a class="link" href="#_second_star_2">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>dive_2</em> the puzzle input will be read line by line and split into the instruction part <em>instruction[0]</em> and the value <em>instruction[1]</em>. The varibles <em>depth</em>, <em>horizontal</em> and <em>aim</em> are increased or decreased within a if/else instruction according to their instructions. After going through the complete input file <em>depth</em> multiplied by <em>horizontal</em> is returned</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun dive_2(): Int {
+
+	var depth: Int = 0
+	var horizontal: Int = 0
+	var aim: Int = 0
+
+	File("day2102_puzzle_input.txt").forEachLine {
+
+		var instruction = it.split(' ')
+
+		if (instruction[0].equals("forward")) {
+			horizontal = horizontal + instruction[1].toInt()
+			depth = depth + aim * instruction[1].toInt()
+		} else if (instruction[0].equals("down")) {
+			aim = aim + instruction[1].toInt()
+		} else if (instruction[0].equals("up")) {
+			aim = aim - instruction[1].toInt()
+		}
+	}
+	return depth*horizontal
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("*******************")
+	println("--- Day 2: Dive ---")
+	println("*******************")
+	println("Solution for part1")
+	println("   $solution1 is your final horizontal position multiplied by final depth ")
+	println()
+// print solution for part 2
+	println("**************************")
+	println("Solution for part2")
+	println("   $solution2 is your final horizontal position multiplied by final depth")
+	println()</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_kotlin"><a class="anchor" href="#_day_03_kotlin"></a><a class="link" href="#_day_03_kotlin">Day 03: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_3_binary_diagnostic"><a class="anchor" href="#_day_3_binary_diagnostic"></a><a class="link" href="#_day_3_binary_diagnostic">Day 3: Binary Diagnostic</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/3" class="bare">https://adventofcode.com/2021/day/3</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2103_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_3"><a class="anchor" href="#_first_star_3"></a><a class="link" href="#_first_star_3">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>diagnostic_power</em> the puzzle input will be read line by line and within a loop over all elements of the string a counter for each position will be increased, if the string contains a ´1´ at this position. Afterwards there are strings for gamma and epsilon set up and converted to dezimal integers. The result of the multiplication of gamma and epsilon is returned as solution for part one:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun diagnostic_power(): Int {
+	var count = mutableListOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	var reports: Int = 0
+
+	// search for most common bit
+	File("day2103_puzzle_input.txt").forEachLine {
+		reports += 1
+		for (i in 0..it.length - 1) {
+			if (it[i].equals('1')) {
+				count[i] = count[i] + 1
+			}
+		}
+	}
+
+	// calculate gamma and epsilon rate out of most common bit list
+	var gamma: String = ""
+	var epsilon: String = ""
+	count.forEach {
+		if (it &gt; reports - it) {
+			gamma = gamma + "1"
+			epsilon = epsilon + "0"
+		} else {
+			gamma = gamma + "0"
+			epsilon = epsilon + "1"
+		}
+	}
+
+	// return power consumption
+	return gamma.toInt(2) * epsilon.toInt(2)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_3"><a class="anchor" href="#_second_star_3"></a><a class="link" href="#_second_star_3">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Inside function <em>diagnostic_life</em> the puzzle input will be read into a list for O2 and one for CO2. Then we  start splitting the O2 list postition by position only keeping the part with the most common bit until there is only one entry left. Same is done for the CO2 list, only difference is, that only the list with the least common bit is kept. Both remaining entries are converted to dezimal integer and the result of the multiplication is returned as solution for part two:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun diagnostic_life(): Int {
+	val list = mutableListOf&lt;String&gt;()
+	val list_co2 = mutableListOf&lt;String&gt;()
+	var pos: Int = 0
+
+	// setup lists for O2 and CO2 ratings
+	File("day2103_puzzle_input.txt").forEachLine {
+		list.add(it)
+		list_co2.add(it)
+	}
+
+	// determine O2 generator rating
+	while (list.size &gt; 1) {
+		var (first, second) = list.partition { it[pos].equals('1') }
+		if (first.size &gt;= second.size) {
+			list.clear()
+			first.forEach {
+				list.add(it)
+			}
+		} else {
+			list.clear()
+			second.forEach {
+				list.add(it)
+			}
+		}
+		pos += 1
+	}
+
+	// determine CO2 scrubber rating
+	pos = 0
+
+	while (list_co2.size &gt; 1) {
+		var (first, second) = list_co2.partition { it[pos].equals('1') }
+		if (first.size &gt;= second.size) {
+			list_co2.clear()
+			second.forEach {
+				list_co2.add(it)
+			}
+		} else {
+			list_co2.clear()
+			first.forEach {
+				list_co2.add(it)
+			}
+		}
+		pos += 1
+	}
+
+	// return life supporting rate
+	return list[0].toInt(2) * list_co2[0].toInt(2)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("********************************")
+	println("--- Day 3: Binary Diagnostic ---")
+	println("********************************")
+	println("Solution for part1")
+	println("   $solution1 is your power consumption ")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   $solution2 is your life supporting rate")
+	println()</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_kotlin"><a class="anchor" href="#_day_04_kotlin"></a><a class="link" href="#_day_04_kotlin">Day 04: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_4_giant_squid"><a class="anchor" href="#_day_4_giant_squid"></a><a class="link" href="#_day_4_giant_squid">Day 4: Giant Squid</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/4" class="bare">https://adventofcode.com/2021/day/4</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2104_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned"><a class="anchor" href="#_today_i_learned"></a><a class="link" href="#_today_i_learned">Today I learned</a></h5>
+<div class="paragraph">
+<p>I never worked with classes, but today&#8217;s puzzle seemed to be a good start for learning something about it. At the beginning I had some difficulties to transfer the boards to the class, whenever I read in the next board also the last classes' boards where cleaned. I solved it by introducing a second list which I made unmutable, I guess there are better solutions but for the start it worked out to solve the today&#8217;s puzzle.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_4"><a class="anchor" href="#_first_star_4"></a><a class="link" href="#_first_star_4">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>I created a class representing a bingo card with individual numbers and a method <em>next_number</em>. Evoking this method will mark all numbers matching the given number, evaluate, if already a row or column is complete and calculate the final score:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">class bingo(field: List&lt;Int&gt;) {
+	// this class should represent a single bingo board. The board is initialized with it's individual numbers
+	var field = field
+	var fieldProgress = field.toMutableList()
+	var win: Boolean = false
+	var finalScore: Int = 0
+
+	// this method is used to print the board
+	fun print_board() {
+		println("-- Board --")
+		for (j in 0..4) {
+			for (i in 0..4) {
+				print("${fieldProgress[i + j * 5]} ")
+			}
+			println()
+		}
+		println()
+	}
+
+	// this method is used every time a new number is given, to check if bingo is complete and to calculate the final score
+	fun nextNumber(Number: Int) {
+		var currentNumber: Int = Number
+		var sumOfUnmarkedNumbers: Int = 0
+
+		// mark positions which have already fitted
+		for (i in 0..fieldProgress.size - 1) {
+			if (fieldProgress[i] == currentNumber) {
+				fieldProgress[i] = -1
+			}
+		}
+
+		// check if one row is complete - set win - claculate final score
+		if (fieldProgress[0] + fieldProgress[1] + fieldProgress[2] + fieldProgress[3] + fieldProgress[4] == -5 ||
+			fieldProgress[5] + fieldProgress[6] + fieldProgress[7] + fieldProgress[8] + fieldProgress[9] == -5 ||
+			fieldProgress[10] + fieldProgress[11] + fieldProgress[12] + fieldProgress[13] + fieldProgress[14] == -5 ||
+			fieldProgress[15] + fieldProgress[16] + fieldProgress[17] + fieldProgress[18] + fieldProgress[19] == -5 ||
+			fieldProgress[20] + fieldProgress[21] + fieldProgress[22] + fieldProgress[23] + fieldProgress[24] == -5 ||
+			fieldProgress[0] + fieldProgress[5] + fieldProgress[10] + fieldProgress[15] + fieldProgress[20] == -5 ||
+			fieldProgress[1] + fieldProgress[6] + fieldProgress[11] + fieldProgress[16] + fieldProgress[21] == -5 ||
+			fieldProgress[2] + fieldProgress[7] + fieldProgress[12] + fieldProgress[17] + fieldProgress[22] == -5 ||
+			fieldProgress[3] + fieldProgress[8] + fieldProgress[13] + fieldProgress[18] + fieldProgress[23] == -5 ||
+			fieldProgress[4] + fieldProgress[9] + fieldProgress[14] + fieldProgress[19] + fieldProgress[24] == -5
+		) {
+			win = true
+			fieldProgress.forEach {
+				if (it != -1) {
+					sumOfUnmarkedNumbers = sumOfUnmarkedNumbers + it
+				}
+			}
+			finalScore = currentNumber * sumOfUnmarkedNumbers
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To start, the puzzle input will be read. All numbers are added to a list, for all boards a new bingo class is added to second list.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// setup for reading puzzle input
+	var numbers = mutableListOf&lt;Int&gt;()
+	var card = mutableListOf&lt;Int&gt;()
+	var cardboard = listOf&lt;Int&gt;()
+	var fields = mutableListOf&lt;bingo&gt;()
+
+	File("day2104_puzzle_input.txt").forEachLine {
+		if (it.length &gt; 15) {
+			var instruction = it.split(",")
+			instruction.forEach { numbers.add(it.toInt()) }
+		} else if (it.length &gt; 2) {
+			var line: String = ""
+			if (it[0].equals(' ')) {
+				line = it.drop(1)
+			} else {
+				line = it
+			}
+			var instruction = line.replace("  ", " ").replace("  ", " ").split(" ")
+			for (i in instruction) {
+				card.add(i.toInt())
+			}
+		} else if (it.length &lt; 2 &amp;&amp; card.size &gt; 10) {
+			cardboard = card.toList()
+			fields.add(bingo(cardboard))
+			card.clear()
+		}
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After the preparation, two nested loop&#8217;s run over each number and each board until the first board wins, and the final score is printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// start game
+	// loop through numbers until gameend, then printout final score
+	var currentNumber: Int
+	var outOfGame = mutableListOf&lt;Int&gt;()
+	var winningScores = mutableListOf&lt;Int&gt;()
+
+	loop@ for (i in 0..numbers.size - 1) {
+		currentNumber = numbers[i]
+
+		var xx: Int = 0
+		for (j in fields) {//fields.forEach {
+			if (!outOfGame.contains(xx)) {
+				j.nextNumber(currentNumber)
+				if (j.win) {
+					outOfGame.add(xx)
+					winningScores.add(j.finalScore)
+					if (outOfGame.size == fields.size) {
+						break@loop
+					}
+				}
+			}
+			xx += 1
+		}
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_4"><a class="anchor" href="#_second_star_4"></a><a class="link" href="#_second_star_4">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Instead stopping after the first win, all wins are added to a list, a board which has already a complete row or column is exluded for the ongoning game. The last element of the win list is the solution for number two.</p>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("**************************")
+	println("--- Day 4: Giant Squid ---")
+	println("**************************")
+	println("Solution for part1")
+	println("   ${winningScores[0]} will your final score be if you choose that board")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   ${winningScores[winningScores.size-1]} would be the final score")
+	println()</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_kotlin"><a class="anchor" href="#_day_05_kotlin"></a><a class="link" href="#_day_05_kotlin">Day 05: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_5_hydrothermal_venture"><a class="anchor" href="#_day_5_hydrothermal_venture"></a><a class="link" href="#_day_5_hydrothermal_venture">Day 5: Hydrothermal Venture</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/5" class="bare">https://adventofcode.com/2021/day/5</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2105_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_5"><a class="anchor" href="#_first_star_5"></a><a class="link" href="#_first_star_5">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>I created a class function reading file input and separating coordinates. Then for each horizontal and vertical lines a map entry is created with value 1 or if already existing, increased by one. The function returns the number of all map entries higher than one. The function has one parameter which is by default 0, that means the evaluation of diagonal lines will be skipped.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun lines(solution: Int = 0): Int {
+	var ground = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Int&gt;()
+	var result: Int = 0
+
+	File("day2105_puzzle_input.txt").forEachLine {
+		var instruction = it.split(" -&gt; ")
+		var pos1 = instruction[0].split(",")
+		var pos2 = instruction[1].split(",")
+		var x1: Int = pos1[0].toInt()
+		var y1: Int = pos1[1].toInt()
+		var x2: Int = pos2[0].toInt()
+		var y2: Int = pos2[1].toInt()
+
+		if (x1 == x2) {
+			for (i in minOf(y1, y2)..maxOf(y1, y2)) {
+				if (ground.contains(Pair(x1, i))) {
+					ground.put(Pair(x1, i), ground.getValue(Pair(x1, i)) + 1)
+				} else {
+					ground.put(Pair(x1, i), 1)
+				}
+			}
+
+		} else if (y1 == y2) {
+			for (i in minOf(x1, x2)..maxOf(x1, x2)) {
+				if (ground.contains(Pair(i, y1))) {
+					ground.put(Pair(i, y1), ground.getValue(Pair(i, y1)) + 1)
+				} else {
+					ground.put(Pair(i, y1), 1)
+				}
+			}
+		} else {
+		// tag::lines2[]
+		if (solution &gt; 0) {
+				for (j in 0..(maxOf(x1, x2)-minOf(x1, x2))) {
+					if (x2 &gt; x1 &amp;&amp; y2 &gt; y1 ) {
+						if (ground.contains(Pair(j + minOf(x1, x2), j + minOf(y1, y2)))) {
+							ground.put(
+								Pair(j + minOf(x1, x2) , j + minOf(y1, y2)),
+								ground.getValue(Pair(j + minOf(x1, x2), j + minOf(y1, y2))) + 1
+							)
+						} else {
+							ground.put(Pair(j + minOf(x1, x2), j + minOf(y1, y2)), 1)
+						}
+					} else if (x2 &lt; x1 &amp;&amp; y2 &gt; y1) {
+						if (ground.contains(Pair( maxOf(x1, x2) - j, minOf(y1,y2)+j))) {
+							ground.put(
+								Pair(maxOf(x1, x2) - j, minOf(y1, y2)+j),
+								ground.getValue(Pair(maxOf(x1, x2) - j, minOf(y1, y2) + j)) + 1
+							)
+						} else {
+							ground.put(Pair(maxOf(x1, x2) - j, minOf(y1, y2) +j), 1)
+						}
+					} else if (x2 &gt; x1 &amp;&amp; y2 &lt; y1) {
+						if (ground.contains(Pair(j + minOf(x1, x2), maxOf(y1, y2) - j))) {
+							ground.put(
+								Pair(j + minOf(x1, x2) , maxOf(y1, y2) - j),
+								ground.getValue(Pair(j + minOf(x1, x2), maxOf(y1, y2)-j)) + 1
+							)
+						} else {
+							ground.put(Pair(j + minOf(x1, x2), maxOf(y1, y2)-j), 1)
+						}
+					} else if (x2 &lt; x1 &amp;&amp; y2 &lt; y1) {
+						if (ground.contains(Pair(maxOf(x1, x2) - j, maxOf(y1, y2) - j))) {
+							ground.put(
+								Pair(maxOf(x1, x2) - j , maxOf(y1, y2) - j),
+								ground.getValue(Pair(maxOf(x1, x2) - j, maxOf(y1, y2)-j)) + 1
+							)
+						} else {
+							ground.put(Pair(maxOf(x1, x2) - j, maxOf(y1, y2)-j), 1)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for ((key, value) in ground) {
+		if (value &gt; 1) {
+			result += 1
+		}
+	}
+
+	return result
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_5"><a class="anchor" href="#_second_star_5"></a><a class="link" href="#_second_star_5">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>By invokeing the function with a parameter higher than 0 the diagonal lines will also be taken into account.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin"></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("***********************************")
+	println("--- Day 5: Hydrothermal Venture ---")
+	println("***********************************")
+	println("Solution for part1")
+	println("   At $solution1 points at least two lines overlap ")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   At $solution2 points at least two lines overlap")
+	println()
+// end::output[]
+//}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>

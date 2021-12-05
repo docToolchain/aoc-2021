@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: uniqueck</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_uniqueck">uniqueck</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_01_groovy">Day 01: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day1_of_advent_of_code">Day1 of Advent of Code</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1">Part 1</a></li>
+<li><a href="#_part_2">Part 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_02_groovy">Day 02: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day_2_dive">Day 2: Dive!</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_2">Part 1</a></li>
+<li><a href="#_part2">Part2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_03_groovy">Day 03: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a>
+<ul class="sectlevel4">
+<li><a href="#_part1_calculate_power_consumption_rating">Part1 calculate power consumption rating</a></li>
+<li><a href="#_part2_calculate_life_support_rating">Part2 calculate life support rating</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_04_groovy">Day 04: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_giant_squid">Day 4: Giant Squid</a>
+<ul class="sectlevel4">
+<li><a href="#_today_i_learned">Today I learned</a></li>
+<li><a href="#_first_star">First Star</a></li>
+<li><a href="#_second_star">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_05_groovy">Day 05: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_hydrothermal_venture">Day 4: Hydrothermal Venture</a>
+<ul class="sectlevel4">
+<li><a href="#_today_i_learned_2">Today I learned</a></li>
+<li><a href="#_first_star_2">First Star</a></li>
+<li><a href="#_second_star_2">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_uniqueck"><a class="anchor" href="#_uniqueck"></a><a class="link" href="#_uniqueck">uniqueck</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" alt="12494167?s=400&amp;u=8b5a96545fd5df74ef263d06135616aa40f5c075&amp;v=4" width="100px"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>uniqueck</strong><br>
+Constantin Krüger<br>
+Github: <a href="https://github.com/uniqueck">uniqueck</a>,
+Twitter: <a href="https://twitter.com/CKrger">CKrger</a><br></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>First time, i hope i can provide every day a solution. I hope to start a little with ruby for the Asciidoctor universe or NodeJs is also fine to provide more extensions also for Antora.</p>
+</div>
+<a id="day01" />
+</div>
+<div class="sect2">
+<h3 id="_day_01_groovy"><a class="anchor" href="#_day_01_groovy"></a><a class="link" href="#_day_01_groovy">Day 01: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day1_of_advent_of_code"><a class="anchor" href="#_day1_of_advent_of_code"></a><a class="link" href="#_day1_of_advent_of_code">Day1 of Advent of Code</a></h4>
+<div class="paragraph">
+<p>Done with TDD in Groovy.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1"><a class="anchor" href="#_part_1"></a><a class="link" href="#_part_1">Part 1</a></h5>
+<div class="paragraph">
+<p>First we create a test with an assumption</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void countIfNextMeasurementIncreased() {
+        assertEquals(7, SonarSweep.countIfNextMeasurementIncreased([199, 200,208,210,200,207,240,269,260,263]))
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we create the production code and start here with the method <code>countIfNextMeasurementIncreased(def list)</code>
+We iterate over two pairs from the list and compare it with each other. If the second is greater than the first, count it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static int countIfNextMeasurementIncreased(List&lt;Integer&gt; input) {
+        int counter = 0
+        for (int i = 0; i &lt; input.size() - 1; i++) {
+            counter += count(input[i], input[i+1])
+        }
+        counter
+    }
+    static int count(int a, b) {
+        b &gt; a ? 1 : 0
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After we check that the test succeed, we read the input and pass it to the method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">        def collect = new File('input.txt').text.split('\n').collect { Integer::valueOf(it) }
+        println "Part1 solution: ${countIfNextMeasurementIncreased(collect)}"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2"><a class="anchor" href="#_part_2"></a><a class="link" href="#_part_2">Part 2</a></h5>
+<div class="paragraph">
+<p>We start with a test and the assumption from the puzzle description.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void countThreeMeasurementSlidingWindow() {
+        assertEquals(5, SonarSweep.countThreeMeasurementSlidingWindow([199, 200,208,210,200,207,240,269,260,263]))
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we start implement the production code. We iterate over the list and create for each iteration two sub lists with each 3 elements. We sum these sub lists each separate and call the count method to compare these sums.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static int countThreeMeasurementSlidingWindow(List&lt;Integer&gt; input) {
+        int counter = 0
+        for (int i = 0; i &lt; input.size() - 3; i++) {
+            int sum1 = input.subList(i, i +3).sum(0) as int
+            int sum2 = input.subList(i+1, i +4).sum(0) as int
+            counter += count(sum1, sum2)
+        }
+        counter
+    }
+    static int count(int a, b) {
+        b &gt; a ? 1 : 0
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we pass the input to the method and print the solution.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">        def collect = new File('input.txt').text.split('\n').collect { Integer::valueOf(it) }
+        println "Part2 solution: ${countThreeMeasurementSlidingWindow(collect)}"</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_groovy"><a class="anchor" href="#_day_02_groovy"></a><a class="link" href="#_day_02_groovy">Day 02: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day_2_dive"><a class="anchor" href="#_day_2_dive"></a><a class="link" href="#_day_2_dive">Day 2: Dive!</a></h4>
+<div class="paragraph">
+<p>Navigate never without a test case. Doit with TDD and groovy.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_2"><a class="anchor" href="#_part_1_2"></a><a class="link" href="#_part_1_2">Part 1</a></h5>
+<div class="paragraph">
+<p>just create a test that fails for the provided example course</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void part1() {
+        assertEquals(150, Navigation.calculateFinalPositionValue(["forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"]))
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>iterate over the planned steps and extract speed and direction.
+Update coordinates and return multiplied result of depth and horizontalPosition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    enum Course {
+        DOWN, FORWARD, UP
+    }
+    static int calculateFinalPositionValue(def plannedCourse = String[]) {
+        int horizontalPosition = 0
+        int depth = 0
+
+        plannedCourse.each { String plannedStep -&gt;
+            def (direction, sValue) = plannedStep.tokenize(" ")
+            int speed = Integer.valueOf(sValue)
+            switch (Course.valueOf(direction.toUpperCase())) {
+                case Course.FORWARD: {
+                    horizontalPosition += speed
+                    break
+                }
+                case Course.UP: {
+                    depth -= speed
+                    break
+                }
+                case Course.DOWN: {
+                    depth += speed
+                    break
+                }
+            }
+        }
+        return horizontalPosition * depth
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we read the specific input and let navigator do the rest.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">        def lines = new File("input.txt").readLines()
+        println "Day2 part 1 solution: ${calculateFinalPositionValue(lines)}"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part2"><a class="anchor" href="#_part2"></a><a class="link" href="#_part2">Part2</a></h5>
+<div class="paragraph">
+<p>just create a test that fails for the provided example course</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void part2() {
+        assertEquals(900, Navigation.calculateFinalPositionValueWithAIM(["forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"]))
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>iterate over the planned steps and extract speed and direction.
+Update coordinates and return multiplied result of depth and horizontalPosition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    enum Course {
+        DOWN, FORWARD, UP
+    }
+    static int calculateFinalPositionValueWithAIM(def plannedCourse = String[]) {
+        int horizontalPosition = 0
+        int depth = 0
+        int aim = 0
+
+        plannedCourse.each { String plannedStep -&gt;
+            def (direction, sValue) = plannedStep.tokenize(" ")
+            int speed = Integer.valueOf(sValue)
+            switch (Course.valueOf(direction.toUpperCase())) {
+                case Course.FORWARD: {
+                    horizontalPosition += speed
+                    depth += (aim * speed)
+                    break
+                }
+                case Course.UP: {
+                    aim -= speed
+                    break
+                }
+                case Course.DOWN: {
+                    aim += speed
+                }
+            }
+        }
+
+        println "${horizontalPosition}, ${depth}, ${aim}"
+
+
+        return horizontalPosition * depth
+
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we read the specific input and let navigator do the rest.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">        def lines = new File("input.txt").readLines()
+        println "Day2 part 2 solution: ${calculateFinalPositionValueWithAIM(lines)}"</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_groovy"><a class="anchor" href="#_day_03_groovy"></a><a class="link" href="#_day_03_groovy">Day 03: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day_03_binary_diagnostic"><a class="anchor" href="#_day_03_binary_diagnostic"></a><a class="link" href="#_day_03_binary_diagnostic">Day 03: Binary Diagnostic</a></h4>
+<div class="sect4">
+<h5 id="_part1_calculate_power_consumption_rating"><a class="anchor" href="#_part1_calculate_power_consumption_rating"></a><a class="link" href="#_part1_calculate_power_consumption_rating">Part1 calculate power consumption rating</a></h5>
+<div class="paragraph">
+<p>Let start creating a test.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void calculatePowerConsumption() {
+        assertEquals(198, BinaryDiagnostic.calculatePowerConsumption(["00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"]))
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We iterate over the input and count for each position the bit equals <code>1</code>. If the sum is greater than the half over all input lines we set the bit <code>1</code> for the gamma rate and <code>0</code> fir the epsilon rate. After all positions are processed we can multiply the decimal values for gamma rating and epsilon rating to get the power consumption rating.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static int calculatePowerConsumption(List&lt;String&gt; diagnosticReport) {
+
+        def gammaBinary = ""
+        def epsilonBinary = ""
+        def tempValue = 0
+        def length = diagnosticReport[0].length()
+        int half = diagnosticReport.size() / 2
+
+        for (int position = 0; position &lt; length; position++) {
+            tempValue = 0
+            diagnosticReport.each { String it -&gt;
+                tempValue += Integer.parseInt(it[position])
+            }
+            gammaBinary += tempValue &gt; half ? "1" : "0"
+            epsilonBinary += tempValue &gt; half ? "0" : "1"
+        }
+        println gammaBinary
+        println epsilonBinary
+
+        return Integer.parseInt(gammaBinary, 2) * Integer.parseInt(epsilonBinary, 2)
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the calculation with our puzzle input.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static void main(String[] args) {
+        println "Day3 power consumption rating: ${calculatePowerConsumption(new File("input.txt").readLines())}"
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part2_calculate_life_support_rating"><a class="anchor" href="#_part2_calculate_life_support_rating"></a><a class="link" href="#_part2_calculate_life_support_rating">Part2 calculate life support rating</a></h5>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The same we start with a test for the example input.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    @Test
+    void calculateLifeSupportRating() {
+        assertEquals(230, BinaryDiagnostic.calculateLifeSupportRating(["00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"]))
+    }</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>So for this we have to count the bits on each position multiple times, so we create some help method <code>countBitsOnPosition</code>. We define another help method <code>filterByCriteria</code> to filter our input list for the criteria (oxygen and co2). The last method <code>calculateLifeSupportRating</code> is our main method to start the calculation based on out puzzle input. We call <code>filterByCriteria</code> two times with different closures for the filter criteria (oxygen and CO2)</p>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static int calculateLifeSupportRating(List&lt;String&gt; diagnosticReport) {
+        // calculate oxygen generator rating
+        String oxygenGeneratorRating = filterByCriteria(diagnosticReport, { int[] tempBitsCounted -&gt; tempBitsCounted[0] &gt; tempBitsCounted[1] ? "0" : "1" })
+        String co2ScrubberRating = filterByCriteria(diagnosticReport, { int[] tempBitsCounted -&gt; tempBitsCounted[0] &lt;= tempBitsCounted[1] ? "0" : "1" })
+        return Integer.parseInt(oxygenGeneratorRating, 2) * Integer.parseInt(co2ScrubberRating, 2)
+    }
+
+    static String filterByCriteria(List&lt;String&gt; diagnosticReport, Closure&lt;String&gt; filterBitClosure) {
+        int position = 0
+        List&lt;String&gt; tempList = diagnosticReport
+        do {
+            String filterBit = filterBitClosure.call(countBitsOnPosition(position, tempList))
+            tempList = tempList.findAll { it[position] == filterBit }
+            position++
+        } while (tempList.size() &gt; 1)
+        return tempList[0]
+    }
+
+    static int[] countBitsOnPosition(int position, List&lt;String&gt; diagnosticReport) {
+        def by = diagnosticReport.countBy { it[position] }
+        return [by."0", by."1"]
+    }</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Run the calculation with our puzzle input.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static void main(String[] args) {
+        println "Day3 life support rating: ${calculateLifeSupportRating(new File("input.txt").readLines())}"
+    }</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<a id="day04" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_groovy"><a class="anchor" href="#_day_04_groovy"></a><a class="link" href="#_day_04_groovy">Day 04: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day_4_giant_squid"><a class="anchor" href="#_day_4_giant_squid"></a><a class="link" href="#_day_4_giant_squid">Day 4: Giant Squid</a></h4>
+<div class="paragraph">
+<p>This solution is written in Groovy and of course with TDD approach.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/4" class="bare">https://adventofcode.com/2021/day/4</a></p>
+</div>
+<div class="paragraph">
+<p>The working example can be found here <a href="https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day4">uniqueck / advent-of-code</a></p>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned"><a class="anchor" href="#_today_i_learned"></a><a class="link" href="#_today_i_learned">Today I learned</a></h5>
+<div class="paragraph">
+<p>You can solve the puzzle without an error free algorithm. Part 1 I solved and at part 2 if run the test it fails any time. My testcases for the class <code>BingoBoard</code> and method <code>isWins</code> don&#8217;t cover columns or maybe rows the right way. So for the second part I have to reimplement the <code>isWins</code> method. Also I doesn&#8217;t react in the <code>markNumber</code> method on not existing fields for that number, so maybe it was another day too late for the kind of puzzle ;) But my new lovely method for collections is <code>collate</code> &#8594; easily split a list to sublist of a specific size. Groovy I love you, but for the namings we have something to discuss, why in the hell call this method not <code>partials</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star"><a class="anchor" href="#_first_star"></a><a class="link" href="#_first_star">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>I created a class <code>BingoBoard</code> representing a bingo board with a subclass <code>Field</code> representing one field of a bingo board.
+These class can check if the boards currently wins, and we can sum the remaining points on this board with, also we can mark a field with the given number.
+To print the board to the console I added some simple toString method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">class BingoBoard {
+
+    static class Field {
+        int value
+        boolean marked
+
+        private Field(int value) {
+            this.value = value
+            this.marked = false
+        }
+
+        static Field of(int value) {
+            return new Field(value)
+        }
+
+        String toString() {
+            return (marked ? "X" : "${value}").padLeft(2, " ")
+        }
+    }
+
+    List&lt;Field&gt; fields
+
+
+    static BingoBoard init(String[] boardLayout) {
+        def fields = boardLayout.collect { it.split(" ").findAll { it.trim() }.collect { Field.of(it.trim() as int) } }.flatten()
+        return new BingoBoard(fields)
+    }
+
+    private BingoBoard(def fields) {
+        this.fields = fields
+    }
+
+    boolean isWins() {
+        // check rows
+        def match = false
+        int i = 0
+        do {
+            // check line
+            match |= fields.subList(i * 5, 5 * i + 5).every { it.marked }
+            // check row
+            match |= fields.collate(5).every { it[i].marked }
+            i++
+        } while (!match &amp;&amp; i &lt; 5)
+        return match
+    }
+
+    int sumOfAllUnmarkedNumbers() {
+        def sum = fields.findAll { !it.marked }.collect { it.value as int }.sum(0)
+        return sum as int
+    }
+
+    boolean markNumber(int value) {
+        // search field with this number
+        def field = fields.find { it.value == value }
+        if (field) {
+            field.marked = true
+            return wins
+        } else {
+            return false
+        }
+    }
+
+    String toString() {
+        return fields.collect { it.toString() }.collate(5).collect {it.join(" ")}.join("\n")
+    }
+
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To read the puzzle input, I choose to skip empty lines and remove the first lines, and process it as the random numbers. For the remaining lines I choose my new lovely method collate to split all 5 lines, so I can map these as a BingoBoard instance. The first line we only have to split after <code>,</code> and parse the values as int.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">    static GiantSquid initGame(File puzzleInputFile) {
+        def allLines = puzzleInputFile.readLines().findAll { String it -&gt; it?.trim() }
+        int[] randomNumbers = allLines.remove(0).split(",").collect{it as int}
+        def boards = allLines.collate(5).collect { it.join(" " ) }.collect { BingoBoard.init(it) }
+        return new GiantSquid(boards, randomNumbers)
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So we can start play bingo and choose the right board to win.
+So we iterate over the random numbers and mark these number on each board. The mark method also returns the win state of these board after marking the number. So we can fast breaks the loops and calculate the final score.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">    int playBingoAndReturnFinalScoreFromWinningBoard() {
+        int finalScore = -1
+        int randomNumbersIndex = 0
+        do {
+            for (int j = 0; j &lt; boards.size(); j++) {
+                if (boards[j].markNumber(randomNumbers[randomNumbersIndex])) {
+                    finalScore = randomNumbers[randomNumbersIndex] * boards[j].sumOfAllUnmarkedNumbers()
+                    break
+                }
+            }
+            randomNumbersIndex++
+        } while (finalScore == -1 &amp;&amp; randomNumbersIndex &lt; randomNumbers.size())
+        return finalScore
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star"><a class="anchor" href="#_second_star"></a><a class="link" href="#_second_star">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>The same way as for the First star, we iterate over the random numbers and mark all remaining boars. After that we look for a board that wins the game and save the instance, all winning boards are removed from the list, and we repeat this loop until the no board is left.
+So we can now calculate with the saved instance of the board the final score.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">    int playBingoAndLetGiantSquidWins() {
+        int finalScore = -1
+        int randomNumbersIndex = 0
+        int lastNumber = -1
+        BingoBoard lastBoard = null
+        do {
+            lastNumber = randomNumbers[randomNumbersIndex]
+            boards.each {it.markNumber(lastNumber)}
+            lastBoard = boards.find {it.wins}
+            boards.removeAll {it.wins }
+            randomNumbersIndex++
+        } while (boards.size() &gt; 0 &amp;&amp; randomNumbersIndex &lt; randomNumbers.size())
+        return lastBoard.sumOfAllUnmarkedNumbers() * lastNumber
+    }</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_groovy"><a class="anchor" href="#_day_05_groovy"></a><a class="link" href="#_day_05_groovy">Day 05: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day_4_hydrothermal_venture"><a class="anchor" href="#_day_4_hydrothermal_venture"></a><a class="link" href="#_day_4_hydrothermal_venture">Day 4: Hydrothermal Venture</a></h4>
+<div class="paragraph">
+<p>This solution is written in Groovy and of course with TDD approach.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/5" class="bare">https://adventofcode.com/2021/day/5</a></p>
+</div>
+<div class="paragraph">
+<p>The working example can be found here <a href="https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day5">uniqueck / advent-of-code</a></p>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_2"><a class="anchor" href="#_today_i_learned_2"></a><a class="link" href="#_today_i_learned_2">Today I learned</a></h5>
+<div class="paragraph">
+<p>It is better to complete all test of the helper classes and simplify the code afterwards.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_2"><a class="anchor" href="#_first_star_2"></a><a class="link" href="#_first_star_2">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>We craete a list of <code>Line</code> elements from the puzzle input.
+We filter all lines out, which not have a start and end point on the the row or column. So only horizontal and vertical lines are processed.</p>
+</div>
+<div class="paragraph">
+<p>Then we create the map based on all points / coords on the line and increased the bit for these coord.</p>
+</div>
+<div class="paragraph">
+<p>After these map is created we filter out all elements with a bit higher than one.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">package io.uniqueck.aoc.day5
+
+import java.util.stream.IntStream
+
+class Coord {
+
+    int x, y
+
+    static Coord of(String stringRepresentation) {
+        def (tempX, tempY) = stringRepresentation.tokenize(",")
+        new Coord(tempX as int, tempY as int)
+    }
+
+    Coord(int x, y) {
+        this.x = x
+        this.y = y
+    }
+
+    boolean isOnSameRowOrColumn(Coord target) {
+        return x == target.x || y == target.y
+    }
+
+
+    List&lt;Coord&gt; createListOfCoordsToConnectTo(Coord target) {
+
+        List&lt;Coord&gt; listOfCoords = []
+        // diagonal
+        int stepSizeX = target.x - x &lt; 0 ? -1 : target.x - x == 0 ? 0 : 1
+        int stepSizeY = target.y - y &lt; 0 ? -1 : target.y - y == 0 ? 0 : 1
+
+        int stepX = x
+        int stepY = y
+
+        while (!(stepX == target.x &amp;&amp; stepY == target.y)) {
+            listOfCoords &lt;&lt; new Coord(stepX, stepY)
+            stepX += stepSizeX
+            stepY += stepSizeY
+        }
+        listOfCoords &lt;&lt; target
+
+        return listOfCoords
+    }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Coord coord = (Coord) o
+
+        if (x != coord.x) return false
+        if (y != coord.y) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = x
+        result = 31 * result + y
+        return result
+    }
+
+    String toString() {
+        return "(${x},${y})"
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">package io.uniqueck.aoc.day5
+
+class Line {
+
+    Coord start, end
+
+    // converts 1,2 -&gt; 3,2 to a line with start coordinate 1,2 and end coordinate 3,2
+    static Line of(String stringRepresentation) {
+        def (tempStart, tempEnd) = stringRepresentation.tokenize("-&gt;")
+        return new Line(Coord.of(tempStart), Coord.of(tempEnd))
+    }
+
+    Line(Coord start, end) {
+        this.start = start
+        this.end = end
+    }
+
+    boolean isStartAndEndOnSameRowOrColumn() {
+        return start.isOnSameRowOrColumn(end)
+    }
+
+    List&lt;Coord&gt; getListOfCoordsFromStartToEnd() {
+        return start.createListOfCoordsToConnectTo(end)
+    }
+
+
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">package io.uniqueck.aoc.day5
+
+class HydrothermalVenture {
+
+    static void main(String[] args) {
+        def lines = new File("src/main/resources/day5/input.txt").readLines()
+        new HydrothermalVenture().process(lines)
+    }
+
+    void process(List&lt;String&gt; input) {
+        def lines = input.collect {Line.of(it)}
+        println "HydrothermalVenture only horizontal and vertical lines: ${countHowManyPointsAreOverlappingFromMoreThenOnLine(lines.findAll {it.startAndEndOnSameRowOrColumn})}"
+        println "HydrothermalVenture all type of lines: ${countHowManyPointsAreOverlappingFromMoreThenOnLine(lines)}"
+    }
+
+    @SuppressWarnings('GrMethodMayBeStatic')
+    int countHowManyPointsAreOverlappingFromMoreThenOnLine(List&lt;Line&gt; lines) {
+        int[][] result = new int[999][999]
+        lines.collect { it.listOfCoordsFromStartToEnd}.flatten().each { Coord it -&gt;
+            result[it.y][it.x]++
+        }
+        ((List&lt;List&lt;Integer&gt;&gt;)result).flatten().findAll{it &gt; 1}.size()
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_2"><a class="anchor" href="#_second_star_2"></a><a class="link" href="#_second_star_2">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>The only difference between the first star and this star, is that we process also diagonal lines.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>
