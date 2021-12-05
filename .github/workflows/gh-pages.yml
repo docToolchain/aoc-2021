@@ -18,6 +18,8 @@ jobs:
         run: chmod +x ./gradlew
       - name: fix config
         run: sed -i 's|site.contextPath=/$|site.contextPath=/aoc-2021/|g' src/site/jbake.properties
+      - name: fix build.gradle
+        run: sed -i 's|link:/gene|link:/aoc-2021/gene|g' build.gradle
       - name: generate site
         run: ./gradlew generateIndex bake --info --stacktrace
       - name: Deploy
