@@ -1,0 +1,36 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-05: Hydrothermal Venture
+https://adventofcode.com/2021/day/5
+
+=== Info
+
+Avoid hydrothermal ventline clouds
+*: Find hot-spots on grid with >1 lines crossing, consider only vertical & horizontal lines
+**: Find hot-spots including diagonal lines (45° only)
+Return number of hot-spots on 1000x1000 grid
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed --> list of list with two coordinates (set of x,y).
+*: check if horizontal or vertical, then add +1 to grid. Increase hot-spot count when grid point equals 2.
+**: add second loop to additionally process horizontal lines and increase count accordingly.
+
+=== Learned today
+
+Quite straightforward, just a few small traps wrt. processing order of hor/vert lines vs. diagonal lines
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

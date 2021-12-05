@@ -22,6 +22,7 @@ Checksum: All unmarked numbers of winning bingo field * last number to complete 
 
 Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into bingo_numbers and bingo_fields.
 Separate functions to mark a number in a field and to check for complete row/col and calculation of checksum.
+Marking is done by substracting 100 from field (max 99) and later checking for <0.
 Iterate trough numbers and fields.
 Note first winning board.
 Have index of winning boards, calculate checksum of all newly winning boards and note last one.
