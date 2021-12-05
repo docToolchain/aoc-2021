@@ -1,0 +1,162 @@
+== Day 5: Hydrothermal Venture
+
+Today I wanted to do another TDD vs hacky comparison.
+This time doing TDD (and initial thinking) first and then later see how fast I can hack it knowing the way forward.
+TDD approach took me 80 minutes T_T, partially due to initial design error, see explanation for first star.
+
+=== TIL
+
+. underestimated how big this puzzles get...again
+. when tracking objects try to create a map that can be indexed easily rather than relying on searching items in a list with every iteration
+. `== 2` is not the same as `>= 2`
+
+=== First Star
+
+At first I was focused only on the example and led astray by its small numbers - as it happens every year.
+
+My first approach was to just create points for each entry in the input list and if these points already exist, increase their counter.
+
+For this purpose I introduced two classes, one for plain two-dimension points and another that contains a counter for vents on this point using P2D as base class.
+
+[plantuml]
+----
+@startuml classes
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+class P2D {
+  int x
+  int y
+  points_to(p2d)
+  distance(p2d)
+  is_diagonal(p2d)
+}
+
+class Spot {
+  int x
+  int y
+  int vent_count
+}
+Spot --|> P2D
+@enduml
+----
+
+
+[plantuml]
+----
+@startuml plan1
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+start
+:parse input into
+pairs of points;
+:remove all pairs of
+diagonal points;
+:init empty list of spots;
+while (for each vent in input)
+  :calculate all points
+  covered by vent;
+  if (vent point 
+  is already in spots) then
+    note left
+      ouch!
+      this operation hurts
+      for long lists
+    end note
+    :increase vent counter
+    for spot;
+  else
+    :create new spot
+    with vent count = 1;
+    :add new spot
+    to list of spots;
+  endif
+endwhile
+
+
+while (for each spot in list)
+  if (vent count is more than 2) then
+    :increase score;
+  endif
+endwhile
+:return final score;
+end
+@enduml
+----
+
+This approach worked fine for the test example but already became a performance nightmare even when using only 20% of the real input.
+The main issue was that individual vents are way bigger than initially anticipated, so relying on the `vent point is already in spots` operation was way too inefficient.
+
+I decided to opt for another design that went for creating a map of the area - similar as proposed through the challenge description.
+
+My new design looked like this:
+
+[plantuml]
+----
+@startuml plan1
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+start
+:parse input into
+pairs of points;
+:remove all pairs of
+diagonal points;
+:identify dimensions of
+map based on provided points;
+:create a map with each
+point set to 0;
+while (for each vent in input)
+  :calculate all points
+  covered by vent;
+  while (for each point in vent)
+    :increase point score
+    on map by 1;
+    note left
+      this is now a simple
+      <i>map[y][x]</i> index operation
+      instead of lookup in a list
+    end note
+  endwhile
+endwhile
+while (for each row on map)
+  while (point in row)
+    if (vent score is more than 2) then
+      :increase overall score;
+    endif
+  endwhile
+endwhile
+:print final score;
+end
+@enduml
+----
+
+Luckily a lot of functions I had written for my initial approach could be reused.
+With all these operations put into neat little functions the function for star1 was easy:
+
+[source, python, numbered]
+....
+include::solution.py[tags=star1]
+....
+
+=== Second Star
+
+What needed to be done here is refactor the existing code to work with diagonal lines, in particular the _get all points between these two points_ portion of my `P2D` class.
+
+There was one issue initially that was not covered by my test cases but discovered when testing for the example output for star2.
+I debugged a little and realized my geometric approach to finding all points on a vent worked only in certain cases.
+I added another test case for the _broken scenario_ and vent on to refactor my functions.
+
+After this was done star2 was basically the same code as star1 without removing the diagonal points.
+
+[source, python, numbered]
+....
+include::solution.py[tags=star2]
+....
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[tags=star1]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

@@ -1,0 +1,45 @@
+==  Day 4: Giant Squid  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/4
+
+For execution enter _kotlin day2104_1_2.kts_ in the command line.
+
+=== Today I learned
+
+I never worked with classes, but today's puzzle seemed to be a good start for learning something about it. At the beginning I had some difficulties to transfer the boards to the class, whenever I read in the next board also the last classes' boards where cleaned. I solved it by introducing a second list which I made unmutable, I guess there are better solutions but for the start it worked out to solve the today's puzzle.
+
+=== First Star
+
+How does it work: +
+
+I created a class representing a bingo card with individual numbers and a method _next_number_. Evoking this method will mark all numbers matching the given number, evaluate, if already a row or column is complete and calculate the final score:
+[source, kotlin, numbered]
+....
+include::day2104_1_2.kts[tags=bingo]
+....
+
+To start, the puzzle input will be read. All numbers are added to a list, for all boards a new bingo class is added to second list.
+[source, kotlin, numbered]
+....
+include::day2104_1_2.kts[tags=read_puzzle_input]
+....
+
+After the preparation, two nested loop's run over each number and each board until the first board wins, and the final score is printed out.
+[source, kotlin, numbered]
+....
+include::day2104_1_2.kts[tags=play_bingo]
+....
+
+=== Second Star
+
+How does it work: +
+
+Instead stopping after the first win, all wins are added to a list, a board which has already a complete row or column is exluded for the ongoning game. The last element of the win list is the solution for number two.
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2104_1_2.kts[tags=output]
+....

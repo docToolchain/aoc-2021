@@ -1,0 +1,45 @@
+== Day 05: Hydrothermal Venture ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/5[AoC|2021|05].
+
+=== Part 1 & 2 ===
+
+I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples ```(x1, y1, x2, y2)```. When parsing the inputs. 
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+To understand the playground, I have a function to determine the bounding box of all lines.  
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=bbox]
+----
+
+The solution is then build by iterating over all lines and for each line iterating over all points it contains and increment a counter for the coordinate of that point. Then count all coordinates which belong to more than one line (have counter value greater than 1).
+
+To iterate over the points, I calculate deltas ``dx`` and ``dy`` that define the difference in the x and y coordinate from one point to the next. They can be one of 0, 1, or -1. 
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=count_overlaps]
+----
+
+Whether or not to include diagonal lines is controlled with a flag ```include_diagonal``` which is set to ```false``` for part 1 and ```true``` for part 2.
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
+
+A range is empty, if the upper bound is less than the lower bound.
+
+It is not easy to write functions in rust that return iterators, since the actual type of the iterator depends on how it is constructed. Implementing an iterator on your own is not always worth the effort.
+
+Sometimes, it is a good idea to use signed types even if all the results are positive. This allows to deal with negative increments much more directly.

@@ -1,0 +1,51 @@
+==  Day 4: Giant Squid
+
+This solution is written in Groovy and of course with TDD approach.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/4
+
+The working example can be found here https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day4[uniqueck / advent-of-code]
+
+=== Today I learned
+
+You can solve the puzzle without an error free algorithm. Part 1 I solved and at part 2 if run the test it fails any time. My testcases for the class `BingoBoard` and method `isWins` don't cover columns or maybe rows the right way. So for the second part I have to reimplement the `isWins` method. Also I doesn't react in the `markNumber` method on not existing fields for that number, so maybe it was another day too late for the kind of puzzle ;) But my new lovely method for collections is `collate` -> easily split a list to sublist of a specific size. Groovy I love you, but for the namings we have something to discuss, why in the hell call this method not `partials`
+
+=== First Star
+
+How does it work: +
+
+I created a class ``BingoBoard`` representing a bingo board with a subclass ``Field`` representing one field of a bingo board.
+These class can check if the boards currently wins, and we can sum the remaining points on this board with, also we can mark a field with the given number.
+To print the board to the console I added some simple toString method.
+
+[source, groovy, numbered]
+....
+include::BingoBoard.groovy[]
+....
+
+To read the puzzle input, I choose to skip empty lines and remove the first lines, and process it as the random numbers. For the remaining lines I choose my new lovely method collate to split all 5 lines, so I can map these as a BingoBoard instance. The first line we only have to split after `,` and parse the values as int.
+
+[source, groovy, numbered]
+....
+include::GiantSquid.groovy[tags=parse_input]
+....
+
+So we can start play bingo and choose the right board to win.
+So we iterate over the random numbers and mark these number on each board. The mark method also returns the win state of these board after marking the number. So we can fast breaks the loops and calculate the final score.
+
+[source, groovy, numbered]
+....
+include::GiantSquid.groovy[tags=playBingoAndWin]
+....
+
+=== Second Star
+
+How does it work: +
+
+The same way as for the First star, we iterate over the random numbers and mark all remaining boars. After that we look for a board that wins the game and save the instance, all winning boards are removed from the list, and we repeat this loop until the no board is left.
+So we can now calculate with the saved instance of the board the final score.
+
+[source, groovy, numbered]
+----
+include::GiantSquid.groovy[tags=playBingoAndLetGiantSquidWin]
+----
