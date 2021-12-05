@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: rdmueller/doctoolchain:v2.0.3
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
