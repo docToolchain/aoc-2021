@@ -98,6 +98,7 @@ def print_map(spots: Map):
         print(s)
 
 
+# tag::star1[]
 def star1(puzzle_in):
     remove_diagonal_entries(puzzle_in)
     p = get_board_size(puzzle_in)
@@ -113,6 +114,8 @@ def star1(puzzle_in):
     return spots_with_two_vents
 
 
+# end::star1[]
+# tag::star2[]
 def star2(puzzle_in):
     p = get_board_size(puzzle_in)
     spots = create_map(p.x, p.y)
@@ -125,6 +128,9 @@ def star2(puzzle_in):
             if point >= 2:
                 spots_with_two_vents += 1
     return spots_with_two_vents
+
+
+# end::star2[]
 
 
 def read_input(filepath):
