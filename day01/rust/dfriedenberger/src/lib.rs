@@ -31,7 +31,7 @@ mod tests {
         //tag::test-calculate-window[]
         let vec2 = calculate_window(&vec1).unwrap();
         assert_eq!(calculate_increases(&vec2).unwrap(), 5);
-        //end::test-calculate-increases[]
+        //end::test-calculate-window[]
 
         Ok(())
     }
