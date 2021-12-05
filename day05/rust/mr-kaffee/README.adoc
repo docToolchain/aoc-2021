@@ -1,19 +1,50 @@
-== Day 05: ___ ==
+== Day 05: Hydrothermal Venture ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/5[AoC|2021|05].
 
-=== Part 1 ===
+=== Part 1 & 2 ===
+
+I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples ```(x1, y1, x2, y2)```. When parsing the inputs, I normalize the tuples so that ```x1 <= x2``` and ```x1 == x2``` implies ```y1 <= y2```. This eases processing later on quite a bit.
 
 [source,rust,numbered]
 ----
-include::src/lib.rs[]
+include::src/lib.rs[tags=parse]
 ----
+
+To understand the playground, I have a function to determine the bounding box of all lines. For the y-coordinate, I don't know whether ```y1 <= y2```, so this needs a bit of special treatment. 
 
 [source,rust,numbered]
 ----
-include::src/main.rs[]
+include::src/lib.rs[tags=bbox]
 ----
 
-=== Part 2 ===
+The solution is then build by iterating over all lines and for each line iterating over all points it contains and increment a counter for the coordinate of that point. Then count all coordinates which belong to more than one line (have counter value greater than 1).
+
+The simplest solution was to distinguish the four cases 
+
+* vertical line 
+* horizontal line
+* diagonal line from top left to bottom right
+* diagonal line from bottom left to top right
+
+and iterate over the points in the line slightly differently in these.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=count_overlaps]
+----
+
+Whether or not to include diagonal lines is controlled with a flag ```include_diagonal``` which is set to ```false``` for part 1 and ```true``` for part 2.
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
 
 === Today I learned ===
+
+A range is empty, if the upper bound is less than the lower bound.
+
+It is not easy to write functions in rust that return iterators, since the actual type of the iterator depends on how it is constructed.
