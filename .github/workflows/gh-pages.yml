@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: setup
         run: chmod +x ./gradlew
+      - name: fix config
+        run: sed -i 's|site.contextPath=|site.contextPath=/aoc-2021|g' src/site/jbake.properties
       - name: generate site
         run: ./gradlew generateIndex bake --info --stacktrace
       - name: Deploy
