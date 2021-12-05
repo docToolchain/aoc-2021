@@ -69,6 +69,12 @@
       }
 
       </style>
+      <script>
+          //smart redirectg
+          if (document.location.href.includes("netlify")) {
+              document.location.href=document.location.href.replace("aoc-2021.netlify.app/","doctoolchain.org/aoc-2021/");
+          }
+      </script>
 <!-- ${config.site_contextPath} -->
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
