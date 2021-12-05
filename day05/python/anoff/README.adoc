@@ -1,0 +1,43 @@
+== Day 5: Hydrothermal Venture
+
+Today I wanted to do another TDD vs hacky comparison.
+This time doing TDD (and initial thinking) first and then later see how fast I can hack it knowing the way forward.
+
+=== TIL
+
+. underestimated how big this puzzles get...again
+. when tracking objects try to create a map that can be indexed easily rather than relying on searching items in a list with every iteration
+. `== 2` is not the same as `>= 2`
+
+=== First Star
+
+At first I was focused only on the example and led astray by its small numbers - as it happens every year.
+
+[plantuml]
+----
+@startuml plan1
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+start
+:parse input into
+pairs of points;
+
+end
+@enduml
+----
+
+
+=== Second Star
+
+
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....
