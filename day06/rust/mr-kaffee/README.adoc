@@ -1,0 +1,27 @@
+== Day 06: Lanternfish ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/6[AoC|2021|06].
+
+=== Parts 1 & 2 ===
+
+The key is to not keep a list of fishes but a list of timer values. 
+
+Parsing the input is done as follows:app-name: 
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Simulations are done with:
+Parsing the input is done as follows:app-name: 
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sol]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----

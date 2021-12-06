@@ -21,13 +21,13 @@
     <div class="col-md-1">&nbsp;
             </div>
 <div class="col-md-5 clearfix">
-  <p class="text-center"><img src="/images/TheRules.png" alt="The Rules" style="max-width:70%;"/></p>
+  <p class="text-center"><img src="${config.site_contextPath}images/TheRules.png" alt="The Rules" style="max-width:70%;"/></p>
   <p>The repository structure follows simple rules which enable us to collect solutions in different languages.</p>
   <p>Check out this guide to find your way around.</p>
   <p >&nbsp;<a class="btn btn-primary right" href="rules/" role="button">Rules &raquo;</a></p>
 </div>
 <div class="col-md-5 cleafix" >
-  <p class="text-center"><img src="/images/EasySetup.png" alt="Easy Setup" style="max-width:70%;"/></p>
+  <p class="text-center"><img src="${config.site_contextPath}images/EasySetup.png" alt="Easy Setup" style="max-width:70%;"/></p>
   <p>No development environment at hand?</p>
   <p>Use Gitpod.io with our customized docker image to get your favourite language up and running in minutes.</p>
   <p>&nbsp;<a class="right" href="https://gitpod.io#https://github.com/docToolchain/aoc-2021" alt="Open in Gitpod"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="open in gitpod"></a></p>
@@ -41,10 +41,10 @@
             <div class="col-md-2">&nbsp;
             </div>
             <div class="col-md-4 text-center">
-                <a href="https://github.com/docToolchain/aoc-2021"><img src="images/githublogo.png" style="max-width: 70%"/></a>
+                <a href="https://github.com/docToolchain/aoc-2021"><img src="${config.site_contextPath}images/githublogo.png" style="max-width: 70%"/></a>
             </div>
             <div class="col-md-4 text-center">
-                <a href="https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg"><img src="/images/slacklogo.png"  style="max-width: 70%"/></a>
+                <a href="https://join.slack.com/t/slack-dwj2089/shared_invite/zt-zi9wmzxc-Z05uAmczaY0cb4r1ff9Yeg"><img src="${config.site_contextPath}images/slacklogo.png"  style="max-width: 70%"/></a>
             </div>
             <div class="col-md-2">&nbsp;
             </div>
