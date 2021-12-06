@@ -37,3 +37,5 @@ Cargo.lock
 *.iml
 
 lib
+
+node_modules/
