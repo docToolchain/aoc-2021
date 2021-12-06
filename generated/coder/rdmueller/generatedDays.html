@@ -184,6 +184,11 @@
 <li><a href="#_groovy_2">groovy</a></li>
 </ul>
 </li>
+<li><a href="#_day_06_groovy">Day 06: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day06_lantern_fishes">Day06: Lantern fishes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1876,6 +1881,87 @@ println sum</code></pre>
 436,978 -&gt; 244,978
 921,633 -&gt; 921,340
 872,63 -&gt; 233,63</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_groovy"><a class="anchor" href="#_day_06_groovy"></a><a class="link" href="#_day_06_groovy">Day 06: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day06_lantern_fishes"><a class="anchor" href="#_day06_lantern_fishes"></a><a class="link" href="#_day06_lantern_fishes">Day06: Lantern fishes</a></h4>
+<div class="paragraph">
+<p>I followed the steps described in the puzzle and easily got the first star.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">#!/usr/bin/env groovy
+// export JAVA_OPTS=-Xmx2048m
+List&lt;byte&gt; input = new File("test.txt").text.split(",").collect{it as byte}
+List&lt;byte&gt; nextInput
+long sum = 0
+input.eachWithIndex { it, j -&gt;
+    input2 = [it]
+    80.times { day -&gt;
+        nextInput = []
+        input2.each { byte counter -&gt;
+            counter--
+            if (counter == -1) {
+                counter = 6 as byte
+                nextInput &lt;&lt; (8 as byte)
+            }
+            nextInput &lt;&lt; counter
+        }
+        input2 = nextInput
+    }
+    sum += input2.size()
+}
+println "&gt;&gt;&gt; "+sum</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I thought this might be good enough for the second star.
+I was wrong: it takes up just too much memory.
+I even tried to optimize it and run it fish by fish, but it still took too long.</p>
+</div>
+<div class="paragraph">
+<p>Take a look at the solution by @uniqueck - it is quite elegant!
+And fast!</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">class Simulator {
+
+    static void main(String[] args) {
+        def countBy = new File("input.txt").readLines().collect { it.split(",") }.flatten().collect { it as int }.countBy { it }
+        long[] initialStock = [0,0,0,0,0,0,0,0,0]
+        countBy.each {initialStock[it.key] += it.value}
+        println initialStock
+        println "Star1: ${countLanternFishesAfterDays(initialStock, 80)}"
+        println "Star2: ${countLanternFishesAfterDays(initialStock, 256)}"
+    }
+
+    static long countLanternFishesAfterDays(long[] initialStock, int afterDays, int currentDay = 1) {
+        println "Day: ${currentDay} - ${initialStock}"
+        long[] newFishes = [0,0,0,0,0,0,0,0,0]
+        initialStock.eachWithIndex { long count, int index -&gt;
+            if (index &gt; 0) {
+                newFishes[index - 1] += count
+            } else {
+                newFishes[6] += count
+                newFishes[8] += count
+            }
+        }
+        if (currentDay &lt; afterDays) {
+            return countLanternFishesAfterDays(newFishes, afterDays, currentDay + 1)
+        } else {
+            return newFishes.sum()
+        }
+    }
+
+
+
+}</code></pre>
 </div>
 </div>
 </div>
