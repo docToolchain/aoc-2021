@@ -1,0 +1,54 @@
+== Day 6: Lanternfish 
+
+TIP: Find the full puzzle https://adventofcode.com/2021/day/6
+
+=== Problem Star 1
+[quote]
+....
+Exponentially growth rate of lanternfishs.
+....
+=== Test
+[source,rust,numbered]
+....
+include::src/lib.rs[tag=testdata]
+....
+[quote]
+....
+This list means that the first fish has an internal timer of 3, the second fish has an internal timer of 4, and so on until the fifth fish, which has an internal timer of 2.
+....
+==== Testcase
+[source,rust,numbered]
+....
+include::src/lib.rs[tag=test1]
+....
+
+=== Solution
+
+Because the '''exponentially''' keyword triggers us, I used one counter per fish age as the data structure instread managing each fish individually.
+
+[source,rust,numbered]
+....
+include::src/parser.rs[tag=create_swarm]
+....
+
+So is was easy to calculate the numbers of fishes.
+
+[source,rust,numbered]
+....
+include::src/parser.rs[tag=incr_and_count]
+....
+
+
+[source,rust,numbered]
+....
+include::src/main.rs[tag=star1]
+....
+
+=== Problem Star 2
+For solving, had to need change u32 values to u64 values. One advantage of Rust I learned today, was that rust throw integer overflow exception.
+
+Calculate 256-80 more days. ;-)
+[source,rust,numbered]
+....
+include::src/main.rs[tag=star2]
+....
