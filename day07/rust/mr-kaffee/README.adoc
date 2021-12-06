@@ -1,0 +1,23 @@
+== Day 07: ____ ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/7[AoC|2021|07].
+
+=== Part 1 ===
+
+Parse
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+=== Part 2 ===
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
