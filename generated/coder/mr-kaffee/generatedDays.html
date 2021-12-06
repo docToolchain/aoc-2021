@@ -1251,7 +1251,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;(isize, isize, isize, isize)&gt; {
 </div>
 </div>
 <div class="paragraph">
-<p>To understand the playground, I have a function to determine the bounding box of all lines.</p>
+<p>I initially decided to count vents in a flat list representing the relevant part of the ocean&#8217;s ground. To identify that relevant part, I have a function to determine the bounding box of all lines.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1275,6 +1275,65 @@ pub fn get_bbox(lines: &amp;[(isize, isize, isize, isize)]) -&gt; (isize, isize,
 </div>
 </div>
 <div class="paragraph">
+<p>Later on, I realized that a lot of other solutions used hash maps to keep the counters. So I wanted to try that as well and see the runtime impact. I made my solution generic using a trait <code>VentsCount</code> and implementing it for <code>HashMap</code> directly and for vectors using a struct <code>VecVentsCount</code> with a bit of extra information on the bounding box.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// to allow using the same code with counts stored in a vector or in a hash map, the interface is modeled as a trait
+pub trait VentsCount {
+    /// increment count at given coordinate
+    fn increment(&amp;mut self, coord: (isize, isize));
+    /// count number of coordinates with count &gt; 1
+    fn count_dangerous(&amp;self) -&gt; usize;
+}
+
+impl VentsCount for HashMap&lt;(isize, isize), usize&gt; {
+    fn increment(&amp;mut self, coord: (isize, isize)) {
+        // get entry, create and initialize with value 0 if not yet present
+        let count = self.entry(coord).or_insert(0);
+        // increment
+        *count += 1;
+    }
+
+    fn count_dangerous(&amp;self) -&gt; usize {
+        self.values().filter(|count| **count &gt; 1).count()
+    }
+}
+
+/// structure to count vents based on a vector
+pub struct VecVentsCount {
+    counts: Vec&lt;usize&gt;,
+    width: isize,
+    x_min: isize,
+    y_min: isize,
+}
+
+impl VecVentsCount {
+    /// create new ``VecVentsCount`` for bounding box
+    pub fn new((x_min, y_min, x_max, y_max): (isize, isize, isize, isize)) -&gt; Self {
+        let width = x_max - x_min;
+        let counts = vec![0usize; (width * (y_max - y_min)) as usize];
+        VecVentsCount {
+            counts,
+            width,
+            x_min,
+            y_min,
+        }
+    }
+}
+
+impl VentsCount for VecVentsCount {
+    fn increment(&amp;mut self, (x, y): (isize, isize)) {
+        self.counts[(x - self.x_min + self.width * (y - self.y_min)) as usize] += 1;
+    }
+
+    fn count_dangerous(&amp;self) -&gt; usize {
+        self.counts.iter().filter(|count| **count &gt; 1).count()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>The solution is then build by iterating over all lines and for each line iterating over all points it contains and increment a counter for the coordinate of that point. Then count all coordinates which belong to more than one line (have counter value greater than 1).</p>
 </div>
 <div class="paragraph">
@@ -1282,11 +1341,14 @@ pub fn get_bbox(lines: &amp;[(isize, isize, isize, isize)]) -&gt; (isize, isize,
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn count_overlaps(lines: &amp;[(isize, isize, isize, isize)], incl_diagonal: bool) -&gt; usize {
-    let (x_min, y_min, x_max, y_max) = get_bbox(lines);
-
-    let width = x_max - x_min;
-    let mut counts = vec![0usize; (width * (y_max - y_min)) as usize];
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// this function uses the struct [VecVentsCount] by default. This behavior can be changed to using ``HashMap`` based
+/// counting using the feature ``hash_counters``
+pub fn count_overlaps(lines: &amp;[(isize, isize, isize, isize)], incl_diagonal: bool) -&gt; usize {
+    let mut counts: Box&lt;dyn VentsCount&gt; = if cfg!(feature = "hash_counters") {
+        Box::new(HashMap::new())
+    } else {
+        Box::new(VecVentsCount::new(get_bbox(lines)))
+    };
 
     for (x1, y1, x2, y2) in lines {
         if incl_diagonal || x1 == x2 || y1 == y2 {
@@ -1302,12 +1364,12 @@ pub fn get_bbox(lines: &amp;[(isize, isize, isize, isize)]) -&gt; (isize, isize,
             };
             let len = cmp::max((x2 - x1) * dx, (y2 - y1) * dy) + 1;
             for k in 0..len {
-                counts[(x1 + k * dx - x_min + width * (y1 + k * dy - y_min)) as usize] += 1;
+                counts.increment((x1 + k * dx, y1 + k * dy));
             }
         }
     }
 
-    counts.iter().filter(|count| **count &gt; 1).count()
+    counts.count_dangerous()
 }</code></pre>
 </div>
 </div>
@@ -1380,6 +1442,9 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>Sometimes, it is a good idea to use signed types even if all the results are positive. This allows to deal with negative increments much more directly.</p>
+</div>
+<div class="paragraph">
+<p>Hash map based counting may come with a runtime penalty. In today&#8217;s puzzle, vector based counting performs three to four times faster.</p>
 </div>
 <a id="day06" />
 </div>
