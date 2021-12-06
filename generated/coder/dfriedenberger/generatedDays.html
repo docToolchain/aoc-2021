@@ -228,6 +228,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_rust">Day 06: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_6_lanternfish">Day 6: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_5">Problem Star 1</a></li>
+<li><a href="#_test_9">Test</a></li>
+<li><a href="#_solution_11">Solution</a></li>
+<li><a href="#_problem_star_2_4">Problem Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1367,6 +1379,129 @@ impl Board {
                     x += xo;
                     y += yo;
                 }</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_rust"><a class="anchor" href="#_day_06_rust"></a><a class="link" href="#_day_06_rust">Day 06: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_6_lanternfish"><a class="anchor" href="#_day_6_lanternfish"></a><a class="link" href="#_day_6_lanternfish">Day 6: Lanternfish</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/6" class="bare">https://adventofcode.com/2021/day/6</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_5"><a class="anchor" href="#_problem_star_1_5"></a><a class="link" href="#_problem_star_1_5">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Exponentially growth rate of lanternfishs.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_9"><a class="anchor" href="#_test_9"></a><a class="link" href="#_test_9">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "3,4,3,1,2"
+        ];</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>This list means that the first fish has an internal timer of 3, the second fish has an internal timer of 4, and so on until the fifth fish, which has an internal timer of 2.</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_4"><a class="anchor" href="#_testcase_4"></a><a class="link" href="#_testcase_4">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let mut swarm = create_swarm(&amp;vec2).unwrap();
+        let cnt = incr_and_count(&amp;mut swarm,18);
+        assert_eq!(cnt, 26);
+
+        let cnt = incr_and_count(&amp;mut swarm,80 - 18);
+        assert_eq!(cnt, 5934);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_11"><a class="anchor" href="#_solution_11"></a><a class="link" href="#_solution_11">Solution</a></h5>
+<div class="paragraph">
+<p>Because the '''exponentially''' keyword triggers us, I used one counter per fish age as the data structure instread managing each fish individually.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn create_swarm(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;Vec&lt;u64&gt;&gt; {
+
+    let mut swarm = vec![0,0,0,0,0,0,0,0,0];
+    let first_line = data.get(0).unwrap();
+    let numbers: Vec&lt;u64&gt; = first_line.split(",").map(|s| s.parse().unwrap()).collect();
+
+
+    for n in numbers {
+        let i = n as usize;
+        swarm[i] += 1;
+    }
+
+    return Ok(swarm)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So is was easy to calculate the numbers of fishes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn incr_and_count(data: &amp;mut Vec&lt;u64&gt;,days: u32) -&gt; u64 {
+
+    for _d in 0..days {
+        let n = data.remove(0);
+        data.push(0);
+        data[6] += n;
+        data[8] += n;
+    }
+    let mut sum = 0;
+    for n in data {
+        sum += *n;
+    }
+    return sum;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data = read_file("input.txt").unwrap();
+    let mut swarm = create_swarm(&amp;data).unwrap();
+    let cnt = incr_and_count(&amp;mut swarm,80);
+    println!("star 1 {}",cnt);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_4"><a class="anchor" href="#_problem_star_2_4"></a><a class="link" href="#_problem_star_2_4">Problem Star 2</a></h5>
+<div class="paragraph">
+<p>For solving, had to need change u32 values to u64 values. One advantage of Rust I learned today, was that rust throw integer overflow exception.</p>
+</div>
+<div class="paragraph">
+<p>Calculate 256-80 more days. ;-)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let cnt = incr_and_count(&amp;mut swarm,256-80);
+    println!("star 2 {}",cnt);</code></pre>
 </div>
 </div>
 </div>

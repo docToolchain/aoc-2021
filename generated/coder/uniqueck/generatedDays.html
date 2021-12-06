@@ -197,6 +197,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_groovy">Day 06: groovy</a>
+<ul class="sectlevel3">
+<li><a href="#_day_4_lanternfish">Day 4: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_today_i_learned_3">Today I learned</a></li>
+<li><a href="#_first_star_second_star">First Star + Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -910,6 +920,79 @@ class HydrothermalVenture {
 </div>
 <div class="paragraph">
 <p>The only difference between the first star and this star, is that we process also diagonal lines.</p>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_groovy"><a class="anchor" href="#_day_06_groovy"></a><a class="link" href="#_day_06_groovy">Day 06: groovy</a></h3>
+<div class="sect3">
+<h4 id="_day_4_lanternfish"><a class="anchor" href="#_day_4_lanternfish"></a><a class="link" href="#_day_4_lanternfish">Day 4: Lanternfish</a></h4>
+<div class="paragraph">
+<p>This solution is written in Groovy.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/6" class="bare">https://adventofcode.com/2021/day/6</a></p>
+</div>
+<div class="paragraph">
+<p>The working example can be found here <a href="https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day6">uniqueck / advent-of-code</a></p>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_3"><a class="anchor" href="#_today_i_learned_3"></a><a class="link" href="#_today_i_learned_3">Today I learned</a></h5>
+<div class="paragraph">
+<p>For performance fallback to simple data types is a good idea ;)</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_second_star"><a class="anchor" href="#_first_star_second_star"></a><a class="link" href="#_first_star_second_star">First Star + Second Star</a></h5>
+<div class="paragraph">
+<p>I started to create a class representing the LanternFish and his behaviour, this worked well for Start 1, but for Star 2 this is a memory problem to spawn every time a new object of LanternFish.</p>
+</div>
+<div class="paragraph">
+<p>So i switched back to array based approach. We have a array of datatype long to eliminate integer overflow errors.</p>
+</div>
+<div class="paragraph">
+<p>So we iterate over the array and shift each entry to the left, until we reached the first position. For the first position we added the current count of fishes to position 6 (reseted age to 6 days) and the current count of zero day fishes as new borned fishes at position 8 (8 days).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-groovy" data-lang="groovy">class Simulator {
+
+    static void main(String[] args) {
+        def countBy = new File("input.txt").readLines().collect { it.split(",") }.flatten().collect { it as int }.countBy { it }
+        long[] initialStock = [0,0,0,0,0,0,0,0,0]
+        countBy.each {initialStock[it.key] += it.value}
+        println initialStock
+        println "Star1: ${countLanternFishesAfterDays(initialStock, 80)}"
+        println "Star2: ${countLanternFishesAfterDays(initialStock, 256)}"
+    }
+
+    static long countLanternFishesAfterDays(long[] initialStock, int afterDays, int currentDay = 1) {
+        println "Day: ${currentDay} - ${initialStock}"
+        long[] newFishes = [0,0,0,0,0,0,0,0,0]
+        initialStock.eachWithIndex { long count, int index -&gt;
+            if (index &gt; 0) {
+                newFishes[index - 1] += count
+            } else {
+                newFishes[6] += count
+                newFishes[8] += count
+            }
+        }
+        if (currentDay &lt; afterDays) {
+            return countLanternFishesAfterDays(newFishes, afterDays, currentDay + 1)
+        } else {
+            return newFishes.sum()
+        }
+    }
+
+
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the input processing we have to count all fishes based on the age of days to create the initialStock array.</p>
 </div>
 </div>
 </div>

@@ -210,6 +210,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_python">Day 06: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_06_lanternfish">AoC21-06: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_info_6">Info</a></li>
+<li><a href="#_howto_6">HowTo</a></li>
+<li><a href="#_learned_today_6">Learned today</a></li>
+<li><a href="#_source_6">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -835,6 +847,98 @@ def main():
     daily_list = read_daily_input('input05.txt')
     line_field, star1, star2 = generate_field(daily_list)
     print(f"Result (*): {star1}")
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_python"><a class="anchor" href="#_day_06_python"></a><a class="link" href="#_day_06_python">Day 06: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_06_lanternfish"><a class="anchor" href="#_aoc21_06_lanternfish"></a><a class="link" href="#_aoc21_06_lanternfish">AoC21-06: Lanternfish</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/6" class="bare">https://adventofcode.com/2021/day/6</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_6"><a class="anchor" href="#_info_6"></a><a class="link" href="#_info_6">Info</a></h5>
+<div class="paragraph">
+<p>Calculate exp. growth of lanternfish
+<strong>: After 80 days
+*</strong>: After 256 days</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_6"><a class="anchor" href="#_howto_6"></a><a class="link" href="#_howto_6">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line (one line today&#8230;&#8203;) and prepocessed.
+Being wary of the mentioned exp. growth, I choose a list with bins for every counter state, i.e. 10 fish with timer "3" -&#8594; list[3] = 10.
+Then one iteration was just to manage bin "0" (1x to "9", 1x added to "7") and shift afterwards all bins &gt;1 down one bin.
+Glad I did for star 2 😅</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_6"><a class="anchor" href="#_learned_today_6"></a><a class="link" href="#_learned_today_6">Learned today</a></h5>
+<div class="paragraph">
+<p>Exp. growth does not always have to be scary.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_6"><a class="anchor" href="#_source_6"></a><a class="link" href="#_source_6">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see description.adoc
+
+from pprint import pprint
+
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+        numbers_list = [int(elem) for elem in local_list[0].split(',')]
+        return_list = [numbers_list.count(i) for i in range(10)]
+        return return_list
+
+
+def iterate_one_day(fishcount_list):
+    ''' Decrease counters by 1, spawn new 8's by 0
+        Return new list
+    '''
+    fishcount_list[9] = fishcount_list[0]
+    fishcount_list[7] += fishcount_list[0]
+    for i in range(1, len(fishcount_list)):
+        fishcount_list[i-1] = fishcount_list[i]
+    fishcount_list[9] = 0
+    return fishcount_list
+
+
+def main():
+    daily_list = read_daily_input('input06.txt')
+    pprint(daily_list)
+    for i in range(80):
+        daily_list = iterate_one_day(daily_list)
+        print(i+1, daily_list)
+    star1 = sum(daily_list)
+    print(f"Result (*): {star1}")
+    for i in range(256-80):
+        daily_list = iterate_one_day(daily_list)
+        print(i+1, daily_list)
+    star2 = sum(daily_list)
     print(f"Result (**): {star2}")
 
 

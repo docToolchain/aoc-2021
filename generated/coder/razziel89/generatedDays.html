@@ -195,6 +195,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_go">Day 06: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_06_lanternfish">Day 06: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_6">Oveview</a></li>
+<li><a href="#_how_to_run_6">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1182,6 +1192,247 @@ func ReadLinesAsLines() ([]Line, error) {
 </div>
 <div class="sect4">
 <h5 id="_how_to_run_5"><a class="anchor" href="#_how_to_run_5"></a><a class="link" href="#_how_to_run_5">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for part 2.
+You can run the solution for part 1 using <code>cat input.dat | PART=1 go run .</code> or
+in general by setting the environment variable <code>PART</code> to <code>1</code>.</p>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_go"><a class="anchor" href="#_day_06_go"></a><a class="link" href="#_day_06_go">Day 06: go</a></h3>
+<div class="sect3">
+<h4 id="_day_06_lanternfish"><a class="anchor" href="#_day_06_lanternfish"></a><a class="link" href="#_day_06_lanternfish">Day 06: Lanternfish</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the lanternfish puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_6"><a class="anchor" href="#_oveview_6"></a><a class="link" href="#_oveview_6">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where some helper functions are.
+There is also a <code>population.go</code>, which contains specifications of a population
+of breeding lifeforms.
+This solution also fully re-uses the counting set implementation of day 3 in
+<code>set.go</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	initialDaysToBreed = 9
+	daysToBreed        = 7
+)
+
+var (
+	partChoice = os.Getenv("PART")
+)
+
+//nolint: funlen
+func main() {
+	var days int
+	if partChoice == "1" {
+		days = 80
+	} else {
+		days = 256
+	}
+	sets, err := ReadLinesAsSets()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if len(sets) != 1 {
+		log.Fatal("exactly 1 population supported")
+	}
+	population, err := NewPopulation(daysToBreed, initialDaysToBreed)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	population.PopulateFromSet(sets[0])
+	population.Age(days)
+	fmt.Printf("There are %d fish after %d days.\n", population.Size(), days)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsSets reads all lines from stdin as counting sets.
+func ReadLinesAsSets() ([]CountingSet, error) {
+	var result []CountingSet
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []CountingSet{}, err
+		}
+		fields := trimStrings(strings.Split(line, setSep))
+		set := CountingSet{}
+		for _, field := range fields {
+			err := set.Add(field)
+			if err != nil {
+				return []CountingSet{}, err
+			}
+		}
+		result = append(result, set)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>population.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Population tracks the time left until breeding of life forms and counts how many there are per
+// such time.
+type Population struct {
+	pop            []int
+	adultDuration  int
+	infantDuration int
+}
+
+// NewPopulation initialises a new population with times for adults and infants until they breed.
+func NewPopulation(adultDuration, infantDuration int) (Population, error) {
+	if adultDuration &gt; infantDuration {
+		return Population{}, fmt.Errorf("infants must breed slower than adults")
+	}
+	return Population{
+		pop:            make([]int, infantDuration),
+		adultDuration:  adultDuration,
+		infantDuration: infantDuration,
+	}, nil
+}
+
+// PopulateFromSet populates a population from a counting set. This ignores entries in the set
+// larger than the maximum supported time to breed.
+func (p *Population) PopulateFromSet(set CountingSet) {
+	for idx := 0; idx &lt; p.infantDuration; idx++ {
+		p.pop[idx] = set.Count(fmt.Sprint(idx))
+	}
+}
+
+// Age ages a population by the given number of days, breeding appropriately.
+func (p *Population) Age(days int) {
+	for dayCount := 0; dayCount &lt; days; dayCount++ {
+		// This new population is auto-initialised with all zeroes.
+		newPop := make([]int, len(p.pop))
+		// Handle all non-special cases. Simply decrease time to breed by one.
+		for breedTime := 0; breedTime &lt; p.infantDuration-1; breedTime++ {
+			newPop[breedTime] = p.pop[breedTime+1]
+		}
+		// Handle special case of those ready to breed.
+		newPop[p.infantDuration-1] += p.pop[0]
+		newPop[p.adultDuration-1] += p.pop[0]
+		// Overwrite the data about the current population.
+		_ = copy(p.pop, newPop)
+	}
+}
+
+// Size determines the total size of the population.
+func (p Population) Size() int {
+	sum := 0
+	for _, val := range p.pop {
+		sum += val
+	}
+	return sum
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>set.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// This file contains the exact same counting set as used for day 3.
+
+// CountingSet is a set that also knows how often each element has been added. It does support
+// non-empty strings only.
+type CountingSet map[string]int
+
+// Add adds an entry to the set. The empty string is not supported!
+func (c *CountingSet) Add(entry string) error {
+	if len(entry) == 0 {
+		return fmt.Errorf("empty string not supported in counting set")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*c)[entry] = (*c)[entry] + 1
+	return nil
+}
+
+// Count determines how often an entry has been added to the set.
+func (c *CountingSet) Count(entry string) int {
+	return (*c)[entry]
+}
+
+// RemoveAll removes all counts for a specific key.
+func (c *CountingSet) RemoveAll(entry string) {
+	delete(*c, entry)
+}
+
+// MostCommon determines the most common entry in the set. If the set is empty, this returns the
+// empty string! A non-empty tie breaker will be returned in case there are multiple most common
+// entries. If the tie breaker is empty but there are duplicates, an empty string will be returned.
+func (c *CountingSet) MostCommon(tieBreaker string) string {
+	return c.filter(
+		tieBreaker,
+		func(i1, i2 int) bool {
+			return i1 &gt; i2
+		},
+	)
+}
+
+// LeastCommon determines the least common entry in the set. If the set is empty, this returns the
+// empty string! A non-empty tie breaker will be returned in case there are multiple least common
+// entries. If the tie breaker is empty but there are duplicates, an empty string will be returned.
+func (c *CountingSet) LeastCommon(tieBreaker string) string {
+	return c.filter(
+		tieBreaker,
+		func(i1, i2 int) bool {
+			return i1 &lt; i2
+		},
+	)
+}
+
+type comparisonFunc = func(int, int) bool
+
+func (c *CountingSet) filter(tieBreaker string, cmpFn comparisonFunc) string {
+	var result string
+	var resultCount int
+	foundOne := false
+	for entry, count := range *c {
+		if !foundOne || cmpFn(count, resultCount) {
+			foundOne = true
+			result = entry
+			resultCount = count
+		}
+	}
+	// Check whether there are any duplicate findings and handle appropriately.
+	for entry, count := range *c {
+		if count == resultCount &amp;&amp; entry != result {
+			return tieBreaker
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_6"><a class="anchor" href="#_how_to_run_6"></a><a class="link" href="#_how_to_run_6">How to run</a></h5>
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run the solution for part 2.
