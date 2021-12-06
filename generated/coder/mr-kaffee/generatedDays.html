@@ -231,6 +231,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_rust">Day 06: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_06_lanternfish">Day 06: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_parts_1_2">Parts 1 &amp; 2</a></li>
+<li><a href="#_tests_5">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1370,6 +1380,104 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>Sometimes, it is a good idea to use signed types even if all the results are positive. This allows to deal with negative increments much more directly.</p>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_rust"><a class="anchor" href="#_day_06_rust"></a><a class="link" href="#_day_06_rust">Day 06: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_06_lanternfish"><a class="anchor" href="#_day_06_lanternfish"></a><a class="link" href="#_day_06_lanternfish">Day 06: Lanternfish</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/6">AoC|2021|06</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_parts_1_2"><a class="anchor" href="#_parts_1_2"></a><a class="link" href="#_parts_1_2">Parts 1 &amp; 2</a></h5>
+<div class="paragraph">
+<p>The key is to not keep a list of fishes but a list of timer values.</p>
+</div>
+<div class="paragraph">
+<p>Parsing the input is done as follows:app-name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse fishes
+///
+/// returns an vector of the number of fishes per given timer value
+///
+/// ```
+/// # use mr_kaffee_2021_06::*;
+/// assert_eq!(vec![0, 1, 1, 2, 1, 0, 0, 0, 0], parse("3,4,3,1,2"));
+/// ```
+pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
+    let mut fishes = vec![0; 9];
+
+    for age in content.trim().split(',') {
+        fishes[age.parse::&lt;usize&gt;().expect("Could not parse fish")] += 1;
+    }
+
+    fishes
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Simulations are done with:
+Parsing the input is done as follows:app-name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// simulate a given number of rounds
+///
+/// the timer values of all fishes are decreased by one. If the timer value is 0,
+/// it is reset to 6 and the same amount of fishes with time value 8 is added.
+pub fn simulate(mut fishes: Vec&lt;usize&gt;, rounds: usize) -&gt; Vec&lt;usize&gt; {
+    for _ in 0..rounds {
+        let new_fishes = fishes[0];
+        for k in 1..fishes.len() {
+            fishes[k - 1] = fishes[k];
+        }
+        fishes[6] += new_fishes;
+        fishes[8] = new_fishes;
+    }
+    fishes
+}
+
+/// simulate given number of rounds and return sum
+pub fn simulate_and_count(mut fishes: Vec&lt;usize&gt;, rounds: usize) -&gt; usize {
+    fishes = simulate(fishes, rounds);
+    fishes.iter().sum()
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_5"><a class="anchor" href="#_tests_5"></a><a class="link" href="#_tests_5">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const DATA: &amp;'static [usize] = &amp;[0, 1, 1, 2, 1, 0, 0, 0, 0];
+
+    #[test]
+    fn  test_simulate() {
+        let mut fishes = DATA.to_vec();
+        fishes = simulate(fishes, 1);
+        assert_eq!(fishes, parse("2,3,2,0,1"));
+        fishes = simulate(fishes, 1);
+        assert_eq!(fishes, parse("1,2,1,6,0,8"));
+        fishes = simulate(fishes, 1);
+        assert_eq!(fishes, parse("0,1,0,5,6,7,8"));
+    }
+
+    #[test]
+    fn test_simulate_and_count() {
+        assert_eq!(5934, simulate_and_count(DATA.to_vec(), 80));
+    }
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
