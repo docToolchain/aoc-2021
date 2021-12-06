@@ -206,6 +206,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_06_python">Day 06: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_6_lanternfish">Day 6: Lanternfish</a>
+<ul class="sectlevel4">
+<li><a href="#_til_2">TIL</a></li>
+<li><a href="#_first_star_6">First Star</a></li>
+<li><a href="#_second_star_6">Second Star</a></li>
+<li><a href="#_source_6">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1128,6 +1140,175 @@ def test_star2():
     puzzle_in = read_input("input_test.txt")
     score = star2(puzzle_in)
     assert score == 12</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_python"><a class="anchor" href="#_day_06_python"></a><a class="link" href="#_day_06_python">Day 06: python</a></h3>
+<div class="sect3">
+<h4 id="_day_6_lanternfish"><a class="anchor" href="#_day_6_lanternfish"></a><a class="link" href="#_day_6_lanternfish">Day 6: Lanternfish</a></h4>
+<div class="paragraph">
+<p>Ahh Eric Wastel, you did it again!</p>
+</div>
+<div class="sect4">
+<h5 id="_til_2"><a class="anchor" href="#_til_2"></a><a class="link" href="#_til_2">TIL</a></h5>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>stop trying to understand weird growth patterns</p>
+</li>
+<li>
+<p>use proper data structures</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_6"><a class="anchor" href="#_first_star_6"></a><a class="link" href="#_first_star_6">First Star</a></h5>
+<div class="paragraph">
+<p>Went the naive way and just kept increasing a list of fish days.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_6"><a class="anchor" href="#_second_star_6"></a><a class="link" href="#_second_star_6">Second Star</a></h5>
+<div class="paragraph">
+<p>Even without running my code I realized it will not produce an answer in a reasonable amount of time.
+Of course I still ran it anyway..</p>
+</div>
+<div class="paragraph">
+<p>While it kept running I thought about how to approach this problem.</p>
+</div>
+<div class="paragraph">
+<p>Attempt 1: Try to find repeating patterns in the growth of the fish. Failed.</p>
+</div>
+<div class="paragraph">
+<p>Attempt 2: Rethink data structures&#8230;&#8203; d&#8217;OH, easy fix.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_6"><a class="anchor" href="#_source_6"></a><a class="link" href="#_source_6">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from typing import List
+
+
+def sunrise(fish):
+    new_fish = list()
+    for i, f in enumerate(fish):
+        if f &gt; 0:
+            fish[i] -= 1
+        else:
+            new_fish.append(8)
+            fish[i] = 6
+    fish += new_fish
+
+
+# tag::star1[]
+def star1(puzzle_in):
+    for n in range(80):
+        sunrise(puzzle_in)
+    return len(puzzle_in)
+
+
+# end::star1[]
+
+
+def fish2dict(puzzle_in):
+    count = dict()
+    for n in range(9):
+        count[n] = len([f for f in puzzle_in if f == n])
+    return count
+
+
+def sunset(fish):
+    new = fish[0]
+    for n in list(range(8)):
+        fish[n] = fish[n + 1]
+    fish[8] = new
+    fish[6] += new
+
+
+# tag::star2[]
+def star2(puzzle_in):
+    fish = fish2dict(puzzle_in)
+    for n in range(256):
+        sunset(fish)
+    return sum(fish.values())
+
+
+# end::star2[]
+
+
+def read_input(filepath):
+    """Create input and parse it.
+
+    Returns:
+        list of integers
+    """
+    with open(filepath, "r") as f:
+        entries = f.readline()
+    entries = [int(s) for s in entries.split(",")]
+    return entries
+
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    puzzle_in = read_input("input.txt")
+    print(f"Result for second star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import *
+
+
+def test_parse_input():
+    puzzle_in = read_input("input_test.txt")
+    assert len(puzzle_in) == 5
+    e1 = puzzle_in[0]
+    assert e1 == 3
+
+
+def test_sunrise():
+    puzzle_in = read_input("input_test.txt")
+    sunrise(puzzle_in)
+    assert puzzle_in == [2, 3, 2, 0, 1]
+    sunrise(puzzle_in)
+    assert puzzle_in == [1, 2, 1, 6, 0, 8]
+
+
+def test_star1():
+    puzzle_in = read_input("input_test.txt")
+    score = star1(puzzle_in)
+    assert score == 5934
+
+
+def test_fish2dict():
+    puzzle_in = read_input("input_test.txt")
+    d = fish2dict(puzzle_in)
+    assert d[3] == 2
+    assert d[5] == 0
+
+
+def test_sunset():
+    puzzle_in = read_input("input_test.txt")
+    fish = fish2dict(puzzle_in)
+    sunset(fish)
+    assert fish[0] == 1
+    assert fish[2] == 2
+    sunset(fish)
+    assert fish[0] == 1
+    assert fish[8] == 1
+
+
+def test_star2():
+    puzzle_in = read_input("input_test.txt")
+    score = star2(puzzle_in)
+    assert score == 26984457539</code></pre>
 </div>
 </div>
 </div>
