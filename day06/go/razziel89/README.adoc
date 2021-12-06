@@ -1,0 +1,45 @@
+== Day 06: Lanternfish ==
+
+This is my implementation for both rounds of the lanternfish puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where some helper functions are.
+There is also a `population.go`, which contains specifications of a population
+of breeding lifeforms.
+This solution also fully re-uses the counting set implementation of day 3 in
+`set.go`.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`population.go`
+[source,go,numbered]
+----
+include::population.go[tags=population]
+----
+
+`set.go`
+[source,go,numbered]
+----
+include::set.go[tags=set]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution for part 2.
+You can run the solution for part 1 using `cat input.dat | PART=1 go run .` or
+in general by setting the environment variable `PART` to `1`.
