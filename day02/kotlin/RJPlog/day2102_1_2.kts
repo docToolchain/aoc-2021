@@ -35,7 +35,7 @@ fun dive_2(): Int {
 		
 		if (instruction[0].equals("forward")) {
 			horizontal = horizontal + instruction[1].toInt()
-			depth = depth + aim * + instruction[1].toInt()
+			depth = depth + aim * instruction[1].toInt()
 		} else if (instruction[0].equals("down")) {
 			aim = aim + instruction[1].toInt()
 		} else if (instruction[0].equals("up")) {

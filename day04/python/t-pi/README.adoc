@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-04: Giant Squid  
+https://adventofcode.com/2021/day/4
+
+=== Info
+
+Play bingo with giant squid attached to sub
+*: Win (checksum from first board to bingo)
+*: Loose (checksum from last board to bingo)
+Checksum: All unmarked numbers of winning bingo field * last number to complete row/column
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into bingo_numbers and bingo_fields.
+Separate functions to mark a number in a field and to check for complete row/col and calculation of checksum.
+Marking is done by substracting 100 from field (max 99) and later checking for <0.
+Iterate trough numbers and fields.
+Note first winning board.
+Have index of winning boards, calculate checksum of all newly winning boards and note last one.
+
+=== Learned today
+
+Got back somewhat into multi-dim lists and some list comprehension - although not everything worked as expected. Yet :)
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

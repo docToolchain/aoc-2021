@@ -1,0 +1,43 @@
+==  Day 4: Hydrothermal Venture
+
+This solution is written in Groovy and of course with TDD approach.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/5
+
+The working example can be found here https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day5[uniqueck / advent-of-code]
+
+=== Today I learned
+
+It is better to complete all test of the helper classes and simplify the code afterwards.
+
+=== First Star
+
+How does it work: +
+
+We craete a list of `Line` elements from the puzzle input.
+We filter all lines out, which not have a start and end point on the the row or column. So only horizontal and vertical lines are processed.
+
+Then we create the map based on all points / coords on the line and increased the bit for these coord.
+
+After these map is created we filter out all elements with a bit higher than one.
+
+[source, groovy, numbered]
+....
+include::Coord.groovy[]
+....
+
+[source, groovy, numbered]
+....
+include::Line.groovy[]
+....
+
+[source, groovy, numbered]
+....
+include::HydrothermalVenture.groovy[]
+....
+
+=== Second Star
+
+How does it work: +
+
+The only difference between the first star and this star, is that we process also diagonal lines.

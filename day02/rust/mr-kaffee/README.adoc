@@ -5,6 +5,12 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/2[AoC|
 === Part 1 ===
 
 The most difficult part today was to parse the input. My rust knowledge obviously is slightly rusty...
+Eventually I created an enum with a `parse` function as follows:
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=command]
+----
+
 
 The solution then is done with a simple fold operation on an iterator accumulating depth (y) and horizontal position (x)
 
@@ -24,4 +30,4 @@ include::src/lib.rs[tags=calc_position_with_aim]
 
 === Today I learned ===
 
-Parsing simple inputs does not require regular expressions.
+Parsing simple inputs does not require regular expressions & creating enums with parse functions leads to a bit more code but looks much prettier

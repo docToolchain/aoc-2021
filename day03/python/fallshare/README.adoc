@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+=== Star 1
+Groundhog day. Pass by value vs. pass by reference.
+=== Start 2
+Today I learned that Python is rounding to the next even number..
+
+[source, python]
+....
+include::solution.py[]
+....
