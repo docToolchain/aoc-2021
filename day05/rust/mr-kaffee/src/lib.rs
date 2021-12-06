@@ -3,6 +3,7 @@ use std::{
     collections::HashMap,
 };
 
+//tag::counters[]
 /// to allow using the same code with counts stored in a vector or in a hash map, the interface is modeled as a trait
 pub trait VentsCount {
     /// increment count at given coordinate
@@ -55,6 +56,7 @@ impl VentsCount for VecVentsCount {
         self.counts.iter().filter(|count| **count > 1).count()
     }
 }
+//end::counters[]
 
 //tag::parse[]
 /// parse lines ``"x1,y1 -> x2,y2"`` to tuples ``(x1, y1, x2, y2)``
@@ -113,6 +115,8 @@ pub fn get_bbox(lines: &[(isize, isize, isize, isize)]) -> (isize, isize, isize,
 //end::bbox[]
 
 //tag::count_overlaps[]
+/// this function uses the struct [VecVentsCount] by default. This behavior can be changed to using ``HashMap`` based
+/// counting using the feature ``hash_counters``
 pub fn count_overlaps(lines: &[(isize, isize, isize, isize)], incl_diagonal: bool) -> usize {
     let mut counts: Box<dyn VentsCount> = if cfg!(feature = "hash_counters") {
         Box::new(HashMap::new())
