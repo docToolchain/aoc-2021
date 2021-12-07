@@ -1,0 +1,34 @@
+==  Day 7: The Treachery of Whales  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/7
+
+For execution enter _kotlin day2107_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+After reading the puzzle input and placing it in a list, I went through all possible positions and calculated the fuel amount. For each position the fuel amount is compared and the minimum kept as solution
+[source, kotlin, numbered]
+....
+include::day2107_1_2.kts[tags=part1]
+....
+
+=== Second Star
+
+How does it work: +
+
+Same procedure as in part 1, only some adder for the calculation of the consumed fuel.
+[source, kotlin, numbered]
+....
+include::day2107_1_2.kts[tags=part2]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2107_1_2.kts[tags=output]
+....
