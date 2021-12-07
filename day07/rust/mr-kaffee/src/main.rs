@@ -8,14 +8,14 @@ fn read_input() -> String {
 fn main() {     
     // solve part 1
     let instant_1 = Instant::now();
-    println!("{:?}", parse(&read_input()));
-    let sol_1 = 0;
+    let crabs = parse(&read_input());
+    let sol_1 = get_optimal_positions_fuel(&crabs, COST_LINEAR);
     println!("Solved part 1 in {:?}: {:?}", instant_1.elapsed(), sol_1);
-    assert_eq!(0, sol_1);
+    assert_eq!(337_833, sol_1);
 
     // solve part 2
     let instant_2 = Instant::now();
-    let sol_2 = 1;
+    let sol_2 = get_optimal_positions_fuel(&crabs, COST_INCREASING);
     println!("Solved part 2 in {:?}: {:?}", instant_2.elapsed(), sol_2);
-    assert_eq!(1, sol_2);
+    assert_eq!(96_678_050, sol_2);
 }
