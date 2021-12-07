@@ -237,6 +237,18 @@
 <ul class="sectlevel4">
 <li><a href="#_parts_1_2">Parts 1 &amp; 2</a></li>
 <li><a href="#_tests_5">Tests</a></li>
+<li><a href="#_some_more_thoughts">Some more thoughts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_07_rust">Day 07: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_07_the_treachery_of_whales">Day 07: The Treachery of Whales</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_5">Part 1</a></li>
+<li><a href="#_part_2_5">Part 2</a></li>
+<li><a href="#_tests_6">Tests</a></li>
 </ul>
 </li>
 </ul>
@@ -1463,7 +1475,7 @@ mod tests {
 <p>The key is to not keep a list of fishes but a list of timer values.</p>
 </div>
 <div class="paragraph">
-<p>Parsing the input is done as follows:app-name:</p>
+<p>Parsing the input is done as follows</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1487,17 +1499,16 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
 </div>
 </div>
 <div class="paragraph">
-<p>Simulations are done with:
-Parsing the input is done as follows:app-name:</p>
+<p>Simulations are done with:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// simulate a given number of rounds
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// simulate a given number of days
 ///
 /// the timer values of all fishes are decreased by one. If the timer value is 0,
 /// it is reset to 6 and the same amount of fishes with time value 8 is added.
-pub fn simulate(mut fishes: Vec&lt;usize&gt;, rounds: usize) -&gt; Vec&lt;usize&gt; {
-    for _ in 0..rounds {
+pub fn simulate(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; Vec&lt;usize&gt; {
+    for _ in 0..days {
         let new_fishes = fishes[0];
         for k in 1..fishes.len() {
             fishes[k - 1] = fishes[k];
@@ -1509,8 +1520,8 @@ pub fn simulate(mut fishes: Vec&lt;usize&gt;, rounds: usize) -&gt; Vec&lt;usize&
 }
 
 /// simulate given number of rounds and return sum
-pub fn simulate_and_count(mut fishes: Vec&lt;usize&gt;, rounds: usize) -&gt; usize {
-    fishes = simulate(fishes, rounds);
+pub fn simulate_and_count(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; usize {
+    fishes = simulate(fishes, days);
     fishes.iter().sum()
 }</code></pre>
 </div>
@@ -1527,7 +1538,7 @@ mod tests {
     const DATA: &amp;'static [usize] = &amp;[0, 1, 1, 2, 1, 0, 0, 0, 0];
 
     #[test]
-    fn  test_simulate() {
+    fn test_simulate() {
         let mut fishes = DATA.to_vec();
         fishes = simulate(fishes, 1);
         assert_eq!(fishes, parse("2,3,2,0,1"));
@@ -1540,6 +1551,230 @@ mod tests {
     #[test]
     fn test_simulate_and_count() {
         assert_eq!(5934, simulate_and_count(DATA.to_vec(), 80));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_some_more_thoughts"><a class="anchor" href="#_some_more_thoughts"></a><a class="link" href="#_some_more_thoughts">Some more thoughts</a></h5>
+<div class="paragraph">
+<p>I was thinking to create an explicit solution (in memory of my time at <a href="https://www.ist.uni-stuttgart.de/">University Stuttgart</a>). Fish growth is governed by the discrte time ODE</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>timers[k + 1] = A timers[k]
+count[k] = C timers[k]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>with the matrices</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    | 0 1 0 0 0 0 0 0 0 |
+    | 0 0 1 0 0 0 0 0 0 |
+    | 0 0 0 1 0 0 0 0 0 |
+    | 0 0 0 0 1 0 0 0 0 |
+A = | 0 0 0 0 0 1 0 0 0 |
+    | 0 0 0 0 0 0 1 0 0 |
+    | 1 0 0 0 0 0 0 1 0 |
+    | 0 0 0 0 0 0 0 0 1 |
+    | 1 0 0 0 0 0 0 0 0 |</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>C = ( 1 1 1 1 1 1 1 1 1 )</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The characteristic equation of A is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>z^9 - z^2 - 1 = 0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which <a href="https://maxima.sourceforge.io/">Maxima</a> is not able to solve :( - so no explicit solution that I would be able to come up with</p>
+</div>
+<div class="paragraph">
+<p>For a big number of rounds, it might be interesting to calculate powers of the above matrix using <a href="https://en.wikipedia.org/wiki/Exponentiation_by_squaring">exponentiation by squaring</a>, but for 256 rounds, a direct approach is certainly more efficient.</p>
+</div>
+<div class="paragraph">
+<p>I might not have a direct soluton for an arbitrary number of rounds, but a direct solution for 80 and 256 rounds can still be given as</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>count[80] = ( 1421 1401 1191 1154 1034 950 905 779 768 ) * timers[0]
+count[256] = ( 6703087164 6206821033 5617089148 5217223242 4726100874 4368232009 3989468462 3649885552 3369186778 ) * timers[0]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">const CA_80: &amp;'static [usize] = &amp;[1421, 1401, 1191, 1154, 1034, 950, 905, 779, 768];
+const CA_256: &amp;'static [usize] = &amp;[
+    6703087164, 6206821033, 5617089148, 5217223242, 4726100874, 4368232009, 3989468462, 3649885552,
+    3369186778,
+];
+
+pub fn solve_direct(fishes: &amp;[usize], days: usize) -&gt; usize {
+    fishes
+        .iter()
+        .zip(
+            match days {
+                80 =&gt; CA_80,
+                256 =&gt; CA_256,
+                _ =&gt; panic!("No direct solution for {} days", days),
+            }
+            .iter(),
+        )
+        .map(|(counter, factor)| counter * factor)
+        .sum()
+}
+
+#[cfg(test)]
+mod direct_solution_test {
+    use super::*;
+
+    const INPUT: &amp;str = "4,1,1,4,1,2,1,4,1,3,4,4,1,5,5,1,3,1,1,1,4,4,3,1,5,3,1,2,5,1,1,5,\
+1,1,4,1,1,1,1,2,1,5,3,4,4,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,5,1,1,1,4,1,2,3,5,1,2,2,4,1,4,4,4,\
+1,2,5,1,2,1,1,1,1,1,1,4,1,1,4,3,4,2,1,3,1,1,1,3,5,5,4,3,4,1,5,1,1,1,2,2,1,3,1,2,4,1,1,3,3,\
+1,3,3,1,1,3,1,5,1,1,3,1,1,1,5,4,1,1,1,1,4,1,1,3,5,4,3,1,1,5,4,1,1,2,5,4,2,1,4,1,1,1,1,3,1,\
+1,1,1,4,1,1,1,1,2,4,1,1,1,1,3,1,1,5,1,1,1,1,1,1,4,2,1,3,1,1,1,2,4,2,3,1,4,1,2,1,4,2,1,4,4,\
+1,5,1,1,4,4,1,2,2,1,1,1,1,1,1,1,1,1,1,1,4,5,4,1,3,1,3,1,1,1,5,3,5,5,2,2,1,4,1,4,2,1,4,1,2,\
+1,1,2,1,1,5,4,2,1,1,1,2,4,1,1,1,1,2,1,1,5,1,1,2,2,5,1,1,1,1,1,2,4,2,3,1,2,1,5,4,5,1,4";
+
+    #[test]
+    #[should_panic]
+    fn test_direct_fails() {
+        solve_direct(&amp;parse(INPUT), 56);
+    }
+
+    #[test]
+    fn test_direct_80() {
+        let fishes = parse(INPUT);
+        let sol_direct = solve_direct(&amp;fishes, 80);
+        let sol_classic = simulate_and_count(fishes, 80);
+        assert_eq!(sol_classic, sol_direct);
+    }
+
+    #[test]
+    fn test_direct_256() {
+        let fishes = parse(INPUT);
+        let sol_direct = solve_direct(&amp;fishes, 256);
+        let sol_classic = simulate_and_count(fishes, 256);
+        assert_eq!(sol_classic, sol_direct);
+    }
+}</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_rust"><a class="anchor" href="#_day_07_rust"></a><a class="link" href="#_day_07_rust">Day 07: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_07_the_treachery_of_whales"><a class="anchor" href="#_day_07_the_treachery_of_whales"></a><a class="link" href="#_day_07_the_treachery_of_whales">Day 07: The Treachery of Whales</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/7">AoC|2021|07</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_5"><a class="anchor" href="#_part_1_5"></a><a class="link" href="#_part_1_5">Part 1</a></h5>
+<div class="paragraph">
+<p>Parse input into number of vectors</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
+    content
+        .trim()
+        .split(',')
+        .map(|v| v.parse().expect("Could not parse"))
+        .collect()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function to map distance to cost as argument, for part 1, this is just the identity)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_fuel(crabs: &amp;[usize], position: usize, cost: fn(usize) -&gt; usize) -&gt; usize {
+    crabs
+        .iter()
+        .map(|crab| {
+            cost(if crab &gt; &amp;position {
+                crab - position
+            } else {
+                position - crab
+            })
+        })
+        .sum()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For optimization, I did not even think about for something more clever than linear search.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_optimal_positions_fuel(crabs: &amp;[usize], cost: fn(usize) -&gt; usize) -&gt; usize {
+    let pos_min = *crabs.iter().min().expect("No min");
+    let pos_max = *crabs.iter().max().expect("No max");
+    (pos_min..=pos_max)
+        .map(|position| get_fuel(crabs, position, cost))
+        .min()
+        .expect("No min")
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_5"><a class="anchor" href="#_part_2_5"></a><a class="link" href="#_part_2_5">Part 2</a></h5>
+<div class="paragraph">
+<p>For part two I just use a different cost function: <code>COST_LINEAR</code> solves part 1, <code>COST_INCREASING</code> solves part 2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const COST_LINEAR: fn(usize) -&gt; usize = |distance| distance;
+pub const COST_INCREASING: fn(usize) -&gt; usize = |distance| distance * (distance + 1) / 2;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_6"><a class="anchor" href="#_tests_6"></a><a class="link" href="#_tests_6">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "16,1,2,0,4,2,7,1,2,14";
+    const DATA: &amp;'static [usize] = &amp;[16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(DATA, parse(CONTENT));
+    }
+
+    #[test]
+    fn test_get_fuel() {
+        assert_eq!(37, get_fuel(DATA, 2, COST_LINEAR));
+        assert_eq!(41, get_fuel(DATA, 1, COST_LINEAR));
+        assert_eq!(39, get_fuel(DATA, 3, COST_LINEAR));
+    }
+
+    #[test]
+    fn test_get_optimal_positions_fuel() {
+        assert_eq!(37, get_optimal_positions_fuel(DATA, COST_LINEAR));
+    }
+
+    #[test]
+    fn test_get_optimal_positions_fuel_2() {
+        assert_eq!(168, get_optimal_positions_fuel(DATA, COST_INCREASING));
     }
 }</code></pre>
 </div>
