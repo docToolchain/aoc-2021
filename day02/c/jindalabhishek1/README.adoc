@@ -1,6 +1,6 @@
 == Day 02 ==
 
-Implemented in C
+Implemented in C +
 .Learned
 * How to handle files in C
 * Better code quality
