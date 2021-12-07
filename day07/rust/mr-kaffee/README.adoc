@@ -4,14 +4,14 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/7[AoC|
 
 === Part 1 ===
 
-Parse input into number of vectors
+Parse input into a vector of numbers
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
-Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function to map distance to cost as argument, for part 1, this is just the identity)
+Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function - mapping distance to cost - as argument; for part 1, this is just the identity)
 
 [source,rust,numbered]
 ----
