@@ -1,0 +1,36 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-07: The Treachery of Whales
+https://adventofcode.com/2021/day/7
+
+=== Info
+
+Align crab subs horizontally at single position with minimum fuel to escape the whale.
+* Star1 (*): Linear fuel consumption with distance
+* Star2 (**): Fuel consumption increases linearly with distance (1:1 + 2:2 + 3:3 + ...)
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line (one long line today...) and prepocessed.
+* Two functions: 
+ * First star to calculate the sum of the differences
+ * Second star to calculate the sum of the sums of (difference range + 1), to account for increasing fuel need
+
+=== Learned today
+
+Basic algebra: had to recheck the formula to sum first n integers :)
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
