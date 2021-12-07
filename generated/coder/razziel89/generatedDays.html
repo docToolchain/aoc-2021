@@ -205,6 +205,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_07_go">Day 07: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_07_the_treachery_of_whales">Day 07: The Treachery of Whales</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_7">Oveview</a></li>
+<li><a href="#_how_to_run_7">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1438,6 +1448,190 @@ func (c *CountingSet) filter(tieBreaker string, cmpFn comparisonFunc) string {
 <code>cat input.dat | go run .</code> to run the solution for part 2.
 You can run the solution for part 1 using <code>cat input.dat | PART=1 go run .</code> or
 in general by setting the environment variable <code>PART</code> to <code>1</code>.</p>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_go"><a class="anchor" href="#_day_07_go"></a><a class="link" href="#_day_07_go">Day 07: go</a></h3>
+<div class="sect3">
+<h4 id="_day_07_the_treachery_of_whales"><a class="anchor" href="#_day_07_the_treachery_of_whales"></a><a class="link" href="#_day_07_the_treachery_of_whales">Day 07: The Treachery of Whales</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the whales puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_7"><a class="anchor" href="#_oveview_7"></a><a class="link" href="#_oveview_7">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where some helper functions are.
+This solution also re-uses the counting set implementation of day 3 in
+<code>set.go</code> but using integers instead of string tokens this time.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// For each entry in the set, compute the cost based on some cost function. The target will be every
+// possible number between the smallest and largest entry in the set. Multiples of set entries are
+// accounted for. The lowest cost and associated target are returned.
+func overallCost(set CountingSet, costFn func(int, int) int) (int, int) {
+	bestCost := 0
+	bestPos := 0
+	found := false
+	for checkPos := set.Min(); checkPos &lt;= set.Max(); checkPos++ {
+		checkCost := 0
+		for _, startPos := range set.Keys() {
+			additionalCost := costFn(startPos, checkPos) * set.Count(startPos)
+			checkCost += additionalCost
+		}
+		if !found || checkCost &lt; bestCost {
+			bestPos = checkPos
+			bestCost = checkCost
+			found = true
+		}
+	}
+	return bestCost, bestPos
+}
+
+//nolint: funlen
+func main() {
+	sets, err := ReadLinesAsSets()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if len(sets) != 1 {
+		log.Fatal("exactly 1 input set supported")
+	}
+	set := sets[0]
+	// Part 1.
+	fuelConsumptionFnPart1 := func(start, end int) int {
+		return abs(start - end)
+	}
+	bestCost, bestPos := overallCost(set, fuelConsumptionFnPart1)
+	fmt.Printf("Best position is %d with cost %d\n", bestPos, bestCost)
+	// Part 2. Same code, different cost formula.
+	fuelConsumptionFnPart2 := func(start, end int) int {
+		diff := abs(start - end)
+		// This is the sum of the first diff natural numbers. This also nicely works for diff==0.
+		return (diff * (diff + 1)) / 2 //nolint: gomnd
+	}
+	bestCost, bestPos = overallCost(set, fuelConsumptionFnPart2)
+	fmt.Printf("Best position is %d with cost %d\n", bestPos, bestCost)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsSets reads all lines from stdin as counting sets.
+func ReadLinesAsSets() ([]CountingSet, error) {
+	var result []CountingSet
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []CountingSet{}, err
+		}
+		fields := trimStrings(strings.Split(line, setSep))
+		set := CountingSet{}
+		for _, field := range fields {
+			err := set.Add(field)
+			if err != nil {
+				return []CountingSet{}, err
+			}
+		}
+		result = append(result, set)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>set.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// This file contains the counting set as used for day 3 but with ints instead of strings and with
+// some unneeded functionality removed.
+
+// CountingSet is a set that also knows how often each element has been added. It does support
+// non-empty strings only.
+type CountingSet map[int]int
+
+// Add adds an entry to the set.
+func (c *CountingSet) Add(entry string) error {
+	conv, err := strconv.Atoi(entry)
+	if err != nil {
+		return err
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*c)[conv] = (*c)[conv] + 1
+	return nil
+}
+
+// Min returns the smallest key.
+func (c *CountingSet) Min() int {
+	var result int
+	found := false
+	for key := range *c {
+		if !found || key &lt; result {
+			result = key
+			found = true
+		}
+	}
+	return result
+}
+
+// Max returns the largest key.
+func (c *CountingSet) Max() int {
+	var result int
+	found := false
+	for key := range *c {
+		if !found || key &gt; result {
+			result = key
+			found = true
+		}
+	}
+	return result
+}
+
+// Keys returns all keys of the set.
+func (c *CountingSet) Keys() []int {
+	result := make([]int, 0, len(*c))
+	for key := range *c {
+		result = append(result, key)
+	}
+	return result
+}
+
+// Count determines how often an entry has been added to the set.
+func (c *CountingSet) Count(entry int) int {
+	return (*c)[entry]
+}
+
+// RemoveAll removes all counts for a specific key.
+func (c *CountingSet) RemoveAll(entry int) {
+	delete(*c, entry)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_7"><a class="anchor" href="#_how_to_run_7"></a><a class="link" href="#_how_to_run_7">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for both parts.
+The solution for part 1 will be output first, followed by that for part 2.</p>
 </div>
 </div>
 </div>
