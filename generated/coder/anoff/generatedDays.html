@@ -218,6 +218,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_07_python">Day 07: python</a>
+<ul class="sectlevel3">
+<li><a href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a>
+<ul class="sectlevel4">
+<li><a href="#_til_3">TIL</a></li>
+<li><a href="#_first_star_7">First Star</a></li>
+<li><a href="#_second_star_7">Second Star</a></li>
+<li><a href="#_source_7">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1309,6 +1321,155 @@ def test_star2():
     puzzle_in = read_input("input_test.txt")
     score = star2(puzzle_in)
     assert score == 26984457539</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_python"><a class="anchor" href="#_day_07_python"></a><a class="link" href="#_day_07_python">Day 07: python</a></h3>
+<div class="sect3">
+<h4 id="_day_7_the_treachery_of_whales"><a class="anchor" href="#_day_7_the_treachery_of_whales"></a><a class="link" href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a></h4>
+<div class="sect4">
+<h5 id="_til_3"><a class="anchor" href="#_til_3"></a><a class="link" href="#_til_3">TIL</a></h5>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>math problems should be solved using math</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_7"><a class="anchor" href="#_first_star_7"></a><a class="link" href="#_first_star_7">First Star</a></h5>
+<div class="paragraph">
+<p>Remembered yesterdays challenge and went for the same data structure.
+Keeping count of submarines per location instead of long list.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_7"><a class="anchor" href="#_second_star_7"></a><a class="link" href="#_second_star_7">Second Star</a></h5>
+<div class="paragraph">
+<p>Looked up how to mathematically create the sum of all integers until <code>n</code> and implemented a new <em>fuel</em> function.
+Done.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_7"><a class="anchor" href="#_source_7"></a><a class="link" href="#_source_7">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from typing import List, Dict
+
+
+def fuel_cost(subs: Dict, position: int):
+    cost = 0
+    for sub_pos, sub_count in subs.items():
+        cost += abs(sub_pos - position) * sub_count
+    return cost
+
+
+# tag::star1[]
+def star1(subs: Dict):
+    possible_positions = subs.keys()
+    min_cost = 1e9
+    min_pos = 0
+    for p in possible_positions:
+        cost = fuel_cost(subs, p)
+        if cost &lt; min_cost:
+            min_cost = cost
+            min_pos = p
+    return min_cost
+
+
+# end::star1[]
+
+
+def fuel_cost2(subs: Dict, position: int):
+    cost = 0
+    for sub_pos, sub_count in subs.items():
+        delta = abs(sub_pos - position)
+
+        cost += delta * (delta + 1) / 2 * sub_count
+    return int(cost)
+
+
+# tag::star2[]
+def star2(subs: Dict):
+    possible_positions = range(max(subs.keys()))
+    min_cost = 1e9
+    min_pos = 0
+    for p in possible_positions:
+        cost = fuel_cost2(subs, p)
+        if cost &lt; min_cost:
+            min_cost = cost
+            min_pos = p
+    print("Best position:", min_pos)
+    return min_cost
+
+
+# end::star2[]
+
+
+def read_input(filepath):
+    """Create input and parse it.
+
+    Returns:
+        dictionary with key-&gt;position, value-&gt;count of subs
+    """
+    d = dict()
+    with open(filepath, "r") as f:
+        entries = f.readline()
+    entries = [int(s) for s in entries.split(",")]
+    for n in entries:
+        if n in d:
+            d[n] += 1
+        else:
+            d[n] = 1
+    return d
+
+
+if __name__ == "__main__":
+    puzzle_in = read_input("input.txt")
+    print(f"Result for first star: {star1(puzzle_in)}")
+    puzzle_in = read_input("input.txt")
+    print(f"Result for second star: {star2(puzzle_in)}")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-python" data-lang="python">from solution import *
+
+
+def test_parse_input():
+    puzzle_in = read_input("input_test.txt")
+    assert puzzle_in[1] == 2
+    assert puzzle_in[16] == 1
+
+
+def test_fuel_cost():
+    d = read_input("input_test.txt")
+    assert fuel_cost(d, 1) == 41
+    assert fuel_cost(d, 10) == 71
+    assert fuel_cost(d, 3) == 39
+
+
+def test_star1():
+    puzzle_in = read_input("input_test.txt")
+    score = star1(puzzle_in)
+    assert score == 37
+
+
+def test_fuel_cost2():
+    d = read_input("input_test.txt")
+    assert fuel_cost2(d, 2) == 206
+    assert fuel_cost2(d, 5) == 168
+
+
+def test_star2():
+    puzzle_in = read_input("input_test.txt")
+    score = star2(puzzle_in)
+    assert score == 168</code></pre>
 </div>
 </div>
 </div>
