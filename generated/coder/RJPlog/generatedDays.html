@@ -211,6 +211,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_07_kotlin">Day 07: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_7">First Star</a></li>
+<li><a href="#_second_star_7">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1061,6 +1071,71 @@
 	println("*********************************")
 	println("Solution for part2")
 	println("   $solution2 laternfish would be there after 80 days")
+	println()
+// end::output[]
+//}</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_kotlin"><a class="anchor" href="#_day_07_kotlin"></a><a class="link" href="#_day_07_kotlin">Day 07: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_7_the_treachery_of_whales"><a class="anchor" href="#_day_7_the_treachery_of_whales"></a><a class="link" href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/7" class="bare">https://adventofcode.com/2021/day/7</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2107_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_7"><a class="anchor" href="#_first_star_7"></a><a class="link" href="#_first_star_7">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>After reading the puzzle input and placing it in a list, I went through all possible positions and calculated the fuel amount. For each position the fuel amount is compared and the minimum kept as solution</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin"></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_7"><a class="anchor" href="#_second_star_7"></a><a class="link" href="#_second_star_7">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Same procedure as in part 1, only some adder for the calculation of the consumed fuel.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin"></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("**************************************")
+	println("--- Day 7: The Treachery of Whales ---")
+	println("**************************************")
+	println("Solution for part1")
+	println("   $minPos fuel must they spend to align to that position?")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   $minPos2 fuel must they spend to align to that position?")
 	println()
 // end::output[]
 //}</code></pre>
