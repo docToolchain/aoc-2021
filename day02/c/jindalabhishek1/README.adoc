@@ -5,7 +5,7 @@ Implemented in C
 * How to handle files in C
 * Better code quality
 
-ADMONITION: Pre-requisite: A file `input.txt` with the data in it
+NOTE: Pre-requisite: A file `input.txt` with the data in it
 
 == Part 01 ==
 
