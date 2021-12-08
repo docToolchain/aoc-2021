@@ -214,7 +214,7 @@
 </li>
 <li><a href="#_day_08_groovy">Day 08: groovy</a>
 <ul class="sectlevel3">
-<li><a href="#_day_4_seven_segment_seach">Day 4: Seven Segment Seach</a>
+<li><a href="#_day_8_seven_segment_seach">Day 8: Seven Segment Seach</a>
 <ul class="sectlevel4">
 <li><a href="#_today_i_learned_4">Today I learned</a></li>
 <li><a href="#_first_star_3">First Star</a></li>
@@ -1108,7 +1108,7 @@ class TheTreacheryOfWhalesTest {
 <div class="sect2">
 <h3 id="_day_08_groovy"><a class="anchor" href="#_day_08_groovy"></a><a class="link" href="#_day_08_groovy">Day 08: groovy</a></h3>
 <div class="sect3">
-<h4 id="_day_4_seven_segment_seach"><a class="anchor" href="#_day_4_seven_segment_seach"></a><a class="link" href="#_day_4_seven_segment_seach">Day 4: Seven Segment Seach</a></h4>
+<h4 id="_day_8_seven_segment_seach"><a class="anchor" href="#_day_8_seven_segment_seach"></a><a class="link" href="#_day_8_seven_segment_seach">Day 8: Seven Segment Seach</a></h4>
 <div class="paragraph">
 <p>This solution is written in Groovy.</p>
 </div>
@@ -1131,7 +1131,24 @@ class TheTreacheryOfWhalesTest {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy"></code></pre>
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    static int star1(File input) {
+        int counter = 0
+        input.readLines().each { String line -&gt;
+            println line
+            def (uniqueSignalPatterns, fourDigitOutputValue) = line.tokenize("|")
+            List&lt;String&gt; uniqueSignalPatternsList = uniqueSignalPatterns.tokenize(" ")
+            println uniqueSignalPatternsList
+            List&lt;String&gt; fourDigitOutputValueList = fourDigitOutputValue.tokenize(" ")
+            println fourDigitOutputValueList
+
+            fourDigitOutputValueList.findAll { [2, 3, 4, 7].contains(it.size()) }.each {
+                counter += createCombinations(it).findAll {
+                    uniqueSignalPatternsList.contains(it)
+                }.size()
+            }
+        }
+        return counter
+    }</code></pre>
 </div>
 </div>
 </div>
