@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// tag::main[]
+
 const (
 	baseStr = "abcdefg"
 )
@@ -165,3 +167,5 @@ func main() {
 	}
 	fmt.Printf("Solution part 1 is %d\n", count)
 }
+
+// end::end[]

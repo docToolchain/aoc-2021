@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# tag::solution[]
+
 main() {
     echo "SAMPLE"
     sample | solve
@@ -239,3 +241,5 @@ EOF
 }
 
 main
+
+# end::solution[]
