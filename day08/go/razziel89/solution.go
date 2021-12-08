@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 const (
@@ -89,6 +90,7 @@ var numForStr = map[string]int{
 	SortString("abcdfg"):  9,
 }
 
+//nolint:funlen
 func main() {
 	numbers, outputCount, err := ReadLinesAsInputsAndOutputs()
 	if err != nil {
@@ -143,5 +145,23 @@ func main() {
 	for _, num := range solutions {
 		sum += num
 	}
-	fmt.Println(sum)
+	fmt.Printf("Solution part 2 is %d\n", sum)
+	// Solve part 1 based on the much harder part 2 as I solved part 1 in bash initially, which was
+	// nice.
+	allStr := make([]string, 0, len(solutions))
+	for _, num := range solutions {
+		str := fmt.Sprint(num)
+		allStr = append(allStr, str)
+	}
+	allDigits := strings.Join(allStr, "")
+	count := 0
+	allowedDigits := []rune{'1', '4', '7', '8'}
+	for _, digit := range allDigits {
+		for _, checkDigit := range allowedDigits {
+			if digit == checkDigit {
+				count++
+			}
+		}
+	}
+	fmt.Printf("Solution part 1 is %d\n", count)
 }
