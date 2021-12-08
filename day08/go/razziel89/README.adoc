@@ -1,0 +1,32 @@
+== Day 08: Seven Segment Search ==
+
+This is my implementation for both rounds of the seven segment puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where some helper functions are.
+There is also a solution in bash in the appropriate directory.
+Part 1 has been solved based on the solution of part 2.
+This implementation brute-forces the solution by generating all possible
+mappings and checking each one for validity.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution for both parts.
+The solution for part 1 will be output second, preceded by that for part 2.
