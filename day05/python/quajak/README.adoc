@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+
+Since the board size is originally not known, use a dictionary of dictionary of integers to keep track how many lines are present at any point.
+
+Then iterate over lines and add the necessary locations to the map.
+
+[source, python]
+....
+include::five.py[]
+....
