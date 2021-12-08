@@ -1,4 +1,4 @@
-==  Day 4: Seven Segment Seach
+==  Day 8: Seven Segment Seach
 
 This solution is written in Groovy.
 
@@ -16,7 +16,7 @@ We have to count all unique output digits, this mean patterns with size (2,3,4,7
 
 [source, groovy]
 ----
-include::SevenSegmentSearch.groovy[tags=part=1]
+include::SevenSegmentSearch.groovy[tags=part1]
 ----
 
 === Second Star
