@@ -7,58 +7,6 @@ import (
 	"strings"
 )
 
-const (
-	baseStr = "abcdefg"
-)
-
-func permutations(str []string) [][]string {
-	var helper func([]string, int)
-	res := [][]string{}
-
-	for _, char := range str {
-		if len(char) != 1 {
-			return [][]string{}
-		}
-	}
-
-	helper = func(str []string, n int) {
-		if n == 1 {
-			tmp := make([]string, len(str))
-			copy(tmp, str)
-			res = append(res, tmp)
-		} else {
-			for i := 0; i < n; i++ {
-				helper(str, n-1)
-				if n%2 == 1 {
-					tmp := str[i]
-					str[i] = str[n-1]
-					str[n-1] = tmp
-				} else {
-					tmp := str[0]
-					str[0] = str[n-1]
-					str[n-1] = tmp
-				}
-			}
-		}
-	}
-	helper(str, len(str))
-	return res
-}
-
-// nolint:gomnd
-var numForStr = map[string]int{
-	"abcefg":  0,
-	"cf":      1,
-	"acdeg":   2,
-	"acdfg":   3,
-	"bcdf":    4,
-	"abdfg":   5,
-	"abdefg":  6,
-	"acf":     7,
-	"abcdefg": 8,
-	"abcdfg":  9,
-}
-
 func mapFromPerm(baseStr string, perm []string) (map[string]string, error) {
 	result := map[string]string{}
 	if len(baseStr) != len(perm) {
@@ -102,14 +50,6 @@ func applyMap(str string, myMap map[string]string) ([]string, error) {
 	return split, nil
 }
 
-func pow(base, exponent int) int {
-	result := 1
-	for exp := 0; exp < exponent; exp++ {
-		result *= base
-	}
-	return result
-}
-
 func getSolution(
 	input []string, outputCount int, myMap map[string]string, numForStr map[string]int,
 ) (int, error) {
@@ -136,17 +76,51 @@ func getSolution(
 	return result, nil
 }
 
+const (
+	baseStr = "abcdefg"
+)
+
+// Taken from the puzzle. This maps each segment list with segments identified by the letters a
+// through g to the corresponding number. This uses the same assignment as in the task, namely this:
+//
+//    aaaa
+//   b    c
+//   b    c
+//    dddd
+//   e    f
+//   e    f
+//    gggg
+//
+// Using SortString here is overkill but I want to make sure the strings are sorted.
+// nolint:gomnd
+var numForStr = map[string]int{
+	SortString("abcefg"):  0,
+	SortString("cf"):      1,
+	SortString("acdeg"):   2,
+	SortString("acdfg"):   3,
+	SortString("bcdf"):    4,
+	SortString("abdfg"):   5,
+	SortString("abdefg"):  6,
+	SortString("acf"):     7,
+	SortString("abcdefg"): 8,
+	SortString("abcdfg"):  9,
+}
+
 func main() {
 	numbers, outputCount, err := ReadLinesAsInputsAndOutputs()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	if SortString(baseStr) != baseStr {
+		log.Fatal(fmt.Errorf("base string is not sorted"))
+	}
+	// Remember the score for each solution. A score of >=0 means a solution for this particular
+	// line has been found.
 	solutions := make([]int, len(numbers))
 	for idx := 0; idx < len(solutions); idx++ {
 		solutions[idx] = -1
 	}
-	perms := permutations(strings.Split(baseStr, ""))
-	for _, perm := range perms {
+	for perm := range AllPermutations(baseStr) {
 		myMap, err := mapFromPerm(baseStr, perm)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -163,7 +137,6 @@ func main() {
 			if sol >= 0 {
 				// This is a valid mapping for this line, remember the output number.
 				solutions[solIdx] = sol
-				fmt.Printf("found solution for line %d\n", solIdx+1)
 			}
 		}
 	}
