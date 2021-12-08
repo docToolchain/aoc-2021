@@ -1,31 +1,29 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 // tag::parse[]
 /// return a vector of tuples, each containing a vector of unique patterns and a vector of outputs
 ///
 /// each pattern / output is represented by an integer whos bits indicate the state of segments a (bit 0) to g (bit 6)
 pub fn parse(content: &str) -> Vec<(Vec<usize>, Vec<usize>)> {
-    let mut displays = Vec::new();
-    for line in content.lines() {
-        let parts = line
-            .trim()
-            .split(" | ") // separate patterns from outputs
-            .map(|part| {
-                part.trim()
-                    .split_ascii_whitespace() // separate individual patterns
-                    .map(|pattern| {
-                        // convert pattern to usize
-                        pattern
-                            .chars()
-                            .map(|char| 1usize << (char as usize - 'a' as usize))
-                            .fold(0, |bits, bit| bits | bit)
-                    })
-                    .collect::<Vec<_>>() // patterns as usize
-            })
-            .collect::<Vec<_>>(); // patterns and outputs
-        displays.push((parts[0].to_vec(), parts[1].to_vec()));
-    }
-    displays
+    content
+        .lines()
+        .map(|line| {
+            line.split(" | ") // separate patterns from outputs
+                .map(|part| {
+                    part.split_ascii_whitespace() // separate individual patterns
+                        .map(|pattern| {
+                            // convert pattern to usize
+                            pattern
+                                .chars()
+                                .map(|char| 1 << (char as usize - 'a' as usize))
+                                .fold(0, |bits, bit| bits | bit)
+                        })
+                        .collect::<Vec<_>>() // patterns / outputs as usize
+                })
+                .collect::<VecDeque<_>>() // VecDeque with one element for patterns and one for outputs
+        })
+        .map(|mut parts| (parts.pop_front().unwrap(), parts.pop_front().unwrap()))
+        .collect()
 }
 // end::parse[]
 
@@ -47,18 +45,25 @@ pub fn solution_1(displays: &[(Vec<usize>, Vec<usize>)]) -> usize {
 // tag::part2[]
 /// sum over decoded outputs
 pub fn solution_2(displays: &[(Vec<usize>, Vec<usize>)]) -> usize {
+    let f = if cfg!(feature = "rjplog_solution") {
+        // alternative decoder if feature "rjplog_solution" is chosen
+        self::decode_alt
+    } else {
+        self::decode
+    };
+
     displays
         .iter()
-        .map(|(patterns, outputs)| decode(patterns, outputs))
+        .map(|(patterns, outputs)| f(patterns, outputs))
         .sum()
 }
 
 /// determine wiring by unique batterns and decode output
-/// 
+///
 /// # Example
 /// ```
 /// # use mr_kaffee_2021_08::*;
-/// let content = 
+/// let content =
 ///     "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
 /// let displays = parse(content);
 /// let (patterns, outputs) = &displays[0];
@@ -73,14 +78,14 @@ pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
     // 1 -> _ _ c _ _ f _ -> set bits match 0b0100100
     // 7 -> a _ c _ _ f _ -> set bits match 0b0100101
     // 4 -> _ b c d _ f _ -> set bits match 0b0101110
-    let pos_patterns = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
+    let pos_masks = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
     // 2 -> a _ c d e _ g
     // 3 -> a _ c d _ f g
     // 5 -> a b _ d _ f g -> unset bits match 0b0110110
     // 0 -> a b c _ e f g
     // 6 -> a b _ d e f g
     // 9 -> a b c d _ f g -> unset bits match 0b0011100
-    let neg_patterns = HashMap::from([
+    let neg_masks = HashMap::from([
         (2, !0b0100100),
         (3, !0b0100101),
         (4, !0b0101110),
@@ -90,12 +95,12 @@ pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
 
     // for each pattern, reduce map by impossible bits
     for pattern in patterns {
-        if let Some(p) = pos_patterns.get(&pattern.count_ones()) {
+        if let Some(p) = pos_masks.get(&pattern.count_ones()) {
             for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 1) {
                 map[wire] &= p;
             }
         }
-        if let Some(p) = neg_patterns.get(&pattern.count_ones()) {
+        if let Some(p) = neg_masks.get(&pattern.count_ones()) {
             for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 0) {
                 map[wire] &= p;
             }
@@ -137,11 +142,77 @@ pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
                     0b0100101 => 7,
                     0b1111111 => 8,
                     0b1101111 => 9,
-                    _ => panic!("Invalid output {}", digit),
+                    _ => panic!("Invalid digit: {}", digit),
                 }
         })
 }
 // end::part2[]
+
+// tag::decode_alt[]
+/// decode output (solution idea by https://github.com/RJPlog[RJPlog])
+///
+/// # Example
+/// ```
+/// # use mr_kaffee_2021_08::*;
+/// let content =
+///     "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
+/// let displays = parse(content);
+/// let (patterns, outputs) = &displays[0];
+/// assert_eq!(5353, decode(patterns, outputs));
+/// ```
+pub fn decode_alt(patterns: &[usize], outputs: &[usize]) -> usize {
+    let mut map: Vec<usize> = vec![0; 10];
+    for pattern in patterns {
+        // unique segment counts
+        // 1 -> _ _ c _ _ f _  2 segments
+        // 7 -> a _ c _ _ f _  3 segments
+        // 4 -> _ b c d _ f _  4 segments
+        // 8 -> a b c d e f g  7 segments
+        match pattern.count_ones() {
+            2 => map[1] = *pattern,
+            3 => map[7] = *pattern,
+            4 => map[4] = *pattern,
+            7 => map[8] = *pattern,
+            _ => {} // nothing here
+        }
+    }
+    for pattern in patterns.iter().filter(|pattern| pattern.count_ones() == 5) {
+        // 2 -> a _ c d e _ g
+        // 3 -> a _ c d _ f g
+        // 5 -> a b _ d _ f g
+        if pattern & map[1] == map[1] {
+            // c | f is only contained in segments for 3
+            map[3] = *pattern;
+        } else if pattern & (map[4] & !map[1]) == (map[4] & !map[1]) {
+            // b | c | d | f & !(c | f) = b | d is only contained in segments for 5
+            map[5] = *pattern;
+        } else {
+            // if it is neither 3 nor 5, it must be 2
+            map[2] = *pattern;
+        }
+    }
+    for pattern in patterns.iter().filter(|pattern| pattern.count_ones() == 6) {
+        // 0 -> a b c _ e f g
+        // 6 -> a b _ d e f g
+        // 9 -> a b c d _ f g
+        if pattern & map[3] == map[3] {
+            // a | c | d | f | g is only contained in the segments for 9
+            map[9] = *pattern;
+        } else if pattern & map[5] == map[5] {
+            // a | b | d | f | g is contained in the segments for 9 (already handled) and 6
+            map[6] = *pattern;
+        } else {
+            // if it is neither 9 nor 6, it must be 0
+            map[0] = *pattern;
+        }
+    }
+
+    outputs
+        .iter()
+        .map(|output| map.iter().position(|pattern| output == pattern).unwrap())
+        .fold(0, |result, digit| 10 * result + digit)
+}
+// end::decode_alt[]
 
 // tag::tests[]
 #[cfg(test)]
