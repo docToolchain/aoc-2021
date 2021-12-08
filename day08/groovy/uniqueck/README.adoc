@@ -1,0 +1,43 @@
+==  Day 4: Seven Segment Seach
+
+This solution is written in Groovy.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/8
+
+The working example can be found here https://github.com/uniqueck/advent-of-code/tree/2021/groovy/src/main/groovy/io/uniqueck/aoc/day8[uniqueck / advent-of-code]
+
+=== Today I learned
+
+Start with the solution on a sheet of paper ;)
+
+=== First Star
+
+We have to count all unique output digits, this mean patterns with size (2,3,4,7)
+
+[source, groovy]
+----
+include::SevenSegmentSearch.groovy[tags=part=1]
+----
+
+=== Second Star
+
+To get the unique numbers I used the groupBy operator with size of the strings and the use a map with key is the digit.
+All not unique digits remain in a list of undetermined patterns.
+
+We have to determined based on the unique digits (1,4,7,8) the other digits (0,6,9) and (2,3,5).
+
+It's easy to determine the 6, because we know the bits for digit 1 and one bit is not part of the 6, but both bits are part of 0 and 9.
+
+The same solution works for 3 with a little difference, because we have to check if both bits are part of 3.
+
+If we have determined the 3, we can determine based on the 3 the 9 and the last missing pattern is 0.
+
+So only 2 and 5 are missing. Here we have to use the determined digits 1,6 and 9 to determine the 5. Why?
+We have to check which bit from digit 1 is not part of digit 6. We eliminate this bit from digit 9 and compare it with the last patterns. The match is 5, the remaining pattern is the two.
+
+After this, we can decode the four output patterns and sum it up.
+
+[source, groovy, numbered]
+----
+include::SevenSegmentSearch.groovy[tags=part2]
+----
