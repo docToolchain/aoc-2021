@@ -31,8 +31,8 @@ func trimStrings(sli []string) []string {
 
 // tag::utils[]
 
-// Compute an integer power of an integer base.
-func pow(base, exponent int) int {
+// Pow computes an integer power of an integer base.
+func Pow(base, exponent int) int {
 	result := 1
 	for exp := 0; exp < exponent; exp++ {
 		result *= base

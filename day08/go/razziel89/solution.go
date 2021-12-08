@@ -3,82 +3,65 @@ package main
 import (
 	"fmt"
 	"log"
-	"sort"
-	"strings"
 )
-
-func mapFromPerm(baseStr string, perm []string) (map[string]string, error) {
-	result := map[string]string{}
-	if len(baseStr) != len(perm) {
-		err := fmt.Errorf("permutation has unexpected length")
-		return map[string]string{}, err
-	}
-	for _, char := range baseStr {
-		seekChar := string(char)
-		found := false
-		for _, checkChar := range perm {
-			if seekChar == checkChar {
-				found = true
-				break
-			}
-		}
-		if !found {
-			err := fmt.Errorf("incomplete permutation")
-			return map[string]string{}, err
-		}
-	}
-	for idx := 0; idx < len(baseStr); idx++ {
-		char := string(baseStr[idx])
-		result[perm[idx]] = char
-	}
-	if len(result) != len(baseStr) {
-		err := fmt.Errorf("duplicate entries in permutation")
-		return map[string]string{}, err
-	}
-	return result, nil
-}
-
-func applyMap(str string, myMap map[string]string) ([]string, error) {
-	split := strings.Split(str, "")
-	for idx := 0; idx < len(split); idx++ {
-		mapped, ok := myMap[string(str[idx])]
-		if !ok {
-			return []string{}, fmt.Errorf("invalid character")
-		}
-		split[idx] = mapped
-	}
-	return split, nil
-}
-
-func getSolution(
-	input []string, outputCount int, myMap map[string]string, numForStr map[string]int,
-) (int, error) {
-	nums := make([]int, 0, len(input))
-	for _, in := range input {
-		mapped, err := applyMap(in, myMap)
-		if err != nil {
-			return -1, fmt.Errorf("cannot map")
-		}
-		sort.Strings(mapped)
-		converted := strings.Join(mapped, "")
-		num, ok := numForStr[converted]
-		if !ok {
-			// The mapped string does not describe a valid number. This "solution" is thus not valid
-			// here.
-			return -1, nil
-		}
-		nums = append(nums, num)
-	}
-	result := 0
-	for idx, digit := range nums[len(nums)-outputCount:] {
-		result += pow(10, outputCount-idx-1) * digit // nolint:gomnd
-	}
-	return result, nil
-}
 
 const (
 	baseStr = "abcdefg"
 )
+
+// UnjumbleFn is what you get by callind GetStrMapFn.
+type UnjumbleFn = func(string) (string, error)
+
+// GetStrMapFn returns a function that, when applied to a string, will apply the same mapping that
+// would be needed to transform jumbled into base.
+func GetStrMapFn(base, jumbled string) (UnjumbleFn, error) {
+	// Sanity check.
+	if SortString(base) != SortString(jumbled) {
+		err := fmt.Errorf("jumbled string could not be matched to base")
+		return func(string) (string, error) { return "", err }, err
+	}
+
+	unjumble := map[rune]rune{}
+	for idx, char := range jumbled {
+		unjumble[char] = rune(base[idx])
+	}
+
+	mapFn := func(input string) (string, error) {
+		result := make([]rune, 0, len(input))
+		for _, char := range input {
+			mapped, ok := unjumble[char]
+			if !ok {
+				return "", fmt.Errorf("don't know what to do with %c", char)
+			}
+			result = append(result, mapped)
+		}
+		return string(result), nil
+	}
+
+	return mapFn, nil
+}
+
+func getSolution(
+	numsAsStrs []string,
+	numOutputs int,
+	stringToNumber func(string) (int, bool, error),
+) (int, bool, error) {
+	sum := 0
+	firstOutputIdx := len(numsAsStrs) - numOutputs
+	for idx, numAsStr := range numsAsStrs {
+		num, ok, err := stringToNumber(numAsStr)
+		if err != nil {
+			return 0, false, err
+		}
+		if !ok {
+			return 0, false, nil
+		}
+		if idx > firstOutputIdx {
+			sum += Pow(10, numOutputs-(idx-firstOutputIdx)) * num //nolint:gomnd
+		}
+	}
+	return sum, true, nil
+}
 
 // Taken from the puzzle. This maps each segment list with segments identified by the letters a
 // through g to the corresponding number. This uses the same assignment as in the task, namely this:
@@ -121,21 +104,37 @@ func main() {
 		solutions[idx] = -1
 	}
 	for perm := range AllPermutations(baseStr) {
-		myMap, err := mapFromPerm(baseStr, perm)
+
+		// Define a function that will unjumble a string based on a permutation.
+		unsortedMapFn, err := GetStrMapFn(baseStr, perm)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		// Directly try to convert a string to a number based on a permutation. The returned bool
+		// indicates whether a mapping could be constructed.
+		stringToNumber := func(str string) (int, bool, error) {
+			unsorted, err := unsortedMapFn(str)
+			if err != nil {
+				return 0, false, err
+			}
+			// The entries in numForStr are sorted character-wise. Thus, sort before putting it into
+			// the map.
+			sorted := SortString(unsorted)
+			num, ok := numForStr[sorted]
+			return num, ok, nil
+		}
+
 		for solIdx := 0; solIdx < len(numbers); solIdx++ {
 			if solutions[solIdx] != -1 {
 				// We've already found that solution.
 				continue
 			}
-			sol, err := getSolution(numbers[solIdx], outputCount, myMap, numForStr)
+
+			sol, ok, err := getSolution(numbers[solIdx], outputCount, stringToNumber)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
-			if sol >= 0 {
-				// This is a valid mapping for this line, remember the output number.
+			if ok {
 				solutions[solIdx] = sol
 			}
 		}
