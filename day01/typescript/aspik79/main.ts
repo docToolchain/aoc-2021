@@ -2,5 +2,6 @@
 
 import { SonarSweeper } from "./sonarSweeper";
 
-new SonarSweeper().RunSilver();
-new SonarSweeper().RunGold();
+const sweeper = new SonarSweeper();
+sweeper.RunSilver();
+sweeper.RunGold();
