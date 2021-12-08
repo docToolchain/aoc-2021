@@ -160,6 +160,36 @@
 <li><a href="#_python_3">Python</a></li>
 </ul>
 </li>
+<li><a href="#_day_03_python">Day 03: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_4">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_04_python">Day 04: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_5">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_05_python">Day 05: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_6">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_06_python">Day 06: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_7">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_07_python">Day 07: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_8">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_08_python">Day 08: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_9">Python</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -290,6 +320,433 @@ for line in lines:
         aim -= value
 
 print("Star 2", x * y)</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_python"><a class="anchor" href="#_day_03_python"></a><a class="link" href="#_day_03_python">Day 03: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_4"><a class="anchor" href="#_python_4"></a><a class="link" href="#_python_4">Python</a></h4>
+<div class="paragraph">
+<p>For the first star, use list comprehension to get the relevant column of bits and use list.count to determine the most common bit.</p>
+</div>
+<div class="paragraph">
+<p>For the second star, use the same approach and use list comprehension to filter the possible values until only one remains.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("./three.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+
+gamma = ""
+for index in range(len(lines[0])):
+    bits = [line[index] for line in lines]
+    zeros = list(bits).count('0')
+    ones = list(bits).count('1')
+    if zeros &gt; ones:
+        gamma += "0"
+    else:
+        gamma += "1"
+
+epsilon = ""
+for index in range(len(lines[0])):
+    bits = [line[index] for line in lines]
+    zeros = list(bits).count('0')
+    ones = list(bits).count('1')
+    if zeros &lt; ones:
+        epsilon += "0"
+    else:
+        epsilon += "1"
+
+print("Star 1", int(epsilon, 2) * int(gamma, 2))
+
+oxygen_valid = list(lines)
+
+index = 0
+while len(oxygen_valid) &gt; 1:
+    bits = [line[index] for line in oxygen_valid]
+    zeros = list(bits).count('0')
+    ones = list(bits).count('1')
+    if zeros &gt; ones:
+        oxygen_valid = [line for line in oxygen_valid if line[index] == "0"]
+    else:
+        oxygen_valid = [line for line in oxygen_valid if line[index] == "1"]
+    index += 1
+
+
+co = list(lines)
+
+index = 0
+while len(co) &gt; 1:
+    bits = [line[index] for line in co]
+    zeros = list(bits).count('0')
+    ones = list(bits).count('1')
+    if zeros &lt;= ones:
+        co = [line for line in co if line[index] == "0"]
+    else:
+        co = [line for line in co if line[index] == "1"]
+    index += 1
+
+print("Star 2", int(oxygen_valid[0], 2) * int(co[0], 2))</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_python"><a class="anchor" href="#_day_04_python"></a><a class="link" href="#_day_04_python">Day 04: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_5"><a class="anchor" href="#_python_5"></a><a class="link" href="#_python_5">Python</a></h4>
+<div class="paragraph">
+<p>Define a class to track all non-drawn values on the board and all possible lines in a board and how many of the values in each have not been drawn.
+Then whenever a value is drawn decrement all counters if value is in the line and remove the value from the not-drawn list.
+For the first star, simply print when the first counter reaches 0, sum up the non-drawn values and multiply by the current value.</p>
+</div>
+<div class="paragraph">
+<p>For the second star, modify the board to keep track of if the board has already been solved and draw until all boards have been finished.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open(".\day02\python\quajak\\four.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+class Board:
+    def __init__(self, raw):
+        self.lines = []
+        self.values = []
+        self.won = False
+
+        # horizontal
+        for l in raw:
+            self.lines.append((5, l))
+
+        # vertical
+        lines = [[], [], [], [], []]
+        for l in raw:
+            for i in range(len(l)):
+                lines[i].append(l[i])
+
+        for l in lines:
+            self.lines.append((5, l))
+
+        for r in raw:
+            self.values += r
+
+    def add(self, val):
+        if val in self.values and not self.won:
+            self.values.remove(val)
+        else:
+            return 0
+        for i in range(len(self.lines)):
+            count, vals = self.lines[i]
+            if val in vals:
+                count -= 1
+            self.lines[i] = (count, vals)
+            if count == 0:
+                self.won = True
+                return sum(self.values) * val
+        return 0
+
+drawn = []
+draws = [int(ch) for ch in lines[0].split(",")]
+
+boards = []
+
+b_index = 0
+index = 1
+while len(lines) &gt; index:
+    index += 1
+    raw = []
+    for i in range(5):
+        raw.append([int(c) for c in lines[index].split()])
+        index += 1
+    cur = Board(raw)
+    boards.append(cur)
+
+first = False
+last = 0
+for d in draws:
+    for b in boards:
+        val = b.add(d)
+        if val != 0:
+            if not first:
+                print("Star 1", val)
+                first = True
+            last = val
+
+print("Star 2", last)</code></pre>
+</div>
+</div>
+<a id="day05" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_05_python"><a class="anchor" href="#_day_05_python"></a><a class="link" href="#_day_05_python">Day 05: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_6"><a class="anchor" href="#_python_6"></a><a class="link" href="#_python_6">Python</a></h4>
+<div class="paragraph">
+<p>Since the board size is originally not known, use a dictionary of dictionary of integers to keep track how many lines are present at any point.</p>
+</div>
+<div class="paragraph">
+<p>Then iterate over lines and add the necessary locations to the map.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("five.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+space = {}
+
+for line in lines:
+    words = line.split(" ")
+    start = [int(w) for w in words[0].split(",")]
+    end = [int(w) for w in words[2].split(",")]
+
+    if start[0] == end[0]:
+        for i in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
+            if not start[0] in space:
+                space[start[0]] = {i: 1}
+            else:
+                if i not in space[start[0]]:
+                    space[start[0]][i] = 1
+                else:
+                    space[start[0]][i] += 1
+    elif start[1] == end[1]:
+        for i in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
+            if not i in space:
+                space[i] = {start[1]: 1}
+            else:
+                if start[1] not in space[i]:
+                    space[i][start[1]] = 1
+                else:
+                    space[i][start[1]] += 1
+
+points = 0
+for x in space.keys():
+    for y in space[x].keys():
+        if space[x][y] &gt; 1:
+            points += 1
+
+print("Star 1", points)
+
+for line in lines:
+    words = line.split(" ")
+    start = [int(w) for w in words[0].split(",")]
+    end = [int(w) for w in words[2].split(",")]
+
+    if start[0] == end[0]:
+        pass # we already handled these cases in the first star
+    elif start[1] == end[1]:
+        pass
+    else:
+        x_dir = 1 if start[0] &lt; end[0] else -1
+        y_dir = 1 if start[1] &lt; end[1] else -1
+        for (x,y) in zip(range(start[0], end[0] + x_dir, x_dir), range(start[1], end[1] + y_dir, y_dir)):
+            if not x in space:
+                space[x] = {}
+            if not y in space[x]:
+                space[x][y] = 1
+            else:
+                space[x][y] += 1
+
+points = 0
+for x in space.keys():
+    for y in space[x].keys():
+        if space[x][y] &gt; 1:
+            points += 1
+
+print("Star 2", points)</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_python"><a class="anchor" href="#_day_06_python"></a><a class="link" href="#_day_06_python">Day 06: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_7"><a class="anchor" href="#_python_7"></a><a class="link" href="#_python_7">Python</a></h4>
+<div class="paragraph">
+<p>Went with the correct approach for the first star already and simply used dictionary(list would have been better in hindsight) to keep track of the number of fishes at each age.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("six.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+fishes = [int(num) for num in lines[0].split(",")]
+
+ages = {}
+
+for i in range(9):
+    ages[i] = 0
+
+for fish in fishes:
+    ages[fish] += 1
+
+# change range() for first star
+for i in range(256):
+    n_ages = {}
+    for age in range(1, 9):
+        n_ages[age - 1] = ages[age]
+    n_ages[6] += ages[0]
+    n_ages[8] = ages[0]
+    ages = n_ages
+
+print(sum(ages.values()))</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_python"><a class="anchor" href="#_day_07_python"></a><a class="link" href="#_day_07_python">Day 07: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_8"><a class="anchor" href="#_python_8"></a><a class="link" href="#_python_8">Python</a></h4>
+<div class="paragraph">
+<p>For the first star use numpy to determine the medium. The second star just brute force the possible range and use closed form of triangle values to calculate cost.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import numpy as np
+
+f = open("seven.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+nums = np.array([int(n) for n in lines[0].split(",")])
+
+cur =  np.median(nums)
+print("Star 1", np.sum(np.abs(nums - cur)))
+
+
+min = 10000000000000000
+for i in range(100, 500):
+    dis = np.abs((nums - i))
+    cost =dis * (dis + 1) / 2
+    cost = np.sum(np.abs(cost))
+    if cost &lt; min:
+        min = cost
+
+print("Star 2", min)</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_python"><a class="anchor" href="#_day_08_python"></a><a class="link" href="#_day_08_python">Day 08: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_9"><a class="anchor" href="#_python_9"></a><a class="link" href="#_python_9">Python</a></h4>
+<div class="paragraph">
+<p>First store all digits with the same length in a dictionary.</p>
+</div>
+<div class="paragraph">
+<p>For the first star for each word in the 4 letter output, check if only one possible digit has that length.</p>
+</div>
+<div class="paragraph">
+<p>For the second star, first normalize all words by sorting the characters alphabetically.</p>
+</div>
+<div class="paragraph">
+<p>Then solve the simple ones (where only one integer needs that many digits).</p>
+</div>
+<div class="paragraph">
+<p>To solve the three cases with six digits, if the case includes all values of 4, its a 9, else if it contains all values of 1, its a 0, else its a 6.</p>
+</div>
+<div class="paragraph">
+<p>To solve the cases with five cases, if it contains the 1, its a 3, if the entire letter is contained within the 9, its a 5, else its a 2.</p>
+</div>
+<div class="paragraph">
+<p>Then convert each output into a integer and sum all outputs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("eight.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+special = 0
+
+for line in lines:
+    parts = line.split("|")
+    letters = [''.join(sorted(o.strip())) for o in parts[0].split()]
+    output = [''.join(sorted(o.strip())) for o in parts[1].split()]
+    lengths = {}
+    for word in letters:
+        word = word.strip()
+        length = len(word)
+        if length not in lengths:
+            lengths[length] = [word]
+        elif not word in lengths[length]:
+            lengths[length].append(word)
+
+    for length in lengths.keys():
+        if len(lengths[length]) == 1:
+            special += output.count(lengths[length][0])
+
+print(special)
+
+sum = 0
+for line in lines:
+    parts = line.split("|")
+    letters = [''.join(sorted(o.strip())) for o in parts[0].split()]
+    output = [''.join(sorted(o.strip())) for o in parts[1].split()]
+    lengths = {}
+    for word in letters:
+        word = word.strip()
+        length = len(word)
+        if length not in lengths:
+            lengths[length] = [word]
+        elif not word in lengths[length]:
+            lengths[length].append(word)
+
+    values = {}
+    one = lengths[2][0]
+    four = lengths[4][0]
+    values[one] = 1
+    values[four] = 4
+    values[lengths[3][0]] = 7
+    eight = lengths[7][0]
+    values[eight] = 8
+    nine = ""
+    for val in lengths[6]:
+        if all(c in val for c in four):
+            nine = val
+            values[val] = 9
+        elif all(c in val for c in one):
+            values[val] = 0
+        else:
+            values[val] = 6
+
+    for val in lengths[5]:
+        if all(c in val for c in one):
+            values[val] = 3
+        elif len(set(list(val)).difference(list(nine))) == 0:
+            values[val] = 5
+        else:
+            values[val] = 2
+
+    o = values[output[0]] * 1000 + values[output[1]] * 100 + values[output[2]] * 10 + values[output[3]]
+    sum += o
+
+print(sum)</code></pre>
 </div>
 </div>
 </div>
