@@ -56,8 +56,8 @@ func getSolution(
 		if !ok {
 			return 0, false, nil
 		}
-		if idx > firstOutputIdx {
-			sum += Pow(10, numOutputs-(idx-firstOutputIdx)) * num //nolint:gomnd
+		if idx >= firstOutputIdx {
+			sum += Pow(10, numOutputs-1-(idx-firstOutputIdx)) * num //nolint:gomnd
 		}
 	}
 	return sum, true, nil
@@ -139,7 +139,6 @@ func main() {
 			}
 		}
 	}
-	fmt.Println(solutions)
 	sum := 0
 	for _, num := range solutions {
 		sum += num
