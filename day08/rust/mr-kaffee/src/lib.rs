@@ -1,198 +1,147 @@
+use std::collections::HashMap;
+
 // tag::parse[]
-pub fn parse(content: &str) -> Vec<(Vec<String>, Vec<String>)> {
-    let mut inputs = Vec::new();
+/// return a vector of tuples, each containing a vector of unique patterns and a vector of outputs
+///
+/// each pattern / output is represented by an integer whos bits indicate the state of segments a (bit 0) to g (bit 6)
+pub fn parse(content: &str) -> Vec<(Vec<usize>, Vec<usize>)> {
+    let mut displays = Vec::new();
     for line in content.lines() {
-        let parts = line.trim().split(" | ");
-        let mut parts_vec = Vec::new();
-        for part in parts {
-            let patterns = part.trim().split_ascii_whitespace();
-            let mut patterns_vec = Vec::new();
-            for pattern in patterns {
-                let chars = pattern.chars().collect::<String>();
-                patterns_vec.push(chars);
-            }
-            parts_vec.push(patterns_vec);
-        }
-        if parts_vec.len() != 2 {
-            panic!("Bad number of parts in {:?}", parts_vec);
-        }
-        inputs.push((parts_vec[0].to_vec(), parts_vec[1].to_vec()));
+        let parts = line
+            .trim()
+            .split(" | ") // separate patterns from outputs
+            .map(|part| {
+                part.trim()
+                    .split_ascii_whitespace() // separate individual patterns
+                    .map(|pattern| {
+                        // convert pattern to usize
+                        pattern
+                            .chars()
+                            .map(|char| 1usize << (char as usize - 'a' as usize))
+                            .fold(0, |bits, bit| bits | bit)
+                    })
+                    .collect::<Vec<_>>() // patterns as usize
+            })
+            .collect::<Vec<_>>(); // patterns and outputs
+        displays.push((parts[0].to_vec(), parts[1].to_vec()));
     }
-    inputs
+    displays
 }
 // end::parse[]
 
-pub fn solution_1(data: &[(Vec<String>, Vec<String>)]) -> usize {
-    data.iter()
-        .map(|(_, codes)| {
-            codes
+// tag::part1[]
+/// count unique ouput values (1 - 2 bits set, 7 - 3 bits set, 4 - 4 bits set, 8 - 7 bits set) in all outputs
+pub fn solution_1(displays: &[(Vec<usize>, Vec<usize>)]) -> usize {
+    displays
+        .iter()
+        .map(|(_, outputs)| {
+            outputs
                 .iter()
-                .filter(|code| {
-                    code.len() == 2 || code.len() == 3 || code.len() == 4 || code.len() == 7
-                })
+                .filter(|output| [2, 3, 4, 7].contains(&output.count_ones()))
                 .count()
         })
         .sum()
 }
+// end::part1[]
 
-pub fn solution_2(data: &[(Vec<String>, Vec<String>)]) -> usize {
-    let mut result = 0;
-    for (patterns, outputs) in data {
-        result += decode(patterns, outputs);
-    }
-    result
+// tag::part2[]
+/// sum over decoded outputs
+pub fn solution_2(displays: &[(Vec<usize>, Vec<usize>)]) -> usize {
+    displays
+        .iter()
+        .map(|(patterns, outputs)| decode(patterns, outputs))
+        .sum()
 }
 
-pub fn decode(patterns: &[String], outputs: &[String]) -> usize {
-    // 1 -> 2     _ _ c _ _ f _
-    // 7 -> 3     a _ c _ _ f _
-    // 4 -> 4     _ b c d _ f _
+/// determine wiring by unique batterns and decode output
+/// 
+/// # Example
+/// ```
+/// # use mr_kaffee_2021_08::*;
+/// let content = 
+///     "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
+/// let displays = parse(content);
+/// let (patterns, outputs) = &displays[0];
+/// assert_eq!(5353, decode(patterns, outputs));
+/// ```
+pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
+    // map is a vector of 7 integers, one for each segment
+    // each row represents a wire in a display (a = 0 to g = 6).
+    // Each bit in the entry represents a segment, the wire actually controls (a = 0 to g = 6)
+    let mut map: Vec<usize> = vec![(1 << 7) - 1; 7];
 
-    // 2 -> 5     a _ c d e _ g
-    // 3 -> 5     a _ c d _ f g
-    // 5 -> 5     a b _ d _ f g
+    // 1 -> _ _ c _ _ f _ -> set bits match 0b0100100
+    // 7 -> a _ c _ _ f _ -> set bits match 0b0100101
+    // 4 -> _ b c d _ f _ -> set bits match 0b0101110
+    let pos_patterns = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
+    // 2 -> a _ c d e _ g
+    // 3 -> a _ c d _ f g
+    // 5 -> a b _ d _ f g -> unset bits match 0b0110110
+    // 0 -> a b c _ e f g
+    // 6 -> a b _ d e f g
+    // 9 -> a b c d _ f g -> unset bits match 0b0011100
+    let neg_patterns = HashMap::from([
+        (2, !0b0100100),
+        (3, !0b0100101),
+        (4, !0b0101110),
+        (5, 0b0110110),
+        (6, 0b0011100),
+    ]);
 
-    // 0 -> 6     a b c _ e f g
-    // 6 -> 6     a b _ d e f g
-    // 9 -> 6     a b c d _ f g
-
-    // 8 -> 7     a b c d e f g
-
-    let mut map = vec![true; 7 * 7];
-    let off = 'a' as usize;
-
+    // for each pattern, reduce map by impossible bits
     for pattern in patterns {
-        match pattern.len() {
-            2 => {
-                // two chars can only be c or f
-                for c in pattern.chars() {
-                    for d in ['a', 'b', 'd', 'e', 'g'] {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-                for d in ['c', 'f'] {
-                    for c in "abcdefg"
-                        .chars()
-                        .filter(|c| !pattern.chars().any(|d| *c == d))
-                    {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
+        if let Some(p) = pos_patterns.get(&pattern.count_ones()) {
+            for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 1) {
+                map[wire] &= p;
             }
-            3 => {
-                // three chars can only be a c or f
-                for c in pattern.chars() {
-                    for d in ['b', 'd', 'e', 'g'] {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-                for d in ['a', 'c', 'f'] {
-                    for c in "abcdefg"
-                        .chars()
-                        .filter(|c| !pattern.chars().any(|d| *c == d))
-                    {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-            }
-            4 => {
-                // four chars can only be b c d or f
-                for c in pattern.chars() {
-                    for d in ['a', 'e', 'g'] {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-                for d in ['b', 'c', 'd', 'f'] {
-                    for c in "abcdefg"
-                        .chars()
-                        .filter(|c| !pattern.chars().any(|d| *c == d))
-                    {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-            }
-            5 => {
-                // unset chars can only be b c e or f
-                for c in "abcdefg"
-                    .chars()
-                    .filter(|c| !pattern.chars().any(|d| *c == d))
-                {
-                    for d in ['a', 'd', 'g'] {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-            }
-            6 => {
-                // unset chars can only be c d or e
-                for c in "abcdefg"
-                    .chars()
-                    .filter(|c| !pattern.chars().any(|d| *c == d))
-                {
-                    for d in ['a', 'b', 'f', 'g'] {
-                        map[(d as usize) - off + 7 * ((c as usize) - off)] = false;
-                    }
-                }
-            }
-            7 => {
-                // can't deduce anything
-            }
-            _ => panic!("Invalid pattern"),
         }
-    }
-
-    for c in 0..7 {
-        let indices = map[7 * c..7 * (c + 1)]
-            .iter()
-            .enumerate()
-            .filter(|(_, x)| **x)
-            .map(|(idx, _)| idx)
-            .collect::<Vec<_>>();
-        if indices.len() == 1 {
-            for d in 0..7 {
-                if d == c {
-                    continue;
-                }
-                map[indices[0] + 7 * d] = false;
+        if let Some(p) = neg_patterns.get(&pattern.count_ones()) {
+            for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 0) {
+                map[wire] &= p;
             }
         }
     }
 
-    let mut result = 0;
-    for output in outputs {
-        let output = output
-            .chars()
-            .map(|c| {
-                map[7 * (c as usize - off)..7 * (c as usize - off) + 7]
-                    .iter()
-                    .enumerate()
-                    .find(|(_, d)| **d)
-                    .expect("Nothing found")
-            })
-            .map(|(a, _)| (a + off) as u8 as char)
-            .collect::<Vec<_>>();
-        let output = "abcdefg"
-            .chars()
-            .filter(|c| output.contains(c))
-            .collect::<String>();
-
-        result = 10 * result
-            + match output.as_str() {
-                "abcefg" => 0,
-                "cf" => 1,
-                "acdeg" => 2,
-                "acdfg" => 3,
-                "bcdf" => 4,
-                "abdfg" => 5,
-                "abdefg" => 6,
-                "acf" => 7,
-                "abcdefg" => 8,
-                "abcdfg" => 9,
-                _ => panic!("Invalid output {}", output),
+    // reduce map
+    // if a row contains only one bit set, this bit is removed from every other row
+    for wire_1 in 0..7 {
+        if map[wire_1].count_ones() == 1 {
+            for wire_2 in (0..7).filter(|wire_2| *wire_2 != wire_1) {
+                map[wire_2] &= !map[wire_1];
             }
+        }
     }
 
-    result
+    // determine digits and fold to output
+    outputs
+        .iter()
+        .map(|output| {
+            // map wires to segments
+            (0..7)
+                .filter(|wire| (output >> wire) & 1 == 1)
+                .map(|wire| map[wire])
+                .fold(0, |digit, bit| digit | bit)
+        })
+        .fold(0, |result, digit| {
+            // calculate output from digits
+            10 * result
+                + match digit {
+                    // map digit patterns to decimal digit
+                    0b1110111 => 0,
+                    0b0100100 => 1,
+                    0b1011101 => 2,
+                    0b1101101 => 3,
+                    0b0101110 => 4,
+                    0b1101011 => 5,
+                    0b1111011 => 6,
+                    0b0100101 => 7,
+                    0b1111111 => 8,
+                    0b1101111 => 9,
+                    _ => panic!("Invalid output {}", digit),
+                }
+        })
 }
+// end::part2[]
 
 // tag::tests[]
 #[cfg(test)]
@@ -213,19 +162,8 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_solution_1() {
-        let data = parse(CONTENT);
-        let sol = solution_1(&data);
-        assert_eq!(26, sol);
-    }
-
-    #[test]
-    fn test_decode() {
-        let data = parse(
-            "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf",
-        );
-        let (patterns, outputs) = &data[0];
-        let result = decode(patterns, outputs);
-        assert_eq!(5353, result);
+        let displays = parse(CONTENT);
+        assert_eq!(26, solution_1(&displays));
     }
 
     #[test]
