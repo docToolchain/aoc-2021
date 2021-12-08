@@ -1,0 +1,40 @@
+== Day 3: Binary Diagnostic
+
+Done without TDD in Python.
+
+This time I just tried to be as quick as possible, no clean design, no modularity, no tests just code.
+
+Possible speed improvements: use proper debugging setup instead
+
+=== First Star
+
+It was clear that we need to step through the input numbers _column-wise_ so I split the inputs already in the preprocessing.
+Disregarding any planning for most / least common I just started typing the code I had in mind to identify the most common number by strongly relying on list concatenation and writing one liners.
+
+The main idea is to identify the most common number by just summing up all "1" and "0" per column.
+If the sum of all "1" is greater than the _line count / 2_ it means "1" is more common.
+
+Finally just use python to convert the resulting binary number (string) into integer using `int(x, 2)`
+
+=== Second Star
+
+At first I regretted not having a modular code to reuse.
+But it turns out that I did not copy&paste any code from the first star.
+So reuse would have been limited unless having exactly the right function already defined in star1.
+
+Even though my head was going _this will be recursive_ I ended up just looping through the list from left-most to right-most digit, adding a condition to stop early in case there is only one entry remaining.
+
+For finding the most common digit I used the same approach as described for the first star.
+Then filtered using list concatenation.
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

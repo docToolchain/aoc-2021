@@ -1,0 +1,66 @@
+== Day 06: Lanternfish ==
+:stem:
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/6[AoC|2021|06].
+
+=== Parts 1 & 2 ===
+
+The key is to not keep a list of fishes but a list of timer values. 
+
+Parsing the input is done as follows
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Simulations are done with:
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sol]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Some more thoughts ===
+
+I was thinking to create an explicit solution (in memory of my time at https://www.ist.uni-stuttgart.de/[University Stuttgart]). Fish growth is governed by the discrte time ODE
+
+ timers[k + 1] = A timers[k]
+ count[k] = C timers[k]
+
+with the matrices
+
+     | 0 1 0 0 0 0 0 0 0 |
+     | 0 0 1 0 0 0 0 0 0 |
+     | 0 0 0 1 0 0 0 0 0 |
+     | 0 0 0 0 1 0 0 0 0 |
+ A = | 0 0 0 0 0 1 0 0 0 |
+     | 0 0 0 0 0 0 1 0 0 |
+     | 1 0 0 0 0 0 0 1 0 |
+     | 0 0 0 0 0 0 0 0 1 |
+     | 1 0 0 0 0 0 0 0 0 |
+
+ C = ( 1 1 1 1 1 1 1 1 1 )
+
+The characteristic equation of A is
+ 
+ z^9 - z^2 - 1 = 0
+
+which https://maxima.sourceforge.io/[Maxima] is not able to solve :( - so no explicit solution that I would be able to come up with
+
+For a big number of rounds, it might be interesting to calculate powers of the above matrix using https://en.wikipedia.org/wiki/Exponentiation_by_squaring[exponentiation by squaring], but for 256 rounds, a direct approach is certainly more efficient.
+
+I might not have a direct soluton for an arbitrary number of rounds, but a direct solution for 80 and 256 rounds can still be given as
+
+ count[80] = ( 1421 1401 1191 1154 1034 950 905 779 768 ) * timers[0]
+ count[256] = ( 6703087164 6206821033 5617089148 5217223242 4726100874 4368232009 3989468462 3649885552 3369186778 ) * timers[0]
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=direct_solution]
+----

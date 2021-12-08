@@ -1,0 +1,4 @@
+== Day 03: Binary Diagnostic
+
+=== Part 1
+

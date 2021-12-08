@@ -1,0 +1,34 @@
+==  Day 5: Hydrothermal Venture  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/5
+
+For execution enter _kotlin day2105_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+I created a class function reading file input and separating coordinates. Then for each horizontal and vertical lines a map entry is created with value 1 or if already existing, increased by one. The function returns the number of all map entries higher than one. The function has one parameter which is by default 0, that means the evaluation of diagonal lines will be skipped.
+[source, kotlin, numbered]
+....
+include::day2105_1_2.kts[tags=lines]
+....
+
+=== Second Star
+
+How does it work: +
+
+By invokeing the function with a parameter higher than 0 the diagonal lines will also be taken into account.
+[source, kotlin, numbered]
+....
+include::day2105_1_2.kts[tags=lines2]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2105_1_2.kts[tags=output]
+....

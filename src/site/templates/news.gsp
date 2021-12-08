@@ -25,7 +25,7 @@
 </div>
 	</div>
 	<%published_posts.each {post ->%>
-		<a href="/${post.uri}"><h2>${post.title}</h2></a>
+		<a href="${config.site_contextPath}/${post.uri}"><h2>${post.title}</h2></a>
 		<p>${new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(post.date)}</p>
 		<!--p>${post.body}</p-->
   	<%}%>

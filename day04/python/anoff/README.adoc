@@ -1,0 +1,61 @@
+== Day 4: Giant Squid
+
+Done once in a hacky way, took me ~40 minutes to get the right answer.
+Had issues with parsing the input data in the beginning (creating empty boards) and later in second star due to the fact that I did not consider multiple boards winning in one turn.
+
+Want to redo it with TDD later.
+
+later..
+With TDD it took me same time even though I already had put some thought into it earlier.
+However ~10 minutes were wasted into researching how to do things prettier, aliasing types etc.
+
+=== First Star
+
+With TDD I first created test cases for the individual functions that will be needed (test case always using the provided example):
+. test my input parser to return numbers and boards in correct number and type converted
+. test `play_board` function that should always play one board with one number
+. `score_board` to calculate the score based on unmarked numbers
+. `is_complete_board` to identify if a board is completed or not
+. a final test case validating that star1 function returns the correct value for example input
+
+Using these tests the first star was super simple.
+The only thing that took a bit of thinking and decision making was how to mark the already seen numbers.
+I decided to keep it simple (maybe?) and just convert the seen numbers into string format, so unseen numbers are integers and seen ones are strings.
+
+[source, python, numbered]
+----
+include::solution.py[tags=star1]
+----
+
+=== Second Star
+
+Second star was pretty much the same as the first one until I ran into an issue with the loop handling in case you modify the looped variables elements.
+I had to introduce a second loop; go once over all boards and play them, then check if they are complete and remove the complete ones.
+
+I figured this issue out with my star2 test case because it happened to not give the correct output.
+
+[IMPORTANT]
+.Modifying loop variables is bad
+====
+When you `for element in mylist` loop over a list
+
+. you can modify the `element` during the loop as it acts as a reference to `mylist`
+. if you remove an element from `mylist` this causes the `for` loop to misbehave, similar to removing an element in a while loop without adjusting the loop pointer
+====
+
+[source, python, numbered]
+----
+include::solution.py[tags=star2]
+----
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

@@ -1,0 +1,20 @@
+== Day06: Lantern fishes
+
+I followed the steps described in the puzzle and easily got the first star.
+
+[source,groovy]
+----
+include::solution.groovy[]
+----
+
+I thought this might be good enough for the second star.
+I was wrong: it takes up just too much memory.
+I even tried to optimize it and run it fish by fish, but it still took too long.
+
+Take a look at the solution by @uniqueck - it is quite elegant!
+And fast!
+
+[source,groovy]
+----
+include::../uniqueck/Simulator.groovy[]
+----

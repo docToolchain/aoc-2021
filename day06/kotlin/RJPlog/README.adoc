@@ -1,0 +1,34 @@
+==  Day 6: Lanternfish  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/6
+
+For execution enter _kotlin day2106_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+Within the function _laternfish()_ the puzzle input is read into a list, each fish has one entry. Day by day the entry is either reduced by one or reset to 6 and a new entry added wiht value 8.
+[source, kotlin, numbered]
+....
+include::day2106_1_2.kts[tags=laternfish]
+....
+
+=== Second Star
+
+How does it work: +
+
+Just to increase days did not work, so I had to find a different solution. Finaly I went with a map, see _fun laternfish2()_. The keys are the reproducing days 0-8, the values the number of fishes. Every day this map is updated. At the end the sum over all values is calculated.
+[source, kotlin, numbered]
+....
+include::day2106_1_2.kts[tags=laternfish2]
+....
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2106_1_2.kts[tags=output]
+....
+

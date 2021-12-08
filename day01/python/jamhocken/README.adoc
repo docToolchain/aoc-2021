@@ -1,0 +1,20 @@
+
+Day 1 of year 2021
+https://adventofcode.com/2021/day/1
+
+== What I learned
+
+. I forgot that Python also can do string comparisons. Now, I remember.
+
+== Approach
+
+. For star 1, I just go through the whole list comparing the values pair-wise.
+. For star 2, I created a list with the 3 value window. And then compared that list pair-wise.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

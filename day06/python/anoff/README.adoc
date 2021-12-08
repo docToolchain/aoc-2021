@@ -1,0 +1,35 @@
+== Day 6: Lanternfish
+
+Ahh Eric Wastel, you did it again!
+
+=== TIL
+
+. stop trying to understand weird growth patterns
+. use proper data structures
+
+=== First Star
+
+Went the naive way and just kept increasing a list of fish days.
+
+=== Second Star
+
+Even without running my code I realized it will not produce an answer in a reasonable amount of time.
+Of course I still ran it anyway..
+
+While it kept running I thought about how to approach this problem.
+
+Attempt 1: Try to find repeating patterns in the growth of the fish. Failed.
+
+Attempt 2: Rethink data structures... d'OH, easy fix.
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

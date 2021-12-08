@@ -1,0 +1,28 @@
+== Day 7: The Treachery of Whales
+
+
+=== TIL
+
+. math problems should be solved using math
+
+=== First Star
+
+Remembered yesterdays challenge and went for the same data structure.
+Keeping count of submarines per location instead of long list.
+
+=== Second Star
+
+Looked up how to mathematically create the sum of all integers until `n` and implemented a new _fuel_ function.
+Done.
+
+=== Source
+
+[source, python, numbered]
+....
+include::solution.py[]
+....
+
+[source, python, numbered]
+....
+include::solution_test.py[]
+....

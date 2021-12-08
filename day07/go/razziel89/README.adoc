@@ -1,0 +1,36 @@
+== Day 07: The Treachery of Whales ==
+
+This is my implementation for both rounds of the whales puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where some helper functions are.
+This solution also re-uses the counting set implementation of day 3 in
+`set.go` but using integers instead of string tokens this time.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`set.go`
+[source,go,numbered]
+----
+include::set.go[tags=set]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution for both parts.
+The solution for part 1 will be output first, followed by that for part 2.

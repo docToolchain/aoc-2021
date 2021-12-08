@@ -1,0 +1,36 @@
+== Day 03: Binary Diagnostic ==
+
+This is my implementation for the second round of the binary diagnostic puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `set.go`, which contains specifications of a string set that
+also knows how often individual entries have been added to it.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`set.go`
+[source,go,numbered]
+----
+include::set.go[tags=set]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution.

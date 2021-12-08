@@ -51,18 +51,42 @@
           height: 60px; /* fixed header height*/
           margin: -60px 0 0; /* negative fixed header height */
       }
+      .navbar {
+          background-image: url(${config.site_contextPath}images/treeback.png);
+          background-size: contain;
+          background-repeat: repeat-x;
+          border-bottom: 0;
+          padding-bottom: 20px;
+          background-color: transparent;
+          box-shadow: none;
+      }
+      html {
+          background: url(${config.site_contextPath}images/snowback.png) no-repeat center center fixed;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size: cover;
+      }
+
       </style>
+      <script>
+          //smart redirectg
+          if (document.location.href.includes("netlify")) {
+              document.location.href=document.location.href.replace("aoc-2021.netlify.app/","doctoolchain.org/aoc-2021/");
+          }
+      </script>
+<!-- ${config.site_contextPath} -->
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="<%if (content.rootpath) {%>${content.rootpath}<% } else { %><% }%>js/html5shiv.min.js"></script>
     <![endif]-->
 
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-      <link rel="manifest" href="/site.webmanifest">
-      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <link rel="apple-touch-icon" sizes="180x180" href="${config.site_contextPath}/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="${config.site_contextPath}/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="${config.site_contextPath}/favicon-16x16.png">
+      <link rel="manifest" href="${config.site_contextPath}/site.webmanifest">
+      <link rel="mask-icon" href="${config.site_contextPath}/safari-pinned-tab.svg" color="#5bbad5">
       <meta name="msapplication-TileColor" content="#da532c">
       <meta name="theme-color" content="#ffffff">
   </head>

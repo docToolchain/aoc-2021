@@ -1,0 +1,36 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-06: Lanternfish
+https://adventofcode.com/2021/day/6
+
+=== Info
+
+Calculate exp. growth of lanternfish
+*: After 80 days
+**: After 256 days
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line (one line today...) and prepocessed.
+Being wary of the mentioned exp. growth, I choose a list with bins for every counter state, i.e. 10 fish with timer "3" --> list[3] = 10.
+Then one iteration was just to manage bin "0" (1x to "9", 1x added to "7") and shift afterwards all bins >1 down one bin.
+Glad I did for star 2 😅
+
+=== Learned today
+
+Exp. growth does not always have to be scary.
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
