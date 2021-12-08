@@ -221,6 +221,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_08_kotlin">Day 08: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_8_seven_segment_search">Day 8: Seven Segment Search</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_8">First Star</a></li>
+<li><a href="#_second_star_8">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1139,6 +1149,147 @@
 	println()
 // end::output[]
 //}</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_kotlin"><a class="anchor" href="#_day_08_kotlin"></a><a class="link" href="#_day_08_kotlin">Day 08: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_8_seven_segment_search"><a class="anchor" href="#_day_8_seven_segment_search"></a><a class="link" href="#_day_8_seven_segment_search">Day 8: Seven Segment Search</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/8" class="bare">https://adventofcode.com/2021/day/8</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2108_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_8"><a class="anchor" href="#_first_star_8"></a><a class="link" href="#_first_star_8">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Frist part is just spliting in put lines and searching for values 2, 4, 3, 7 and counting.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// part 1
+	var solution1: Int = 0
+
+	File("day2108_puzzle_input.txt").forEachLine {
+		var instruction = it.split(" | ")
+		var output = instruction[1].split(" ")
+		output.forEach {
+			if (it.length == 2 || it.length == 4 || it.length == 3 || it.length == 7) {
+				solution1 += 1
+			}
+		}
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_8"><a class="anchor" href="#_second_star_8"></a><a class="link" href="#_second_star_8">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Here I had several difficulties to sort samples out. I don&#8217;t think that this is a good example for learning, anyway it provides a correct result.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// part 2
+	var solution2: Int = 0
+	var mapTable = mutableListOf&lt;String&gt;()
+	for (i in 0..9) {
+		mapTable.add("")
+	}
+	File("day2108_puzzle_input.txt").forEachLine {
+		var instruction = it.split(" | ")
+		var inp = instruction[0].split(" ")
+
+		// sort all input values alphabetically
+		var input = mutableListOf&lt;String&gt;()
+		inp.forEach {
+			input.add(it.toCharArray().sorted().joinToString(""))
+		}
+
+		// assigning 1, 4, 7, 8
+		input.forEach {
+			if (it.length == 2) {
+				mapTable[1] = it
+			} else if (it.length == 4) {
+				mapTable[4] = it
+			} else if (it.length == 3) {
+				mapTable[7] = it
+			} else if (it.length == 7) {
+				mapTable[8] = it
+			}
+		}
+		// assigning 5
+		input.forEach {
+			var help: String = ""
+			mapTable[4].forEach {
+				if (!mapTable[1].contains(it)) {
+					help = help + it
+				}
+			}
+			if (it.length == 5) {
+				if (it.toList().containsAll(mapTable[1].toList())) {     // if it contains 1 --&gt; 3
+					mapTable.set(3, it)
+				} else if (it.toList().containsAll(help.toList())) {     // if it contains 4 --&gt;5
+					mapTable.set(5, it)
+				} else {                                                  // else --&gt; 2
+					mapTable.set(2, it)
+				}
+			}
+		}
+		// assigning 6
+		input.forEach {
+			if (it.length == 6) {
+				if (it.toList().containsAll(mapTable[3].toList())) {   		// if it contains 3 --&gt; 9
+					mapTable.set(9, it)
+				} else if (it.toList().containsAll(mapTable[5].toList())) {  // if it contains 5 --&gt; 9
+					mapTable.set(6, it) // if it containns 4 --&gt; 9
+				} else {
+					mapTable.set(0, it)
+				}
+			}
+		}
+
+		var out = instruction[1].split(" ")
+		// sort all input values alphabetically
+		var output = mutableListOf&lt;String&gt;()
+		out.forEach {
+			output.add(it.toCharArray().sorted().joinToString(""))
+		}
+		solution2 =
+			solution2 + mapTable.indexOf(output[0]) * 1000 + mapTable.indexOf(output[1]) * 100 + mapTable.indexOf(output[2]) * 10 + mapTable.indexOf(output[3])
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("***********************************")
+	println("--- Day 8: Seven Segment Search ---")
+	println("***********************************")
+	println("Solution for part1")
+	println("   $solution1 times do digits 1, 4, 7, or 8 appear")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   You get $solution2 if you add up all of the output values")
+	println()</code></pre>
 </div>
 </div>
 </div>
