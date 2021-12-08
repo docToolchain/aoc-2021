@@ -1,0 +1,34 @@
+==  Day 8: Seven Segment Search  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/8
+
+For execution enter _kotlin day2108_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+Frist part is just spliting in put lines and searching for values 2, 4, 3, 7 and counting.
+[source, kotlin, numbered]
+....
+include::day2108_1_2.kts[tags=firstpart]
+....
+
+=== Second Star
+
+How does it work: +
+
+Here I had several difficulties to sort samples out. I don't think that this is a good example for learning, anyway it provides a correct result.
+[source, kotlin, numbered]
+....
+include::day2108_1_2.kts[tags=secondpart]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2108_1_2.kts[tags=output]
+....
