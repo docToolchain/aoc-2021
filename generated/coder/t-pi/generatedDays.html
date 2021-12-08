@@ -234,6 +234,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_08_python">Day 08: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_08_seven_segment_search">AoC21-08: Seven Segment Search</a>
+<ul class="sectlevel4">
+<li><a href="#_info_8">Info</a></li>
+<li><a href="#_howto_8">HowTo</a></li>
+<li><a href="#_learned_today_8">Learned today</a></li>
+<li><a href="#_source_8">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1064,6 +1076,138 @@ def main():
             print(i, min_fuel)
             star2 = min_fuel
     print(f"Result (*): {star1}")
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_python"><a class="anchor" href="#_day_08_python"></a><a class="link" href="#_day_08_python">Day 08: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_08_seven_segment_search"><a class="anchor" href="#_aoc21_08_seven_segment_search"></a><a class="link" href="#_aoc21_08_seven_segment_search">AoC21-08: Seven Segment Search</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/8" class="bare">https://adventofcode.com/2021/day/8</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_8"><a class="anchor" href="#_info_8"></a><a class="link" href="#_info_8">Info</a></h5>
+<div class="paragraph">
+<p>Interpret garbled seven segment display with two data structures (input | output)
+* Star1 (<strong>): Identify easy digits by counting only output digits with uniquely identifiable length (1, 4, 7, 8)
+* Star2 (</strong>*): Identify all digits and construct single output number from digits. Sum all output numbers</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_8"><a class="anchor" href="#_howto_8"></a><a class="link" href="#_howto_8">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and prepocessed into list of (input | output) lines
+* Star1: Just check output digits for length and count the uniquely identifiable digits
+* Star2:
+ * Identify ambiguous digits by checking for containing segments from 'one' resp. segments from 'four' without 'one' ("crochet")
+ * Construct string number output digit by digit
+ * Return int(result)</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_8"><a class="anchor" href="#_learned_today_8"></a><a class="link" href="#_learned_today_8">Learned today</a></h5>
+<div class="paragraph">
+<p>Had to sort out the identification of digits on paper for lean solution. Long live the pencil! 😁</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_8"><a class="anchor" href="#_source_8"></a><a class="link" href="#_source_8">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see description.adoc
+
+import io
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+        digit_list = [digit for digit in (elem.split() for elem in local_list)]
+        return digit_list
+
+
+def identify_output_number(io_line):
+    ''' Parse digits to identify the numbers
+        Use 'one' and ('four' minus 'one') as distinguishing feature for 5 and 6 active segments
+        Return output number as int
+    '''
+    len_line = [len(digit) for digit in io_line]
+    digit_presence = [len_line.count(i) for i in range(7)]
+    # print(digit_presence)
+    one = list(next(obj for obj in io_line if len(obj) == 2))
+    four = list(next(obj for obj in io_line if len(obj) == 4))
+    crochet = [seg for seg in four if seg not in one]
+    # print(one, four, crochet)
+    output = False
+    result = ''
+    for digit in io_line:
+        brightness = len(digit)
+        if (brightness == 1):
+            output = True
+            continue
+        if output:
+            if (brightness == 2):
+                result += '1'
+            if (brightness == 3):
+                result += '7'
+            if (brightness == 4):
+                result += '4'
+            if (brightness == 7):
+                result += '8'
+            if (brightness == 5): # 2, 3 or 5
+                if (all(seg in digit for seg in one)):
+                    result += '3'
+                elif (all(seg in digit for seg in crochet)):
+                    result += '5'
+                else:
+                    result += '2'
+            if (brightness == 6): # 0, 6 or 9
+                if (not all(seg in digit for seg in crochet)):
+                    result += '0'
+                elif (all(seg in digit for seg in one)):
+                    result += '9'
+                else:
+                    result += '6'
+    return int(result)
+
+
+def main():
+    daily_list = read_daily_input('input08.txt')
+    easy_digits = 0
+    for line in daily_list:
+        output = False
+        for digit in line:
+            brightness = len(digit)
+            if (brightness == 1):
+                output = True
+            if output:
+                if ((brightness == 2) | (brightness == 3) | (brightness == 4) | (brightness == 7)):
+                    easy_digits += 1
+    star1 = easy_digits
+    print(f"Result (*): {star1}")
+    sum_output = 0
+    for line in daily_list:
+        sum_output += identify_output_number(line)
+    star2 = sum_output
     print(f"Result (**): {star2}")
 
 
