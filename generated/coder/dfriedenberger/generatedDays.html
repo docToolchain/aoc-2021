@@ -240,6 +240,31 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_07_rust">Day 07: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_6">Problem Star 1</a></li>
+<li><a href="#_test_10">Test</a></li>
+<li><a href="#_solution_12">Solution</a></li>
+<li><a href="#_problem_star_2_5">Problem Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_08_rust">Day 08: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_8_seven_segment_search">Day 8: Seven Segment Search</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_7">Problem Star 1</a></li>
+<li><a href="#_test_11">Test</a></li>
+<li><a href="#_solution_13">Solution</a></li>
+<li><a href="#_problem_star_2_6">Problem Star 2</a></li>
+<li><a href="#_solution_14">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1502,6 +1527,297 @@ Find the full puzzle <a href="https://adventofcode.com/2021/day/6" class="bare">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let cnt = incr_and_count(&amp;mut swarm,256-80);
     println!("star 2 {}",cnt);</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_rust"><a class="anchor" href="#_day_07_rust"></a><a class="link" href="#_day_07_rust">Day 07: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_7_the_treachery_of_whales"><a class="anchor" href="#_day_7_the_treachery_of_whales"></a><a class="link" href="#_day_7_the_treachery_of_whales">Day 7: The Treachery of Whales</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/7" class="bare">https://adventofcode.com/2021/day/7</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_6"><a class="anchor" href="#_problem_star_1_6"></a><a class="link" href="#_problem_star_1_6">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Crab submarines have limited fuel, so you need to find a way to make all of their horizontal positions match while requiring them to spend as little fuel as possible.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_10"><a class="anchor" href="#_test_10"></a><a class="link" href="#_test_10">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "16,1,2,0,4,2,7,1,2,14"
+        ];</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>This means there's a crab with horizontal position 16, a crab with horizontal position 1, and so on.</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_5"><a class="anchor" href="#_testcase_5"></a><a class="link" href="#_testcase_5">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let swarm = create_swarm(&amp;vec2).unwrap();
+        let cnt = calculate_fuel(&amp;swarm,2,linear);
+        assert_eq!(cnt, 37);
+
+        let cnt = calculate_fuel(&amp;swarm,10,linear);
+        assert_eq!(cnt, 71);
+
+        let mut min = 0;
+        for h in 0..10 {
+            let cnt = calculate_fuel(&amp;swarm,h,linear);
+            println!("sum {}",cnt);
+
+            if min == 0 || cnt &lt; min {
+                min = cnt;
+            }
+        }
+        assert_eq!(min, 37);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_12"><a class="anchor" href="#_solution_12"></a><a class="link" href="#_solution_12">Solution</a></h5>
+<div class="paragraph">
+<p>Calculate used fuel for each position</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn calculate_fuel(data: &amp;Vec&lt;u32&gt;,h : u32,fuel : fn(u32) -&gt; u32) -&gt; u32 {
+
+    let mut sum = 0;
+    for d in data {
+
+        let distance = if *d &lt; h {
+             h - *d
+        } else {
+            *d  - h
+        };
+        sum += fuel(distance);
+    }
+
+    return sum;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and find minimum.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let data = read_file("input.txt").unwrap();
+    let swarm = create_swarm(&amp;data).unwrap();
+
+    let mut min = 0;
+    for h in 0..2000 {
+        let cnt = calculate_fuel(&amp;swarm,h,linear);
+
+        if min == 0 || cnt &lt; min {
+            min = cnt;
+        }
+    }
+    println!("star 1 {}",min);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_5"><a class="anchor" href="#_problem_star_2_5"></a><a class="link" href="#_problem_star_2_5">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>As it turns out, crab submarine engines don't burn fuel at a constant rate.
+Instead, each change of 1 step in horizontal position costs 1 more unit of fuel than the last: the first step costs 1,
+the second step costs 2, the third step costs 3, and so on.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So for calulating fuel we use gaussian sum.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn gaussian_sum(v : u32) -&gt; u32 {
+    return (v * (v+1)) / 2;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and use same algorithm.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    let mut min = 0;
+    for h in 0..2000 {
+        let cnt = calculate_fuel(&amp;swarm,h,gaussian_sum);
+
+        if min == 0 || cnt &lt; min {
+            min = cnt;
+        }
+    }
+    println!("star 2 {}",min);</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_rust"><a class="anchor" href="#_day_08_rust"></a><a class="link" href="#_day_08_rust">Day 08: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_8_seven_segment_search"><a class="anchor" href="#_day_8_seven_segment_search"></a><a class="link" href="#_day_8_seven_segment_search">Day 8: Seven Segment Search</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/8" class="bare">https://adventofcode.com/2021/day/8</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_7"><a class="anchor" href="#_problem_star_1_7"></a><a class="link" href="#_problem_star_1_7">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>In the output values, how many times do digits 1, 4, 7, or 8 appear?</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_11"><a class="anchor" href="#_test_11"></a><a class="link" href="#_test_11">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe",
+            "edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc",
+            "fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg",
+            "fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb",
+            "aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea",
+            "fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb",
+            "dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe",
+            "bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef",
+            "egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb",
+            "gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce"
+        ];
+
+        let vec2 : Vec&lt;String&gt; = vec1.into_iter().map(|e| String::from(e)).collect();</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_6"><a class="anchor" href="#_testcase_6"></a><a class="link" href="#_testcase_6">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let entries = parse_entries(&amp;vec2).unwrap();
+        assert_eq!(entries.len(), 10);
+
+        let cnt = count_digits1478(&amp;entries);
+        assert_eq!(cnt, 26);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_13"><a class="anchor" href="#_solution_13"></a><a class="link" href="#_solution_13">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    pub fn count_digits1478(&amp;self) -&gt; u32 {
+        let mut cnt = 0;
+        for diget in &amp;self.digets {
+            let l = diget.len();
+
+            if l == 2 || l == 3 || l == 4 || l == 7 {
+                cnt += 1;
+            }
+
+        }
+        return cnt;
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_6"><a class="anchor" href="#_problem_star_2_6"></a><a class="link" href="#_problem_star_2_6">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>For each entry, determine all of the wire/segment connections and decode the four-digit output values.
+What do you get if you add up all of the output values?</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_7"><a class="anchor" href="#_testcase_7"></a><a class="link" href="#_testcase_7">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let nr = entries[0].determine();
+        assert_eq!(nr, 8394);
+
+        let all = determine(&amp;entries);
+        assert_eq!(all, 61229);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_14"><a class="anchor" href="#_solution_14"></a><a class="link" href="#_solution_14">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    pub fn determine(&amp;self) -&gt; u32 {
+
+        let n1 = self.get(2);
+        let n7 = self.get(3);
+        let n4 = self.get(4);
+        let n235 = self.get(5);
+        let n069 = self.get(6);
+        let n8 = self.get(7);
+
+        let d48 = diff(&amp;n4[0],&amp;n8[0]); //segments eg
+        let d41 = diff(&amp;n4[0],&amp;n1[0]); //segments bd
+
+        let (n2 , n35) = split(&amp;n235,&amp;d48);
+        let (n06 , n9) = split(&amp;n069,&amp;d48);
+
+        let (n5, n3) = split(&amp;n35,&amp;d41);
+        let (n6, n0) = split(&amp;n06,&amp;d41);
+
+        let mut num = 0;
+        for diget in &amp;self.digets {
+
+            num *= 10;
+            let mut z = 0;
+            if n0[0] == *diget { z = 0; }
+            if n1[0] == *diget { z = 1; }
+            if n2[0] == *diget { z = 2; }
+            if n3[0] == *diget { z = 3; }
+            if n4[0] == *diget { z = 4; }
+            if n5[0] == *diget { z = 5; }
+            if n6[0] == *diget { z = 6; }
+            if n7[0] == *diget { z = 7; }
+            if n8[0] == *diget { z = 8; }
+            if n9[0] == *diget { z = 9; }
+            num += z;
+
+        }
+        return num;
+    }</code></pre>
 </div>
 </div>
 </div>
