@@ -24,8 +24,9 @@ type Vec struct {
 }
 
 var (
-	unitX = Vec{x: 1}
-	unitY = Vec{y: 1}
+	unitX     = Vec{x: 1}
+	unitY     = Vec{y: 1}
+	unitDisps = []Vec{unitX, unitY, unitX.Inv(), unitY.Inv()}
 )
 
 // VecFromStr converts a sring into a vector.
@@ -155,12 +156,11 @@ func (g *Grid) FilterCounts(filterFn FilterFn) []Vec {
 
 // IsLocalMin determines whether a point is a local minimum.
 func (g *Grid) IsLocalMin(entry Vec) bool {
-	disps := []Vec{unitX, unitY, unitX.Inv(), unitY.Inv()}
-	for _, disp := range disps {
-		if !g.Has(entry.Add(disp)) {
+	for neigh := range pointEnv(entry) {
+		if !g.Has(neigh) {
 			continue
 		}
-		if g.Count(entry) >= g.Count(entry.Add(disp)) {
+		if g.Count(entry) >= g.Count(neigh) {
 			return false
 		}
 	}
@@ -177,6 +177,77 @@ func (g *Grid) Points() <-chan Vec {
 		close(channel)
 	}()
 	return channel
+}
+
+// Check whether a slice has a specific entry.
+func sliceHasEntry(sli []Vec, entry Vec) bool {
+	for _, val := range sli {
+		if entry == val {
+			return true
+		}
+	}
+	return false
+}
+
+// Obtain an iterator over a point's environment.
+func pointEnv(point Vec) <-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for _, disp := range unitDisps {
+			displaced := point.Add(disp)
+			channel <- displaced
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// Basin returns a "grid" that contains the basin associated with the given entry. The value of max
+// will be the maximum value permitted for a point in a basin.
+func (g *Grid) Basin(entry Vec, max int) (Grid, error) {
+	if !g.IsLocalMin(entry) {
+		err := fmt.Errorf("can only start basin generation from local minimum")
+		return Grid{}, err
+	}
+	result := Grid{}
+	for checkEnv := []Vec{entry}; len(checkEnv) != 0; {
+		newEnv := []Vec{}
+		// Add each entry of checkEnv to the basin if it is lower than or equal to all of its
+		// surrounding points that are not yet in the basin.
+		for _, checkVec := range checkEnv {
+			keepThis := true
+			for displaced := range pointEnv(checkVec) {
+				// Non-existent points count as ultra-high walls.
+				if !g.Has(displaced) {
+					continue
+				}
+				// If the to-be-checked point itself does not exist, it cannot be added. Neither can
+				// it be added if it is too large.
+				if !g.Has(checkVec) || g.Count(checkVec) > max {
+					keepThis = false
+				}
+				// We use > here since we assume lava can also flow horizontally instead of just
+				// downward all the time.
+				if !result.Has(displaced) && g.Count(checkVec) > g.Count(displaced) {
+					keepThis = false
+				}
+			}
+			if keepThis && !result.Has(checkVec) {
+				err := result.Mark(checkVec, g.Count(checkVec))
+				if err != nil {
+					return Grid{}, err
+				}
+				// Add a point's entire surrounding to be checked for the same basin next time.
+				for displaced := range pointEnv(checkVec) {
+					if !sliceHasEntry(newEnv, displaced) {
+						newEnv = append(newEnv, displaced)
+					}
+				}
+			}
+		}
+		checkEnv = newEnv
+	}
+	return result, nil
 }
 
 // end::set[]
