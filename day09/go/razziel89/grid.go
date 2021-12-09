@@ -2,18 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
 const (
 	vecSep         = ","
 	tokensPerPoint = 2
-)
-
-var (
-	// Set PART to "1" to select only part 1.
-	partSelect = os.Getenv("PART")
 )
 
 // tag::grid[]
@@ -72,41 +66,6 @@ func (v Vec) Inv() Vec {
 // Sub subtracts a vector'v data from another one'v.
 func (v Vec) Sub(delta Vec) Vec {
 	return v.Add(delta.Inv())
-}
-
-func abs(num int) int {
-	if num < 0 {
-		return -num
-	}
-	return num
-}
-
-func max(i1, i2 int) int {
-	if i1 > i2 {
-		return i1
-	}
-	return i2
-}
-
-// Normalize returns a unit vector with the same direction as the original vector. For now, this
-// does not support diagonals.
-func (v Vec) Normalize() (Vec, error) {
-	if partSelect == "1" {
-		if v.x != 0 && v.y != 0 {
-			return Vec{}, fmt.Errorf("cannot normalize %v", v)
-		}
-	} else {
-		// Default to part 2.
-		if v.x != 0 && v.y != 0 && abs(v.x) != abs(v.y) {
-			return Vec{}, fmt.Errorf("cannot normalize %v", v)
-		}
-	}
-	length := max(abs(v.x), abs(v.y))
-	norm := Vec{
-		x: v.x / length,
-		y: v.y / length,
-	}
-	return norm, nil
 }
 
 // Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
