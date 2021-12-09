@@ -99,20 +99,6 @@ func (g *Grid) RemoveAll(entry Vec) {
 	delete(*g, entry)
 }
 
-// FilterFn is a type that can be used for FilterCounts to filter counts that fulfil a predicate.
-type FilterFn = func(int) bool
-
-// FilterCounts allow to filter points based counts using a FilterFn.
-func (g *Grid) FilterCounts(filterFn FilterFn) []Vec {
-	result := []Vec{}
-	for point, count := range *g {
-		if filterFn(count) {
-			result = append(result, point)
-		}
-	}
-	return result
-}
-
 // IsLocalMin determines whether a point is a local minimum.
 func (g *Grid) IsLocalMin(entry Vec) bool {
 	for neigh := range pointEnv(entry) {
