@@ -230,6 +230,16 @@
 <li><a href="#_day_08_seven_segment_search_2">Day 08: Seven Segment Search</a></li>
 </ul>
 </li>
+<li><a href="#_day_09_go">Day 09: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_09_smoke_basin">Day 09: Smoke Basin</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_9">Oveview</a></li>
+<li><a href="#_how_to_run_9">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1208,7 +1218,168 @@ func ReadLinesAsLines() ([]Line, error) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go"></code></pre>
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Vec is a 2D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y int
+}
+
+// VecFromStr converts a sring into a vector.
+func VecFromStr(str string) (Vec, error) {
+	fields := trimStrings(strings.Split(str, vecSep))
+	if len(fields) != tokensPerPoint {
+		return Vec{}, fmt.Errorf("cannot parse %v as vector, wrong number of fields", str)
+	}
+	ints, err := strSliceToIntSlice(fields)
+	if err != nil {
+		return Vec{}, fmt.Errorf("cannot parse %s as vector, %s", str, err.Error())
+	}
+	result := Vec{
+		x: ints[0],
+		y: ints[1],
+	}
+	return result, nil
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+func abs(num int) int {
+	if num &lt; 0 {
+		return -num
+	}
+	return num
+}
+
+func max(i1, i2 int) int {
+	if i1 &gt; i2 {
+		return i1
+	}
+	return i2
+}
+
+// Normalize returns a unit vector with the same direction as the original vector. For now, this
+// does not support diagonals.
+func (v Vec) Normalize() (Vec, error) {
+	if partSelect == "1" {
+		if v.x != 0 &amp;&amp; v.y != 0 {
+			return Vec{}, fmt.Errorf("cannot normalize %v", v)
+		}
+	} else {
+		// Default to part 2.
+		if v.x != 0 &amp;&amp; v.y != 0 &amp;&amp; abs(v.x) != abs(v.y) {
+			return Vec{}, fmt.Errorf("cannot normalize %v", v)
+		}
+	}
+	length := max(abs(v.x), abs(v.y))
+	norm := Vec{
+		x: v.x / length,
+		y: v.y / length,
+	}
+	return norm, nil
+}
+
+// Line is a line in 2D with a start and an end.
+type Line struct {
+	start, end Vec
+}
+
+// LineFromStr converts a sring into a line.
+func LineFromStr(str string) (Line, error) {
+	fields := trimStrings(strings.Split(str, lineSep))
+	if len(fields) != tokensPerLine {
+		return Line{}, fmt.Errorf("cannot parse %v as line, wrong number of fields", str)
+	}
+	start, err := VecFromStr(fields[0])
+	if err != nil {
+		return Line{}, fmt.Errorf("cannot parse %v as line, %v", str, err.Error())
+	}
+	end, err := VecFromStr(fields[1])
+	if err != nil {
+		return Line{}, fmt.Errorf("cannot parse %v as line, %v", str, err.Error())
+	}
+	result := Line{
+		start: start,
+		end:   end,
+	}
+	return result, nil
+}
+
+// Points determines all points on this line.
+func (l Line) Points() ([]Vec, error) {
+	result := []Vec{}
+	direction, err := l.end.Sub(l.start).Normalize()
+	if err != nil {
+		// We ignore lines whose direction we cannot determine.
+		return []Vec{}, nil
+	}
+	pos := l.start
+	for pos != l.end {
+		result = append(result, pos)
+		pos = pos.Add(direction)
+	}
+	result = append(result, pos)
+	return result, nil
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid map[Vec]int
+
+// Mark marks a point on the grid once.
+func (g *Grid) Mark(entry Vec) {
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*g)[entry] = (*g)[entry] + 1
+}
+
+// Count determines how often a point has been marked.
+func (g *Grid) Count(entry Vec) int {
+	return (*g)[entry]
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(*g, entry)
+}
+
+// FilterFn is a type that can be used for FilterCounts to filter counts that fulfil a predicate.
+type FilterFn = func(int) bool
+
+// FilterCounts allow to filter points based counts using a FilterFn.
+func (g *Grid) FilterCounts(filterFn FilterFn) []Vec {
+	result := []Vec{}
+	for point, count := range *g {
+		if filterFn(count) {
+			result = append(result, point)
+		}
+	}
+	return result
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2038,6 +2209,315 @@ main</code></pre>
 </div>
 <div class="paragraph">
 <p>Simply run the script to solve.</p>
+</div>
+<a id="day09" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_go"><a class="anchor" href="#_day_09_go"></a><a class="link" href="#_day_09_go">Day 09: go</a></h3>
+<div class="sect3">
+<h4 id="_day_09_smoke_basin"><a class="anchor" href="#_day_09_smoke_basin"></a><a class="link" href="#_day_09_smoke_basin">Day 09: Smoke Basin</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the smoke basin puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_9"><a class="anchor" href="#_oveview_9"></a><a class="link" href="#_oveview_9">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>grid.go</code>, which contains specifications of a grid and other
+geometrical functionality.
+This solution reuses quite a bit of the day 5 solution.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	noMoreBasinHeight = 9
+	numLargestBasins  = 3
+)
+
+//nolint: funlen
+func main() {
+	grid, err := ReadLinesAsGrid()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	minima := []Vec{}
+	risk := 0
+	for point := range grid.Points() {
+		if grid.IsLocalMin(point) {
+			risk += 1 + grid.Count(point)
+			minima = append(minima, point)
+		}
+	}
+	// minima = []Vec{Vec{x: 0, y: 1}}
+	fmt.Printf("There is %d risk.\n", risk)
+	sizes := []int{}
+	for _, min := range minima {
+		basin, err := grid.Basin(min, noMoreBasinHeight-1)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		sizes = append(sizes, len(basin))
+	}
+	// Multiply the sizes of the three largest basins.
+	sort.Ints(sizes)
+	sizeMult := 1
+	for _, size := range sizes[len(sizes)-numLargestBasins:] {
+		sizeMult *= size
+	}
+	fmt.Printf("Multiplied basin size is %d.\n", sizeMult)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsGrid reads all lines from stdin as a grid. That is, each point on the grid has a
+// height and a location.
+func ReadLinesAsGrid() (Grid, error) {
+	lineIdx := 0
+	result := make(Grid)
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return Grid{}, err
+		}
+		line = strings.TrimSpace(line)
+		ints, err := strSliceToIntSlice(strings.Split(line, ""))
+		if err != nil {
+			return Grid{}, err
+		}
+		for rowIdx, val := range ints {
+			// This is lazy but I wanted to re-use old code.
+			point, err := VecFromStr(fmt.Sprintf("%d%s%d", lineIdx, vecSep, rowIdx))
+			if err != nil {
+				return Grid{}, err
+			}
+			err = result.Mark(point, val)
+			if err != nil {
+				return Grid{}, err
+			}
+		}
+		if err != nil {
+			return Grid{}, err
+		}
+		lineIdx++
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Vec is a 2D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y int
+}
+
+var (
+	unitX     = Vec{x: 1}
+	unitY     = Vec{y: 1}
+	unitDisps = []Vec{unitX, unitY, unitX.Inv(), unitY.Inv()}
+)
+
+// VecFromStr converts a sring into a vector.
+func VecFromStr(str string) (Vec, error) {
+	fields := trimStrings(strings.Split(str, vecSep))
+	if len(fields) != tokensPerPoint {
+		return Vec{}, fmt.Errorf("cannot parse %v as vector, wrong number of fields", str)
+	}
+	ints, err := strSliceToIntSlice(fields)
+	if err != nil {
+		return Vec{}, fmt.Errorf("cannot parse %s as vector, %s", str, err.Error())
+	}
+	result := Vec{
+		x: ints[0],
+		y: ints[1],
+	}
+	return result, nil
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid map[Vec]int
+
+// Mark marks a point on the grid n times. Don't accept numbers &lt;0.
+func (g *Grid) Mark(entry Vec, n int) error {
+	if n &lt; 0 {
+		return fmt.Errorf("can only mark non-negative times")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*g)[entry] = (*g)[entry] + n
+	return nil
+}
+
+// Count determines how often a point has been marked.
+func (g *Grid) Count(entry Vec) int {
+	return (*g)[entry]
+}
+
+// Has determines whether a point is on the grid.
+func (g *Grid) Has(entry Vec) bool {
+	_, ok := (*g)[entry]
+	return ok
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(*g, entry)
+}
+
+// IsLocalMin determines whether a point is a local minimum.
+func (g *Grid) IsLocalMin(entry Vec) bool {
+	for neigh := range pointEnv(entry) {
+		if !g.Has(neigh) {
+			continue
+		}
+		if g.Count(entry) &gt;= g.Count(neigh) {
+			return false
+		}
+	}
+	return true
+}
+
+// Points returns an iterator over all points on the grid.
+func (g *Grid) Points() &lt;-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for point := range *g {
+			channel &lt;- point
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// Check whether a slice has a specific entry.
+func sliceHasEntry(sli []Vec, entry Vec) bool {
+	for _, val := range sli {
+		if entry == val {
+			return true
+		}
+	}
+	return false
+}
+
+// Obtain an iterator over a point's environment.
+func pointEnv(point Vec) &lt;-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for _, disp := range unitDisps {
+			displaced := point.Add(disp)
+			channel &lt;- displaced
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// Basin returns a "grid" that contains the basin associated with the given entry. The value of max
+// will be the maximum value permitted for a point in a basin.
+func (g *Grid) Basin(entry Vec, max int) (Grid, error) {
+	if !g.IsLocalMin(entry) {
+		err := fmt.Errorf("can only start basin generation from local minimum")
+		return Grid{}, err
+	}
+	result := Grid{}
+	for checkEnv := []Vec{entry}; len(checkEnv) != 0; {
+		newEnv := []Vec{}
+		// Add each entry of checkEnv to the basin if it is lower than or equal to all of its
+		// surrounding points that are not yet in the basin.
+		for _, checkVec := range checkEnv {
+			keepThis := true
+			for displaced := range pointEnv(checkVec) {
+				// Non-existent points count as ultra-high walls.
+				if !g.Has(displaced) {
+					continue
+				}
+				// If the to-be-checked point itself does not exist, it cannot be added. Neither can
+				// it be added if it is too large.
+				if !g.Has(checkVec) || g.Count(checkVec) &gt; max {
+					keepThis = false
+				}
+				// We use &gt; here since we assume lava can also flow horizontally instead of just
+				// downward all the time.
+				if !result.Has(displaced) &amp;&amp; g.Count(checkVec) &gt; g.Count(displaced) {
+					keepThis = false
+				}
+			}
+			if keepThis &amp;&amp; !result.Has(checkVec) {
+				err := result.Mark(checkVec, g.Count(checkVec))
+				if err != nil {
+					return Grid{}, err
+				}
+				// Add a point's entire surrounding to be checked for the same basin next time.
+				for displaced := range pointEnv(checkVec) {
+					if !sliceHasEntry(newEnv, displaced) {
+						newEnv = append(newEnv, displaced)
+					}
+				}
+			}
+		}
+		checkEnv = newEnv
+	}
+	return result, nil
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_9"><a class="anchor" href="#_how_to_run_9"></a><a class="link" href="#_how_to_run_9">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for part 2.
+You can run the solution for part 1 using <code>cat input.dat | PART=1 go run .</code> or
+in general by setting the environment variable <code>PART</code> to <code>1</code>.</p>
+</div>
 </div>
 </div>
 </div>
