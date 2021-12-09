@@ -26,7 +26,7 @@ For patterns with 2, 3, or 4 wires, the 2, 3, or 4 corresponding segments are kn
 
 For patterns with 5 or 6 wires, the unused wires correspond to one of 4 or 3 segments, respectively.
 
-Once all patterns processed, the map es further reduced by removing segments which are the only candidate left for one wire from the candidates of all other wires.
+Once all patterns processed, the map is further reduced by removing segments which are the only candidate left for one wire from the candidates of all other wires.
 
 That was enough in my case to end up with a unique mapping.
 
@@ -35,6 +35,19 @@ That was enough in my case to end up with a unique mapping.
 include::src/lib.rs[tags=part2]
 ----
 
+==== Alternative Solution ====
+
+I looked at the solution by https://github.com/RJPlog[RJPlog] later, which is actually much simpler than mine. Here is a Rust version of his decode idea. 
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=decode_alt]
+----
+
+Run the alternative solution with ``cargo run --release --features rjplog_solution``
+
+Not only is this solution simpler but it also runs faster. With compiler optimizations turned on, my original part 2 solves in about 1ms, the alternative solution takes about 0.1ms.
+
 === Tests ===
 
 [source,rust,numbered]
@@ -42,4 +55,3 @@ include::src/lib.rs[tags=part2]
 include::src/lib.rs[tags=tests]
 ----
 
-=== Today I learned ===
