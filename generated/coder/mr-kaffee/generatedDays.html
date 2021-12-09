@@ -260,6 +260,17 @@
 <li><a href="#_part_1_6">Part 1</a></li>
 <li><a href="#_part_2_6">Part 2</a></li>
 <li><a href="#_tests_7">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_09_rust">Day 09: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_09_smoke_basin">Day 09: Smoke Basin</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_7">Part 1</a></li>
+<li><a href="#_part_2_7">Part 2</a></li>
+<li><a href="#_tests_8">Tests</a></li>
 <li><a href="#_today_i_learned_5">Today I learned</a></li>
 </ul>
 </li>
@@ -1813,27 +1824,25 @@ mod tests {
 ///
 /// each pattern / output is represented by an integer whos bits indicate the state of segments a (bit 0) to g (bit 6)
 pub fn parse(content: &amp;str) -&gt; Vec&lt;(Vec&lt;usize&gt;, Vec&lt;usize&gt;)&gt; {
-    let mut displays = Vec::new();
-    for line in content.lines() {
-        let parts = line
-            .trim()
-            .split(" | ") // separate patterns from outputs
-            .map(|part| {
-                part.trim()
-                    .split_ascii_whitespace() // separate individual patterns
-                    .map(|pattern| {
-                        // convert pattern to usize
-                        pattern
-                            .chars()
-                            .map(|char| 1usize &lt;&lt; (char as usize - 'a' as usize))
-                            .fold(0, |bits, bit| bits | bit)
-                    })
-                    .collect::&lt;Vec&lt;_&gt;&gt;() // patterns as usize
-            })
-            .collect::&lt;Vec&lt;_&gt;&gt;(); // patterns and outputs
-        displays.push((parts[0].to_vec(), parts[1].to_vec()));
-    }
-    displays
+    content
+        .lines()
+        .map(|line| {
+            line.split(" | ") // separate patterns from outputs
+                .map(|part| {
+                    part.split_ascii_whitespace() // separate individual patterns
+                        .map(|pattern| {
+                            // convert pattern to usize
+                            pattern
+                                .chars()
+                                .map(|char| 1 &lt;&lt; (char as usize - 'a' as usize))
+                                .fold(0, |bits, bit| bits | bit)
+                        })
+                        .collect::&lt;Vec&lt;_&gt;&gt;() // patterns / outputs as usize
+                })
+                .collect::&lt;VecDeque&lt;_&gt;&gt;() // VecDeque with one element for patterns and one for outputs
+        })
+        .map(|mut parts| (parts.pop_front().unwrap(), parts.pop_front().unwrap()))
+        .collect()
 }</code></pre>
 </div>
 </div>
@@ -1869,7 +1878,7 @@ pub fn solution_1(displays: &amp;[(Vec&lt;usize&gt;, Vec&lt;usize&gt;)]) -&gt; u
 <p>For patterns with 5 or 6 wires, the unused wires correspond to one of 4 or 3 segments, respectively.</p>
 </div>
 <div class="paragraph">
-<p>Once all patterns processed, the map es further reduced by removing segments which are the only candidate left for one wire from the candidates of all other wires.</p>
+<p>Once all patterns processed, the map is further reduced by removing segments which are the only candidate left for one wire from the candidates of all other wires.</p>
 </div>
 <div class="paragraph">
 <p>That was enough in my case to end up with a unique mapping.</p>
@@ -1878,9 +1887,16 @@ pub fn solution_1(displays: &amp;[(Vec&lt;usize&gt;, Vec&lt;usize&gt;)]) -&gt; u
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// sum over decoded outputs
 pub fn solution_2(displays: &amp;[(Vec&lt;usize&gt;, Vec&lt;usize&gt;)]) -&gt; usize {
+    let f = if cfg!(feature = "rjplog_solution") {
+        // alternative decoder if feature "rjplog_solution" is chosen
+        self::decode_alt
+    } else {
+        self::decode
+    };
+
     displays
         .iter()
-        .map(|(patterns, outputs)| decode(patterns, outputs))
+        .map(|(patterns, outputs)| f(patterns, outputs))
         .sum()
 }
 
@@ -1904,14 +1920,14 @@ pub fn decode(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
     // 1 -&gt; _ _ c _ _ f _ -&gt; set bits match 0b0100100
     // 7 -&gt; a _ c _ _ f _ -&gt; set bits match 0b0100101
     // 4 -&gt; _ b c d _ f _ -&gt; set bits match 0b0101110
-    let pos_patterns = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
+    let pos_masks = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
     // 2 -&gt; a _ c d e _ g
     // 3 -&gt; a _ c d _ f g
     // 5 -&gt; a b _ d _ f g -&gt; unset bits match 0b0110110
     // 0 -&gt; a b c _ e f g
     // 6 -&gt; a b _ d e f g
     // 9 -&gt; a b c d _ f g -&gt; unset bits match 0b0011100
-    let neg_patterns = HashMap::from([
+    let neg_masks = HashMap::from([
         (2, !0b0100100),
         (3, !0b0100101),
         (4, !0b0101110),
@@ -1921,12 +1937,12 @@ pub fn decode(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
 
     // for each pattern, reduce map by impossible bits
     for pattern in patterns {
-        if let Some(p) = pos_patterns.get(&amp;pattern.count_ones()) {
+        if let Some(p) = pos_masks.get(&amp;pattern.count_ones()) {
             for wire in (0..7).filter(|wire| (pattern &gt;&gt; wire) &amp; 1 == 1) {
                 map[wire] &amp;= p;
             }
         }
-        if let Some(p) = neg_patterns.get(&amp;pattern.count_ones()) {
+        if let Some(p) = neg_masks.get(&amp;pattern.count_ones()) {
             for wire in (0..7).filter(|wire| (pattern &gt;&gt; wire) &amp; 1 == 0) {
                 map[wire] &amp;= p;
             }
@@ -1968,10 +1984,89 @@ pub fn decode(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
                     0b0100101 =&gt; 7,
                     0b1111111 =&gt; 8,
                     0b1101111 =&gt; 9,
-                    _ =&gt; panic!("Invalid output {}", digit),
+                    _ =&gt; panic!("Invalid digit: {}", digit),
                 }
         })
 }</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_alternative_solution"><a class="anchor" href="#_alternative_solution"></a><a class="link" href="#_alternative_solution">Alternative Solution</a></h6>
+<div class="paragraph">
+<p>I looked at the solution by <a href="https://github.com/RJPlog">RJPlog</a> later, which is actually much simpler than mine. Here is a Rust version of his decode idea.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// decode output (solution idea by https://github.com/RJPlog[RJPlog])
+///
+/// # Example
+/// ```
+/// # use mr_kaffee_2021_08::*;
+/// let content =
+///     "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
+/// let displays = parse(content);
+/// let (patterns, outputs) = &amp;displays[0];
+/// assert_eq!(5353, decode(patterns, outputs));
+/// ```
+pub fn decode_alt(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
+    let mut map: Vec&lt;usize&gt; = vec![0; 10];
+    for pattern in patterns {
+        // unique segment counts
+        // 1 -&gt; _ _ c _ _ f _  2 segments
+        // 7 -&gt; a _ c _ _ f _  3 segments
+        // 4 -&gt; _ b c d _ f _  4 segments
+        // 8 -&gt; a b c d e f g  7 segments
+        match pattern.count_ones() {
+            2 =&gt; map[1] = *pattern,
+            3 =&gt; map[7] = *pattern,
+            4 =&gt; map[4] = *pattern,
+            7 =&gt; map[8] = *pattern,
+            _ =&gt; {} // nothing here
+        }
+    }
+    for pattern in patterns.iter().filter(|pattern| pattern.count_ones() == 5) {
+        // 2 -&gt; a _ c d e _ g
+        // 3 -&gt; a _ c d _ f g
+        // 5 -&gt; a b _ d _ f g
+        if pattern &amp; map[1] == map[1] {
+            // c | f is only contained in segments for 3
+            map[3] = *pattern;
+        } else if pattern &amp; (map[4] &amp; !map[1]) == (map[4] &amp; !map[1]) {
+            // b | c | d | f &amp; !(c | f) = b | d is only contained in segments for 5
+            map[5] = *pattern;
+        } else {
+            // if it is neither 3 nor 5, it must be 2
+            map[2] = *pattern;
+        }
+    }
+    for pattern in patterns.iter().filter(|pattern| pattern.count_ones() == 6) {
+        // 0 -&gt; a b c _ e f g
+        // 6 -&gt; a b _ d e f g
+        // 9 -&gt; a b c d _ f g
+        if pattern &amp; map[3] == map[3] {
+            // a | c | d | f | g is only contained in the segments for 9
+            map[9] = *pattern;
+        } else if pattern &amp; map[5] == map[5] {
+            // a | b | d | f | g is contained in the segments for 9 (already handled) and 6
+            map[6] = *pattern;
+        } else {
+            // if it is neither 9 nor 6, it must be 0
+            map[0] = *pattern;
+        }
+    }
+
+    outputs
+        .iter()
+        .map(|output| map.iter().position(|pattern| output == pattern).unwrap())
+        .fold(0, |result, digit| 10 * result + digit)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the alternative solution with <code>cargo run --release --features rjplog_solution</code></p>
+</div>
+<div class="paragraph">
+<p>Not only is this solution simpler but it also runs faster. With compiler optimizations turned on, my original part 2 solves in about 1ms, the alternative solution takes about 0.1ms.</p>
 </div>
 </div>
 </div>
@@ -2010,10 +2105,203 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 }</code></pre>
 </div>
 </div>
+<a id="day09" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_rust"><a class="anchor" href="#_day_09_rust"></a><a class="link" href="#_day_09_rust">Day 09: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_09_smoke_basin"><a class="anchor" href="#_day_09_smoke_basin"></a><a class="link" href="#_day_09_smoke_basin">Day 09: Smoke Basin</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/9">AoC|2021|09</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_7"><a class="anchor" href="#_part_1_7"></a><a class="link" href="#_part_1_7">Part 1</a></h5>
+<div class="paragraph">
+<p>I parse the input into a flat list and return the width of the grid in addition</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// get width of grid and numbers as flat vector
+///
+/// ```
+/// # use mr_kaffee_2021_09::*;
+/// assert_eq!((1, vec![0,1]), parse("0\n1"));
+/// ```
+pub fn parse(content: &amp;str) -&gt; (usize, Vec&lt;usize&gt;) {
+    let width = content.lines().next().expect("No lines").len();
+    let numbers = content
+        .chars()
+        .filter(|c| c.is_ascii_digit())
+        .map(|c| (c as usize - '0' as usize))
+        .collect();
+    (width, numbers)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Part one is about finding the low points. This is quite straightforward.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// find all elements for which all adjacents have higher values, sum their values incremented by 1
+pub fn solution_1(width: usize, numbers: &amp;[usize]) -&gt; usize {
+    let height = numbers.len() / width;
+    (0..numbers.len())
+        .map(|idx| (idx % width, idx / width, numbers[idx] + 1))
+        .filter(|(x, y, _)| {
+            (*x == 0 || numbers[x - 1 + width * y] &gt; numbers[x + width * y])
+                &amp;&amp; (*x == width - 1 || numbers[x + 1 + width * y] &gt; numbers[x + width * y])
+                &amp;&amp; (*y == 0 || numbers[x + width * (y - 1)] &gt; numbers[x + width * y])
+                &amp;&amp; (*y == height - 1 || numbers[x + width * (y + 1)] &gt; numbers[x + width * y])
+        })
+        .fold(0, |sum, (_, _, number)| sum + number)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_7"><a class="anchor" href="#_part_2_7"></a><a class="link" href="#_part_2_7">Part 2</a></h5>
+<div class="paragraph">
+<p>Finally a puzzle where a breadth-first-traversal could be used (there might be easier approaches&#8230;&#8203;).</p>
+</div>
+<div class="paragraph">
+<p><span class="line-through">I did not read the instructions well and thought that adjacent coordinates only belong to a basin if their value was heigher than the neighbor&#8217;s value. My tests helped me to sort that out and understand that I only have to look for coordinates with value <code>9</code> that delimit the basins.</span></p>
+</div>
+<div class="paragraph">
+<p>Actually, the problem was that in my test case I did not start from the low point <code>(1, 0)</code> but a neighbor <code>(0, 0)</code>. Looking only for numbers with higher values would work when starting from the low point, but it is not necessary. Only looking for nines is fine and allows to start from anywhere in the basin.</p>
+</div>
+<div class="paragraph">
+<p>The depth first traversal is put in its own function <code>get_basin_size</code> for readability ;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// get the basin sizes of the basins the given coordinates belong to with a breadth first traversal
+pub fn get_basin_size(width: usize, numbers: &amp;[usize], x: usize, y: usize) -&gt; usize {
+    // markers for seen coordinates
+    let mut seen = vec![false; numbers.len()];
+    // queue for breadth first traversal
+    let mut queue = VecDeque::new();
+
+    // initialize
+    seen[x + width * y] = true;
+    queue.push_back((x as isize, y as isize));
+    let mut count = 0;
+
+    // height and width of the grid as signed integers
+    let height = (numbers.len() / width) as isize;
+    let width = width as isize;
+
+    // breadth first traversal
+    while !queue.is_empty() {
+        let (x, y) = queue.pop_front().unwrap();
+        count += 1;
+
+        for (dx, dy) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
+            // adjacent coordinates
+            let x_a = x + dx;
+            let y_a = y + dy;
+            if x_a &gt;= 0
+                &amp;&amp; x_a &lt; width
+                &amp;&amp; y_a &gt;= 0
+                &amp;&amp; y_a &lt; height
+                &amp;&amp; !seen[(x_a + width * y_a) as usize]
+                &amp;&amp; numbers[(x_a + width * y_a) as usize] != 9
+            {
+                // if adjacent coordinates in grid, not yet seen and not 9, mark seen and add to queue
+                seen[(x_a + width * y_a) as usize] = true;
+                queue.push_back((x_a, y_a));
+            }
+        }
+    }
+
+    count
+}
+
+/// get the product of the sizes of the (at most) three biggest basins
+pub fn solution_2(width: usize, numbers: &amp;[usize]) -&gt; usize {
+    // height of the grid
+    let height = numbers.len() / width;
+
+    // determine low points
+    let lows = (0..numbers.len())
+        .map(|idx| (idx % width, idx / width))
+        .filter(|(x, y)| {
+            (*x == 0 || numbers[x - 1 + width * y] &gt; numbers[x + width * y])
+                &amp;&amp; (*x == width - 1 || numbers[x + 1 + width * y] &gt; numbers[x + width * y])
+                &amp;&amp; (*y == 0 || numbers[x + width * (y - 1)] &gt; numbers[x + width * y])
+                &amp;&amp; (*y == height - 1 || numbers[x + width * (y + 1)] &gt; numbers[x + width * y])
+        })
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+
+    // determine basin sizes
+    let mut basins = lows
+        .iter()
+        .map(|(x, y)| get_basin_size(width, numbers, *x, *y))
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+
+    // sort basin sizes
+    basins.sort_unstable();
+
+    // product over the last three elements
+    basins.iter().rev().take(3).product()
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_8"><a class="anchor" href="#_tests_8"></a><a class="link" href="#_tests_8">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "2199943210
+3987894921
+9856789892
+8767896789
+9899965678";
+
+    #[test]
+    fn test_parse() {
+        let (width, numbers) = parse(CONTENT);
+        assert_eq!(10, width);
+        assert_eq!(50, numbers.len());
+    }
+
+    #[test]
+    fn test_solution_1() {
+        let (width, numbers) = parse(CONTENT);
+        let risk = solution_1(width, &amp;numbers);
+        assert_eq!(15, risk);
+    }
+
+    #[test]
+    fn test_get_basin_size() {
+        let (width, numbers) = parse(CONTENT);
+
+        assert_eq!(3, get_basin_size(width, &amp;numbers, 1, 0));
+        assert_eq!(9, get_basin_size(width, &amp;numbers, width - 1, 0));
+        assert_eq!(14, get_basin_size(width, &amp;numbers, 2, 2));
+        assert_eq!(9, get_basin_size(width, &amp;numbers, 6, 4));
+    }
+
+    #[test]
+    fn test_solution_2() {
+        let (width, numbers) = parse(CONTENT);
+        assert_eq!(1_134, solution_2(width, &amp;numbers));
+    }
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_today_i_learned_5"><a class="anchor" href="#_today_i_learned_5"></a><a class="link" href="#_today_i_learned_5">Today I learned</a></h5>
-
+<div class="paragraph">
+<p>Read the puzzle description carefully (ha, not really a new learning) and continue to test (I think we had that before).</p>
+</div>
 </div>
 </div>
 </div>
