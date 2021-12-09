@@ -231,6 +231,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_09_kotlin">Day 09: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_9_smoke_basin">Day 9: Smoke Basin</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_9">First Star</a></li>
+<li><a href="#_second_star_9">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1290,6 +1300,157 @@
 	println("Solution for part2")
 	println("   You get $solution2 if you add up all of the output values")
 	println()</code></pre>
+</div>
+</div>
+<a id="day09" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_kotlin"><a class="anchor" href="#_day_09_kotlin"></a><a class="link" href="#_day_09_kotlin">Day 09: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_9_smoke_basin"><a class="anchor" href="#_day_9_smoke_basin"></a><a class="link" href="#_day_9_smoke_basin">Day 9: Smoke Basin</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/9" class="bare">https://adventofcode.com/2021/day/9</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2109_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_9"><a class="anchor" href="#_first_star_9"></a><a class="link" href="#_first_star_9">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>For the first part I read in the puzzle input and added a frame outside, one line with '9' on each side. For evalation of risk level, I went through the map and checked, if the adjacent tiles are higher or lower. If all are lower, you found a sink and added it to the result (+1)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var solution1: Int = 0
+	var solution2: Int
+	var solution2_results = mutableListOf&lt;Int&gt;()
+	var heightmap = mutableListOf&lt;Int&gt;()
+	var width: Int = 0
+	var height: Int = 0
+
+	// read puzzle input to evaluate width and height of grid
+	File("day2109_puzzle_input.txt").forEachLine {
+		width = it.length
+		height += 1
+	}
+
+	// add a frame to grid, makes following evaluations easier, you don't have to check if value is out of grid at borders
+	width = width + 2
+	height = height + 2
+	for (i in 0..width - 1) {
+		heightmap.add(9)
+	}
+
+	// read puzzle input into list
+	File("day2109_puzzle_input.txt").forEachLine {
+		heightmap.add(9)
+		it.forEach {
+			heightmap.add(it.toString().toInt())
+		}
+		heightmap.add(9)
+	}
+	for (i in 0..width - 1) {
+		heightmap.add(9)
+	}
+
+	// check for sinks and add up risk level, for each sink start fun smokeBasin to get size of basin
+	for (y in 1..height - 2) {
+		for (x in 1..width - 2) {
+			if (heightmap[x + y * width] &lt; heightmap[(x - 1) + (y) * width] &amp;&amp; heightmap[x + y * width] &lt; heightmap[(x + 1) + (y) * width] &amp;&amp; heightmap[x + y * width] &lt; heightmap[(x) + (y + 1) * width] &amp;&amp; heightmap[x + y * width] &lt; heightmap[(x) + (y - 1) * width]) {
+				solution1 = solution1 + heightmap[x + y * width] + 1
+				solution2_results.add(smokeBasin(x, y, heightmap, width, height))
+			}
+		}
+	}
+
+	// sort list to find highest 3
+	solution2_results.sort()
+	solution2 = solution2_results[solution2_results.size-1] * solution2_results[solution2_results.size-2] * solution2_results[solution2_results.size-3]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_9"><a class="anchor" href="#_second_star_9"></a><a class="link" href="#_second_star_9">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>The second part is nested into part one, whenever a sink is identified, a function is called, which evaluates the size of the basin arround. All basins are stored into a list, the result is calculated by multiplication of the three largest.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun smokeBasin(input1: Int, input2: Int, input3: List&lt;Int&gt;, input4: Int, input5: Int): Int {
+	var xpos = input1
+	var ypos = input2
+	var map = mutableListOf&lt;Char&gt;()
+	var width = input4
+	var height = input5
+	var result: Int = 1
+
+	input3.forEach {
+		map.add((it + 48).toChar())
+	}
+	map.set(xpos + ypos * width, 'x')
+
+	var searchEnd: Boolean = false
+	while (!searchEnd) {
+		searchEnd = true
+		for (y in 1..height - 2) {
+			for (x in 1..width - 2) {
+				if (map[x + y * width].isDigit()) { // check if digit (no evaluation for already placed 'x')
+					if (map[x + y * width].toString().toInt() &lt; 9 &amp;&amp; map[(x - 1) + (y) * width] == 'x') {
+						result = result + 1
+						map.set(x + y * width, 'x')
+						searchEnd = false
+					} else if (map[x + y * width].toString().toInt() &lt; 9 &amp;&amp; map[(x + 1) + (y) * width] == 'x') {
+						result = result + 1
+						map.set(x + y * width, 'x')
+						searchEnd = false
+					} else if (map[x + y * width].toString().toInt() &lt; 9 &amp;&amp; map[(x) + (y - 1) * width] == 'x') {
+						result = result + 1
+						map.set(x + y * width, 'x')
+						searchEnd = false
+					} else if (map[x + y * width].toString().toInt() &lt; 9 &amp;&amp; map[(x) + (y + 1) * width] == 'x') {
+						result = result + 1
+						map.set(x + y * width, 'x')
+						searchEnd = false
+					}
+
+				} // if digit
+			} //end for x
+		} // end for y
+	} // searchEnd
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("**************************")
+	println("--- Day 9: Smoke Basin ---")
+	println("**************************")
+	println("Solution for part1")
+	println("   $solution1 is the sum of the risk levels of all low points on your heightmap")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   You get $solution2 if you add up all of the output values")
+	println()
+// end::output[]
+//}</code></pre>
 </div>
 </div>
 </div>
