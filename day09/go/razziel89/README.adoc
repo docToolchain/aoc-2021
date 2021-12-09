@@ -1,0 +1,39 @@
+== Day 09: Smoke Basin ==
+
+This is my implementation for both rounds of the smoke basin puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `grid.go`, which contains specifications of a grid and other
+geometrical functionality.
+This solution reuses quite a bit of the day 5 solution.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`grid.go`
+[source,go,numbered]
+----
+include::grid.go[tags=grid]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution for part 2.
+You can run the solution for part 1 using `cat input.dat | PART=1 go run .` or
+in general by setting the environment variable `PART` to `1`.

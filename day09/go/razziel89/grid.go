@@ -16,7 +16,7 @@ var (
 	partSelect = os.Getenv("PART")
 )
 
-// tag::set[]
+// tag::grid[]
 
 // Vec is a 2D vector. Most of it has been taken from a previous solution.
 type Vec struct {
@@ -250,4 +250,4 @@ func (g *Grid) Basin(entry Vec, max int) (Grid, error) {
 	return result, nil
 }
 
-// end::set[]
+// end::grid[]
