@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Went with the correct approach for the first star already and simply used dictionary(list would have been better in hindsight) to keep track of the number of fishes at each age. 
+
+[source, python]
+....
+include::six.py[]
+....

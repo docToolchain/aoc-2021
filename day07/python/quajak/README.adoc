@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+For the first star use numpy to determine the medium. The second star just brute force the possible range and use closed form of triangle values to calculate cost.
+
+[source, python]
+....
+include::seven.py[]
+....

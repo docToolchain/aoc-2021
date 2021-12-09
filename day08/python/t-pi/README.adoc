@@ -1,0 +1,38 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-08: Seven Segment Search 
+https://adventofcode.com/2021/day/8
+
+=== Info
+
+Interpret garbled seven segment display with two data structures (input | output)
+* Star1 (*): Identify easy digits by counting only output digits with uniquely identifiable length (1, 4, 7, 8)
+* Star2 (**): Identify all digits and construct single output number from digits. Sum all output numbers
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into list of (input | output) lines
+* Star1: Just check output digits for length and count the uniquely identifiable digits
+* Star2: 
+ * Identify ambiguous digits by checking for containing segments from 'one' resp. segments from 'four' without 'one' ("crochet")
+ * Construct string number output digit by digit
+ * Return int(result)
+
+=== Learned today
+
+Had to sort out the identification of digits on paper for lean solution. Long live the pencil! 😁
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

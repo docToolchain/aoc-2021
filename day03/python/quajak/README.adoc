@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+
+For the first star, use list comprehension to get the relevant column of bits and use list.count to determine the most common bit.
+
+For the second star, use the same approach and use list comprehension to filter the possible values until only one remains.
+
+[source, python]
+....
+include::three.py[]
+....

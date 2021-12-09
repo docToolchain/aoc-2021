@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
         i++;
     }
 
+    free(arr);
     printf ("Count: %d\n", count);
     return 0;
 }

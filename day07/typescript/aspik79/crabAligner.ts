@@ -39,6 +39,7 @@ export class CrabAligner {
     }
 
     private calculateFuel(distance: number) : number {
+        // Thanks to Mr. Gauss for simplified calcualtion of aggregated fuel use.
         return this.constantFuel ? distance : distance * (distance + 1) / 2;
     }
 }
