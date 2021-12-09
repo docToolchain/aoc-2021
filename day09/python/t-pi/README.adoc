@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-09: Smoke Basin
+https://adventofcode.com/2021/day/9
+
+=== Info
+
+Determine 2D minima in cave floor (height: 0 .. 9)
+
+* Star1 (*): Consider adjacent (l, r, t, b, no diagonals) fields
+
+* Star2 (**): Fill minima up to height 8 and determine size (extension in positions) of basin. Multiply 3 largest basins.
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into 2d int list
+
+* Star1: Straightforward, check for lower adjacent field for every position. Just make sure to have the comparisons right 🙄
+
+* Star2: Take recursive approach comparable to floodfill (thanks @rdmueller for the pointer in Slack 😅). Don't forget to mark visited positions...
+
+=== Learned today
+
+No easy hacking with head full of booster aftereffects...
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
