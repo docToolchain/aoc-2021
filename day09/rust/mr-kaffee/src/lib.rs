@@ -23,15 +23,14 @@ pub fn parse(content: &str) -> (usize, Vec<usize>) {
 pub fn solution_1(width: usize, numbers: &[usize]) -> usize {
     let height = numbers.len() / width;
     (0..numbers.len())
-        .map(|idx| (idx % width, idx / width, numbers[idx]))
+        .map(|idx| (idx % width, idx / width, numbers[idx] + 1))
         .filter(|(x, y, _)| {
             (*x == 0 || numbers[x - 1 + width * y] > numbers[x + width * y])
                 && (*x == width - 1 || numbers[x + 1 + width * y] > numbers[x + width * y])
                 && (*y == 0 || numbers[x + width * (y - 1)] > numbers[x + width * y])
                 && (*y == height - 1 || numbers[x + width * (y + 1)] > numbers[x + width * y])
         })
-        .map(|(_, _, number)| number + 1)
-        .sum()
+        .fold(0, |sum, (_, _, number)| sum + number)
 }
 // end::part1[]
 
