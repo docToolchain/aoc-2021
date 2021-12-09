@@ -136,7 +136,7 @@ mod tests {
     fn test_get_basin_size() {
         let (width, numbers) = parse(CONTENT);
 
-        assert_eq!(3, get_basin_size(width, &numbers, 0, 0));
+        assert_eq!(3, get_basin_size(width, &numbers, 1, 0));
         assert_eq!(9, get_basin_size(width, &numbers, width - 1, 0));
         assert_eq!(14, get_basin_size(width, &numbers, 2, 2));
         assert_eq!(9, get_basin_size(width, &numbers, 6, 4));
