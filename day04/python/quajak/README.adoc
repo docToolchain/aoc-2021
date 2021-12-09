@@ -1,0 +1,14 @@
+Advent of Code 2021
+
+== Python
+
+Define a class to track all non-drawn values on the board and all possible lines in a board and how many of the values in each have not been drawn. 
+Then whenever a value is drawn decrement all counters if value is in the line and remove the value from the not-drawn list. 
+For the first star, simply print when the first counter reaches 0, sum up the non-drawn values and multiply by the current value.
+
+For the second star, modify the board to keep track of if the board has already been solved and draw until all boards have been finished.
+
+[source, python]
+....
+include::four.py[]
+....

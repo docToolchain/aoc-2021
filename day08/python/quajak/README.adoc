@@ -1,0 +1,22 @@
+Advent of Code 2021
+
+== Python
+
+First store all digits with the same length in a dictionary. 
+
+For the first star for each word in the 4 letter output, check if only one possible digit has that length.
+
+For the second star, first normalize all words by sorting the characters alphabetically. 
+
+Then solve the simple ones (where only one integer needs that many digits).
+
+To solve the three cases with six digits, if the case includes all values of 4, its a 9, else if it contains all values of 1, its a 0, else its a 6.
+
+To solve the cases with five cases, if it contains the 1, its a 3, if the entire letter is contained within the 9, its a 5, else its a 2. 
+
+Then convert each output into a integer and sum all outputs.
+
+[source, python]
+....
+include::eight.py[]
+....
