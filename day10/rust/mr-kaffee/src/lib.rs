@@ -12,36 +12,24 @@ pub fn find_illegal_char(line: &str) -> Option<usize> {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' => {
-                queue.push_back(')');
+            '(' | '[' | '{' | '<' => {
+                queue.push_back(match c {
+                    '(' => ')',
+                    '[' => ']',
+                    '{' => '}',
+                    '<' => '>',
+                    _ => unreachable!(),
+                });
             }
-            '[' => {
-                queue.push_back(']');
-            }
-            '{' => {
-                queue.push_back('}');
-            }
-            '<' => {
-                queue.push_back('>');
-            }
-            ')' => {
+            ')' | ']' | '}' | '>' => {
                 if c != queue.pop_back().expect("Empty queue") {
-                    return Some(3);
-                }
-            }
-            ']' => {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(57);
-                }
-            }
-            '}' => {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(1197);
-                }
-            }
-            '>' => {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(25137);
+                    return match c {
+                        ')' => Some(3),
+                        ']' => Some(57),
+                        '}' => Some(1197),
+                        '>' => Some(25137),
+                        _ => unreachable!(),
+                    };
                 }
             }
             _ => panic!("Illegal charachter '{}'", c),
@@ -50,7 +38,7 @@ pub fn find_illegal_char(line: &str) -> Option<usize> {
     None
 }
 
-/// Calculate some of scores of illegal chars
+/// Calculate sum of scores of illegal chars
 pub fn solution_1(lines: &[String]) -> usize {
     lines
         .iter()
@@ -65,17 +53,14 @@ pub fn get_repair_score(line: &str) -> Option<usize> {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' => {
-                queue.push_front(')');
-            }
-            '[' => {
-                queue.push_front(']');
-            }
-            '{' => {
-                queue.push_front('}');
-            }
-            '<' => {
-                queue.push_front('>');
+            '(' | '[' | '{' | '<' => {
+                queue.push_front(match c {
+                    '(' => ')',
+                    '[' => ']',
+                    '{' => '}',
+                    '<' => '>',
+                    _ => unreachable!(),
+                });
             }
             ')' | '>' | '}' | ']' => {
                 if c != queue.pop_front().expect("Empty queue") {
