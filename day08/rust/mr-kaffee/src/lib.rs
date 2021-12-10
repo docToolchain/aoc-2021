@@ -15,8 +15,7 @@ pub fn parse(content: &str) -> Vec<(Vec<usize>, Vec<usize>)> {
                             // convert pattern to usize
                             pattern
                                 .chars()
-                                .map(|char| 1 << (char as usize - 'a' as usize))
-                                .fold(0, |bits, bit| bits | bit)
+                                .fold(0, |bits, c| bits | 1 << (c as usize - 'a' as usize))
                         })
                         .collect::<Vec<_>>() // patterns / outputs as usize
                 })
@@ -78,31 +77,25 @@ pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
     // 1 -> _ _ c _ _ f _ -> set bits match 0b0100100
     // 7 -> a _ c _ _ f _ -> set bits match 0b0100101
     // 4 -> _ b c d _ f _ -> set bits match 0b0101110
-    let pos_masks = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
     // 2 -> a _ c d e _ g
     // 3 -> a _ c d _ f g
     // 5 -> a b _ d _ f g -> unset bits match 0b0110110
     // 0 -> a b c _ e f g
     // 6 -> a b _ d e f g
     // 9 -> a b c d _ f g -> unset bits match 0b0011100
-    let neg_masks = HashMap::from([
-        (2, !0b0100100),
-        (3, !0b0100101),
-        (4, !0b0101110),
-        (5, 0b0110110),
-        (6, 0b0011100),
+    let masks = HashMap::from([
+        (2, (0b0100100, !0b0100100)),
+        (3, (0b0100101, !0b0100101)),
+        (4, (0b0101110, !0b0101110)),
+        (5, (0b1111111, 0b0110110)),
+        (6, (0b1111111, 0b0011100)),
     ]);
 
     // for each pattern, reduce map by impossible bits
     for pattern in patterns {
-        if let Some(p) = pos_masks.get(&pattern.count_ones()) {
-            for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 1) {
-                map[wire] &= p;
-            }
-        }
-        if let Some(p) = neg_masks.get(&pattern.count_ones()) {
-            for wire in (0..7).filter(|wire| (pattern >> wire) & 1 == 0) {
-                map[wire] &= p;
+        if let Some((p, n)) = masks.get(&pattern.count_ones()) {
+            for wire in 0..7 {
+                map[wire] &= if (pattern >> wire) & 1 == 1 { p } else { n };
             }
         }
     }
@@ -124,8 +117,7 @@ pub fn decode(patterns: &[usize], outputs: &[usize]) -> usize {
             // map wires to segments
             (0..7)
                 .filter(|wire| (output >> wire) & 1 == 1)
-                .map(|wire| map[wire])
-                .fold(0, |digit, bit| digit | bit)
+                .fold(0, |digit, wire| digit | map[wire])
         })
         .fold(0, |result, digit| {
             // calculate output from digits
