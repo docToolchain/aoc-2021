@@ -32,6 +32,11 @@
     </url>
 
     <url>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/t-pi/generatedDays.html</loc>
+    	<lastmod>2021-12-10</lastmod>
+    </url>
+
+    <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/RJPlog/generatedDays.html</loc>
     	<lastmod>2021-12-10</lastmod>
     </url>
@@ -43,11 +48,6 @@
 
     <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/rdmueller/generatedDays.html</loc>
-    	<lastmod>2021-12-10</lastmod>
-    </url>
-
-    <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/t-pi/generatedDays.html</loc>
     	<lastmod>2021-12-10</lastmod>
     </url>
 

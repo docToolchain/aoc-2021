@@ -265,6 +265,30 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_09_rust">Day 09: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_9_smoke_basin">Day 9: Smoke Basin</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_8">Problem Star 1</a></li>
+<li><a href="#_test_12">Test</a></li>
+<li><a href="#_problem_star_2_7">Problem Star 2</a></li>
+<li><a href="#_solution_15">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_10_rust">Day 10: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_10_syntax_scoring">Day 10: Syntax Scoring</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_9">Problem Star 1</a></li>
+<li><a href="#_testdata">Testdata</a></li>
+<li><a href="#_problem_star_2_8">Problem Star 2</a></li>
+<li><a href="#_solution_16">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1818,6 +1842,420 @@ What do you get if you add up all of the output values?</pre>
         }
         return num;
     }</code></pre>
+</div>
+</div>
+<a id="day09" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_rust"><a class="anchor" href="#_day_09_rust"></a><a class="link" href="#_day_09_rust">Day 09: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_9_smoke_basin"><a class="anchor" href="#_day_9_smoke_basin"></a><a class="link" href="#_day_9_smoke_basin">Day 9: Smoke Basin</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/9" class="bare">https://adventofcode.com/2021/day/9</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_8"><a class="anchor" href="#_problem_star_1_8"></a><a class="link" href="#_problem_star_1_8">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Your first goal is to find the low points - the locations that are lower than any of its adjacent locations. Most locations have four adjacent locations (up, down, left, and right);
+locations on the edge or corner of the map have three or two adjacent locations, respectively. (Diagonal locations do not count as adjacent.)</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test_12"><a class="anchor" href="#_test_12"></a><a class="link" href="#_test_12">Test</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "2199943210",
+            "3987894921",
+            "9856789892",
+            "8767896789",
+            "9899965678"
+        ];
+
+        let vec2 : Vec&lt;String&gt; = vec1.into_iter().map(|e| String::from(e)).collect();</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_8"><a class="anchor" href="#_testcase_8"></a><a class="link" href="#_testcase_8">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let heightmap = create_heightmap(&amp;vec2).unwrap();
+
+        assert_eq!(heightmap.cnt_risk_levels(), 15);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_7"><a class="anchor" href="#_problem_star_2_7"></a><a class="link" href="#_problem_star_2_7">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>What do you get if you multiply together the sizes of the three largest basins?</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_9"><a class="anchor" href="#_testcase_9"></a><a class="link" href="#_testcase_9">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         assert_eq!(heightmap.largest_basin_sizes(), 1134);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_15"><a class="anchor" href="#_solution_15"></a><a class="link" href="#_solution_15">Solution</a></h5>
+<div class="paragraph">
+<p>HeightMap</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">use array2d::Array2D;
+
+//Array2D based field
+pub struct HeightMap {
+    array : Array2D&lt;u32&gt;
+}
+
+impl HeightMap {
+    pub fn new(rows : Vec&lt;Vec&lt;u32&gt;&gt;) -&gt; HeightMap
+    {
+        HeightMap {
+            array : Array2D::from_rows(&amp;rows)
+        }
+    }
+
+    pub fn get(&amp;self,x : usize,y : usize) -&gt; u32
+    {
+        return *self.array.get(x,y).unwrap();
+    }
+
+    pub fn is_low_point(&amp;self,x : usize,y : usize) -&gt; bool {
+
+        let lx = self.array.column_len() - 1;
+        let ly = self.array.row_len() - 1;
+        let i = self.get(x,y);
+        if 0 &lt; x &amp;&amp; self.get(x-1,y) &lt;= i { return false }
+        if 0 &lt; y &amp;&amp; self.get(x,y-1) &lt;= i { return false }
+        if x &lt; lx &amp;&amp; self.get(x+1,y) &lt;= i { return false }
+        if y &lt; ly &amp;&amp; self.get(x,y+1) &lt;= i { return false }
+
+        return true
+    }
+
+    pub fn basin_size(&amp;self,visited : &amp;mut Array2D&lt;bool&gt; , x : usize,y : usize) -&gt; u32 {
+
+        let lastx = self.array.column_len() - 1;
+        let lasty = self.array.row_len() - 1;
+
+
+        if *visited.get(x,y).unwrap() { return 0; }
+        visited.set(x,y,true).ok();
+
+        let i = self.get(x,y);
+        if i == 9 { return 0; }
+
+        let mut size = 1;
+
+        if x &gt; 0  { size += self.basin_size(visited,x-1,y) }
+        if x &lt; lastx { size += self.basin_size(visited,x+1,y) }
+        if y &gt; 0 { size += self.basin_size(visited,x,y-1) }
+        if y &lt; lasty { size += self.basin_size(visited,x,y+1) }
+
+        return size;
+    }
+
+    pub fn lowest_points(&amp;self) -&gt; Vec&lt;(usize,usize)&gt; {
+        let mut points = Vec::new();
+
+        for y in 0..self.array.row_len() {
+            for x in 0..self.array.column_len() {
+                if self.is_low_point(x,y) {
+                    points.push((x,y));
+                }
+            }
+        }
+
+        return points;
+    }
+
+
+    pub fn cnt_risk_levels(&amp;self) -&gt; u32
+    {
+
+        let lp = self.lowest_points();
+
+        let mut sum = 0;
+        for (x,y) in lp {
+
+            let i = self.get(x,y);
+            sum += i + 1;
+        }
+        return sum;
+    }
+
+    pub fn largest_basin_sizes(&amp;self) -&gt; u32
+    {
+        let mut sizes : Vec&lt;u32&gt; = Vec::new();
+        let lp = self.lowest_points();
+        for (x,y) in lp {
+            let mut visited = Array2D::filled_with(false,self.array.column_len(),self.array.row_len());
+            sizes.push(self.basin_size(&amp;mut visited,x,y));
+        }
+
+        sizes.sort_by(|a, b| b.cmp(a));
+
+        return sizes[0] * sizes[1] * sizes[2]
+    }
+
+}</code></pre>
+</div>
+</div>
+<a id="day10" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_10_rust"><a class="anchor" href="#_day_10_rust"></a><a class="link" href="#_day_10_rust">Day 10: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_10_syntax_scoring"><a class="anchor" href="#_day_10_syntax_scoring"></a><a class="link" href="#_day_10_syntax_scoring">Day 10: Syntax Scoring</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/10" class="bare">https://adventofcode.com/2021/day/10</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_9"><a class="anchor" href="#_problem_star_1_9"></a><a class="link" href="#_problem_star_1_9">Problem Star 1</a></h5>
+<div class="paragraph">
+<p>Find all corrupt lines (ignore incomplete lines) and calculate error score.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>To calculate the syntax error score for a line, take the first illegal character on the line and look it up in the following table:
+
+): 3 points.
+]: 57 points.
+}: 1197 points.
+&gt;: 25137 points.</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_testdata"><a class="anchor" href="#_testdata"></a><a class="link" href="#_testdata">Testdata</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "[({(&lt;(())[]&gt;[[{[]{&lt;()&lt;&gt;&gt;",
+            "[(()[&lt;&gt;])]({[&lt;{&lt;&lt;[]&gt;&gt;(",
+            "{([(&lt;{}[&lt;&gt;[]}&gt;{[]{[(&lt;()&gt;",
+            "(((({&lt;&gt;}&lt;{&lt;{&lt;&gt;}{[]{[]{}",
+            "[[&lt;[([]))&lt;([[{}[[()]]]",
+            "[{[{({}]{}}([{[{{{}}([]",
+            "{&lt;[[]]&gt;}&lt;{[{[{[]{()[[[]",
+            "[&lt;(&lt;(&lt;(&lt;{}))&gt;&lt;([]([]()",
+            "&lt;{([([[(&lt;&gt;()){}]&gt;(&lt;&lt;{{",
+            "&lt;{([{{}}[&lt;[[[&lt;&gt;{}]]]&gt;[]]"
+        ];
+
+        let vec2 : Vec&lt;String&gt; = vec1.into_iter().map(|e| String::from(e)).collect();</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_10"><a class="anchor" href="#_testcase_10"></a><a class="link" href="#_testcase_10">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let err = validate(&amp;vec2).unwrap();
+        assert_eq!(err, 26397);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_8"><a class="anchor" href="#_problem_star_2_8"></a><a class="link" href="#_problem_star_2_8">Problem Star 2</a></h5>
+<div class="paragraph">
+<p>Find all incomplete lines (ignore corrupt lines) and calculate autocomplete score.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>The score is determined by considering the completion string character-by-character. Start with a total score of 0. Then, for each character, multiply the total score by 5 and then increase the total score by the point value given for the character in the following table:
+
+): 1 point.
+]: 2 points.
+}: 3 points.
+&gt;: 4 points.</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_11"><a class="anchor" href="#_testcase_11"></a><a class="link" href="#_testcase_11">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         let score = autocomplete(&amp;vec2).unwrap();
+         assert_eq!(score, 288957);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_16"><a class="anchor" href="#_solution_16"></a><a class="link" href="#_solution_16">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn index(str : &amp;str,z : char) -&gt; i32 {
+    match str.find(z) {
+        Some(a) =&gt; a as i32,
+        None =&gt; -1
+    }
+}
+
+pub fn checkline(line : &amp;String) -&gt; Option&lt;char&gt; {
+
+    let row: Vec&lt;char&gt; = line.chars().collect();
+
+    //validate
+    let mut stack: Vec&lt;char&gt; = Vec::new();
+
+    for c in row {
+
+
+        if index("[({&lt;",c) &gt;= 0 {
+            stack.push(c);
+        }
+
+        if index("])}&gt;",c) &gt;= 0 {
+            //try pop_back
+            let c2 = stack.remove(stack.len() - 1);
+
+            if index("[({&lt;",c2) != index("])}&gt;",c)
+            {
+                //println!("corrupt line: {} != {} in line {}",c2,c,line);
+                return Some(c);
+            }
+        }
+        //println!("Stack {:?}",stack);
+
+    }
+    if stack.len() != 0
+    {
+        //println!("incomplete line: {}",line);
+    }
+    return None;
+
+
+}
+
+pub fn checkline2(line : &amp;String) -&gt; Option&lt;Vec&lt;char&gt;&gt; {
+
+    let row: Vec&lt;char&gt; = line.chars().collect();
+
+    //validate
+    let mut stack: Vec&lt;char&gt; = Vec::new();
+
+    for c in row {
+
+
+        if index("[({&lt;",c) &gt;= 0 {
+            stack.push(c);
+        }
+
+        if index("])}&gt;",c) &gt;= 0 {
+            //try pop_back
+            let c2 = stack.remove(stack.len() - 1);
+
+            if index("[({&lt;",c2) != index("])}&gt;",c)
+            {
+                //println!("corrupt line: {} != {} in line {}",c2,c,line);
+                return None;
+            }
+        }
+        //println!("Stack {:?}",stack);
+
+    }
+    if stack.len() != 0
+    {
+        //println!("incomplete line: {}",line);
+        return Some(stack);
+
+    }
+    return None;
+
+
+}
+
+//tag::create_bingo_boards[]
+pub fn validate(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;u32&gt; {
+
+    let l = data.len();
+
+    let mut err = 0;
+    for i in 0..l {
+        let line = data.get(i).unwrap();
+        match checkline(line) {
+            Some(c) =&gt; {
+                err += match c {
+                    ')' =&gt; 3,
+                    ']' =&gt; 57,
+                    '}' =&gt; 1197,
+                    '&gt;' =&gt; 25137,
+                    _ =&gt; panic!(" unknown char {}",c)
+                }
+            },
+            None =&gt; {}
+        }
+    }
+
+    return Ok(err)
+}
+
+pub fn autocomplete(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;u64&gt; {
+
+    let l = data.len();
+
+    let mut scores = Vec::new();
+    for i in 0..l {
+        let line = data.get(i).unwrap();
+        match checkline2(line) {
+            Some(stack) =&gt; {
+                let mut score : u64 = 0;
+                for c in stack.iter().rev() {
+                    score *= 5;
+                    score += match c {
+                        '(' =&gt; 1,
+                        '[' =&gt; 2,
+                        '{' =&gt; 3,
+                        '&lt;' =&gt; 4,
+                        _ =&gt; panic!(" unknown char {}",c)
+                    }
+                }
+                scores.push(score);
+                //println!("Stack {:?} scores {} in line {}",stack,score,line)
+            },
+            None =&gt; {}
+        }
+    }
+
+    //return middle of scores
+    scores.sort();
+    let l = scores.len();
+    return Ok(*scores.get((l-1)/2).unwrap())
+}</code></pre>
 </div>
 </div>
 </div>
