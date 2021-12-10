@@ -1,0 +1,30 @@
+== Day 10: Syntax Scoring ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/10[AoC|2021|10].
+
+=== Part 1 ===
+
+Solution idea is to parse the characters one by one. If they are open delimiters, push the corresponding closing delimiter to a queue. If they are closing delimites, pop values from the queue and compare them to current character.
+
+If a comparison fails, an illegal character is found and its score is returned. Then the sum over the scores is taken.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+Same idea as for part 1. Now discard lines where comparisons fail. What remains in the queue once a line is processed are the characters required to repair the line. This time, I push/pop at the front, so that I can iterate over the remaining queue from first to last character.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
