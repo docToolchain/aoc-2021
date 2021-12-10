@@ -240,6 +240,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_10_go">Day 10: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_10_syntax_scoring">Day 10: Syntax Scoring</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_10">Oveview</a></li>
+<li><a href="#_how_to_run_10">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2517,6 +2527,171 @@ func (g *Grid) Basin(entry Vec, max int) (Grid, error) {
 <code>cat input.dat | go run .</code> to run the solution for part 2.
 You can run the solution for part 1 using <code>cat input.dat | PART=1 go run .</code> or
 in general by setting the environment variable <code>PART</code> to <code>1</code>.</p>
+</div>
+<a id="day10" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_10_go"><a class="anchor" href="#_day_10_go"></a><a class="link" href="#_day_10_go">Day 10: go</a></h3>
+<div class="sect3">
+<h4 id="_day_10_syntax_scoring"><a class="anchor" href="#_day_10_syntax_scoring"></a><a class="link" href="#_day_10_syntax_scoring">Day 10: Syntax Scoring</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the syntax scoring puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_10"><a class="anchor" href="#_oveview_10"></a><a class="link" href="#_oveview_10">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>stack.go</code>, which contains specifications of a FIFO.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">var openerCloser = map[string]string{
+	"(": ")",
+	"[": "]",
+	"{": "}",
+	"&lt;": "&gt;",
+}
+
+//nolint:gomnd
+var delimScorePart1 = map[string]int{
+	")": 3,
+	"]": 57,
+	"}": 1197,
+	"&gt;": 25137,
+}
+
+//nolint:gomnd
+const (
+	multScorePart2 = 5
+)
+
+//nolint:gomnd
+var delimScorePart2 = map[string]int{
+	")": 1,
+	"]": 2,
+	"}": 3,
+	"&gt;": 4,
+}
+
+// Check the syntax. Return whether the syntax was OK, the sequence of expected closing delimiters,
+// and the first offending character.
+func checkSyntax(line string) (bool, Stack, string) {
+	stack := Stack{}
+	for _, char := range strings.Split(line, "") {
+		if closer, isOpener := openerCloser[char]; isOpener {
+			// We found a new opener. Add the corresponding closer to the stack.
+			stack.Push(closer)
+		} else {
+			// We did not find an opener. Check whether the closer we found is the expected one.
+			expectedCloser, ok := stack.Pop()
+			if !ok {
+				// The stack was empty. An empty offender means the line had more closing delimiters
+				// than opening ones.
+				return false, stack, ""
+			}
+			if expectedCloser != char {
+				// We did not find the closer we expected. The current char is the offender.
+				return false, stack, char
+			}
+		}
+	}
+	return true, stack, ""
+}
+
+//nolint: funlen
+func main() {
+	lines, err := ReadLines()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	remainingLines := []string{}
+	// Part 1.
+	scorePart1 := 0
+	for _, line := range lines {
+		ok, _, offender := checkSyntax(line)
+		// The second condition means we currently only check corrupted lines but not such ones that
+		// are incomplete.
+		if !ok &amp;&amp; offender != "" {
+			newScore, found := delimScorePart1[offender]
+			if !found {
+				log.Fatalf("cannot find score for offender %s", offender)
+			}
+			scorePart1 += newScore
+		} else {
+			// Keep all lines that are not corrupted.
+			remainingLines = append(remainingLines, line)
+		}
+	}
+	fmt.Printf("Score is %d points.\n", scorePart1)
+	// Part 1.
+	scoresPart2 := []int{}
+	for _, line := range remainingLines {
+		lineScore := 0
+		ok, remainder, _ := checkSyntax(line)
+		if !ok {
+			// We wanted to filter out all corrupted lines already. Thus, finding one here is a bug.
+			log.Fatalf("found corrupted line '%s' but we have filtered them all", line)
+		}
+		// Iterate over all the remaining characters.
+		for char, nonEmpty := remainder.Pop(); nonEmpty; char, nonEmpty = remainder.Pop() {
+			lineScore *= multScorePart2
+			newScore, found := delimScorePart2[char]
+			if !found {
+				log.Fatalf("cannot find score for character %s", char)
+			}
+			lineScore += newScore
+		}
+		scoresPart2 = append(scoresPart2, lineScore)
+	}
+	// Pick the middle one.
+	sort.Ints(scoresPart2)
+	if len(scoresPart2)%2 != 1 {
+		log.Fatal("we were promised an odd number of scores but found an even one")
+	}
+	// Integer division FTW.
+	scorePart2 := scoresPart2[len(scoresPart2)/2]
+	fmt.Printf("Score is %d points.\n", scorePart2)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>stack.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Stack is a FIFO.
+type Stack []string
+
+// Push puts a value on the stack.
+func (s *Stack) Push(val string) {
+	*s = append(*s, val)
+}
+
+// Pop removes the topmost value and returns it. Also returns whether the stack was non-empty.
+func (s *Stack) Pop() (string, bool) {
+	if len(*s) == 0 {
+		return "", false
+	}
+	val := (*s)[len(*s)-1]
+	*s = (*s)[0 : len(*s)-1 : len(*s)-1]
+	return val, true
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_10"><a class="anchor" href="#_how_to_run_10"></a><a class="link" href="#_how_to_run_10">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
 </div>
 </div>
 </div>
