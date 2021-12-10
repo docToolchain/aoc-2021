@@ -1845,8 +1845,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;(Vec&lt;usize&gt;, Vec&lt;usize&gt;
                             // convert pattern to usize
                             pattern
                                 .chars()
-                                .map(|char| 1 &lt;&lt; (char as usize - 'a' as usize))
-                                .fold(0, |bits, bit| bits | bit)
+                                .fold(0, |bits, c| bits | 1 &lt;&lt; (c as usize - 'a' as usize))
                         })
                         .collect::&lt;Vec&lt;_&gt;&gt;() // patterns / outputs as usize
                 })
@@ -1931,31 +1930,25 @@ pub fn decode(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
     // 1 -&gt; _ _ c _ _ f _ -&gt; set bits match 0b0100100
     // 7 -&gt; a _ c _ _ f _ -&gt; set bits match 0b0100101
     // 4 -&gt; _ b c d _ f _ -&gt; set bits match 0b0101110
-    let pos_masks = HashMap::from([(2, 0b0100100), (3, 0b0100101), (4, 0b0101110)]);
     // 2 -&gt; a _ c d e _ g
     // 3 -&gt; a _ c d _ f g
     // 5 -&gt; a b _ d _ f g -&gt; unset bits match 0b0110110
     // 0 -&gt; a b c _ e f g
     // 6 -&gt; a b _ d e f g
     // 9 -&gt; a b c d _ f g -&gt; unset bits match 0b0011100
-    let neg_masks = HashMap::from([
-        (2, !0b0100100),
-        (3, !0b0100101),
-        (4, !0b0101110),
-        (5, 0b0110110),
-        (6, 0b0011100),
+    let masks = HashMap::from([
+        (2, (0b0100100, !0b0100100)),
+        (3, (0b0100101, !0b0100101)),
+        (4, (0b0101110, !0b0101110)),
+        (5, (0b1111111, 0b0110110)),
+        (6, (0b1111111, 0b0011100)),
     ]);
 
     // for each pattern, reduce map by impossible bits
     for pattern in patterns {
-        if let Some(p) = pos_masks.get(&amp;pattern.count_ones()) {
-            for wire in (0..7).filter(|wire| (pattern &gt;&gt; wire) &amp; 1 == 1) {
-                map[wire] &amp;= p;
-            }
-        }
-        if let Some(p) = neg_masks.get(&amp;pattern.count_ones()) {
-            for wire in (0..7).filter(|wire| (pattern &gt;&gt; wire) &amp; 1 == 0) {
-                map[wire] &amp;= p;
+        if let Some((p, n)) = masks.get(&amp;pattern.count_ones()) {
+            for wire in 0..7 {
+                map[wire] &amp;= if (pattern &gt;&gt; wire) &amp; 1 == 1 { p } else { n };
             }
         }
     }
@@ -1977,8 +1970,7 @@ pub fn decode(patterns: &amp;[usize], outputs: &amp;[usize]) -&gt; usize {
             // map wires to segments
             (0..7)
                 .filter(|wire| (output &gt;&gt; wire) &amp; 1 == 1)
-                .map(|wire| map[wire])
-                .fold(0, |digit, bit| digit | bit)
+                .fold(0, |digit, wire| digit | map[wire])
         })
         .fold(0, |result, digit| {
             // calculate output from digits
@@ -2312,36 +2304,24 @@ pub fn find_illegal_char(line: &amp;str) -&gt; Option&lt;usize&gt; {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' =&gt; {
-                queue.push_back(')');
+            '(' | '[' | '{' | '&lt;' =&gt; {
+                queue.push_back(match c {
+                    '(' =&gt; ')',
+                    '[' =&gt; ']',
+                    '{' =&gt; '}',
+                    '&lt;' =&gt; '&gt;',
+                    _ =&gt; unreachable!(),
+                });
             }
-            '[' =&gt; {
-                queue.push_back(']');
-            }
-            '{' =&gt; {
-                queue.push_back('}');
-            }
-            '&lt;' =&gt; {
-                queue.push_back('&gt;');
-            }
-            ')' =&gt; {
+            ')' | ']' | '}' | '&gt;' =&gt; {
                 if c != queue.pop_back().expect("Empty queue") {
-                    return Some(3);
-                }
-            }
-            ']' =&gt; {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(57);
-                }
-            }
-            '}' =&gt; {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(1197);
-                }
-            }
-            '&gt;' =&gt; {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return Some(25137);
+                    return match c {
+                        ')' =&gt; Some(3),
+                        ']' =&gt; Some(57),
+                        '}' =&gt; Some(1197),
+                        '&gt;' =&gt; Some(25137),
+                        _ =&gt; unreachable!(),
+                    };
                 }
             }
             _ =&gt; panic!("Illegal charachter '{}'", c),
@@ -2350,7 +2330,7 @@ pub fn find_illegal_char(line: &amp;str) -&gt; Option&lt;usize&gt; {
     None
 }
 
-/// Calculate some of scores of illegal chars
+/// Calculate sum of scores of illegal chars
 pub fn solution_1(lines: &amp;[String]) -&gt; usize {
     lines
         .iter()
@@ -2372,17 +2352,14 @@ pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' =&gt; {
-                queue.push_front(')');
-            }
-            '[' =&gt; {
-                queue.push_front(']');
-            }
-            '{' =&gt; {
-                queue.push_front('}');
-            }
-            '&lt;' =&gt; {
-                queue.push_front('&gt;');
+            '(' | '[' | '{' | '&lt;' =&gt; {
+                queue.push_front(match c {
+                    '(' =&gt; ')',
+                    '[' =&gt; ']',
+                    '{' =&gt; '}',
+                    '&lt;' =&gt; '&gt;',
+                    _ =&gt; unreachable!(),
+                });
             }
             ')' | '&gt;' | '}' | ']' =&gt; {
                 if c != queue.pop_front().expect("Empty queue") {
