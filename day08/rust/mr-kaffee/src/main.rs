@@ -1,14 +1,10 @@
 use mr_kaffee_2021_08::*;
-use std::{fs, time::Instant};
-
-fn read_input() -> String {
-    fs::read_to_string("input.txt").expect("Could not read 'input.txt'")
-}
+use std::time::Instant;
 
 fn main() {
     // solve part 1
     let instant_1 = Instant::now();
-    let data = parse(&read_input());
+    let data = parse(include_str!("../input.txt"));
     let sol_1 = solution_1(&data);
     println!("Solved part 1 in {:?}: {:?}", instant_1.elapsed(), sol_1);
     assert_eq!(397, sol_1);
