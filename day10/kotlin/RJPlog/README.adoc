@@ -1,0 +1,37 @@
+==  Day 10: Syntax Scoring  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/10
+
+For execution enter _kotlin day2110_1_2.kts_ in the command line.
+
+=== Today I learned
+The conditions for the if construction got longer and longer, which was not comfortable to edit and to read. So I started to try to solve it with lambda operations, since Peter already animated me some days ago to investigate in this. I guess the result is more readable, and it was also more easy to edit and check for typos.
+
+=== First Star
+
+How does it work: +
+
+Each line will be stripped iterative of legal pairs of chunks until no legal pair is found any more. Then the remaining string is checked, if a wrong closing is in, which means it is a corrupt line and will be part of result calculation or otherwise put in a list already for part 2 (added after revealing part2)
+[source, kotlin, numbered]
+....
+include::day2110_1_2.kts[tags=firstpart]
+....
+
+=== Second Star
+
+How does it work: +
+
+For each incomplete but correct line the total score algorithm is applied and the value put to a list. The middle value of the list is the result asked for.
+[source, kotlin, numbered]
+....
+include::day2110_1_2.kts[tags=secondpart]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2110_1_2.kts[tags=output]
+....
