@@ -1,0 +1,41 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-10: Syntax Scoring 
+https://adventofcode.com/2021/day/10
+
+=== Info
+
+Navigation Subsystem on the fritz: Find corrupt data
+
+* Star1 (*): Find closing brackets (of four kinds ([{<>}])) with no opening counterpart (corrupt lines) and calculate score
+
+* Star2 (**): Discard corrupt lines and calculate scores for _incomplete_ lines and take middle score of result list
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into list of strings.
+
+* Star1: Clean each line from completed pairs until line length stays constant. Then check for any remaining closing bracket and use that to calculate score
+
+* Star2: Use cleaned lines from Star1 and iterate from back to forth through chars to calculate score
+
+=== Learned today
+
+Simple counting of brackets was not enough for part1, I had to switch to actually considering opening and closing brackets. I'm glad that removing full pairs worked rather well - also for part2.
+
+But of course I fell once more for the "middle position" in a list, with the index starting with 0... 🙄
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
