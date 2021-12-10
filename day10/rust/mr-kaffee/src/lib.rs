@@ -12,27 +12,15 @@ pub fn find_illegal_char(line: &str) -> Option<usize> {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' | '[' | '{' | '<' => {
-                queue.push_back(match c {
-                    '(' => ')',
-                    '[' => ']',
-                    '{' => '}',
-                    '<' => '>',
-                    _ => unreachable!(),
-                });
-            }
-            ')' | ']' | '}' | '>' => {
-                if c != queue.pop_back().expect("Empty queue") {
-                    return match c {
-                        ')' => Some(3),
-                        ']' => Some(57),
-                        '}' => Some(1197),
-                        '>' => Some(25137),
-                        _ => unreachable!(),
-                    };
-                }
-            }
-            _ => panic!("Illegal charachter '{}'", c),
+            '(' => queue.push_back(')'),
+            '[' => queue.push_back(']'),
+            '{' => queue.push_back('}'),
+            '<' => queue.push_back('>'),
+            ')' if c != queue.pop_back().unwrap() => return Some(3),
+            ']' if c != queue.pop_back().unwrap() => return Some(57),
+            '}' if c != queue.pop_back().unwrap() => return Some(1_197),
+            '>' if c != queue.pop_back().unwrap() => return Some(25_137),
+            _ => {} // nothing here
         }
     }
     None
@@ -53,36 +41,25 @@ pub fn get_repair_score(line: &str) -> Option<usize> {
     let mut queue = VecDeque::new();
     for c in line.chars() {
         match c {
-            '(' | '[' | '{' | '<' => {
-                queue.push_front(match c {
-                    '(' => ')',
-                    '[' => ']',
-                    '{' => '}',
-                    '<' => '>',
-                    _ => unreachable!(),
-                });
-            }
-            ')' | '>' | '}' | ']' => {
-                if c != queue.pop_front().expect("Empty queue") {
-                    return None;
-                }
-            }
-            _ => panic!("Illegal charachter '{}'", c),
+            '(' => queue.push_front(')'),
+            '[' => queue.push_front(']'),
+            '{' => queue.push_front('}'),
+            '<' => queue.push_front('>'),
+            ')' | '>' | '}' | ']' if c != queue.pop_front().unwrap() => return None,
+            _ => {} // nothing here
         }
     }
 
-    Some(
-        queue
-            .iter()
-            .map(|c| match c {
+    Some(queue.iter().fold(0, |score, c| {
+        score * 5
+            + match c {
                 ')' => 1,
                 ']' => 2,
                 '}' => 3,
                 '>' => 4,
-                _ => panic!("Illegal charachter '{}'", c),
-            })
-            .fold(0, |score, v| score * 5 + v),
-    )
+                _ => unreachable!(),
+            }
+    }))
 }
 
 /// get the middle repair score
