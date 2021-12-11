@@ -1,0 +1,46 @@
+== Day 11: Dumbo Octopus ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/11[AoC|2021|11].
+
+=== Part 1 ===
+
+Parse the input into a flat list of integers
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+In each update step, first increment all energy levels and reset them to 0 if they exceed 9. All indices for reset entries (octopus flashed) are added to a stack.
+
+Then do a depth first traversal (breadth first would work just as well): 
+
+. pop elements off the stack while it is not empty
+. loop through all adjacents skipping adjecents which have already flashed (energy level already reset to 0)
+. increment adjacent's energy level
+. if energy level exceeds 9, reset and add index to stack
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+Perform update steps until all 100 octopuses flash at the same time. Could have re-used the updated grid from part 1, but the solution is fast enough to re-do the first 100 steps ;)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
+
+In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels in when they were popped from the queue. Thus entries could get modified while there indices were in the queue already and indices could be added multiple times. Took a while to sort that out.
