@@ -1,12 +1,12 @@
 // tag::parse[]
-pub fn parse(content: &str) -> Vec<String> {
-    content.lines().map(|s| s.to_string()).collect::<Vec<_>>()
+pub fn parse<'a>(content: &'a str) -> Vec<&'a str> {
+    content.lines().collect()
 }
 // end::parse[]
 
 // tag::part1[]
 /// return illegal char's score if any in as ``Some`` value, otherwise ``None``
-pub fn find_illegal_char(line: &str) -> Option<usize> {
+pub fn get_illegal_score(line: &str) -> Option<usize> {
     let mut stack = Vec::new();
     for c in line.chars() {
         match c {
@@ -25,10 +25,10 @@ pub fn find_illegal_char(line: &str) -> Option<usize> {
 }
 
 /// Calculate sum of scores of illegal chars
-pub fn solution_1(lines: &[String]) -> usize {
+pub fn solution_1(lines: &[&str]) -> usize {
     lines
         .iter()
-        .filter_map(|line| find_illegal_char(line))
+        .filter_map(|line| get_illegal_score(line))
         .sum()
 }
 // end::part1[]
@@ -61,7 +61,7 @@ pub fn get_repair_score(line: &str) -> Option<usize> {
 }
 
 /// get the middle repair score
-pub fn solution_2(lines: &[String]) -> usize {
+pub fn solution_2(lines: &[&str]) -> usize {
     let mut scores = lines
         .iter()
         .filter_map(|line| get_repair_score(line))
@@ -105,7 +105,7 @@ mod tests {
             ],
             lines
                 .iter()
-                .map(|line| find_illegal_char(line))
+                .map(|line| get_illegal_score(line))
                 .collect::<Vec<_>>()
         );
     }
