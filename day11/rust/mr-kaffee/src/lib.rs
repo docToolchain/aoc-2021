@@ -1,4 +1,4 @@
-pub const N: isize = 10;
+pub const N: usize = 10;
 pub const FLASH_THRESHOLD: usize = 9;
 
 // tag::parse[]
@@ -21,7 +21,7 @@ pub fn parse(content: &str) -> Vec<usize> {
 /// do an update step on the energy levels
 /// 
 /// return the count of flashes in that step
-pub fn step(energies: &mut [usize]) -> isize {
+pub fn step(energies: &mut [usize]) -> usize {
     // flashing stack
     let mut stack = Vec::new();
 
@@ -31,7 +31,7 @@ pub fn step(energies: &mut [usize]) -> isize {
         if energies[k] > FLASH_THRESHOLD {
             // flashed -> reset, add index to stack
             energies[k] = 0;
-            stack.push(((k as isize) % N, (k as isize) / N));
+            stack.push((k % N, k / N));
         }
     }
 
@@ -45,13 +45,13 @@ pub fn step(energies: &mut [usize]) -> isize {
             (x + 1, y),
             (x + 1, y + 1),
             (x, y + 1),
-            (x - 1, y + 1),
-            (x - 1, y),
-            (x - 1, y - 1),
-            (x, y - 1),
-            (x + 1, y - 1),
+            (x.wrapping_sub(1), y + 1),
+            (x.wrapping_sub(1), y),
+            (x.wrapping_sub(1), y.wrapping_sub(1)),
+            (x, y.wrapping_sub(1)),
+            (x + 1, y.wrapping_sub(1)),
         ] {
-            if x_a < 0 || x_a >= N || y_a < 0 || y_a >= N {
+            if x_a >= N || y_a >= N {
                 // out of bounds
                 continue;
             }
@@ -79,7 +79,7 @@ pub fn step(energies: &mut [usize]) -> isize {
 pub const ROUNDS: usize = 100;
 
 /// perform [ROUNDS] update steps and return total count of flashes
-pub fn solution_1(energies: &[usize]) -> isize {
+pub fn solution_1(energies: &[usize]) -> usize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
     (0..ROUNDS).map(|_| step(&mut energies)).sum()
@@ -90,7 +90,7 @@ pub fn solution_1(energies: &[usize]) -> isize {
 /// perform update steps until all octopuses flash at the same time
 /// 
 /// return the first step when this occurs.
-pub fn solution_2(energies: &[usize]) -> isize {
+pub fn solution_2(energies: &[usize]) -> usize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
     let mut rounds = 1; // one based counting
