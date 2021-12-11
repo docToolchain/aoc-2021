@@ -270,6 +270,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_11_python">Day 11: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_11_dumbo_octopus">AoC21-11: Dumbo Octopus</a>
+<ul class="sectlevel4">
+<li><a href="#_info_11">Info</a></li>
+<li><a href="#_howto_11">HowTo</a></li>
+<li><a href="#_learned_today_11">Learned today</a></li>
+<li><a href="#_source_11">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1539,6 +1551,130 @@ def main():
         scores.append(count_brackets(line))
     scores.sort()
     star2 = scores[round(len(scores)/2)-1]
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_python"><a class="anchor" href="#_day_11_python"></a><a class="link" href="#_day_11_python">Day 11: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_11_dumbo_octopus"><a class="anchor" href="#_aoc21_11_dumbo_octopus"></a><a class="link" href="#_aoc21_11_dumbo_octopus">AoC21-11: Dumbo Octopus</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/11" class="bare">https://adventofcode.com/2021/day/11</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_11"><a class="anchor" href="#_info_11"></a><a class="link" href="#_info_11">Info</a></h5>
+<div class="paragraph">
+<p>Christmas lights had to be switched off for bioluminescently flashing dumbo octopus'. Navigate by the flashing from the squids.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1 (*): Squids gain 1 energy per step, flash at energy level &gt;9 and also charge adjacent 8 squids, which might then also flash in single step. Calculate number of flashes in 100 steps.</p>
+</li>
+<li>
+<p>Star2 (**): Iterate squid game further until all squids flash together first time in a single step.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_11"><a class="anchor" href="#_howto_11"></a><a class="link" href="#_howto_11">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and prepocessed into list of ints.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Iterate single step. Small array, no need for recursion. Spread flash to adjacents and mark flashed as 0. Important: Stick to 0 level after flashing.</p>
+</li>
+<li>
+<p>Star2: Continue iterations until first time flash count equals all squids.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_11"><a class="anchor" href="#_learned_today_11"></a><a class="link" href="#_learned_today_11">Learned today</a></h5>
+<div class="paragraph">
+<p>Straightforward. Some hiccups like count step as 195 or 196, but all manageable with the test input :)</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_11"><a class="anchor" href="#_source_11"></a><a class="link" href="#_source_11">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see description.adoc
+
+import io
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+        return_list = [[int(digit) for digit in line] for line in local_list]
+        return return_list
+
+
+def do_single_step(energy_levels):
+    ''' Iterate energy levels through single step
+        Return new energy_levels, number of flashes (energy levels &gt;9), bool if flash count equals all squids
+    '''
+    flashes = 0
+    depth = len(energy_levels)
+    width = len(energy_levels[0])
+    energy_levels = [[energy+1 for energy in line] for line in energy_levels]
+    old_flashes = -1
+    while (flashes &gt; old_flashes):
+        old_flashes = flashes
+        for x in range(depth):
+            for y in range(width):
+                if (energy_levels[x][y]&gt;9):
+                    flashes +=1
+                    energy_levels[x][y] = 0
+                    adjacents = [(x-1,y+1),(x,y+1),(x+1,y+1),(x-1,y),(x+1,y),(x-1,y-1),(x,y-1),(x+1,y-1)]
+                    for adj in adjacents:
+                        if ((0 &lt;= adj[0] &lt; depth) and (0 &lt;= adj[1] &lt; width)):
+                            if (energy_levels[adj[0]][adj[1]] != 0):
+                                energy_levels[adj[0]][adj[1]] += 1
+    return energy_levels, flashes, flashes == depth*width
+
+
+def main():
+    daily_list = read_daily_input('input11.txt')
+    sum_flashes = 0
+    star2 = 0
+    for i in range(100):
+        daily_list, flash_count, is_sync = do_single_step(daily_list)
+        sum_flashes += flash_count
+        if (is_sync and (star2 == 0)):
+            star2 = i+1
+    star1 = sum_flashes
+    print(f"Result (*): {star1}")
+    if (star2 == 0):
+        i = 100
+        is_sync = False
+        while not is_sync:
+            daily_list, flash_count, is_sync = do_single_step(daily_list)
+            i += 1
+        star2 = i
     print(f"Result (**): {star2}")
 
 
