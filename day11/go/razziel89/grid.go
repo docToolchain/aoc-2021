@@ -148,10 +148,13 @@ func (g *Grid) MarkAll(val int) error {
 // EnvFn is a function type used to determine a point's environment.
 type EnvFn = func(point Vec) <-chan Vec
 
-// MarkEnv marks all points by the specified value in the environment of a given point. The
-// environment is defined bu envFn.
-func (g *Grid) MarkEnv(val int, point Vec, envFn EnvFn) error {
+// MarkExistingEnv marks all points by the specified value in the environment of a given point. The
+// environment is defined by envFn. Only points that actually exist will be marked.
+func (g *Grid) MarkExistingEnv(val int, point Vec, envFn EnvFn) error {
 	for neigh := range envFn(point) {
+		if !g.Has(neigh) {
+			continue
+		}
 		if err := g.Mark(neigh, val); err != nil {
 			return err
 		}
