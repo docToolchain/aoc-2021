@@ -1,37 +1,36 @@
+pub const N: isize = 10;
+pub const FLASH_ENERGY: usize = 10;
+
 // tag::parse[]
 /// parse energy levels
 ///
 /// # Panics
-/// if number of energy levels is not 10 x 10 = 100
+/// if number of energy levels parsed is not [N]^2
 pub fn parse(content: &str) -> Vec<usize> {
     let energies = content
         .chars()
-        .filter(|c| c.is_ascii_digit())
+        .filter(char::is_ascii_digit)
         .map(|c| c as usize - '0' as usize)
         .collect::<Vec<_>>();
-    assert_eq!(
-        100,
-        energies.len(),
-        "Bad length: expected 100, found {}",
-        energies.len()
-    );
+    assert_eq!((N * N) as usize, energies.len(), "Bad length");
     energies
 }
 // end::parse[]
 
 // tag::part1[]
 /// do an update step on the energy levels
+/// 
 /// return the count of flashes in that step
-pub fn step(energies: &mut [usize]) -> usize {
+pub fn step(energies: &mut [usize]) -> isize {
     // flashing stack
     let mut stack = Vec::new();
 
     // increase all elements by one
     for k in 0..energies.len() {
-        energies[k] = (energies[k] + 1) % 10;
+        energies[k] = (energies[k] + 1) % FLASH_ENERGY;
         if energies[k] == 0 {
             // flashed -> add to stack
-            stack.push(((k % 10) as isize, (k / 10) as isize));
+            stack.push(((k as isize) % N, (k as isize) / N));
         }
     }
 
@@ -51,20 +50,20 @@ pub fn step(energies: &mut [usize]) -> usize {
             (x, y - 1),
             (x + 1, y - 1),
         ] {
-            if x_a < 0 || x_a >= 10 || y_a < 0 || y_a >= 10 {
+            if x_a < 0 || x_a >= N || y_a < 0 || y_a >= N {
                 // out of bounds
                 continue;
             }
 
             // flat index
-            let k_a = (x_a + 10 * y_a) as usize;
+            let k_a = (x_a + N * y_a) as usize;
             if energies[k_a] == 0 {
                 // already flashed
                 continue;
             }
 
             // not flashed yet, increment
-            energies[k_a] = (energies[k_a] + 1) % 10;
+            energies[k_a] = (energies[k_a] + 1) % FLASH_ENERGY;
             if energies[k_a] == 0 {
                 // flashed -> add to stack
                 stack.push((x_a, y_a));
@@ -75,22 +74,25 @@ pub fn step(energies: &mut [usize]) -> usize {
     flash_count
 }
 
-/// perform 100 update steps and return total count of flashes
-pub fn solution_1(energies: &[usize]) -> usize {
+pub const ROUNDS: usize = 100;
+
+/// perform [ROUNDS] update steps and return total count of flashes
+pub fn solution_1(energies: &[usize]) -> isize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
-    (0..100).map(|_| step(&mut energies)).sum()
+    (0..ROUNDS).map(|_| step(&mut energies)).sum()
 }
 // end::part1[]
 
 // tag::part2[]
 /// perform update steps until all octopuses flash at the same time
+/// 
 /// return the first step when this occurs.
-pub fn solution_2(energies: &[usize]) -> usize {
+pub fn solution_2(energies: &[usize]) -> isize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
     let mut rounds = 1; // one based counting
-    while step(&mut energies) < 100 {
+    while step(&mut energies) < N * N {
         rounds += 1;
     }
     rounds
@@ -165,23 +167,23 @@ mod tests {
         let energies_2 = parse(CONTENT_2);
         let energies_10 = parse(CONTENT_10);
 
-        let mut cnt = 0;
+        let mut flash_count = 0;
 
         // one step
-        cnt += step(&mut energies);
-        assert_eq!(0, cnt);
+        flash_count += step(&mut energies);
+        assert_eq!(0, flash_count);
         assert_eq!(energies_1, energies);
 
         // another step
-        cnt += step(&mut energies);
-        assert_eq!(35, cnt);
+        flash_count += step(&mut energies);
+        assert_eq!(35, flash_count);
         assert_eq!(energies_2, energies);
 
         // 8 more steps
         for _ in 2..10 {
-            cnt += step(&mut energies);
+            flash_count += step(&mut energies);
         }
-        assert_eq!(204, cnt);
+        assert_eq!(204, flash_count);
         assert_eq!(energies_10, energies);
     }
 
