@@ -493,7 +493,6 @@ mod tests {
 pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
     content
         .lines()
-        .into_iter()
         .map(|line| line.parse().expect("Could not parse line"))
         .collect()
 }</code></pre>
@@ -818,11 +817,7 @@ pub fn calc_position_with_aim(input: &amp;str) -&gt; (isize, isize, isize) {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse input into integers
 /// return bit-length of values in addition
 pub fn parse(input: &amp;str) -&gt; (Vec&lt;usize&gt;, usize) {
-    let len = input
-        .lines()
-        .map(|line| line.len())
-        .next()
-        .expect("No lines");
+    let len = input.lines().next().expect("No lines").len();
     let values = input
         .lines()
         .map(|line| usize::from_str_radix(line, 2).expect("Could not parse line"))
@@ -1036,7 +1031,7 @@ impl Board {
     /// dimension of the boad
     pub const N: usize = 5;
 
-    /// crate new board from data vector
+    /// create new board from data vector
     pub fn new(data: Vec&lt;usize&gt;) -&gt; Self {
         if data.len() != Self::N * Self::N {
             panic!("Illegal data length: {}", data.len());
@@ -2304,7 +2299,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_part_1_8"><a class="anchor" href="#_part_1_8"></a><a class="link" href="#_part_1_8">Part 1</a></h5>
 <div class="paragraph">
-<p>Solution idea is to parse the characters one by one. If they are open delimiters, push the corresponding closing delimiter to a queue. If they are closing delimites, pop values from the queue and compare them to current character.</p>
+<p>Solution idea is to parse the characters one by one. If they are open delimiters, push the corresponding closing delimiter to a stack. If they are closing delimites, pop values from the stack and compare them to the current character.</p>
 </div>
 <div class="paragraph">
 <p>If a comparison fails, an illegal character is found and its score is returned. Then the sum over the scores is taken.</p>
@@ -2312,18 +2307,18 @@ mod tests {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// return illegal char's score if any in as ``Some`` value, otherwise ``None``
-pub fn find_illegal_char(line: &amp;str) -&gt; Option&lt;usize&gt; {
-    let mut queue = VecDeque::new();
+pub fn get_illegal_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' =&gt; queue.push_back(')'),
-            '[' =&gt; queue.push_back(']'),
-            '{' =&gt; queue.push_back('}'),
-            '&lt;' =&gt; queue.push_back('&gt;'),
-            ')' if c != queue.pop_back().unwrap() =&gt; return Some(3),
-            ']' if c != queue.pop_back().unwrap() =&gt; return Some(57),
-            '}' if c != queue.pop_back().unwrap() =&gt; return Some(1_197),
-            '&gt;' if c != queue.pop_back().unwrap() =&gt; return Some(25_137),
+            '(' =&gt; stack.push(')'),
+            '[' =&gt; stack.push(']'),
+            '{' =&gt; stack.push('}'),
+            '&lt;' =&gt; stack.push('&gt;'),
+            ')' if c != stack.pop().unwrap() =&gt; return Some(3),
+            ']' if c != stack.pop().unwrap() =&gt; return Some(57),
+            '}' if c != stack.pop().unwrap() =&gt; return Some(1_197),
+            '&gt;' if c != stack.pop().unwrap() =&gt; return Some(25_137),
             _ =&gt; {} // nothing here
         }
     }
@@ -2331,10 +2326,10 @@ pub fn find_illegal_char(line: &amp;str) -&gt; Option&lt;usize&gt; {
 }
 
 /// Calculate sum of scores of illegal chars
-pub fn solution_1(lines: &amp;[String]) -&gt; usize {
+pub fn solution_1(lines: &amp;[&amp;str]) -&gt; usize {
     lines
         .iter()
-        .filter_map(|line| find_illegal_char(line))
+        .filter_map(|line| get_illegal_score(line))
         .sum()
 }</code></pre>
 </div>
@@ -2343,25 +2338,25 @@ pub fn solution_1(lines: &amp;[String]) -&gt; usize {
 <div class="sect4">
 <h5 id="_part_2_8"><a class="anchor" href="#_part_2_8"></a><a class="link" href="#_part_2_8">Part 2</a></h5>
 <div class="paragraph">
-<p>Same idea as for part 1. Now discard lines where comparisons fail. What remains in the queue once a line is processed are the characters required to repair the line. This time, I push/pop at the front, so that I can iterate over the remaining queue from first to last character.</p>
+<p>Same idea as for part 1. Now discard lines where comparisons fail. What remains in the stack once a line is processed are the characters required to repair the line.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// get the repair score if the line is incomplete as a ``Some`` value, otherwise return ``None``
 pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
-    let mut queue = VecDeque::new();
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' =&gt; queue.push_front(')'),
-            '[' =&gt; queue.push_front(']'),
-            '{' =&gt; queue.push_front('}'),
-            '&lt;' =&gt; queue.push_front('&gt;'),
-            ')' | '&gt;' | '}' | ']' if c != queue.pop_front().unwrap() =&gt; return None,
+            '(' =&gt; stack.push(')'),
+            '[' =&gt; stack.push(']'),
+            '{' =&gt; stack.push('}'),
+            '&lt;' =&gt; stack.push('&gt;'),
+            ')' | '&gt;' | '}' | ']' if c != stack.pop().unwrap() =&gt; return None,
             _ =&gt; {} // nothing here
         }
     }
 
-    Some(queue.iter().fold(0, |score, c| {
+    Some(stack.iter().rev().fold(0, |score, c| {
         score * 5
             + match c {
                 ')' =&gt; 1,
@@ -2374,12 +2369,12 @@ pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
 }
 
 /// get the middle repair score
-pub fn solution_2(lines: &amp;[String]) -&gt; usize {
+pub fn solution_2(lines: &amp;[&amp;str]) -&gt; usize {
     let mut scores = lines
         .iter()
         .filter_map(|line| get_repair_score(line))
         .collect::&lt;Vec&lt;_&gt;&gt;();
-    scores.sort();
+    scores.sort_unstable();
     scores[scores.len() / 2]
 }</code></pre>
 </div>
@@ -2422,7 +2417,7 @@ mod tests {
             ],
             lines
                 .iter()
-                .map(|line| find_illegal_char(line))
+                .map(|line| get_illegal_score(line))
                 .collect::&lt;Vec&lt;_&gt;&gt;()
         );
     }
@@ -2485,19 +2480,14 @@ mod tests {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse energy levels
 ///
 /// # Panics
-/// if number of energy levels is not 10 x 10 = 100
+/// if number of energy levels parsed is not [N]^2
 pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
     let energies = content
         .chars()
-        .filter(|c| c.is_ascii_digit())
+        .filter(char::is_ascii_digit)
         .map(|c| c as usize - '0' as usize)
         .collect::&lt;Vec&lt;_&gt;&gt;();
-    assert_eq!(
-        100,
-        energies.len(),
-        "Bad length: expected 100, found {}",
-        energies.len()
-    );
+    assert_eq!((N * N) as usize, energies.len(), "Bad length");
     energies
 }</code></pre>
 </div>
@@ -2527,6 +2517,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// do an update step on the energy levels
+///
 /// return the count of flashes in that step
 pub fn step(energies: &amp;mut [usize]) -&gt; usize {
     // flashing stack
@@ -2534,10 +2525,11 @@ pub fn step(energies: &amp;mut [usize]) -&gt; usize {
 
     // increase all elements by one
     for k in 0..energies.len() {
-        energies[k] = (energies[k] + 1) % 10;
-        if energies[k] == 0 {
-            // flashed -&gt; add to stack
-            stack.push(((k % 10) as isize, (k / 10) as isize));
+        energies[k] = energies[k] + 1;
+        if energies[k] &gt; FLASH_THRESHOLD {
+            // flashed -&gt; reset, add index to stack
+            energies[k] = 0;
+            stack.push((k % N, k / N));
         }
     }
 
@@ -2551,28 +2543,29 @@ pub fn step(energies: &amp;mut [usize]) -&gt; usize {
             (x + 1, y),
             (x + 1, y + 1),
             (x, y + 1),
-            (x - 1, y + 1),
-            (x - 1, y),
-            (x - 1, y - 1),
-            (x, y - 1),
-            (x + 1, y - 1),
+            (x.wrapping_sub(1), y + 1),
+            (x.wrapping_sub(1), y),
+            (x.wrapping_sub(1), y.wrapping_sub(1)),
+            (x, y.wrapping_sub(1)),
+            (x + 1, y.wrapping_sub(1)),
         ] {
-            if x_a &lt; 0 || x_a &gt;= 10 || y_a &lt; 0 || y_a &gt;= 10 {
+            if x_a &gt;= N || y_a &gt;= N {
                 // out of bounds
                 continue;
             }
 
             // flat index
-            let k_a = (x_a + 10 * y_a) as usize;
+            let k_a = (x_a + N * y_a) as usize;
             if energies[k_a] == 0 {
                 // already flashed
                 continue;
             }
 
             // not flashed yet, increment
-            energies[k_a] = (energies[k_a] + 1) % 10;
-            if energies[k_a] == 0 {
-                // flashed -&gt; add to stack
+            energies[k_a] = energies[k_a] + 1;
+            if energies[k_a] &gt; FLASH_THRESHOLD {
+                // flashed -&gt; reset, add index to stack
+                energies[k_a] = 0;
                 stack.push((x_a, y_a));
             }
         }
@@ -2581,11 +2574,13 @@ pub fn step(energies: &amp;mut [usize]) -&gt; usize {
     flash_count
 }
 
-/// perform 100 update steps and return total count of flashes
+pub const ROUNDS: usize = 100;
+
+/// perform [ROUNDS] update steps and return total count of flashes
 pub fn solution_1(energies: &amp;[usize]) -&gt; usize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
-    (0..100).map(|_| step(&amp;mut energies)).sum()
+    (0..ROUNDS).map(|_| step(&amp;mut energies)).sum()
 }</code></pre>
 </div>
 </div>
@@ -2598,12 +2593,13 @@ pub fn solution_1(energies: &amp;[usize]) -&gt; usize {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform update steps until all octopuses flash at the same time
+///
 /// return the first step when this occurs.
 pub fn solution_2(energies: &amp;[usize]) -&gt; usize {
     // work on my own copy of the grid
     let mut energies = energies.to_owned();
     let mut rounds = 1; // one based counting
-    while step(&amp;mut energies) &lt; 100 {
+    while step(&amp;mut energies) &lt; N * N {
         rounds += 1;
     }
     rounds
@@ -2682,23 +2678,23 @@ mod tests {
         let energies_2 = parse(CONTENT_2);
         let energies_10 = parse(CONTENT_10);
 
-        let mut cnt = 0;
+        let mut flash_count = 0;
 
         // one step
-        cnt += step(&amp;mut energies);
-        assert_eq!(0, cnt);
+        flash_count += step(&amp;mut energies);
+        assert_eq!(0, flash_count);
         assert_eq!(energies_1, energies);
 
         // another step
-        cnt += step(&amp;mut energies);
-        assert_eq!(35, cnt);
+        flash_count += step(&amp;mut energies);
+        assert_eq!(35, flash_count);
         assert_eq!(energies_2, energies);
 
         // 8 more steps
         for _ in 2..10 {
-            cnt += step(&amp;mut energies);
+            flash_count += step(&amp;mut energies);
         }
-        assert_eq!(204, cnt);
+        assert_eq!(204, flash_count);
         assert_eq!(energies_10, energies);
     }
 
@@ -2718,7 +2714,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_today_i_learned_6"><a class="anchor" href="#_today_i_learned_6"></a><a class="link" href="#_today_i_learned_6">Today I learned</a></h5>
 <div class="paragraph">
-<p>In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels in when they were popped from the queue. Thus entries could get modified while there indices were in the queue already and indices could be added multiple times. Took a while to sort that out.</p>
+<p>In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels when they were popped from the queue. Thus entries could get modified while their indices were in the queue, and indices could be added multiple times. Took a while to sort that out.</p>
 </div>
 </div>
 </div>
