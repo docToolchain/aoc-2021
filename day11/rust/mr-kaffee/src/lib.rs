@@ -12,14 +12,14 @@ pub fn parse(content: &str) -> Vec<usize> {
         .filter(char::is_ascii_digit)
         .map(|c| c as usize - '0' as usize)
         .collect::<Vec<_>>();
-    assert_eq!((N * N) as usize, energies.len(), "Bad length");
+    assert_eq!(N * N, energies.len(), "Bad length");
     energies
 }
 // end::parse[]
 
 // tag::part1[]
 /// do an update step on the energy levels
-/// 
+///
 /// return the count of flashes in that step
 pub fn step(energies: &mut [usize]) -> usize {
     // flashing stack
@@ -27,7 +27,7 @@ pub fn step(energies: &mut [usize]) -> usize {
 
     // increase all elements by one
     for k in 0..energies.len() {
-        energies[k] = energies[k] + 1;
+        energies[k] += 1;
         if energies[k] > FLASH_THRESHOLD {
             // flashed -> reset, add index to stack
             energies[k] = 0;
@@ -57,17 +57,16 @@ pub fn step(energies: &mut [usize]) -> usize {
             }
 
             // flat index
-            let k_a = (x_a + N * y_a) as usize;
-            if energies[k_a] == 0 {
+            if energies[x_a + N * y_a] == 0 {
                 // already flashed
                 continue;
             }
 
             // not flashed yet, increment
-            energies[k_a] = energies[k_a] + 1;
-            if energies[k_a] > FLASH_THRESHOLD {
+            energies[x_a + N * y_a] += 1;
+            if energies[x_a + N * y_a] > FLASH_THRESHOLD {
                 // flashed -> reset, add index to stack
-                energies[k_a] = 0;
+                energies[x_a + N * y_a] = 0;
                 stack.push((x_a, y_a));
             }
         }
@@ -88,7 +87,7 @@ pub fn solution_1(energies: &[usize]) -> usize {
 
 // tag::part2[]
 /// perform update steps until all octopuses flash at the same time
-/// 
+///
 /// return the first step when this occurs.
 pub fn solution_2(energies: &[usize]) -> usize {
     // work on my own copy of the grid
