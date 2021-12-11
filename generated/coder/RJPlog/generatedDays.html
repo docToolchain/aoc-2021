@@ -252,6 +252,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_11_kotlin">Day 11: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_11">First Star</a></li>
+<li><a href="#_second_star_11">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1584,6 +1594,169 @@
 	println("*********************************")
 	println("Solution for part2")
 	println("   $solution2 is the middle score")
+	println()
+// end::output[]
+//}</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_kotlin"><a class="anchor" href="#_day_11_kotlin"></a><a class="link" href="#_day_11_kotlin">Day 11: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_11_dumbo_octopus"><a class="anchor" href="#_day_11_dumbo_octopus"></a><a class="link" href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/11" class="bare">https://adventofcode.com/2021/day/11</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2111_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_11"><a class="anchor" href="#_first_star_11"></a><a class="link" href="#_first_star_11">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>The puzzle input will be read into a array as integers. Then the rules are applied.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>First: Increase each octopus by one. To show that a octopus is ready to flash (&gt;9), I choosed to just set it to 100, at this time I already started counting.</p>
+</li>
+<li>
+<p>Second: Iterative go through all of the tiles and if it is an octopus readiy to flash, increase all adjacent tiles</p>
+</li>
+<li>
+<p>Third: Set all flashed tiles to zero.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After 100 rounds the flash counter will be reported.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var solution1: Int = 0
+	var solution2: Int = 0
+	var dumboField = Array(10) { Array(10) { 0 } }
+	var countFlash: Int = 0
+	var greaterNine: Boolean
+	var n: Int = 1
+	var stepPartTwo: Int
+	var allDumboFlash = false
+
+	// read puzzle input in array
+	var j: Int = 0
+	File("day2111_puzzle_input.txt").forEachLine {
+		for (i in 0..it.length - 1) {
+			dumboField[i][j] = it[i].toString().toInt()
+		}
+		j += 1
+	}
+
+	// run for at least 100 steps or until all dumbo's flash at same time
+	while (!allDumboFlash || n &lt; 101) {
+		greaterNine = false
+
+		// first step: increase every tile by 1
+		for (y in 0..9) {
+			for (x in 0..9) {
+				dumboField[x][y] = dumboField[x][y] + 1
+				if (dumboField[x][y] &gt; 9) {
+					greaterNine = true
+				}
+			}
+		}
+
+		// second step: if tile &gt; 9, flash and increase energy level of nighbours until no tile &gt; 9
+		while (greaterNine) {  // loop while grid.contains 9
+			greaterNine = false
+
+			// go through field and search &gt; nine
+			for (y in 0..9) {
+				for (x in 0..9) {
+					if (dumboField[x][y] &gt; 9 &amp;&amp; dumboField[x][y] &lt; 100) {
+						// set field to burst (= 100), increase burstcount solution1 +=
+						dumboField[x][y] = 100
+						// count number of bursts
+						countFlash += 1
+						// now increase adjacent tiles
+						for (dy in -1..1) {
+							for (dx in -1..1) {
+								if (!(dx == 0 &amp;&amp; dy == 0)) {
+									// if in grid increase adjacent tiles
+									if ((y + dy) &gt;= 0 &amp;&amp; (y + dy) &lt;= 9 &amp;&amp; (x + dx) &gt;= 0 &amp;&amp; (x + dx) &lt;= 9) {
+										if (dumboField[x + dx][y + dy] &lt; 100) {
+											dumboField[x + dx][y + dy] = dumboField[x + dx][y + dy] + 1
+										}
+										if (dumboField[x + dx][y + dy] &gt; 9) {
+											greaterNine = true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}    // loop greaterNine end
+
+		// 100 turns --&gt; solution for part1
+		if (n == 100) {
+			solution1 = countFlash
+		}
+
+		// third step: set all tiles flashed in current turn to zero
+		stepPartTwo = 0
+		for (y in 0..9) {
+			for (x in 0..9) {
+				if (dumboField[x][y] == 100) {
+					dumboField[x][y] = 0
+					stepPartTwo += 1
+
+					// check if all dumbos flashed at same time --&gt; solution for part2
+					if (stepPartTwo == 100) {
+						solution2 = n
+						allDumboFlash = true
+					}
+				}
+			}
+		}
+		n += 1
+	}  // end loop allDumboFlash</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_11"><a class="anchor" href="#_second_star_11"></a><a class="link" href="#_second_star_11">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>This is integrated in the solution for part one, when applying the third rule, setting all flashed tiles to zero, also a counter is implemented. If the counter is 100, then the solution for part 2 is reached.</p>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("*****************************")
+	println("--- Day 11: Dumbo Octopus ---")
+	println("*****************************")
+	println("Solution for part1")
+	println("   $solution1 total flashes are there after 100 steps")
+	println()
+// print solution for part 2
+	println("*********************************")
+	println("Solution for part2")
+	println("   $solution2 is the first step during which all octopuses flash")
 	println()
 // end::output[]
 //}</code></pre>
