@@ -1,5 +1,5 @@
 pub const N: isize = 10;
-pub const FLASH_ENERGY: usize = 10;
+pub const FLASH_THRESHOLD: usize = 9;
 
 // tag::parse[]
 /// parse energy levels
@@ -27,9 +27,10 @@ pub fn step(energies: &mut [usize]) -> isize {
 
     // increase all elements by one
     for k in 0..energies.len() {
-        energies[k] = (energies[k] + 1) % FLASH_ENERGY;
-        if energies[k] == 0 {
-            // flashed -> add to stack
+        energies[k] = energies[k] + 1;
+        if energies[k] > FLASH_THRESHOLD {
+            // flashed -> reset, add index to stack
+            energies[k] = 0;
             stack.push(((k as isize) % N, (k as isize) / N));
         }
     }
@@ -63,9 +64,10 @@ pub fn step(energies: &mut [usize]) -> isize {
             }
 
             // not flashed yet, increment
-            energies[k_a] = (energies[k_a] + 1) % FLASH_ENERGY;
-            if energies[k_a] == 0 {
-                // flashed -> add to stack
+            energies[k_a] = energies[k_a] + 1;
+            if energies[k_a] > FLASH_THRESHOLD {
+                // flashed -> reset, add index to stack
+                energies[k_a] = 0;
                 stack.push((x_a, y_a));
             }
         }
