@@ -1,0 +1,27 @@
+== Day 10: Syntax Scoring ==
+
+This is my implementation for both rounds of the syntax scoring puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `stack.go`, which contains specifications of a FIFO.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`stack.go`
+[source,go,numbered]
+----
+include::stack.go[tags=stack]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution.
