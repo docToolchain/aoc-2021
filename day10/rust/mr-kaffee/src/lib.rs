@@ -68,7 +68,7 @@ pub fn solution_2(lines: &[String]) -> usize {
         .iter()
         .filter_map(|line| get_repair_score(line))
         .collect::<Vec<_>>();
-    scores.sort();
+    scores.sort_unstable();
     scores[scores.len() / 2]
 }
 // end::part2[]
