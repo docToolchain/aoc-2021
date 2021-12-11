@@ -36,3 +36,7 @@ At the end, both solutions are printed out.
 ....
 include::day2111_1_2.kts[tags=output]
 ....
+
+=== Add On
+
+After some discussion with Peter about using lists or arrays I created a verson based on a list and one on an array. Both are running 1000 times and the execution time is measured. I run it several times, but there was not realy a valuable result reachable, one time the array version was faster, one time the list. My expectation would have been, that the array version is faster.
