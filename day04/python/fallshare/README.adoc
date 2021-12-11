@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+=== Star 1
+First time using numpy.
+=== Start 2
+Heck this took a lot of time.
+
+[source, python]
+....
+include::solution.py[]
+....
