@@ -289,6 +289,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_11_rust">Day 11: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a>
+<ul class="sectlevel4">
+<li><a href="#_problem_star_1_10">Problem Star 1</a></li>
+<li><a href="#_testdata_2">Testdata</a></li>
+<li><a href="#_problem_star_2_9">Problem Star 2</a></li>
+<li><a href="#_solution_17">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2255,6 +2267,279 @@ pub fn autocomplete(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;u64&g
     scores.sort();
     let l = scores.len();
     return Ok(*scores.get((l-1)/2).unwrap())
+}</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_rust"><a class="anchor" href="#_day_11_rust"></a><a class="link" href="#_day_11_rust">Day 11: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_11_dumbo_octopus"><a class="anchor" href="#_day_11_dumbo_octopus"></a><a class="link" href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a></h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Find the full puzzle <a href="https://adventofcode.com/2021/day/11" class="bare">https://adventofcode.com/2021/day/11</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_1_10"><a class="anchor" href="#_problem_star_1_10"></a><a class="link" href="#_problem_star_1_10">Problem Star 1</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>Given the starting energy levels of the dumbo octopuses in your cavern,
+simulate 100 steps. How many total flashes are there after 100 steps?</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_testdata_2"><a class="anchor" href="#_testdata_2"></a><a class="link" href="#_testdata_2">Testdata</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let vec1 = vec![
+            "5483143223",
+            "2745854711",
+            "5264556173",
+            "6141336146",
+            "6357385478",
+            "4167524645",
+            "2176841721",
+            "6882881134",
+            "4846848554",
+            "5283751526"
+        ];
+
+        let vec2 : Vec&lt;String&gt; = vec1.into_iter().map(|e| String::from(e)).collect();</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_12"><a class="anchor" href="#_testcase_12"></a><a class="link" href="#_testcase_12">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">        let mut grid = create_octopus_grid(&amp;vec2).unwrap();
+
+        let cnt = simulate_steps(&amp;mut grid,100);
+        assert_eq!(cnt, 1656);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_problem_star_2_9"><a class="anchor" href="#_problem_star_2_9"></a><a class="link" href="#_problem_star_2_9">Problem Star 2</a></h5>
+<div class="literalblock">
+<div class="content">
+<pre>If you can calculate the exact moments when the octopuses will all flash simultaneously,
+you should be able to navigate through the cavern. What is the first step during which all octopuses flash?</pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_testcase_13"><a class="anchor" href="#_testcase_13"></a><a class="link" href="#_testcase_13">Testcase</a></h6>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">         let mut grid = create_octopus_grid(&amp;vec2).unwrap();
+
+         let steps = simulate_until_superflash(&amp;mut grid);
+         assert_eq!(steps, 195);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_17"><a class="anchor" href="#_solution_17"></a><a class="link" href="#_solution_17">Solution</a></h5>
+<div class="paragraph">
+<p>Parser</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">use crate::fields::OctopusGrid;
+
+
+//tag::create_octopus_grid[]
+pub fn create_octopus_grid(data: &amp;Vec&lt;String&gt;) -&gt; std::io::Result&lt;OctopusGrid&gt; {
+
+    let l = data.len();
+
+    let mut rows = Vec::new();
+
+    for i in 0..l {
+        let line = data.get(i).unwrap();
+
+        let row: Vec&lt;u32&gt; = line.chars().map(|c| c.to_digit(10).unwrap()).collect();
+        rows.push(row);
+    }
+
+    return Ok(OctopusGrid::new(rows))
+}
+//end::create_octopus_grid[]
+
+//tag::simulate_steps[]
+pub fn simulate_steps(grid : &amp;mut OctopusGrid,steps : u32) -&gt; u32
+{
+    let mut flashes = 0;
+    for _i in 0..steps {
+        grid.incr();
+        grid.flash();
+        flashes += grid.zero();
+    }
+    return flashes;
+
+}
+//end::simulate_steps[]
+
+//tag::simulate_until_superflash[]
+pub fn simulate_until_superflash(grid : &amp;mut OctopusGrid) -&gt; u32
+{
+    let mut cnt = 0;
+    let size = grid.size() as u32;
+    loop {
+        cnt += 1;
+        grid.incr();
+        grid.flash();
+        let sum = grid.zero();
+        if sum == size {
+            //Superflash 8-)
+            return cnt;
+        }
+    }
+
+}
+//end::simulate_until_superflash[]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Fields</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">//Playing fields
+use array2d::Array2D;
+
+//Array2D based field
+pub struct OctopusGrid {
+    array : Array2D&lt;u32&gt;
+}
+
+impl OctopusGrid {
+    pub fn new(rows : Vec&lt;Vec&lt;u32&gt;&gt;) -&gt; OctopusGrid
+    {
+        OctopusGrid {
+            array : Array2D::from_rows(&amp;rows)
+        }
+    }
+
+    pub fn get(&amp;self,x : usize,y : usize) -&gt; u32
+    {
+        return *self.array.get(x,y).unwrap();
+    }
+
+    pub fn set(&amp;mut self,x : usize,y : usize,v : u32)
+    {
+        self.array.set(x,y,v).ok();
+    }
+
+    pub fn size(&amp;self) -&gt; usize {
+        self.array.row_len() * self.array.column_len()
+    }
+
+    pub fn incr(&amp;mut self)
+    {
+        for y in 0..self.array.row_len() {
+            for x in 0..self.array.column_len() {
+                let v = self.get(x,y);
+                self.set(x,y,v + 1);
+            }
+        }
+    }
+
+    pub fn start_points(&amp;self) -&gt; Vec&lt;(usize,usize)&gt; {
+
+        let mut points = Vec::new();
+        for y in 0..self.array.row_len() {
+            for x in 0..self.array.column_len() {
+                let v = self.get(x,y);
+                if v &gt; 9 {
+                    points.push((x,y));
+                }
+            }
+        }
+        return points;
+    }
+
+    pub fn point_test_incr_flash(&amp;mut self,flashes : &amp;mut Array2D&lt;bool&gt;,x : usize,y : usize,xoff : i32,yoff : i32)
+    {
+        let lastx = self.array.column_len() - 1;
+        let lasty = self.array.row_len() - 1;
+
+        //test
+        if xoff == -1 &amp;&amp; x == 0 { return; }
+        if xoff ==  1 &amp;&amp; x == lastx { return; }
+        if yoff == -1 &amp;&amp; y == 0 { return; }
+        if yoff ==  1 &amp;&amp; y == lasty { return; }
+
+        let nx : usize = (x as i32 + xoff) as usize;
+        let ny : usize = (y as i32 + yoff) as usize;
+
+        let v = self.get(nx,ny) + 1;
+        self.set(nx,ny,v);
+
+        if v &gt; 9 {
+            self.flash_point(flashes,nx,ny);
+        }
+
+    }
+
+    pub fn flash_point(&amp;mut self,flashes : &amp;mut Array2D&lt;bool&gt;,x : usize,y : usize)
+    {
+        if *flashes.get(x,y).unwrap() {
+            return;
+        }
+        flashes.set(x,y,true).ok();
+
+        //incr around this point
+        self.point_test_incr_flash(flashes,x,y,-1,-1);
+        self.point_test_incr_flash(flashes,x,y,-1,0);
+        self.point_test_incr_flash(flashes,x,y,-1,1);
+        self.point_test_incr_flash(flashes,x,y,0,-1);
+        self.point_test_incr_flash(flashes,x,y,0,1);
+        self.point_test_incr_flash(flashes,x,y,1,-1);
+        self.point_test_incr_flash(flashes,x,y,1,0);
+        self.point_test_incr_flash(flashes,x,y,1,1);
+
+    }
+
+    pub fn flash(&amp;mut self)
+    {
+        let mut flashes = Array2D::filled_with(false,self.array.column_len(),self.array.row_len());
+        let sp = self.start_points();
+
+        for (x,y) in sp {
+            self.flash_point(&amp;mut flashes,x,y);
+        }
+
+    }
+
+    pub fn zero(&amp;mut self) -&gt; u32
+    {
+        let mut sum = 0;
+        for y in 0..self.array.row_len() {
+            for x in 0..self.array.column_len() {
+                let v = self.get(x,y);
+                if v &gt; 9 {
+                    sum += 1;
+                    self.set(x,y,0);
+                }
+            }
+        }
+        return sum;
+    }
+
 }</code></pre>
 </div>
 </div>
