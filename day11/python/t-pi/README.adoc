@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-11: Dumbo Octopus 
+https://adventofcode.com/2021/day/11
+
+=== Info
+
+Christmas lights had to be switched off for bioluminescently flashing dumbo octopus'. Navigate by the flashing from the squids.
+
+* Star1 (*): Squids gain 1 energy per step, flash at energy level >9 and also charge adjacent 8 squids, which might then also flash in single step. Calculate number of flashes in 100 steps.
+
+* Star2 (**): Iterate squid game further until all squids flash together first time in a single step.
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into list of ints.
+
+* Star1: Iterate single step. Small array, no need for recursion. Spread flash to adjacents and mark flashed as 0. Important: Stick to 0 level after flashing. 
+
+* Star2: Continue iterations until first time flash count equals all squids.
+
+=== Learned today
+
+Straightforward. Some hiccups like count step as 195 or 196, but all manageable with the test input :)
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
