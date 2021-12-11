@@ -250,6 +250,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_11_go">Day 11: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_11">Oveview</a></li>
+<li><a href="#_how_to_run_11">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2692,6 +2702,348 @@ func (s *Stack) Pop() (string, bool) {
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day11" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_go"><a class="anchor" href="#_day_11_go"></a><a class="link" href="#_day_11_go">Day 11: go</a></h3>
+<div class="sect3">
+<h4 id="_day_11_dumbo_octopus"><a class="anchor" href="#_day_11_dumbo_octopus"></a><a class="link" href="#_day_11_dumbo_octopus">Day 11: Dumbo Octopus</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the dumbo octopus puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_11"><a class="anchor" href="#_oveview_11"></a><a class="link" href="#_oveview_11">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>grid.go</code>, which contains specifications of a grid and other
+geometrical functionality.
+This solution reuses quite a bit of the day 9 solution, which was based on the
+day 5 solution.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	flashThreshold   = 9
+	generationsPart1 = 100
+	// We set a max number of generations to prevent an endless loop.
+	maxGenerationsPart2 = 1000
+)
+
+// SolutionOutput is the output of `solve`'s channel.
+type SolutionOutput struct {
+	value int
+	err   error
+}
+
+func solve(grid Grid, threshold int) &lt;-chan SolutionOutput {
+	channel := make(chan SolutionOutput)
+
+	go func() {
+		for {
+			flashesThisGen := 0
+			if err := grid.MarkAll(1); err != nil {
+				channel &lt;- SolutionOutput{0, err}
+				close(channel)
+				return
+			}
+			addUsBack := []Vec{}
+			for o := grid.FilterThreshold(threshold); len(o) &gt; 0; o = grid.FilterThreshold(threshold) {
+				// If we found any that will flash, handle them.
+				// First, count their flashes.
+				flashesThisGen += len(o)
+				// Then, remove them from the grid. They cannot flash again this time. But remember to
+				// add them back later.
+				for _, p := range o {
+					grid.RemoveAll(p)
+					addUsBack = append(addUsBack, p)
+				}
+				// Then, their flashes will increase the energy levels of their environment. Propagate
+				// that. Only points that are still on the grid will have their energy levels changed.
+				for _, p := range o {
+					if err := grid.MarkExistingEnv(1, p, pointEnv); err != nil {
+						channel &lt;- SolutionOutput{0, err}
+						close(channel)
+						return
+					}
+				}
+				// Rinse repeat until no more points exceed the threshold.
+			}
+			// Add those points back that were removed. Their initial energy level will be zero.
+			for _, addBack := range addUsBack {
+				if err := grid.Mark(addBack, 0); err != nil {
+					channel &lt;- SolutionOutput{0, err}
+					close(channel)
+					return
+				}
+			}
+			channel &lt;- SolutionOutput{flashesThisGen, nil}
+		}
+	}()
+
+	return channel
+}
+
+//nolint: funlen
+func main() {
+	grid, err := ReadLinesAsGrid()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	numOctopodes := len(grid)
+	flashes := 0
+	solutionGenerator := solve(grid, flashThreshold)
+	for gen := 1; gen &lt;= generationsPart1; gen++ {
+		sol := &lt;-solutionGenerator
+		if err := sol.err; err != nil {
+			log.Fatal(err.Error())
+		}
+		flashes += sol.value
+	}
+	fmt.Printf("The octopodes flashed %d times in %d generations.\n", flashes, generationsPart1)
+	for gen := generationsPart1; gen &lt;= maxGenerationsPart2; gen++ {
+		sol := &lt;-solutionGenerator
+		if err := sol.err; err != nil {
+			log.Fatal(err.Error())
+		}
+		if sol.value == numOctopodes {
+			fmt.Printf(
+				"The octopodes all flashed together the 1st time the %d'th generation.\n", gen,
+			)
+			return
+		}
+	}
+	log.Fatal("the octopodes never flashed all together")
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsGrid reads all lines from stdin as a grid. That is, each point on the grid has a
+// value and a location.
+func ReadLinesAsGrid() (Grid, error) {
+	lineIdx := 0
+	result := make(Grid)
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return Grid{}, err
+		}
+		line = strings.TrimSpace(line)
+		ints, err := strSliceToIntSlice(strings.Split(line, ""))
+		if err != nil {
+			return Grid{}, err
+		}
+		for rowIdx, val := range ints {
+			// This is lazy but I wanted to re-use old code.
+			point, err := VecFromStr(fmt.Sprintf("%d%s%d", lineIdx, vecSep, rowIdx))
+			if err != nil {
+				return Grid{}, err
+			}
+			err = result.Mark(point, val)
+			if err != nil {
+				return Grid{}, err
+			}
+		}
+		if err != nil {
+			return Grid{}, err
+		}
+		lineIdx++
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Vec is a 2D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y int
+}
+
+var (
+	unitX         = Vec{x: 1}
+	unitY         = Vec{y: 1}
+	pointEnvDisps = []Vec{
+		// x==1
+		unitX.Add(unitY),
+		unitX,
+		unitX.Sub(unitY),
+		// x==0
+		unitY,
+		unitY.Inv(),
+		// x==-1
+		unitX.Inv().Add(unitY),
+		unitX.Inv(),
+		unitX.Inv().Sub(unitY),
+	}
+)
+
+// Obtain an iterator over a point's environment.
+func pointEnv(point Vec) &lt;-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for _, disp := range pointEnvDisps {
+			displaced := point.Add(disp)
+			channel &lt;- displaced
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// VecFromStr converts a sring into a vector.
+func VecFromStr(str string) (Vec, error) {
+	fields := trimStrings(strings.Split(str, vecSep))
+	if len(fields) != tokensPerPoint {
+		return Vec{}, fmt.Errorf("cannot parse %v as vector, wrong number of fields", str)
+	}
+	ints, err := strSliceToIntSlice(fields)
+	if err != nil {
+		return Vec{}, fmt.Errorf("cannot parse %s as vector, %s", str, err.Error())
+	}
+	result := Vec{
+		x: ints[0],
+		y: ints[1],
+	}
+	return result, nil
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid map[Vec]int
+
+// Mark marks a point on the grid n times. Don't accept numbers &lt;0.
+func (g *Grid) Mark(entry Vec, n int) error {
+	if n &lt; 0 {
+		return fmt.Errorf("can only mark non-negative times")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*g)[entry] = (*g)[entry] + n
+	return nil
+}
+
+// Count determines how often a point has been marked.
+func (g *Grid) Count(entry Vec) int {
+	return (*g)[entry]
+}
+
+// Has determines whether a point is on the grid.
+func (g *Grid) Has(entry Vec) bool {
+	_, ok := (*g)[entry]
+	return ok
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(*g, entry)
+}
+
+// FilterThreshold returns all points whose value exceeds a threshold.
+func (g *Grid) FilterThreshold(threshold int) []Vec {
+	result := []Vec{}
+	for point := range g.Points() {
+		if g.Count(point) &gt; threshold {
+			result = append(result, point)
+		}
+	}
+	return result
+}
+
+// MarkAll maks all points in the grid with the same value.
+func (g *Grid) MarkAll(val int) error {
+	for p := range g.Points() {
+		if err := g.Mark(p, val); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// EnvFn is a function type used to determine a point's environment.
+type EnvFn = func(point Vec) &lt;-chan Vec
+
+// MarkExistingEnv marks all points by the specified value in the environment of a given point. The
+// environment is defined by envFn. Only points that actually exist will be marked.
+func (g *Grid) MarkExistingEnv(val int, point Vec, envFn EnvFn) error {
+	for neigh := range envFn(point) {
+		if !g.Has(neigh) {
+			continue
+		}
+		if err := g.Mark(neigh, val); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Points returns an iterator over all points on the grid.
+func (g *Grid) Points() &lt;-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for point := range *g {
+			channel &lt;- point
+		}
+		close(channel)
+	}()
+	return channel
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_11"><a class="anchor" href="#_how_to_run_11"></a><a class="link" href="#_how_to_run_11">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for both parts.</p>
 </div>
 </div>
 </div>
