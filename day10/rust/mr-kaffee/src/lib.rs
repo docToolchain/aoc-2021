@@ -1,25 +1,23 @@
-use std::collections::VecDeque;
-
 // tag::parse[]
-pub fn parse(content: &str) -> Vec<String> {
-    content.lines().map(|s| s.to_string()).collect::<Vec<_>>()
+pub fn parse<'a>(content: &'a str) -> Vec<&'a str> {
+    content.lines().collect()
 }
 // end::parse[]
 
 // tag::part1[]
 /// return illegal char's score if any in as ``Some`` value, otherwise ``None``
-pub fn find_illegal_char(line: &str) -> Option<usize> {
-    let mut queue = VecDeque::new();
+pub fn get_illegal_score(line: &str) -> Option<usize> {
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' => queue.push_back(')'),
-            '[' => queue.push_back(']'),
-            '{' => queue.push_back('}'),
-            '<' => queue.push_back('>'),
-            ')' if c != queue.pop_back().unwrap() => return Some(3),
-            ']' if c != queue.pop_back().unwrap() => return Some(57),
-            '}' if c != queue.pop_back().unwrap() => return Some(1_197),
-            '>' if c != queue.pop_back().unwrap() => return Some(25_137),
+            '(' => stack.push(')'),
+            '[' => stack.push(']'),
+            '{' => stack.push('}'),
+            '<' => stack.push('>'),
+            ')' if c != stack.pop().unwrap() => return Some(3),
+            ']' if c != stack.pop().unwrap() => return Some(57),
+            '}' if c != stack.pop().unwrap() => return Some(1_197),
+            '>' if c != stack.pop().unwrap() => return Some(25_137),
             _ => {} // nothing here
         }
     }
@@ -27,10 +25,10 @@ pub fn find_illegal_char(line: &str) -> Option<usize> {
 }
 
 /// Calculate sum of scores of illegal chars
-pub fn solution_1(lines: &[String]) -> usize {
+pub fn solution_1(lines: &[&str]) -> usize {
     lines
         .iter()
-        .filter_map(|line| find_illegal_char(line))
+        .filter_map(|line| get_illegal_score(line))
         .sum()
 }
 // end::part1[]
@@ -38,19 +36,19 @@ pub fn solution_1(lines: &[String]) -> usize {
 // tag::part2[]
 /// get the repair score if the line is incomplete as a ``Some`` value, otherwise return ``None``
 pub fn get_repair_score(line: &str) -> Option<usize> {
-    let mut queue = VecDeque::new();
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' => queue.push_front(')'),
-            '[' => queue.push_front(']'),
-            '{' => queue.push_front('}'),
-            '<' => queue.push_front('>'),
-            ')' | '>' | '}' | ']' if c != queue.pop_front().unwrap() => return None,
+            '(' => stack.push(')'),
+            '[' => stack.push(']'),
+            '{' => stack.push('}'),
+            '<' => stack.push('>'),
+            ')' | '>' | '}' | ']' if c != stack.pop().unwrap() => return None,
             _ => {} // nothing here
         }
     }
 
-    Some(queue.iter().fold(0, |score, c| {
+    Some(stack.iter().rev().fold(0, |score, c| {
         score * 5
             + match c {
                 ')' => 1,
@@ -63,12 +61,12 @@ pub fn get_repair_score(line: &str) -> Option<usize> {
 }
 
 /// get the middle repair score
-pub fn solution_2(lines: &[String]) -> usize {
+pub fn solution_2(lines: &[&str]) -> usize {
     let mut scores = lines
         .iter()
         .filter_map(|line| get_repair_score(line))
         .collect::<Vec<_>>();
-    scores.sort();
+    scores.sort_unstable();
     scores[scores.len() / 2]
 }
 // end::part2[]
@@ -107,7 +105,7 @@ mod tests {
             ],
             lines
                 .iter()
-                .map(|line| find_illegal_char(line))
+                .map(|line| get_illegal_score(line))
                 .collect::<Vec<_>>()
         );
     }

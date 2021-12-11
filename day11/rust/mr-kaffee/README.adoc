@@ -43,4 +43,4 @@ include::src/lib.rs[tags=tests]
 
 === Today I learned ===
 
-In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels in when they were popped from the queue. Thus entries could get modified while there indices were in the queue already and indices could be added multiple times. Took a while to sort that out.
+In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels when they were popped from the queue. Thus entries could get modified while their indices were in the queue, and indices could be added multiple times. Took a while to sort that out.

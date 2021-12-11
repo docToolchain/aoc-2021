@@ -2,11 +2,7 @@
 /// parse input into integers
 /// return bit-length of values in addition
 pub fn parse(input: &str) -> (Vec<usize>, usize) {
-    let len = input
-        .lines()
-        .map(|line| line.len())
-        .next()
-        .expect("No lines");
+    let len = input.lines().next().expect("No lines").len();
     let values = input
         .lines()
         .map(|line| usize::from_str_radix(line, 2).expect("Could not parse line"))
