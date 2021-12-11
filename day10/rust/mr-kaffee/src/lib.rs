@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 // tag::parse[]
 pub fn parse(content: &str) -> Vec<String> {
     content.lines().map(|s| s.to_string()).collect::<Vec<_>>()
@@ -9,17 +7,17 @@ pub fn parse(content: &str) -> Vec<String> {
 // tag::part1[]
 /// return illegal char's score if any in as ``Some`` value, otherwise ``None``
 pub fn find_illegal_char(line: &str) -> Option<usize> {
-    let mut queue = VecDeque::new();
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' => queue.push_back(')'),
-            '[' => queue.push_back(']'),
-            '{' => queue.push_back('}'),
-            '<' => queue.push_back('>'),
-            ')' if c != queue.pop_back().unwrap() => return Some(3),
-            ']' if c != queue.pop_back().unwrap() => return Some(57),
-            '}' if c != queue.pop_back().unwrap() => return Some(1_197),
-            '>' if c != queue.pop_back().unwrap() => return Some(25_137),
+            '(' => stack.push(')'),
+            '[' => stack.push(']'),
+            '{' => stack.push('}'),
+            '<' => stack.push('>'),
+            ')' if c != stack.pop().unwrap() => return Some(3),
+            ']' if c != stack.pop().unwrap() => return Some(57),
+            '}' if c != stack.pop().unwrap() => return Some(1_197),
+            '>' if c != stack.pop().unwrap() => return Some(25_137),
             _ => {} // nothing here
         }
     }
@@ -38,19 +36,19 @@ pub fn solution_1(lines: &[String]) -> usize {
 // tag::part2[]
 /// get the repair score if the line is incomplete as a ``Some`` value, otherwise return ``None``
 pub fn get_repair_score(line: &str) -> Option<usize> {
-    let mut queue = VecDeque::new();
+    let mut stack = Vec::new();
     for c in line.chars() {
         match c {
-            '(' => queue.push_front(')'),
-            '[' => queue.push_front(']'),
-            '{' => queue.push_front('}'),
-            '<' => queue.push_front('>'),
-            ')' | '>' | '}' | ']' if c != queue.pop_front().unwrap() => return None,
+            '(' => stack.push(')'),
+            '[' => stack.push(']'),
+            '{' => stack.push('}'),
+            '<' => stack.push('>'),
+            ')' | '>' | '}' | ']' if c != stack.pop().unwrap() => return None,
             _ => {} // nothing here
         }
     }
 
-    Some(queue.iter().fold(0, |score, c| {
+    Some(stack.iter().rev().fold(0, |score, c| {
         score * 5
             + match c {
                 ')' => 1,
