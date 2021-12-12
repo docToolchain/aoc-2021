@@ -40,23 +40,24 @@ pub fn get_basin_size(w: usize, grid: &[usize], x: usize, y: usize) -> usize {
     let mut queue = VecDeque::new();
 
     unknown[x + w * y] = false;
-    queue.push_back((x as isize, y as isize));
+    queue.push_back((x, y));
     let mut count = 0;
 
-    let h = (grid.len() / w) as isize;
-    let w = w as isize;
+    let h = grid.len() / w;
 
     // breadth first traversal
     while let Some((x, y)) = queue.pop_front() {
         count += 1;
 
-        for (x_a, y_a) in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)] {
-            if ((0..w).contains(&x_a) && (0..h).contains(&y_a))
-                && unknown[(x_a + w * y_a) as usize]
-                && grid[(x_a + w * y_a) as usize] != 9
-            {
+        for (x_a, y_a) in [
+            (x.wrapping_sub(1), y),
+            (x + 1, y),
+            (x, y.wrapping_sub(1)),
+            (x, y + 1),
+        ] {
+            if (x_a < w && y_a < h) && unknown[x_a + w * y_a] && grid[x_a + w * y_a] != 9 {
                 // if adjacent is within grid, is not yet seen and has a value != 9, mark known and add to queue
-                unknown[(x_a + w * y_a) as usize] = false;
+                unknown[x_a + w * y_a] = false;
                 queue.push_back((x_a, y_a));
             }
         }
