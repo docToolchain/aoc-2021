@@ -31,4 +31,13 @@ func (s *Stack) Pop() (StackedNode, bool) {
 	return val, true
 }
 
+// ToList gets the nodes stacked in the stack in the order they were stacked in (FIFO).
+func (s *Stack) ToList() []*Node {
+	result := []*Node{}
+	for _, stackedNode := range *s {
+		result = append(result, stackedNode.Node)
+	}
+	return result
+}
+
 // end::stack[]

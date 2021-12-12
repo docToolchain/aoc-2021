@@ -9,6 +9,11 @@ import (
 
 // tag::solution[]
 
+const (
+	startNode = "start"
+	endNode   = "end"
+)
+
 func printNode(node *Node) {
 	connectionIDs := []string{}
 	for _, con := range node.Connections {
@@ -26,6 +31,21 @@ func printNodes(nodes []*Node) {
 	}
 }
 
+func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
+	channel := make(chan []*Node)
+	startNode := FindNode(nodes, startNode)
+	endNode := FindNode(nodes, endNode)
+	if startNode == nil || endNode == nil {
+		close(channel)
+		return channel, fmt.Errorf("start or end not defined")
+	}
+	stack := Stack{}
+	stack.Push(startNode, 0)
+	go func() {
+	}()
+	return channel, nil
+}
+
 //nolint: funlen
 func main() {
 	nodes, err := ReadLinesAsNodes()
@@ -33,6 +53,12 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	printNodes(nodes)
+	iterator, err := findConnections(nodes, startNode, endNode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	connection := <-iterator
+	fmt.Println(connection)
 }
 
 // end::solution[]

@@ -28,7 +28,8 @@ func trimStrings(sli []string) []string {
 
 // tag::utils[]
 
-func findNode(nodes []*Node, id string) *Node {
+// FindNode finds a node based on its ID in a list of them.
+func FindNode(nodes []*Node, id string) *Node {
 	for _, checkNode := range nodes {
 		if checkNode.ID == id {
 			return checkNode
@@ -53,7 +54,7 @@ func ReadLinesAsNodes() ([]*Node, error) {
 		fields := trimStrings(strings.Split(line, connectionSep))
 		// Try to find an existing node of the names. If none is found, create one.
 		for _, field := range fields {
-			if node := findNode(result, field); node == nil {
+			if node := FindNode(result, field); node == nil {
 				// No node found, add a new one.
 				// A limit of zero means no limit in visiting.
 				limit := 0
@@ -70,15 +71,15 @@ func ReadLinesAsNodes() ([]*Node, error) {
 			}
 		}
 		// For each node in this line, add links to all other nodes mentioned in it. Note that
-		// findNode will not be able to return nil here as we already added all nodes mentioned in
+		// FindNode will not be able to return nil here as we already added all nodes mentioned in
 		// this line.
 		for _, startField := range fields {
-			startNode := findNode(result, startField)
+			startNode := FindNode(result, startField)
 			for _, endField := range fields {
 				if endField == startField {
 					continue
 				}
-				endNode := findNode(result, endField)
+				endNode := FindNode(result, endField)
 				// Luckily, AddConnection will not do anything if the node is already known.
 				startNode.AddConnection(endNode)
 				endNode.AddConnection(startNode)
