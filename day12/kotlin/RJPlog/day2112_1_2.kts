@@ -1,5 +1,35 @@
 import java.io.File
 
+// tag::ruleCheck2[]
+fun ruleCheck2(input1: String): Boolean {
+	
+	var count = mutableMapOf<String, Int>()
+	var instruction = input1.split(",")
+	
+	instruction.forEach {
+		if (it.toLowerCase() == it) {
+			if (count.containsKey(it)) {
+				count.put(it, count.getValue(it) + 1)
+				if (count.getValue(it) > 2) {
+					return false
+				}
+			} else {
+				count.put(it, 1)
+			}
+		}
+	}
+	var sum: Int = 0
+	for ((key, value) in count.entries) {
+		sum = sum + value
+	}
+	if (sum > count.size + 1) {
+		return false
+	}
+	return true
+}
+// end::ruleCheck2[]
+
+// tag::followPath[]
 fun followPath(input1: Int): Int {
 	var segments = mutableListOf<Pair<String, String>>()
 	var searchPath = mutableListOf<String>()
@@ -10,8 +40,6 @@ fun followPath(input1: Int): Int {
 	var newCurrentPath: String
 	var ruleCheckPassed: Boolean = false
 
-	//  read puzzle input as Pairs in segment List
-	//  prepare list of searchPath already with path starting with start
 	File("day2112_puzzle_input.txt").forEachLine {
 		var instruction = it.split("-")
 		if (instruction[0] == "start") {
@@ -23,92 +51,70 @@ fun followPath(input1: Int): Int {
 		}
 	}
 
-	println("--- Start, reading puzzle input and preparing searchPath")
-	println("    segments: $segments")
-	println("    searchPath: $searchPath")
-	println()
+	while (!searchEnd) { 
 
-	while (!searchEnd) { //for (k in 0..1) { //
-		//println("k: $k")
 		searchEnd = true
+		
 		searchPath.forEach {
 			currentPath = it
 			var instruction = it.split(",")
 			var lastSegment = instruction[instruction.size - 1]
-			println("   --- searching next connections for $currentPath --> $lastSegment")
-			println()
-			segments.forEach {
-				println("      --- checking segment $it")
-				println("          ${it.second.toLowerCase() == it.second}")
-				println("          ${it.first.toLowerCase() == it.first}")
-				println("          ${it.second.toLowerCase() == it.second && !currentPath.contains(it.second)}")
-				println("          ${it.first.toLowerCase() == it.first && !currentPath.contains(it.first)}")
 
-				println()
+			segments.forEach {
 				if (lastSegment == it.first) {
 					newCurrentPath = currentPath + "," + it.second
 					if (it.second == "end") {
-						validPath.add(newCurrentPath)
+						//if (!validPath.contains(newCurrentPath)) {
+							validPath.add(newCurrentPath)
+						//}
 					} else {
-						// check rule
 						if (input1 == 1) {
 							ruleCheckPassed = !(it.second.toLowerCase() == it.second && currentPath.contains(it.second))
 						} else if (input1 == 2) {
-							// rule for part 2
+							ruleCheckPassed = ruleCheck2(newCurrentPath.drop(6))
 						}
-						if (ruleCheckPassed) {  // rule part1
+						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
 						}
-						println("           --- extended Path with $newCurrentPath")
-						println()
 					}
 				} else if (lastSegment == it.second) {
 					newCurrentPath = currentPath + "," + it.first
 					if (it.first == "end") {
-						validPath.add(newCurrentPath)
+						//if (!validPath.contains(newCurrentPath)) {
+							validPath.add(newCurrentPath)
+						//}
 					} else {
 						// check rule
 						if (input1 == 1) {
 							ruleCheckPassed = !(it.first.toLowerCase() == it.first && currentPath.contains(it.first))
 						} else if (input1 == 2) {
 							// rule for part 2
-						}						
-						if (!(it.first.toLowerCase() == it.first && currentPath.contains(it.first))) {  // rule part1
+							ruleCheckPassed = ruleCheck2(newCurrentPath.drop(6))
+						}
+						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
 						}
-						println("           --- extended Path with $newCurrentPath")
-						println()
 					}
 				}
-
 			}
 		}
-
 		searchPath.clear()
 		searchPath.addAll(searchPathNew)
 		searchPathNew.clear()
-
-		println("--- searchPath ---")
-		println(searchPath)
-		println("--- searchPathNew ---")
-		println(searchPathNew)
-		println()
 	}
-
-	println("+++ validPath+++")
-	println(validPath)
-
 	return validPath.size
 }
+// end::followPath[]
 
 //fun main(args: Array<String>) {
+
 	var solution1: Int
-	var solution2: Int = 0
+	var solution2: Int
 
 	solution1 = followPath(1)
-
+	solution2 = followPath(2)
 
 // tag::output[]
 // print solution for part 1
@@ -119,9 +125,9 @@ fun followPath(input1: Int): Int {
 	println("   $solution1 paths through this cave system are there that visit small caves at most once")
 	println()
 // print solution for part 2
-	println("*********************************")
+	println("*******************************")
 	println("Solution for part2")
-	println("   $solution2 is the first step during which all octopuses flash")
+	println("   $solution2 how many paths through this cave system are there")
 	println()
 // end::output[]	
 //}
