@@ -14,20 +14,26 @@ const (
 	endNode   = "end"
 )
 
-func printNode(node *Node) {
+func nodeToStr(node *Node) string {
 	connectionIDs := []string{}
 	for _, con := range node.Connections {
 		connectionIDs = append(connectionIDs, con.ID)
 	}
 	connections := strings.Join(connectionIDs, ",")
 	str := fmt.Sprintf("{N: %s, L: %d, C: %s}", node.ID, node.Limit, connections)
-
-	fmt.Println(str)
+	return str
 }
 
 func printNodes(nodes []*Node) {
 	for _, node := range nodes {
-		printNode(node)
+		fmt.Println(nodeToStr(node))
+	}
+}
+
+func printStack(stack *Stack) {
+	for _, node := range *stack {
+		nodeStr := nodeToStr(node.Node)
+		fmt.Printf("%s -> %d\n", nodeStr, *node.ConnectionCount)
 	}
 }
 
@@ -65,15 +71,17 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 
 	go func() {
 		it := 0
-		for len(stack) != 0 {
-			fmt.Println(it)
+		for {
+			fmt.Println("It: ", it)
 			it++
-			printNodes(stack.ToList())
+			printStack(&stack)
+
 			set := setFromStack(stack)
 			overLimit := set.Filter(filterAtOrOverLimit)
+
 			topNode := stack.Peek().Node
 			progress := stack.Peek().ConnectionCount
-			*progress++
+
 			if *progress < len(topNode.Connections) {
 				// We have not yet tried out all connections. Try out the next one.
 				// Get the next in line and check if we have not yet exceeded its visitation limit.
@@ -95,7 +103,10 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 					// We have found a connection! Yeah! Emit it.
 					stack.Push(nextTop, 0)
 					channel <- stack.ToList()
+					fmt.Println("EMIT")
 					_, _ = stack.Pop()
+					// Make sure we don't check this connection again.
+					*progress++
 					// Make sure we never traverse the end node.
 					continue
 				}
@@ -104,16 +115,23 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 					stack.Push(nextTop, 0)
 				}
 			}
-			if *progress == len(topNode.Connections) {
+			if *progress >= len(topNode.Connections) {
 				// We have exceeded what we can achieve with this topmost node. Remove the top-most
 				// one and continue from the one underneath.
-				if _, isEmpty := stack.Pop(); isEmpty {
-					// If the stack is empty now, we have reached the end of our search.
-					break
+				if oldTop, nonEmpty := stack.Pop(); nonEmpty {
+					// If the stack is not empty, make sure we check the next connection for the new
+					// top node.
+					fmt.Println("Removing", nodeToStr(oldTop.Node))
+					// If we ever remove the start node, we have reached the end.
+					if oldTop.Node == startNode {
+						close(channel)
+						return
+					}
+					newTop := stack.Peek()
+					*newTop.ConnectionCount++
 				}
 			}
 		}
-		close(channel)
 	}()
 
 	return channel, nil
@@ -130,8 +148,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	connection := <-iterator
-	fmt.Println(connection)
+	pathCount := 0
+	for range iterator {
+		pathCount++
+	}
+	fmt.Printf("there are %d paths\n", pathCount)
 }
 
 // end::solution[]

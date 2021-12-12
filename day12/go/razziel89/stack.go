@@ -22,21 +22,21 @@ func (s *Stack) Push(node *Node, connectionCount int) {
 }
 
 // Pop removes the topmost value and returns it. Also returns whether the stack was non-empty.
-func (s *Stack) Pop() (StackedNode, bool) {
+func (s *Stack) Pop() (*StackedNode, bool) {
 	if len(*s) == 0 {
-		return StackedNode{}, false
+		return &StackedNode{}, false
 	}
-	val := (*s)[len(*s)-1]
+	val := &(*s)[len(*s)-1]
 	*s = (*s)[0 : len(*s)-1 : len(*s)-1]
 	return val, true
 }
 
 // Peek returns the top-most entry.
-func (s *Stack) Peek() StackedNode {
+func (s *Stack) Peek() *StackedNode {
 	if len(*s) == 0 {
-		return StackedNode{}
+		return &StackedNode{}
 	}
-	return (*s)[len(*s)-1]
+	return &(*s)[len(*s)-1]
 }
 
 // ToList gets the nodes stacked in the stack in the order they were stacked in (FIFO).
