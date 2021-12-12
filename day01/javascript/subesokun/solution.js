@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 // tag::star1[]
-function run_solution_puzzle_one(input) {
+function runSolutionPuzzleOne(input) {
     let lastDepth = Infinity
     let increaseCnt = 0
     for (const depth of input) {
@@ -15,7 +15,7 @@ function run_solution_puzzle_one(input) {
 // end::star1[]
 
 // tag::star2[]
-function run_solution_puzzle_two(input) {
+function runSolutionPuzzleTwo(input) {
     let lastDepthSum = Infinity
     let increaseCnt = 0
     for (let i = 0; i + 2 < input.length; i++) {
@@ -31,5 +31,5 @@ function run_solution_puzzle_two(input) {
 
 const input = fs.readFileSync('input.txt').toString().split("\n").map(v => parseInt(v, 10))
 
-run_solution_puzzle_one(input)
-run_solution_puzzle_two(input)
+runSolutionPuzzleOne(input)
+runSolutionPuzzleTwo(input)
