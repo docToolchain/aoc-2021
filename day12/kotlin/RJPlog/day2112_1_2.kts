@@ -1,8 +1,6 @@
 import java.io.File
 
-//fun main(args: Array<String>) {
-	var solution1: Int
-	var solution2: Int = 0
+fun followPath(input1: Int): Int {
 	var segments = mutableListOf<Pair<String, String>>()
 	var searchPath = mutableListOf<String>()
 	var searchPathNew = mutableListOf<String>()
@@ -10,6 +8,7 @@ import java.io.File
 	var searchEnd: Boolean = false
 	var currentPath: String
 	var newCurrentPath: String
+	var ruleCheckPassed: Boolean = false
 
 	//  read puzzle input as Pairs in segment List
 	//  prepare list of searchPath already with path starting with start
@@ -47,11 +46,17 @@ import java.io.File
 
 				println()
 				if (lastSegment == it.first) {
-					if (!(it.second.toLowerCase() == it.second && currentPath.contains(it.second))) {  // rule part1
-						newCurrentPath = currentPath + "," + it.second
-						if (it.second == "end") {
-							validPath.add(newCurrentPath)
-						} else {
+					newCurrentPath = currentPath + "," + it.second
+					if (it.second == "end") {
+						validPath.add(newCurrentPath)
+					} else {
+						// check rule
+						if (input1 == 1) {
+							ruleCheckPassed = !(it.second.toLowerCase() == it.second && currentPath.contains(it.second))
+						} else if (input1 == 2) {
+							// rule for part 2
+						}
+						if (ruleCheckPassed) {  // rule part1
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
 						}
@@ -59,11 +64,17 @@ import java.io.File
 						println()
 					}
 				} else if (lastSegment == it.second) {
-					if (!(it.first.toLowerCase() == it.first && currentPath.contains(it.first))) {  // rule part1
-						newCurrentPath = currentPath + "," + it.first
-						if (it.first == "end") {
-							validPath.add(newCurrentPath)
-						} else {
+					newCurrentPath = currentPath + "," + it.first
+					if (it.first == "end") {
+						validPath.add(newCurrentPath)
+					} else {
+						// check rule
+						if (input1 == 1) {
+							ruleCheckPassed = !(it.first.toLowerCase() == it.first && currentPath.contains(it.first))
+						} else if (input1 == 2) {
+							// rule for part 2
+						}						
+						if (!(it.first.toLowerCase() == it.first && currentPath.contains(it.first))) {  // rule part1
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
 						}
@@ -86,26 +97,17 @@ import java.io.File
 		println()
 	}
 
-
-
 	println("+++ validPath+++")
 	println(validPath)
-	// prepare searchEnd Boolean for while loop
 
-	// loop while searchEnd false
-	// set searchEnd true
-	// for each element in searchPath separate last item
-	// for each element of pairs in segement list, check if the path would continue
-	// check if this continued path follows the rules
-	//how to check rules?  -> if segment to add is lowerCase, check if it is already contained: ","+ab+"," --> if (instruction.contains(,ab,)
-	// put it to searchPathNew if it follows the rules and set searchEnd to false
-	// or put it to validPath list, if last cave is End
-	// clear SearchPath,
-	// set searchPath to searchPathNew,
-	// clear searchPathNew
+	return validPath.size
+}
 
-	// solution1 is size of searchPath
-	solution1 = validPath.size
+//fun main(args: Array<String>) {
+	var solution1: Int
+	var solution2: Int = 0
+
+	solution1 = followPath(1)
 
 
 // tag::output[]
