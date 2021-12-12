@@ -2740,54 +2740,115 @@ mod tests {
 <div class="sect4">
 <h5 id="_solution_2"><a class="anchor" href="#_solution_2"></a><a class="link" href="#_solution_2">Solution</a></h5>
 <div class="paragraph">
-<p>Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute.</p>
+<p>Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute. After some optimizations, I am now down to about 40ms for part 2.</p>
 </div>
+<div class="sect5">
+<h6 id="_data_structure_for_the_cave_map"><a class="anchor" href="#_data_structure_for_the_cave_map"></a><a class="link" href="#_data_structure_for_the_cave_map">Data Structure for the Cave Map</a></h6>
 <div class="paragraph">
-<p>To start, I parse the input into a map with caves as keys and sets of all adjacent caves as values:</p>
+<p>To start, I parse the input into a struct <code>CaveMap</code> (see comments in code for details):</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Parse the input in a map from nodes to sets of neighbor nodes
-pub fn parse&lt;'a&gt;(input: &amp;'a str) -&gt; BTreeMap&lt;&amp;'a str, BTreeSet&lt;&amp;'a str&gt;&gt; {
-    let mut map = BTreeMap::new();
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Map of Caves
+///
+/// Each cave has a unique ID: the position of it's name in the [CaveMap::caves] field.
+/// The adjacents of the cave are stored in the list at the same position in the [CaveMap::adjacents] field.
+///
+/// The IDs of the start and end cave are stored in the fields [CaveMap::start] and [CaveMap::end].
+pub struct CaveMap&lt;'a&gt; {
+    pub caves: Vec&lt;&amp;'a str&gt;,
+    pub adjacents: Vec&lt;Vec&lt;usize&gt;&gt;,
+    pub start: usize,
+    pub end: usize,
+}
 
-    for line in input.lines() {
-        let mut parts = line.split('-');
+impl&lt;'a&gt; CaveMap&lt;'a&gt; {
+    /// parse input to map
+    pub fn parse(input: &amp;'a str) -&gt; Self {
+        let mut caves = Vec::new();
+        let mut adjacents = Vec::new();
+        let mut start = 0;
+        let mut end = 0;
 
-        let lhs = parts.next().expect("No LHS");
-        let rhs = parts.next().expect("No RHS");
-        assert!(parts.next().is_none(), "More than two parts");
+        for line in input.lines() {
+            let mut parts = line.split('-').map(|part| {
+                caves
+                    .iter()
+                    .position(|cave| *cave == part)
+                    .unwrap_or_else(|| {
+                        caves.push(part);
+                        adjacents.push(Vec::new());
+                        // keep ID to start or end
+                        match part {
+                            "start" =&gt; start = caves.len() - 1,
+                            "end" =&gt; end = caves.len() - 1,
+                            _ =&gt; {}
+                        }
+                        caves.len() - 1
+                    })
+            });
 
-        map.entry(lhs).or_insert(BTreeSet::new()).insert(rhs);
-        map.entry(rhs).or_insert(BTreeSet::new()).insert(lhs);
+            let lhs_id = parts.next().expect("No LHS");
+            let rhs_id = parts.next().expect("No RHS");
+            assert!(parts.next().is_none(), "More than two parts");
+            adjacents[lhs_id].push(rhs_id);
+            adjacents[rhs_id].push(lhs_id);
+        }
+
+        CaveMap {
+            caves,
+            adjacents,
+            start,
+            end,
+        }
     }
-    map
+
+    /// check whether cave with given ID is small
+    pub fn is_small(&amp;self, id: usize) -&gt; bool {
+        self.caves[id].chars().next().unwrap().is_ascii_lowercase()
+    }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Then the general soluton idea is to do a (breadth first) traversal on a graph of all possible pathes through the cave:</p>
+<p>In my initial implementation, I used a <code>BTreeMap</code> to map cave names to adjacent names. In the current version, I use cave IDs instead, which are the addresses to the fields in the CaveMap structure. This reduced the runtime by about 25%.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_searching_for_paths"><a class="anchor" href="#_searching_for_paths"></a><a class="link" href="#_searching_for_paths">Searching for Paths</a></h6>
+<div class="paragraph">
+<p>The general soluton idea is to do a (breadth first) traversal on a graph of all possible paths through the cave (graph nodes are paths, not caves):</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Add a path consisting of the <code>start</code> cave only to the queue</p>
+<p>Push a path consisting of the <code>start</code> cave only to the queue</p>
 </li>
 <li>
-<p>Take a path from the queue and look at all adjacent caves of the last cave on the path</p>
+<p>Pop a path from the queue, and look at all adjacent caves of the last cave on the path</p>
 <div class="ulist">
 <ul>
 <li>
 <p>if the adjacent cave is <code>start</code>, ignore it</p>
 </li>
 <li>
-<p>if the adjacent cave is <code>end</code>, a new path is found</p>
+<p>if the adjacent cave is <code>end</code>, the path is complete; increase the unqiue path counter</p>
 </li>
 <li>
 <p>if the adjacent cave is a large cave, append it to the path and push the extended path to the queue</p>
 </li>
 <li>
-<p>if the adjacent cave is a small cave, and it is not yet on the path (part 1) or it is on the path and no small cave is on the path twice yet (part 2), append it to the path and push the extended path to the queue</p>
+<p>if the adjacent cave is a small cave, append it to the path and push the extended path to the queue if</p>
+<div class="ulist">
+<ul>
+<li>
+<p>the small cave is not yet on the path (part 1 &amp; 2) or</p>
+</li>
+<li>
+<p>the small cave is already on the path and no small cave is on the path twice yet (part 2 only)</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -2804,41 +2865,40 @@ pub fn parse&lt;'a&gt;(input: &amp;'a str) -&gt; BTreeMap&lt;&amp;'a str, BTreeS
 /// the flag ``no_duplicate_small`` controls whether small caves may be visited more than
 /// once. If the flag is set to ``true``, this is not allowed at all. If it is set to false,
 /// it is allowed at most once.
-pub fn get_path_count(map: &amp;BTreeMap&lt;&amp;str, BTreeSet&lt;&amp;str&gt;&gt;, no_duplicate_small: bool) -&gt; usize {
+pub fn get_path_count(map: &amp;CaveMap, no_duplicate_small: bool) -&gt; usize {
+    // store all path elements as a cave ID and a parent pointer (= index to this vec) wrapped in an Option
+    let mut paths: Vec&lt;(usize, Option&lt;usize&gt;)&gt; = Vec::new();
+
+    // count of unique paths
     let mut path_count = 0;
 
     let mut queue = VecDeque::new();
-    queue.push_back((vec!["start"], no_duplicate_small));
+    paths.push((map.start, None));
+    queue.push_back((paths.len() - 1, no_duplicate_small));
 
-    while let Some((path, no_duplicate_small)) = queue.pop_front() {
-        let cave = path.last().expect("Incomplete path is empty");
-        for adjacent in map.get(cave).expect("Node missing in map") {
-            match *adjacent {
-                "start" =&gt; continue, // never go back to "start"
-                "end" =&gt; { // new path to "end" found
-                    path_count += 1;
-                    continue;
-                }
-                _ =&gt; {} // no special treatment
+    while let Some((ptr, no_duplicate_small)) = queue.pop_front() {
+        let cave_id = paths[ptr].0;
+        for &amp;adj_id in &amp;map.adjacents[cave_id] {
+            if adj_id == map.start {
+                // never go back to start
+                continue;
+            } else if adj_id == map.end {
+                // new path to "end" found
+                path_count += 1;
+                continue;
             }
 
-            let duplicate_small = adjacent
-                .chars()
-                .next()
-                .expect("Empty node")
-                .is_ascii_lowercase()
-                &amp;&amp; path.contains(adjacent);
+            let duplicate_small = map.is_small(adj_id) &amp;&amp; contains(&amp;paths, ptr, adj_id);
             if no_duplicate_small &amp;&amp; duplicate_small {
                 // skip lower case already on path, if no duplicate small caves are allowed
                 continue;
             }
 
             // extend path by adjacent
-            let mut path_extended = path.clone();
-            path_extended.push(adjacent);
+            paths.push((adj_id, Some(ptr)));
 
             // add extended path to queue, if a duplicate small was added, no further duplicate smalls are allowed
-            queue.push_back((path_extended, no_duplicate_small || duplicate_small));
+            queue.push_back((paths.len() - 1, no_duplicate_small || duplicate_small));
         }
     }
 
@@ -2847,7 +2907,31 @@ pub fn get_path_count(map: &amp;BTreeMap&lt;&amp;str, BTreeSet&lt;&amp;str&gt;&g
 </div>
 </div>
 <div class="paragraph">
-<p>In this function, a path is represented by a vector of caves and a boolean flag indicating whether the path is restricted to not be extended by a small cave already on the path. For part 1, this flag is always set to <code>true</code> (call function with <code>no_duplicate_small = true</code>). For part 2, this flag is only set to <code>true</code> after a single small cave is on the path twice (call function with <code>no_duplicate_small = false</code>).</p>
+<p>Initially, I used <code>Vec</code>s to represent paths. I copied the entire path and pushed new elements to the copies. In the current version, I use kind of a linked list (each path element has a reference to the parent element). Since linked lists are something that does not go very well with Rust&#8217;s ownership and borrowing system (or maybe I just don&#8217;t know how to do that properly), I keep a <code>Vec</code> of all path elements. Each path element is a tuple of a cave ID and and a parent pointer, which points to the parent path element in that <code>Vec</code>. Because the start of a path has no parent, the parent pointer is wrapped in an <code>Option</code>. This optimization reduced the runtime by about 75%.</p>
+</div>
+<div class="paragraph">
+<p>The check whether a cave ID is contained in a path is implemented as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// determine whether a path contains a cave
+fn contains(paths: &amp;[(usize, Option&lt;usize&gt;)], ptr: usize, cave_id: usize) -&gt; bool {
+    let mut ptr = ptr;
+    loop {
+        let (id, opt_ptr) = paths[ptr];
+        if id == cave_id {
+            return true;
+        }
+
+        if let Some(next_ptr) = opt_ptr {
+            ptr = next_ptr;
+        } else {
+            return false;
+        }
+    }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect4">
@@ -2856,6 +2940,8 @@ pub fn get_path_count(map: &amp;BTreeMap&lt;&amp;str, BTreeSet&lt;&amp;str&gt;&g
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
 mod tests {
+    use std::collections::{BTreeMap, BTreeSet};
+
     use super::*;
 
     const TEST_INPUT: &amp;str = "start-A
@@ -2866,7 +2952,7 @@ b-d
 A-end
 b-end";
 
-    fn test_data() -&gt; BTreeMap&lt;&amp;'static str, BTreeSet&lt;&amp;'static str&gt;&gt; {
+    fn get_test_data() -&gt; BTreeMap&lt;&amp;'static str, BTreeSet&lt;&amp;'static str&gt;&gt; {
         BTreeMap::from([
             ("start", BTreeSet::from(["A", "b"])),
             ("A", BTreeSet::from(["start", "c", "b", "end"])),
@@ -2877,19 +2963,32 @@ b-end";
         ])
     }
 
+    fn get_adjacents&lt;'a&gt;(map: &amp;'a CaveMap, name: &amp;str) -&gt; Option&lt;impl Iterator&lt;Item = &amp;'a str&gt;&gt; {
+        map.caves
+            .iter()
+            .position(|cave| *cave == name)
+            .map(|idx| map.adjacents[idx].iter().map(|adj| map.caves[*adj]))
+    }
+
     #[test]
     fn test_parse() {
-        assert_eq!(test_data(), parse(TEST_INPUT));
+        let map = parse(TEST_INPUT);
+        for (name, adjacents) in get_test_data() {
+            assert_eq!(
+                Some(adjacents),
+                get_adjacents(&amp;map, name).map(|it| it.collect())
+            );
+        }
     }
 
     #[test]
     fn test_solution_1() {
-        assert_eq!(10, solution_1(&amp;test_data()))
+        assert_eq!(10, solution_1(&amp;parse(&amp;TEST_INPUT)))
     }
 
     #[test]
     fn test_solution_2() {
-        assert_eq!(36, solution_2(&amp;test_data()))
+        assert_eq!(36, solution_2(&amp;parse(&amp;TEST_INPUT)))
     }
 }</code></pre>
 </div>
