@@ -30,12 +30,12 @@ func printNodes(nodes []*Node) {
 	}
 }
 
-func printStack(stack *Stack) {
-	for _, node := range *stack {
-		nodeStr := nodeToStr(node.Node)
-		fmt.Printf("%s -> %d\n", nodeStr, *node.ConnectionCount)
-	}
-}
+// func printStack(stack *Stack) {
+// 	for _, node := range *stack {
+// 		nodeStr := nodeToStr(node.Node)
+// 		fmt.Printf("%s -> %d\n", nodeStr, *node.ConnectionCount)
+// 	}
+// }
 
 func filterAtOrOverLimit(node *Node, curr int) bool {
 	if node.Limit == 0 {
@@ -46,15 +46,23 @@ func filterAtOrOverLimit(node *Node, curr int) bool {
 }
 
 func setFromStack(stack Stack) CountingSet {
-	set := CountingSet{}
-	for _, node := range stack.ToList() {
-		if err := set.Add(node); err != nil {
-			// We should never even be able to reach this point. That is, a stack only ever contains
-			// non-nil nodes. Thus, fatalling here is fine.
-			log.Fatal("internal error")
-		}
+	set, err := setFromList(stack.ToList())
+	if err != nil {
+		// We should never even be able to reach this point. That is, a stack only ever contains
+		// non-nil nodes. Thus, fatalling here is fine.
+		log.Fatal("internal error")
 	}
 	return set
+}
+
+func setFromList(nodes []*Node) (CountingSet, error) {
+	set := CountingSet{}
+	for _, node := range nodes {
+		if err := set.Add(node); err != nil {
+			return CountingSet{}, err
+		}
+	}
+	return set, nil
 }
 
 //nolint:funlen
@@ -72,9 +80,9 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 	go func() {
 		it := 0
 		for {
-			fmt.Println("It: ", it)
+			// fmt.Println("It: ", it)
 			it++
-			printStack(&stack)
+			// printStack(&stack)
 
 			set := setFromStack(stack)
 			overLimit := set.Filter(filterAtOrOverLimit)
@@ -103,7 +111,7 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 					// We have found a connection! Yeah! Emit it.
 					stack.Push(nextTop, 0)
 					channel <- stack.ToList()
-					fmt.Println("EMIT")
+					// fmt.Println("EMIT")
 					_, _ = stack.Pop()
 					// Make sure we don't check this connection again.
 					*progress++
@@ -121,7 +129,7 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 				if oldTop, nonEmpty := stack.Pop(); nonEmpty {
 					// If the stack is not empty, make sure we check the next connection for the new
 					// top node.
-					fmt.Println("Removing", nodeToStr(oldTop.Node))
+					// fmt.Println("Removing", nodeToStr(oldTop.Node))
 					// If we ever remove the start node, we have reached the end.
 					if oldTop.Node == startNode {
 						close(channel)
@@ -137,22 +145,67 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 	return channel, nil
 }
 
+// Filter for part 1. Only count connections that don't visit any small cave more than once.
+func filterPart1(set CountingSet) bool {
+	threshold := 1
+	filterFn := func(node *Node, curr int) bool {
+		if strings.ToUpper(node.ID) == node.ID {
+			// This is a node we may visit any number of times. Thus, don't filter it out.
+			return false
+		}
+		return curr > threshold
+	}
+	filtered := set.Filter(filterFn)
+	// If we didn't filter out anything, that means the input describes a connection that does not
+	// visit any small cave more than once.
+	return len(filtered) == 0
+}
+
+// Filter for part 2. Only count connections that don't visit more than one small cave more than
+// once.
+func filterPart2(set CountingSet) bool {
+	threshold := 1
+	filterFn := func(node *Node, curr int) bool {
+		if strings.ToUpper(node.ID) == node.ID {
+			// This is a node we may visit any number of times. Thus, don't filter it out.
+			return false
+		}
+		return curr > threshold
+	}
+	filtered := set.Filter(filterFn)
+	// If we didn't filter out more than one entry, that means the input describes a connection that
+	// does not visit more than one small cave more than twice.
+	return len(filtered) <= 1
+}
+
 //nolint: funlen
 func main() {
 	nodes, err := ReadLinesAsNodes()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	fmt.Println("Nodes:")
 	printNodes(nodes)
 	iterator, err := findConnections(nodes, startNode, endNode)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pathCount := 0
-	for range iterator {
-		pathCount++
+	pathCountPart1 := 0
+	pathCountPart2 := 0
+	for con := range iterator {
+		set, err := setFromList(con)
+		if err != nil {
+			log.Fatal("internal error while filtering")
+		}
+		if filterPart1(set) {
+			pathCountPart1++
+		}
+		if filterPart2(set) {
+			pathCountPart2++
+		}
 	}
-	fmt.Printf("there are %d paths\n", pathCount)
+	fmt.Printf("there are %d paths for part 1\n", pathCountPart1)
+	fmt.Printf("there are %d paths for part 2\n", pathCountPart2)
 }
 
 // end::solution[]

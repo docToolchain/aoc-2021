@@ -60,6 +60,12 @@ func ReadLinesAsNodes() ([]*Node, error) {
 				limit := 0
 				if strings.ToLower(field) == field {
 					// Lower case node name, we cannot visit it more than once.
+					// But for part 2, we may visit at most one small cave twice. Thus, we consider
+					// small caves as though they can be visited twice and filter out later.
+					limit = 2
+				}
+				// The start and end nodes must never be visited more than once.
+				if field == "start" || field == "end" {
 					limit = 1
 				}
 				newNode := &Node{
