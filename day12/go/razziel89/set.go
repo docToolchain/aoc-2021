@@ -57,4 +57,15 @@ func (c *CountingSet) Filter(predicate FilterFn) []*Node {
 	return result
 }
 
+// FilterCount counts how many points would be filtered out by a FilterFn.
+func (c *CountingSet) FilterCount(predicate FilterFn) int {
+	result := 0
+	for entry, count := range *c {
+		if predicate(entry, count) {
+			result++
+		}
+	}
+	return result
+}
+
 // end::set[]

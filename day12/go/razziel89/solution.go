@@ -65,8 +65,11 @@ func setFromList(nodes []*Node) (CountingSet, error) {
 	return set, nil
 }
 
+// A validityFn checks whether the currently-attempted solution is stil a valid one.
+type validityFn = func(*CountingSet) bool
+
 //nolint:funlen
-func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
+func findConnections(nodes []*Node, start, end string, checkFn validityFn) (<-chan []*Node, error) {
 	channel := make(chan []*Node)
 	startNode := FindNode(nodes, startNode)
 	endNode := FindNode(nodes, endNode)
@@ -89,6 +92,12 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 
 			topNode := stack.Peek().Node
 			progress := stack.Peek().ConnectionCount
+
+			if !checkFn(&set) {
+				// This is no longer a valid solution. Don't continue to explore solutions based on
+				// it. Make sure to skip it by setting the progress counter to its maximum.
+				*progress = len(topNode.Connections)
+			}
 
 			if *progress < len(topNode.Connections) {
 				// We have not yet tried out all connections. Try out the next one.
@@ -146,7 +155,7 @@ func findConnections(nodes []*Node, start, end string) (<-chan []*Node, error) {
 }
 
 // Filter for part 1. Only count connections that don't visit any small cave more than once.
-func filterPart1(set CountingSet) bool {
+func filterPart1(set *CountingSet) bool {
 	threshold := 1
 	filterFn := func(node *Node, curr int) bool {
 		if strings.ToUpper(node.ID) == node.ID {
@@ -155,15 +164,14 @@ func filterPart1(set CountingSet) bool {
 		}
 		return curr > threshold
 	}
-	filtered := set.Filter(filterFn)
 	// If we didn't filter out anything, that means the input describes a connection that does not
 	// visit any small cave more than once.
-	return len(filtered) == 0
+	return set.FilterCount(filterFn) == 0
 }
 
 // Filter for part 2. Only count connections that don't visit more than one small cave more than
 // once.
-func filterPart2(set CountingSet) bool {
+func filterPart2(set *CountingSet) bool {
 	threshold := 1
 	filterFn := func(node *Node, curr int) bool {
 		if strings.ToUpper(node.ID) == node.ID {
@@ -172,10 +180,9 @@ func filterPart2(set CountingSet) bool {
 		}
 		return curr > threshold
 	}
-	filtered := set.Filter(filterFn)
 	// If we didn't filter out more than one entry, that means the input describes a connection that
 	// does not visit more than one small cave more than twice.
-	return len(filtered) <= 1
+	return set.FilterCount(filterFn) <= 1
 }
 
 //nolint: funlen
@@ -186,7 +193,7 @@ func main() {
 	}
 	fmt.Println("Nodes:")
 	printNodes(nodes)
-	iterator, err := findConnections(nodes, startNode, endNode)
+	iterator, err := findConnections(nodes, startNode, endNode, filterPart2)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -197,12 +204,11 @@ func main() {
 		if err != nil {
 			log.Fatal("internal error while filtering")
 		}
-		if filterPart1(set) {
+		if filterPart1(&set) {
 			pathCountPart1++
 		}
-		if filterPart2(set) {
-			pathCountPart2++
-		}
+		// We have already filtered for part 2's validity function.
+		pathCountPart2++
 	}
 	fmt.Printf("there are %d paths for part 1\n", pathCountPart1)
 	fmt.Printf("there are %d paths for part 2\n", pathCountPart2)
