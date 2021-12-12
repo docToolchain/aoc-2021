@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+Day 5 done.
+Having not that much time. Hence just hacking a little bit :)
+
+[source, python]
+....
+include::solution.py[]
+....
