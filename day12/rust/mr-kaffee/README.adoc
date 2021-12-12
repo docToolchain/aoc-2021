@@ -36,7 +36,7 @@ The general soluton idea is to do a (breadth first) traversal on a graph of all 
 include::src/lib.rs[tags=get_path_count]
 ----
 
-Initially, I used ``Vec``s to represent paths. I copied the entire path and pushed new elements to the copies. In the current version, I use kind of a linked list (each path element has a reference to the parent element). Since linked lists are something that does not go very well with Rust's ownership and borrowing system (or maybe I just don't know how to do that properly), I keep a ``Vec`` of all path elements. Each path element is a tuple of a cave ID and and a parent pointer, which points to the parent path element in that ``Vec``. Because the start of a path has no parent, the parent pointer is wrapped in an ``Option``. This optimization reduced the runtime by about 75%.
+Initially, I used ``Vec``s to represent paths. To extend a path by another cave, I copied the complete ``Vec``, added the cave's name and pushed the ``Vec`` to the queue. In the current version, I use kind of a linked list (each path element has a reference to the parent element). Since linked lists are something that does not go very well with Rust's ownership and borrowing system (or maybe I just don't know how to do that properly), I keep a ``Vec`` of all path elements (for part 2, a total of 427.805 path elements are created). Each path element is a tuple of a cave ID and and a parent pointer, which points to the parent path element in that ``Vec``. Because the start of a path has no parent, the parent pointer is wrapped in an ``Option``. This optimization reduced the runtime by about 75%.
 
 The check whether a cave ID is contained in a path is implemented as follows:
 

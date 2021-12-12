@@ -68,11 +68,11 @@ pub fn parse(input: &'static str) -> CaveMap {
 
 // tag::contains[]
 /// determine whether a path contains a cave
-fn contains(paths: &[(usize, Option<usize>)], ptr: usize, cave_id: usize) -> bool {
+fn contains(paths: &[(usize, Option<usize>)], ptr: usize, id: usize) -> bool {
     let mut ptr = ptr;
     loop {
-        let (id, opt_ptr) = paths[ptr];
-        if id == cave_id {
+        let (cave_id, opt_ptr) = paths[ptr];
+        if cave_id == id {
             return true;
         }
 
@@ -104,26 +104,27 @@ pub fn get_path_count(map: &CaveMap, no_duplicate_small: bool) -> usize {
 
     while let Some((ptr, no_duplicate_small)) = queue.pop_front() {
         let cave_id = paths[ptr].0;
-        for &adj_id in &map.adjacents[cave_id] {
-            if adj_id == map.start {
+        for &id in &map.adjacents[cave_id] {
+            if id == map.start {
                 // never go back to start
                 continue;
-            } else if adj_id == map.end {
+            } else if id == map.end {
                 // new path to "end" found
                 path_count += 1;
                 continue;
             }
 
-            let duplicate_small = map.is_small(adj_id) && contains(&paths, ptr, adj_id);
+            let duplicate_small = map.is_small(id) && contains(&paths, ptr, id);
             if no_duplicate_small && duplicate_small {
-                // skip lower case already on path, if no duplicate small caves are allowed
+                // skip small cave already on path, if no duplicate small caves are allowed
                 continue;
             }
 
-            // extend path by adjacent
-            paths.push((adj_id, Some(ptr)));
+            // push new path element to paths vec
+            paths.push((id, Some(ptr)));
 
-            // add extended path to queue, if a duplicate small was added, no further duplicate smalls are allowed
+            // add pointer to path element to queue
+            // if a duplicate small was added, no further duplicate smalls are allowed
             queue.push_back((paths.len() - 1, no_duplicate_small || duplicate_small));
         }
     }
