@@ -299,6 +299,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_12_rust">Day 12: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_12_passage_pathing">Day 12: Passage Pathing</a>
+<ul class="sectlevel4">
+<li><a href="#_solution_2">Solution</a></li>
+<li><a href="#_tests_11">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2192,23 +2202,24 @@ pub fn get_basin_size(w: usize, grid: &amp;[usize], x: usize, y: usize) -&gt; us
     let mut queue = VecDeque::new();
 
     unknown[x + w * y] = false;
-    queue.push_back((x as isize, y as isize));
+    queue.push_back((x, y));
     let mut count = 0;
 
-    let h = (grid.len() / w) as isize;
-    let w = w as isize;
+    let h = grid.len() / w;
 
     // breadth first traversal
     while let Some((x, y)) = queue.pop_front() {
         count += 1;
 
-        for (x_a, y_a) in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)] {
-            if ((0..w).contains(&amp;x_a) &amp;&amp; (0..h).contains(&amp;y_a))
-                &amp;&amp; unknown[(x_a + w * y_a) as usize]
-                &amp;&amp; grid[(x_a + w * y_a) as usize] != 9
-            {
+        for (x_a, y_a) in [
+            (x.wrapping_sub(1), y),
+            (x + 1, y),
+            (x, y.wrapping_sub(1)),
+            (x, y + 1),
+        ] {
+            if (x_a &lt; w &amp;&amp; y_a &lt; h) &amp;&amp; unknown[x_a + w * y_a] &amp;&amp; grid[x_a + w * y_a] != 9 {
                 // if adjacent is within grid, is not yet seen and has a value != 9, mark known and add to queue
-                unknown[(x_a + w * y_a) as usize] = false;
+                unknown[x_a + w * y_a] = false;
                 queue.push_back((x_a, y_a));
             }
         }
@@ -2487,7 +2498,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
         .filter(char::is_ascii_digit)
         .map(|c| c as usize - '0' as usize)
         .collect::&lt;Vec&lt;_&gt;&gt;();
-    assert_eq!((N * N) as usize, energies.len(), "Bad length");
+    assert_eq!(N * N, energies.len(), "Bad length");
     energies
 }</code></pre>
 </div>
@@ -2525,7 +2536,7 @@ pub fn step(energies: &amp;mut [usize]) -&gt; usize {
 
     // increase all elements by one
     for k in 0..energies.len() {
-        energies[k] = energies[k] + 1;
+        energies[k] += 1;
         if energies[k] &gt; FLASH_THRESHOLD {
             // flashed -&gt; reset, add index to stack
             energies[k] = 0;
@@ -2555,17 +2566,16 @@ pub fn step(energies: &amp;mut [usize]) -&gt; usize {
             }
 
             // flat index
-            let k_a = (x_a + N * y_a) as usize;
-            if energies[k_a] == 0 {
+            if energies[x_a + N * y_a] == 0 {
                 // already flashed
                 continue;
             }
 
             // not flashed yet, increment
-            energies[k_a] = energies[k_a] + 1;
-            if energies[k_a] &gt; FLASH_THRESHOLD {
+            energies[x_a + N * y_a] += 1;
+            if energies[x_a + N * y_a] &gt; FLASH_THRESHOLD {
                 // flashed -&gt; reset, add index to stack
-                energies[k_a] = 0;
+                energies[x_a + N * y_a] = 0;
                 stack.push((x_a, y_a));
             }
         }
@@ -2715,6 +2725,174 @@ mod tests {
 <h5 id="_today_i_learned_6"><a class="anchor" href="#_today_i_learned_6"></a><a class="link" href="#_today_i_learned_6">Today I learned</a></h5>
 <div class="paragraph">
 <p>In depth first traversal (as well as in breadth first traversal), be careful to not add elements to the stack (or queue) multiple times. In my first approach, I only reset the energy levels when they were popped from the queue. Thus entries could get modified while their indices were in the queue, and indices could be added multiple times. Took a while to sort that out.</p>
+</div>
+<a id="day12" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_12_rust"><a class="anchor" href="#_day_12_rust"></a><a class="link" href="#_day_12_rust">Day 12: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_12_passage_pathing"><a class="anchor" href="#_day_12_passage_pathing"></a><a class="link" href="#_day_12_passage_pathing">Day 12: Passage Pathing</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/12">AoC|2021|12</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_solution_2"><a class="anchor" href="#_solution_2"></a><a class="link" href="#_solution_2">Solution</a></h5>
+<div class="paragraph">
+<p>Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute.</p>
+</div>
+<div class="paragraph">
+<p>To start, I parse the input into a map with caves as keys and sets of all adjacent caves as values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Parse the input in a map from nodes to sets of neighbor nodes
+pub fn parse&lt;'a&gt;(input: &amp;'a str) -&gt; BTreeMap&lt;&amp;'a str, BTreeSet&lt;&amp;'a str&gt;&gt; {
+    let mut map = BTreeMap::new();
+
+    for line in input.lines() {
+        let mut parts = line.split('-');
+
+        let lhs = parts.next().expect("No LHS");
+        let rhs = parts.next().expect("No RHS");
+        assert!(parts.next().is_none(), "More than two parts");
+
+        map.entry(lhs).or_insert(BTreeSet::new()).insert(rhs);
+        map.entry(rhs).or_insert(BTreeSet::new()).insert(lhs);
+    }
+    map
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then the general soluton idea is to do a (breadth first) traversal on a graph of all possible pathes through the cave:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Add a path consisting of the <code>start</code> cave only to the queue</p>
+</li>
+<li>
+<p>Take a path from the queue and look at all adjacent caves of the last cave on the path</p>
+<div class="ulist">
+<ul>
+<li>
+<p>if the adjacent cave is <code>start</code>, ignore it</p>
+</li>
+<li>
+<p>if the adjacent cave is <code>end</code>, a new path is found</p>
+</li>
+<li>
+<p>if the adjacent cave is a large cave, append it to the path and push the extended path to the queue</p>
+</li>
+<li>
+<p>if the adjacent cave is a small cave, and it is not yet on the path (part 1) or it is on the path and no small cave is on the path twice yet (part 2), append it to the path and push the extended path to the queue</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Repeat step 2 until queue is empty</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// count number of distinct pathes using map
+///
+/// the flag ``no_duplicate_small`` controls whether small caves may be visited more than
+/// once. If the flag is set to ``true``, this is not allowed at all. If it is set to false,
+/// it is allowed at most once.
+pub fn get_path_count(map: &amp;BTreeMap&lt;&amp;str, BTreeSet&lt;&amp;str&gt;&gt;, no_duplicate_small: bool) -&gt; usize {
+    let mut path_count = 0;
+
+    let mut queue = VecDeque::new();
+    queue.push_back((vec!["start"], no_duplicate_small));
+
+    while let Some((path, no_duplicate_small)) = queue.pop_front() {
+        let cave = path.last().expect("Incomplete path is empty");
+        for adjacent in map.get(cave).expect("Node missing in map") {
+            match *adjacent {
+                "start" =&gt; continue, // never go back to "start"
+                "end" =&gt; { // new path to "end" found
+                    path_count += 1;
+                    continue;
+                }
+                _ =&gt; {} // no special treatment
+            }
+
+            let duplicate_small = adjacent
+                .chars()
+                .next()
+                .expect("Empty node")
+                .is_ascii_lowercase()
+                &amp;&amp; path.contains(adjacent);
+            if no_duplicate_small &amp;&amp; duplicate_small {
+                // skip lower case already on path, if no duplicate small caves are allowed
+                continue;
+            }
+
+            // extend path by adjacent
+            let mut path_extended = path.clone();
+            path_extended.push(adjacent);
+
+            // add extended path to queue, if a duplicate small was added, no further duplicate smalls are allowed
+            queue.push_back((path_extended, no_duplicate_small || duplicate_small));
+        }
+    }
+
+    path_count
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this function, a path is represented by a vector of caves and a boolean flag indicating whether the path is restricted to not be extended by a small cave already on the path. For part 1, this flag is always set to <code>true</code> (call function with <code>no_duplicate_small = true</code>). For part 2, this flag is only set to <code>true</code> after a single small cave is on the path twice (call function with <code>no_duplicate_small = false</code>).</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_11"><a class="anchor" href="#_tests_11"></a><a class="link" href="#_tests_11">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_INPUT: &amp;str = "start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end";
+
+    fn test_data() -&gt; BTreeMap&lt;&amp;'static str, BTreeSet&lt;&amp;'static str&gt;&gt; {
+        BTreeMap::from([
+            ("start", BTreeSet::from(["A", "b"])),
+            ("A", BTreeSet::from(["start", "c", "b", "end"])),
+            ("b", BTreeSet::from(["start", "A", "d", "end"])),
+            ("c", BTreeSet::from(["A"])),
+            ("d", BTreeSet::from(["b"])),
+            ("end", BTreeSet::from(["A", "b"])),
+        ])
+    }
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(test_data(), parse(TEST_INPUT));
+    }
+
+    #[test]
+    fn test_solution_1() {
+        assert_eq!(10, solution_1(&amp;test_data()))
+    }
+
+    #[test]
+    fn test_solution_2() {
+        assert_eq!(36, solution_2(&amp;test_data()))
+    }
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
