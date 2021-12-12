@@ -183,6 +183,16 @@
 <li><a href="#_python_6">Python</a></li>
 </ul>
 </li>
+<li><a href="#_day_06_python">Day 06: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_7">Python</a>
+<ul class="sectlevel4">
+<li><a href="#_star_1_3">Star 1</a></li>
+<li><a href="#_star_2">Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -764,6 +774,74 @@ for i in range(len(lines)):
 count = np.count_nonzero(vent_map &gt; 1)
 print("Solution Start 2:")
 print(f"Points where at least two lines cross: {count}")</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_python"><a class="anchor" href="#_day_06_python"></a><a class="link" href="#_day_06_python">Day 06: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_7"><a class="anchor" href="#_python_7"></a><a class="link" href="#_python_7">Python</a></h4>
+<div class="sect4">
+<h5 id="_star_1_3"><a class="anchor" href="#_star_1_3"></a><a class="link" href="#_star_1_3">Star 1</a></h5>
+<div class="paragraph">
+<p>Easy peasy.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_star_2"><a class="anchor" href="#_star_2"></a><a class="link" href="#_star_2">Star 2</a></h5>
+<div class="paragraph">
+<p>This is a very cool task.
+The easy peasy implentation was sufficient efficient for Star 1.
+But now it is not anymore due to exponential growth. Hence a nother approach is required.
+It is especially nice that the first part is designed to lead you to a list based implentation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">file1 = open('input.txt', 'r')
+string_list = file1.readline().rstrip().split(",")
+lantern_fishes = list(map(int, string_list))
+
+
+max_days = 80
+for day in range(0, max_days):
+    for fish in range(len(lantern_fishes)):
+        lantern_fishes[fish] -= 1
+        if lantern_fishes[fish] == -1:
+            lantern_fishes[fish] = 6
+            lantern_fishes.append(8)
+print("Star 1")
+print(f"After 80 days {len(lantern_fishes)} fishes are found")
+
+#Star 2
+# Exponential growth
+file1 = open('input.txt', 'r')
+string_list = file1.readline().rstrip().split(",")
+lantern_fishes = list(map(int, string_list))
+
+fish_counter = [0] * 9
+for fish in range(len(lantern_fishes)):
+    fish_age = lantern_fishes[fish]
+    fish_counter[fish_age] += 1
+print(fish_counter)
+max_days = 256
+for day in range(0, max_days):
+    new_fish_counter = [0] * 9
+    for age in reversed(range(9)):
+        if age == 0:
+           new_fish_counter[8] = fish_counter[age]
+           new_fish_counter[6] += fish_counter[age]
+        else:
+           new_fish_counter[age - 1] = fish_counter[age]
+    fish_counter = new_fish_counter
+
+print("Star 2")
+print(f"After {max_days} days {sum(fish_counter)} fishes are found")</code></pre>
+</div>
 </div>
 </div>
 </div>
