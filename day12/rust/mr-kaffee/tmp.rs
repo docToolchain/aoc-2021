@@ -51,6 +51,17 @@ impl<'a> CaveMap<'a> {
     }
     // end::parse[]
 
+    /// get index of cave identified by name
+    pub fn index_of(&self, name: &str) -> Option<usize> {
+        self.caves.iter().position(|cave| *cave == name)
+    }
+
+    /// get iterator over adjacents for name
+    pub fn get_adjacents(&self, name: &str) -> Option<impl Iterator<Item = &str>> {
+        self.index_of(name)
+            .map(|idx| self.adjacents[idx].iter().map(|adj| self.caves[*adj]))
+    }
+
     /// check whether cave with given id is small
     pub fn is_small(&self, id: usize) -> bool {
         self.caves[id].chars().next().unwrap().is_ascii_lowercase()
@@ -152,7 +163,7 @@ b-d
 A-end
 b-end";
 
-    fn get_test_data() -> BTreeMap<&'static str, BTreeSet<&'static str>> {
+    fn test_data() -> BTreeMap<&'static str, BTreeSet<&'static str>> {
         BTreeMap::from([
             ("start", BTreeSet::from(["A", "b"])),
             ("A", BTreeSet::from(["start", "c", "b", "end"])),
@@ -163,20 +174,13 @@ b-end";
         ])
     }
 
-    fn get_adjacents<'a>(map: &'a CaveMap, name: &str) -> Option<impl Iterator<Item = &'a str>> {
-        map.caves
-            .iter()
-            .position(|cave| *cave == name)
-            .map(|idx| map.adjacents[idx].iter().map(|adj| map.caves[*adj]))
-    }
-
     #[test]
     fn test_parse() {
         let map = parse(TEST_INPUT);
-        for (name, adjacents) in get_test_data() {
+        for (name, adjacents) in test_data() {
             assert_eq!(
                 Some(adjacents),
-                get_adjacents(&map, name).map(|it| it.collect())
+                map.get_adjacents(name).map(|it| it.collect())
             );
         }
     }
