@@ -1,27 +1,34 @@
-== Day 12: ____ ==
+== Day 12: Passage Pathing ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/12[AoC|2021|12].
 
-=== Part 1 ===
+=== Solution ===
 
-Parse
+Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute.
+
+To start, I parse the input into a map with caves as keys and sets of all adjacent caves as values:
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
+Then the general soluton idea is to do a (breadth first) traversal on a graph of all possible pathes through the cave:
+
+. Add a path consisting of the ``start`` cave only to the queue
+. Take a path from the queue and look at all adjacent caves of the last cave on the path
+** if the adjacent cave is ``start``, ignore it
+** if the adjacent cave is ``end``, a new path is found
+** if the adjacent cave is a large cave, append it to the path and push the extended path to the queue
+** if the adjacent cave is a small cave, and it is not yet on the path (part 1) or it is on the path and no small cave is on the path twice yet (part 2), append it to the path and push the extended path to the queue 
+. Repeat step 2 until queue is empty
+
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=part1]
+include::src/lib.rs[tags=get_path_count]
 ----
 
-=== Part 2 ===
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=part2]
-----
+In this function, a path is represented by a vector of caves and a boolean flag indicating whether the path is restricted to not be extended by a small cave already on the path. For part 1, this flag is always set to ``true`` (call function with ``no_duplicate_small = true``). For part 2, this flag is only set to ``true`` after a single small cave is on the path twice (call function with ``no_duplicate_small = false``). 
 
 === Tests ===
 
@@ -29,5 +36,3 @@ include::src/lib.rs[tags=part2]
 ----
 include::src/lib.rs[tags=tests]
 ----
-
-=== Today I learned ===
