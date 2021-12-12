@@ -1,6 +1,12 @@
 use std::collections::VecDeque;
 
-/// map of caves
+// tag::cavemap[]
+/// Map of Caves
+///
+/// Each cave has a unique ID: the position of it's name in the [CaveMap::caves] field.
+/// The adjacents of the cave are stored in the list at the same position in the [CaveMap::adjacents] field.
+///
+/// The IDs of the start and end cave are stored in the fields [CaveMap::start] and [CaveMap::end].
 pub struct CaveMap<'a> {
     pub caves: Vec<&'a str>,
     pub adjacents: Vec<Vec<usize>>,
@@ -9,7 +15,6 @@ pub struct CaveMap<'a> {
 }
 
 impl<'a> CaveMap<'a> {
-    // tag::parse[]
     /// parse input to map
     pub fn parse(input: &'a str) -> Self {
         let mut caves = Vec::new();
@@ -35,11 +40,11 @@ impl<'a> CaveMap<'a> {
                     })
             });
 
-            let lhs = parts.next().expect("No LHS");
-            let rhs = parts.next().expect("No RHS");
+            let lhs_id = parts.next().expect("No LHS");
+            let rhs_id = parts.next().expect("No RHS");
             assert!(parts.next().is_none(), "More than two parts");
-            adjacents[lhs].push(rhs);
-            adjacents[rhs].push(lhs);
+            adjacents[lhs_id].push(rhs_id);
+            adjacents[rhs_id].push(lhs_id);
         }
 
         CaveMap {
@@ -49,34 +54,36 @@ impl<'a> CaveMap<'a> {
             end,
         }
     }
-    // end::parse[]
 
-    /// check whether cave with given id is small
+    /// check whether cave with given ID is small
     pub fn is_small(&self, id: usize) -> bool {
         self.caves[id].chars().next().unwrap().is_ascii_lowercase()
     }
 }
+// end::cavemap[]
 
 pub fn parse(input: &'static str) -> CaveMap {
     CaveMap::parse(input)
 }
 
+// tag::contains[]
 /// determine whether a path contains a cave
-fn contains(paths: &[(usize, Option<usize>)], path_idx: usize, cave_idx: usize) -> bool {
-    let mut path_idx = path_idx;
+fn contains(paths: &[(usize, Option<usize>)], ptr: usize, cave_id: usize) -> bool {
+    let mut ptr = ptr;
     loop {
-        let (idx, parent) = paths[path_idx];
-        if idx == cave_idx {
+        let (id, opt_ptr) = paths[ptr];
+        if id == cave_id {
             return true;
         }
 
-        if let Some(next_idx) = parent {
-            path_idx = next_idx;
+        if let Some(next_ptr) = opt_ptr {
+            ptr = next_ptr;
         } else {
             return false;
         }
     }
 }
+// end::contains[]
 
 // tag::get_path_count[]
 /// count number of distinct pathes using map
@@ -85,7 +92,7 @@ fn contains(paths: &[(usize, Option<usize>)], path_idx: usize, cave_idx: usize) 
 /// once. If the flag is set to ``true``, this is not allowed at all. If it is set to false,
 /// it is allowed at most once.
 pub fn get_path_count(map: &CaveMap, no_duplicate_small: bool) -> usize {
-    // store all path elements as a cave idx and an index to the parent element (= index to this vec)
+    // store all path elements as a cave ID and a parent pointer (= index to this vec) wrapped in an Option
     let mut paths: Vec<(usize, Option<usize>)> = Vec::new();
 
     // count of unique paths
@@ -95,26 +102,26 @@ pub fn get_path_count(map: &CaveMap, no_duplicate_small: bool) -> usize {
     paths.push((map.start, None));
     queue.push_back((paths.len() - 1, no_duplicate_small));
 
-    while let Some((path_idx, no_duplicate_small)) = queue.pop_front() {
-        let cave = paths[path_idx].0;
-        for &adjacent in &map.adjacents[cave] {
-            if adjacent == map.start {
+    while let Some((ptr, no_duplicate_small)) = queue.pop_front() {
+        let cave_id = paths[ptr].0;
+        for &adj_id in &map.adjacents[cave_id] {
+            if adj_id == map.start {
                 // never go back to start
                 continue;
-            } else if adjacent == map.end {
+            } else if adj_id == map.end {
                 // new path to "end" found
                 path_count += 1;
                 continue;
             }
 
-            let duplicate_small = map.is_small(adjacent) && contains(&paths, path_idx, adjacent);
+            let duplicate_small = map.is_small(adj_id) && contains(&paths, ptr, adj_id);
             if no_duplicate_small && duplicate_small {
                 // skip lower case already on path, if no duplicate small caves are allowed
                 continue;
             }
 
             // extend path by adjacent
-            paths.push((adjacent, Some(path_idx)));
+            paths.push((adj_id, Some(ptr)));
 
             // add extended path to queue, if a duplicate small was added, no further duplicate smalls are allowed
             queue.push_back((paths.len() - 1, no_duplicate_small || duplicate_small));
