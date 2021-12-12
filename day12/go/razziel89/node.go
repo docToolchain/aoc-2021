@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strings"
+)
+
 // tag::node[]
 
 // Node is a node in a tree.
@@ -18,6 +23,26 @@ func (n *Node) AddConnection(connection *Node) {
 		}
 	}
 	n.Connections = append(n.Connections, connection)
+}
+
+// NodeToStr provides a string representation for a node.
+func NodeToStr(node *Node) string {
+	connectionIDs := []string{}
+	for _, con := range node.Connections {
+		connectionIDs = append(connectionIDs, con.ID)
+	}
+	connections := strings.Join(connectionIDs, ",")
+	str := fmt.Sprintf("{N: %s, L: %d, C: %s}", node.ID, node.Limit, connections)
+	return str
+}
+
+// NodesToStr provides a string representation for multiple nodes.
+func NodesToStr(nodes []*Node) string {
+	str := ""
+	for _, node := range nodes {
+		str += NodeToStr(node) + "\n"
+	}
+	return str
 }
 
 // end::node[]

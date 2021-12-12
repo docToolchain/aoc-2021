@@ -14,22 +14,6 @@ const (
 	endNode   = "end"
 )
 
-func nodeToStr(node *Node) string {
-	connectionIDs := []string{}
-	for _, con := range node.Connections {
-		connectionIDs = append(connectionIDs, con.ID)
-	}
-	connections := strings.Join(connectionIDs, ",")
-	str := fmt.Sprintf("{N: %s, L: %d, C: %s}", node.ID, node.Limit, connections)
-	return str
-}
-
-func printNodes(nodes []*Node) {
-	for _, node := range nodes {
-		fmt.Println(nodeToStr(node))
-	}
-}
-
 // func printStack(stack *Stack) {
 // 	for _, node := range *stack {
 // 		nodeStr := nodeToStr(node.Node)
@@ -37,32 +21,12 @@ func printNodes(nodes []*Node) {
 // 	}
 // }
 
-func filterAtOrOverLimit(node *Node, curr int) bool {
+func atOrOverLimit(node *Node, curr int) bool {
 	if node.Limit == 0 {
 		// This is a node we may visit any number of times.
 		return false
 	}
 	return curr >= node.Limit
-}
-
-func setFromStack(stack Stack) CountingSet {
-	set, err := setFromList(stack.ToList())
-	if err != nil {
-		// We should never even be able to reach this point. That is, a stack only ever contains
-		// non-nil nodes. Thus, fatalling here is fine.
-		log.Fatal("internal error")
-	}
-	return set
-}
-
-func setFromList(nodes []*Node) (CountingSet, error) {
-	set := CountingSet{}
-	for _, node := range nodes {
-		if err := set.Add(node); err != nil {
-			return CountingSet{}, err
-		}
-	}
-	return set, nil
 }
 
 // A validityFn checks whether the currently-attempted solution is stil a valid one.
@@ -79,17 +43,11 @@ func findConnections(nodes []*Node, start, end string, checkFn validityFn) (<-ch
 	}
 	stack := Stack{}
 	stack.Push(startNode, 0)
+	set := CountingSet{}
+	_ = set.Add(startNode)
 
 	go func() {
-		it := 0
 		for {
-			// fmt.Println("It: ", it)
-			it++
-			// printStack(&stack)
-
-			set := setFromStack(stack)
-			overLimit := set.Filter(filterAtOrOverLimit)
-
 			topNode := stack.Peek().Node
 			progress := stack.Peek().ConnectionCount
 
@@ -104,7 +62,7 @@ func findConnections(nodes []*Node, start, end string, checkFn validityFn) (<-ch
 				// Get the next in line and check if we have not yet exceeded its visitation limit.
 				var nextTop *Node
 				for idx, checkNext := range topNode.Connections[*progress:] {
-					if FindNode(overLimit, checkNext.ID) == nil {
+					if !atOrOverLimit(checkNext, set.Count(checkNext)) {
 						*progress += idx
 						nextTop = checkNext
 						break
@@ -130,12 +88,15 @@ func findConnections(nodes []*Node, start, end string, checkFn validityFn) (<-ch
 				if nextTop != nil {
 					// We know the next top node. Add it.
 					stack.Push(nextTop, 0)
+					_ = set.Add(nextTop)
 				}
 			}
 			if *progress >= len(topNode.Connections) {
 				// We have exceeded what we can achieve with this topmost node. Remove the top-most
 				// one and continue from the one underneath.
-				if oldTop, nonEmpty := stack.Pop(); nonEmpty {
+				oldTop, nonEmpty := stack.Pop()
+				set.Remove(oldTop.Node)
+				if nonEmpty {
 					// If the stack is not empty, make sure we check the next connection for the new
 					// top node.
 					// fmt.Println("Removing", nodeToStr(oldTop.Node))
@@ -185,14 +146,23 @@ func filterPart2(set *CountingSet) bool {
 	return set.FilterCount(filterFn) <= 1
 }
 
+func setFromList(nodes []*Node) (CountingSet, error) {
+	set := CountingSet{}
+	for _, node := range nodes {
+		if err := set.Add(node); err != nil {
+			return CountingSet{}, err
+		}
+	}
+	return set, nil
+}
+
 //nolint: funlen
 func main() {
 	nodes, err := ReadLinesAsNodes()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println("Nodes:")
-	printNodes(nodes)
+	fmt.Printf("Nodes: %s\n", NodesToStr(nodes))
 	iterator, err := findConnections(nodes, startNode, endNode, filterPart2)
 	if err != nil {
 		log.Fatal(err)
