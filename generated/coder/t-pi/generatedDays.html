@@ -294,6 +294,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_13_python">Day 13: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_13_transparent_origami">AoC21-13: Transparent Origami</a>
+<ul class="sectlevel4">
+<li><a href="#_info_13">Info</a></li>
+<li><a href="#_howto_13">HowTo</a></li>
+<li><a href="#_learned_today_13">Learned today</a></li>
+<li><a href="#_source_13">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1816,6 +1828,147 @@ def main():
     print(f"Result (*): {star1}")
     print("Path finding for Star2 will take some time...")
     star2 = len(find_paths(caves, links, 2))
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day13" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_13_python"><a class="anchor" href="#_day_13_python"></a><a class="link" href="#_day_13_python">Day 13: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_13_transparent_origami"><a class="anchor" href="#_aoc21_13_transparent_origami"></a><a class="link" href="#_aoc21_13_transparent_origami">AoC21-13: Transparent Origami</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/13" class="bare">https://adventofcode.com/2021/day/13</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_13"><a class="anchor" href="#_info_13"></a><a class="link" href="#_info_13">Info</a></h5>
+<div class="paragraph">
+<p>Get code by setting dots on transparent paper and folding it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1 (*): How many visible dots on sheet after first fold</p>
+</li>
+<li>
+<p>Star2 (**): What 8 letters are visible after all folds</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_13"><a class="anchor" href="#_howto_13"></a><a class="link" href="#_howto_13">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and prepocessed into sheet with '1' for dot and '0' for transparent, as well as list of folds.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Iterate single fold and count visible dots.</p>
+</li>
+<li>
+<p>Star2: Iterate all folds and display the eight letter from the dots. Be careful to move the right lines - move in both directions from the folding line. Otherwise the output will be illegible&#8230;&#8203;</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_13"><a class="anchor" href="#_learned_today_13"></a><a class="link" href="#_learned_today_13">Learned today</a></h5>
+<div class="paragraph">
+<p>Took some time to find the error (garbled characters). Did not iterate from foldline first, but from the outside, leading to a pixel shift on some folds&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_13"><a class="anchor" href="#_source_13"></a><a class="link" href="#_source_13">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see README.adoc
+
+import math
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+    coordinates = [item.split(',') for item in local_list[:local_list.index('')]]
+    fold_instructions = [item.split()[2] for item in local_list[local_list.index('')+1:]]
+    return coordinates, fold_instructions
+
+
+def preprocess_input(coordinates_list, fold_instructions):
+    ''' Preprocess daily input
+        Put coordinates into sheet, parse fold_instructions
+        Return sheet with dots, fold lines
+        ! BEWARE: 2d list 'sheet' is flipped &amp; rotated vs. instructions
+    '''
+    coordinates = [[int(x), int(y)] for (x, y) in coordinates_list]
+    max_x = max([x for (x, __) in coordinates])
+    max_y = max([y for (__, y) in coordinates])
+    sheet = [[0 for y in range(max_y+1)] for x in range(max_x+1)]
+    for point in coordinates:
+        sheet[point[0]][point[1]] = 1
+    folds=[[axis, int(coord)] for (axis, coord) in (item.split('=') for item in fold_instructions)]
+    return sheet, folds
+
+
+def transpose_list(any_list):
+    ''' Transpose list for analysis
+    '''
+    return [[row[i] for row in any_list] for i in range(len(any_list[0]))]
+
+
+def fold_sheet(sheet, fold_axis, fold_coord):
+    ''' "Fold" sheet along axis on line coord.
+        superpose inverted second half with first half and discard second half
+        Return new sheet
+        ! BEWARE: 2d list 'sheet' is flipped &amp; rotated vs. instructions
+    '''
+    max_row = len(sheet)
+    max_col = len(sheet[0])
+    if fold_axis == 'y':  # fold along col
+        for row in range(max_row):
+            for i, col in enumerate(range(fold_coord+1, max_col)):
+                sheet[row][fold_coord-1-i] = 1 if (sheet[row][fold_coord-1-i]+sheet[row][col] &gt; 0) else 0
+        folded_sheet = [item[:fold_coord] for item in sheet]
+        return folded_sheet
+    else:  # fold along row
+        for i, row in enumerate(range(fold_coord+1, max_row)):
+            for col in range(max_col):
+                sheet[fold_coord-1-i][col] = 1 if (sheet[fold_coord-1-i][col]+sheet[row][col] &gt; 0) else 0
+        folded_sheet = [item for item in sheet[:fold_coord]]
+        return folded_sheet
+
+
+
+def main():
+    coordinates, fold_instructions = read_daily_input('input13.txt')
+    sheet, folds = preprocess_input(coordinates, fold_instructions)
+    first_folded_sheet = fold_sheet(sheet, folds[0][0], folds[0][1])
+    star1 = sum([sum(row) for row in first_folded_sheet])
+    print(f"Result (*): {star1}")
+    fully_folded_sheet = sheet.copy()
+    for fold in folds:
+        fully_folded_sheet = fold_sheet(fully_folded_sheet, fold[0], fold[1])
+    star2_list = transpose_list(fully_folded_sheet)
+    for row in star2_list:
+        print(''.join(['█' if c == 1 else ' ' for c in row]))
+    star2 = 's. above'
     print(f"Result (**): {star2}")
 
 
