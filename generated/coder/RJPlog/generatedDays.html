@@ -273,6 +273,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_13_kotlin">Day 13: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_13_transparent_origami">Day 13: Transparent Origami</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_13">First Star</a></li>
+<li><a href="#_second_star_13">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1942,6 +1952,125 @@
 	println()
 // end::output[]
 //}</code></pre>
+</div>
+</div>
+<a id="day13" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_13_kotlin"><a class="anchor" href="#_day_13_kotlin"></a><a class="link" href="#_day_13_kotlin">Day 13: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_13_transparent_origami"><a class="anchor" href="#_day_13_transparent_origami"></a><a class="link" href="#_day_13_transparent_origami">Day 13: Transparent Origami</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/13" class="bare">https://adventofcode.com/2021/day/13</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2113_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_13"><a class="anchor" href="#_first_star_13"></a><a class="link" href="#_first_star_13">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>First the width and the height of the samples is identified. Then a list is set up for a grid, all points which are not included in the samples are marked with ".", all samples are marked with "#".</p>
+</div>
+<div class="paragraph">
+<p>Then the rules for folding are applied, after each folding step the grid is reduced and width or height are adapted. After the first fold the number of marked dots is caluclated for the solution of part 1</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// go trough each fold instruction
+	var firstInstruction : Boolean = true
+	foldInstruction.forEach {
+		var instruction = it.split("=")
+		if (instruction[0] == "y") {
+			// do the folding
+			for (y in instruction[1].toInt()..height - 1) {
+				for (x in 0..width - 1) {
+					if (markedPoints[x + y * width] == "#") {
+						markedPoints[x + (instruction[1].toInt() - (y - instruction[1].toInt())) * width] =
+							markedPoints[x + y * width]
+					}
+				}
+			}
+			// create new list
+			height = instruction[1].toInt()
+			for (y in 0..height - 1) {
+				for (x in 0..width - 1) {
+					newMarkedPoints.add(markedPoints[x + y * width])
+				}
+			}
+			// exchange lists
+			markedPoints.clear()
+			markedPoints.addAll(newMarkedPoints)
+			newMarkedPoints.clear()
+
+		} else if (instruction[0] == "x") {
+			// do the folding
+			for (y in 0..height - 1) {
+				for (x in instruction[1].toInt()..width - 1) {
+					if (markedPoints[x + y * width] == "#") {
+						markedPoints[(instruction[1].toInt() - (x - instruction[1].toInt())) + y * width] =
+							markedPoints[x + y * width]
+					}
+				}
+			}
+			// create new list
+			for (y in 0..height - 1) {
+				for (x in 0..instruction[1].toInt() - 1) {
+					newMarkedPoints.add(markedPoints[x + y * width])
+				}
+			}
+			width = instruction[1].toInt()
+			// exchange lists
+			markedPoints.clear()
+			markedPoints.addAll(newMarkedPoints)
+			newMarkedPoints.clear()
+		}
+		if (firstInstruction) {
+				solution1 = markedPoints.count() { it == "#" }
+			firstInstruction = false
+		}
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_13"><a class="anchor" href="#_second_star_13"></a><a class="link" href="#_second_star_13">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Instead of conting all dots after first fold, folding will continue over all instructions and the resulting grid is printed out.</p>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("***********************************")
+	println("--- Day 13: Transparent Origami ---")
+	println("***********************************")
+	println("Solution for part1")
+	println("   $solution1 dots are visible after completing just the first fold instruction on your transparent paper")
+	println()
+// print solution for part 2
+	println("***********************************")
+	println("Solution for part2")
+	for (y in 0..height - 1) {
+		for (x in 0..width - 1) {
+			print(markedPoints[x + y * width])
+		}
+		println()
+	}
+	println("   do you use to activate the infrared thermal imaging camera system")
+	println()</code></pre>
 </div>
 </div>
 </div>
