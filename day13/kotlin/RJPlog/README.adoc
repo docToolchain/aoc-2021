@@ -1,0 +1,34 @@
+==  Day 13: Transparent Origami  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/13
+
+For execution enter _kotlin day2113_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+First the width and the height of the samples is identified. Then a list is set up for a grid, all points which are not included in the samples are marked with ".", all samples are marked with "#". 
+
+Then the rules for folding are applied, after each folding step the grid is reduced and width or height are adapted. After the first fold the number of marked dots is caluclated for the solution of part 1
+
+[source, kotlin, numbered]
+....
+include::day2113_1_2.kts[tags=fold]
+....
+
+=== Second Star
+
+How does it work: +
+
+Instead of conting all dots after first fold, folding will continue over all instructions and the resulting grid is printed out.
+
+
+At the end, both solutions are printed out. 
+
+[source, kotlin, numbered]
+....
+include::day2113_1_2.kts[tags=output]
+....
