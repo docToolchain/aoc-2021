@@ -1,6 +1,6 @@
-== Day 07: The Treachery of Whales ==
+== Day 12: Passage Pathing ==
 
-This is my implementation for both rounds of the whales puzzle.
+This is my implementation for both rounds of the passage pathing puzzle.
 
 === Oveview ===
 
@@ -8,6 +8,8 @@ This solution contains a `solution.go`, which defines the main executable.
 There is also a `utils.go`, which is currently where some helper functions are.
 This solution also re-uses the counting set implementation of day 3 in
 `set.go` but using integers instead of string tokens this time.
+It also contains a `stack.go` and a `node.go` that implement a stack and a node
+with connections, respectively.
 
 `solution.go`
 [source,go,numbered]
@@ -25,6 +27,18 @@ include::utils.go[tags=utils]
 [source,go,numbered]
 ----
 include::set.go[tags=set]
+----
+
+`stack.go`
+[source,go,numbered]
+----
+include::stack.go[tags=stack]
+----
+
+`node.go`
+[source,go,numbered]
+----
+include::node.go[tags=node]
 ----
 
 There are currently no tests.
