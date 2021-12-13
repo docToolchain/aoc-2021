@@ -260,6 +260,26 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_12_go">Day 12: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_12_passage_pathing">Day 12: Passage Pathing</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_12">Oveview</a></li>
+<li><a href="#_how_to_run_12">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_13_go">Day 13: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_13_transparent_origami">Day 13: Transparent Origami</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_13">Oveview</a></li>
+<li><a href="#_how_to_run_13">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3044,6 +3064,823 @@ func (g *Grid) Points() &lt;-chan Vec {
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run the solution for both parts.</p>
+</div>
+<a id="day12" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_12_go"><a class="anchor" href="#_day_12_go"></a><a class="link" href="#_day_12_go">Day 12: go</a></h3>
+<div class="sect3">
+<h4 id="_day_12_passage_pathing"><a class="anchor" href="#_day_12_passage_pathing"></a><a class="link" href="#_day_12_passage_pathing">Day 12: Passage Pathing</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the passage pathing puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_12"><a class="anchor" href="#_oveview_12"></a><a class="link" href="#_oveview_12">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where some helper functions are.
+This solution also re-uses the counting set implementation of day 3 in
+<code>set.go</code> but using integers instead of string tokens this time.
+It also contains a <code>stack.go</code> and a <code>node.go</code> that implement a stack and a node
+with connections, respectively.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	startNode = "start"
+	endNode   = "end"
+)
+
+// func printStack(stack *Stack) {
+// 	for _, node := range *stack {
+// 		nodeStr := nodeToStr(node.Node)
+// 		fmt.Printf("%s -&gt; %d\n", nodeStr, *node.ConnectionCount)
+// 	}
+// }
+
+func atOrOverLimit(node *Node, curr int) bool {
+	if node.Limit == 0 {
+		// This is a node we may visit any number of times.
+		return false
+	}
+	return curr &gt;= node.Limit
+}
+
+// A validityFn checks whether the currently-attempted solution is stil a valid one.
+type validityFn = func(*CountingSet) bool
+
+//nolint:funlen
+func findConnections(nodes []*Node, start, end string, checkFn validityFn) (&lt;-chan []*Node, error) {
+	channel := make(chan []*Node)
+	startNode := FindNode(nodes, startNode)
+	endNode := FindNode(nodes, endNode)
+	if startNode == nil || endNode == nil {
+		close(channel)
+		return channel, fmt.Errorf("start or end not defined")
+	}
+	stack := Stack{}
+	stack.Push(startNode, 0)
+	set := CountingSet{}
+	_ = set.Add(startNode)
+
+	go func() {
+		for {
+			topNode := stack.Peek().Node
+			progress := stack.Peek().ConnectionCount
+
+			if !checkFn(&amp;set) {
+				// This is no longer a valid solution. Don't continue to explore solutions based on
+				// it. Make sure to skip it by setting the progress counter to its maximum.
+				*progress = len(topNode.Connections)
+			}
+
+			if *progress &lt; len(topNode.Connections) {
+				// We have not yet tried out all connections. Try out the next one.
+				// Get the next in line and check if we have not yet exceeded its visitation limit.
+				var nextTop *Node
+				for idx, checkNext := range topNode.Connections[*progress:] {
+					if !atOrOverLimit(checkNext, set.Count(checkNext)) {
+						*progress += idx
+						nextTop = checkNext
+						break
+					}
+				}
+				if nextTop == nil {
+					// We've not found any available connections. Thus, trigger the removal of the
+					// topmost node and continue with the one beneath it. This is done by stating
+					// that we've tried out all possible connections from this one.
+					*progress = len(topNode.Connections)
+				}
+				if nextTop == endNode {
+					// We have found a connection! Yeah! Emit it.
+					stack.Push(nextTop, 0)
+					channel &lt;- stack.ToList()
+					// fmt.Println("EMIT")
+					_, _ = stack.Pop()
+					// Make sure we don't check this connection again.
+					*progress++
+					// Make sure we never traverse the end node.
+					continue
+				}
+				if nextTop != nil {
+					// We know the next top node. Add it.
+					stack.Push(nextTop, 0)
+					_ = set.Add(nextTop)
+				}
+			}
+			if *progress &gt;= len(topNode.Connections) {
+				// We have exceeded what we can achieve with this topmost node. Remove the top-most
+				// one and continue from the one underneath.
+				oldTop, nonEmpty := stack.Pop()
+				set.Remove(oldTop.Node)
+				if nonEmpty {
+					// If the stack is not empty, make sure we check the next connection for the new
+					// top node.
+					// fmt.Println("Removing", nodeToStr(oldTop.Node))
+					// If we ever remove the start node, we have reached the end.
+					if oldTop.Node == startNode {
+						close(channel)
+						return
+					}
+					newTop := stack.Peek()
+					*newTop.ConnectionCount++
+				}
+			}
+		}
+	}()
+
+	return channel, nil
+}
+
+// Filter for part 1. Only count connections that don't visit any small cave more than once.
+func filterPart1(set *CountingSet) bool {
+	threshold := 1
+	filterFn := func(node *Node, curr int) bool {
+		if strings.ToUpper(node.ID) == node.ID {
+			// This is a node we may visit any number of times. Thus, don't filter it out.
+			return false
+		}
+		return curr &gt; threshold
+	}
+	// If we didn't filter out anything, that means the input describes a connection that does not
+	// visit any small cave more than once.
+	return set.FilterCount(filterFn) == 0
+}
+
+// Filter for part 2. Only count connections that don't visit more than one small cave more than
+// once.
+func filterPart2(set *CountingSet) bool {
+	threshold := 1
+	filterFn := func(node *Node, curr int) bool {
+		if strings.ToUpper(node.ID) == node.ID {
+			// This is a node we may visit any number of times. Thus, don't filter it out.
+			return false
+		}
+		return curr &gt; threshold
+	}
+	// If we didn't filter out more than one entry, that means the input describes a connection that
+	// does not visit more than one small cave more than twice.
+	return set.FilterCount(filterFn) &lt;= 1
+}
+
+func setFromList(nodes []*Node) (CountingSet, error) {
+	set := CountingSet{}
+	for _, node := range nodes {
+		if err := set.Add(node); err != nil {
+			return CountingSet{}, err
+		}
+	}
+	return set, nil
+}
+
+//nolint: funlen
+func main() {
+	nodes, err := ReadLinesAsNodes()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Printf("Nodes: %s\n", NodesToStr(nodes))
+	iterator, err := findConnections(nodes, startNode, endNode, filterPart2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pathCountPart1 := 0
+	pathCountPart2 := 0
+	for con := range iterator {
+		set, err := setFromList(con)
+		if err != nil {
+			log.Fatal("internal error while filtering")
+		}
+		if filterPart1(&amp;set) {
+			pathCountPart1++
+		}
+		// We have already filtered for part 2's validity function.
+		pathCountPart2++
+	}
+	fmt.Printf("there are %d paths for part 1\n", pathCountPart1)
+	fmt.Printf("there are %d paths for part 2\n", pathCountPart2)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// FindNode finds a node based on its ID in a list of them.
+func FindNode(nodes []*Node, id string) *Node {
+	for _, checkNode := range nodes {
+		if checkNode.ID == id {
+			return checkNode
+		}
+	}
+	return nil
+}
+
+// ReadLinesAsNodes reads all lines from stdin as nodes. Note that each line refers to more than one
+// node.
+func ReadLinesAsNodes() ([]*Node, error) {
+	var result []*Node
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []*Node{}, err
+		}
+		fields := trimStrings(strings.Split(line, connectionSep))
+		// Try to find an existing node of the names. If none is found, create one.
+		for _, field := range fields {
+			if node := FindNode(result, field); node == nil {
+				// No node found, add a new one.
+				// A limit of zero means no limit in visiting.
+				limit := 0
+				if strings.ToLower(field) == field {
+					// Lower case node name, we cannot visit it more than once.
+					// But for part 2, we may visit at most one small cave twice. Thus, we consider
+					// small caves as though they can be visited twice and filter out later.
+					limit = 2
+				}
+				// The start and end nodes must never be visited more than once.
+				if field == "start" || field == "end" {
+					limit = 1
+				}
+				newNode := &amp;Node{
+					ID:          field,
+					Limit:       limit,
+					Connections: []*Node{},
+				}
+				result = append(result, newNode)
+			}
+		}
+		// For each node in this line, add links to all other nodes mentioned in it. Note that
+		// FindNode will not be able to return nil here as we already added all nodes mentioned in
+		// this line.
+		for _, startField := range fields {
+			startNode := FindNode(result, startField)
+			for _, endField := range fields {
+				if endField == startField {
+					continue
+				}
+				endNode := FindNode(result, endField)
+				// Luckily, AddConnection will not do anything if the node is already known.
+				startNode.AddConnection(endNode)
+				endNode.AddConnection(startNode)
+			}
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>set.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// CountingSet is a set that also knows how often each element has been added. It does support
+// non-empty strings only.
+type CountingSet map[*Node]int
+
+// Add adds an entry to the set. The empty *Node is not supported!
+func (c *CountingSet) Add(entry *Node) error {
+	if entry == nil {
+		return fmt.Errorf("empty *Node not supported in counting set")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*c)[entry] = (*c)[entry] + 1
+	return nil
+}
+
+// Count determines how often an entry has been added to the set.
+func (c *CountingSet) Count(entry *Node) int {
+	return (*c)[entry]
+}
+
+// Remove removes one count for a specific key.
+func (c *CountingSet) Remove(entry *Node) {
+	if (*c)[entry] == 0 || (*c)[entry] == 1 {
+		// Trying to remove an entry we don't have or one that has just one count left results in
+		// that entry no longer being present.
+		c.RemoveAll(entry)
+		return
+	}
+	(*c)[entry] = (*c)[entry] - 1
+}
+
+// RemoveAll removes all counts for a specific key.
+func (c *CountingSet) RemoveAll(entry *Node) {
+	delete(*c, entry)
+}
+
+// FilterFn is a function that can be used to filter entries.
+type FilterFn = func(*Node, int) bool
+
+// Filter filters ebtries based on a predicate. That predicate, a FilterFn, gets the entry checked
+// and its count in the data set.
+func (c *CountingSet) Filter(predicate FilterFn) []*Node {
+	result := []*Node{}
+	for entry, count := range *c {
+		if predicate(entry, count) {
+			result = append(result, entry)
+		}
+	}
+	return result
+}
+
+// FilterCount counts how many points would be filtered out by a FilterFn.
+func (c *CountingSet) FilterCount(predicate FilterFn) int {
+	result := 0
+	for entry, count := range *c {
+		if predicate(entry, count) {
+			result++
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>stack.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// StackedNode tracks nodes on the stack as well as how many of its connections have not yet been
+// visited.
+type StackedNode struct {
+	Node            *Node
+	ConnectionCount *int
+}
+
+// Stack is a FIFO.
+type Stack []StackedNode
+
+// Push puts a value on the stack.
+func (s *Stack) Push(node *Node, connectionCount int) {
+	stackedNode := StackedNode{
+		Node:            node,
+		ConnectionCount: &amp;connectionCount,
+	}
+	*s = append(*s, stackedNode)
+}
+
+// Pop removes the topmost value and returns it. Also returns whether the stack was non-empty.
+func (s *Stack) Pop() (*StackedNode, bool) {
+	if len(*s) == 0 {
+		return &amp;StackedNode{}, false
+	}
+	val := &amp;(*s)[len(*s)-1]
+	*s = (*s)[0 : len(*s)-1 : len(*s)-1]
+	return val, true
+}
+
+// Peek returns the top-most entry.
+func (s *Stack) Peek() *StackedNode {
+	if len(*s) == 0 {
+		return &amp;StackedNode{}
+	}
+	return &amp;(*s)[len(*s)-1]
+}
+
+// ToList gets the nodes stacked in the stack in the order they were stacked in (FIFO).
+func (s *Stack) ToList() []*Node {
+	result := []*Node{}
+	for _, stackedNode := range *s {
+		result = append(result, stackedNode.Node)
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>node.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Node is a node in a tree.
+type Node struct {
+	ID          string
+	Limit       int
+	Connections []*Node
+}
+
+// AddConnection adds a connection to a node, but only if that connection does not yet exist. If it
+// does, nothing is done.
+func (n *Node) AddConnection(connection *Node) {
+	for _, con := range n.Connections {
+		if con == connection {
+			return
+		}
+	}
+	n.Connections = append(n.Connections, connection)
+}
+
+// NodeToStr provides a string representation for a node.
+func NodeToStr(node *Node) string {
+	connectionIDs := []string{}
+	for _, con := range node.Connections {
+		connectionIDs = append(connectionIDs, con.ID)
+	}
+	connections := strings.Join(connectionIDs, ",")
+	str := fmt.Sprintf("{N: %s, L: %d, C: %s}", node.ID, node.Limit, connections)
+	return str
+}
+
+// NodesToStr provides a string representation for multiple nodes.
+func NodesToStr(nodes []*Node) string {
+	str := ""
+	for _, node := range nodes {
+		str += NodeToStr(node) + "\n"
+	}
+	return str
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_12"><a class="anchor" href="#_how_to_run_12"></a><a class="link" href="#_how_to_run_12">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution for both parts.
+The solution for part 1 will be output first, followed by that for part 2.</p>
+</div>
+<a id="day13" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_13_go"><a class="anchor" href="#_day_13_go"></a><a class="link" href="#_day_13_go">Day 13: go</a></h3>
+<div class="sect3">
+<h4 id="_day_13_transparent_origami"><a class="anchor" href="#_day_13_transparent_origami"></a><a class="link" href="#_day_13_transparent_origami">Day 13: Transparent Origami</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the transparent origami puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_13"><a class="anchor" href="#_oveview_13"></a><a class="link" href="#_oveview_13">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>grid.go</code>, which contains specifications of a grid and other
+geometrical functionality.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">func foldPoint(point Vec, ins Instruction) Vec {
+	// Assume the point is unaffected.
+	newPoint := point
+	if ins.Dir == "x" &amp;&amp; point.x &gt; ins.Val {
+		// Affected by fold.
+		newPoint = Vec{
+			x: ins.Val - (point.x - ins.Val),
+			y: point.y,
+		}
+	} else if ins.Dir == "y" &amp;&amp; point.y &gt; ins.Val {
+		// Affected by fold.
+		newPoint = Vec{
+			x: point.x,
+			y: ins.Val - (point.y - ins.Val),
+		}
+	} else if !strings.Contains("xy", ins.Dir) {
+		// Cannot reach here, so fatalling is OK if we do.
+		log.Fatal("internal error while folding")
+	}
+	return newPoint
+}
+
+func fold(grid Grid, ins Instruction) (Grid, error) {
+	result := Grid{}
+	if !strings.Contains("xy", ins.Dir) {
+		return Grid{}, fmt.Errorf("internal error")
+	}
+	// Check that no point is on the fold line.
+	for p := range grid.Points() {
+		if (ins.Dir == "x" &amp;&amp; p.x == ins.Val) || (ins.Dir == "y" &amp;&amp; p.y == ins.Val) {
+			return Grid{}, fmt.Errorf("point on fold line")
+		}
+	}
+	// Fold the points.
+	for p := range grid.Points() {
+		newPoint := foldPoint(p, ins)
+		err := result.Mark(newPoint, 1)
+		if err != nil {
+			return Grid{}, err
+		}
+	}
+	return result, nil
+}
+
+//nolint: funlen
+func main() {
+	prettyPrint := os.Getenv(prettyPrintEnvVar) == "1"
+	grid, ins, err := ReadLinesAsGridAndInstructions()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if prettyPrint {
+		fmt.Println(grid.Pretty(1))
+	}
+	for _, instruct := range ins {
+		folded, err := fold(grid, instruct)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		fmt.Printf("There are %d marked points.\n", len(folded))
+		if prettyPrint {
+			fmt.Println(folded.Pretty(1))
+		}
+		// err = folded.ReduceMarked(1)
+		// if err != nil {
+		// 	log.Fatal(err.Error())
+		// }
+		grid = folded
+	}
+	fmt.Println()
+	// We need this in the end even though generating it might take long.
+	fmt.Println(grid.Pretty(1)) //nolint:gomnd
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	defaultGridVal    = 1
+	instructionSep    = "fold along "
+	instructionFields = 2
+	lineSep           = "="
+)
+
+// Instruction describes a folding instruction.
+type Instruction struct {
+	Val int
+	Dir string
+}
+
+func instructionFromString(str string) (Instruction, error) {
+	fields := strings.Split(str, lineSep)
+	if len(fields) != instructionFields {
+		return Instruction{}, fmt.Errorf("cannot convert %s to instruction, fields", str)
+	}
+	var result Instruction
+	val, err := strconv.Atoi(fields[1])
+	if err != nil {
+		return Instruction{}, err
+	}
+	result = Instruction{
+		Val: val,
+		Dir: fields[0],
+	}
+	if !strings.Contains("xy", fields[0]) {
+		return Instruction{}, fmt.Errorf("cannot convert %s to instruction, coord", str)
+	}
+	return result, nil
+}
+
+// ReadLinesAsGridAndInstructions reads all lines from stdin as a grid and instructions.
+func ReadLinesAsGridAndInstructions() (Grid, []Instruction, error) {
+	result := make(Grid)
+	instructions := []Instruction{}
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, instructions, nil
+		}
+		if err != nil {
+			return Grid{}, []Instruction{}, err
+		}
+		line = strings.TrimSpace(line)
+		if len(line) == 0 {
+			// Ignore empty lines.
+			continue
+		}
+		//nolint:nestif
+		if strings.Contains(line, instructionSep) {
+			// Line with instruction.
+			fields := strings.Split(line, instructionSep)
+			if len(fields) != instructionFields {
+				err := fmt.Errorf("cannot extract instruction from %s", line)
+				return Grid{}, []Instruction{}, err
+			}
+			ins, err := instructionFromString(fields[1])
+			if err != nil {
+				return Grid{}, []Instruction{}, err
+			}
+			instructions = append(instructions, ins)
+		} else {
+			// Line with grid point.
+			vec, err := VecFromStr(line)
+			if err != nil {
+				return Grid{}, []Instruction{}, err
+			}
+			err = result.Mark(vec, defaultGridVal)
+			if err != nil {
+				return Grid{}, []Instruction{}, err
+			}
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Vec is a 2D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y int
+}
+
+// VecFromStr converts a sring into a vector.
+func VecFromStr(str string) (Vec, error) {
+	fields := trimStrings(strings.Split(str, vecSep))
+	if len(fields) != tokensPerPoint {
+		return Vec{}, fmt.Errorf("cannot parse %v as vector, wrong number of fields", str)
+	}
+	ints, err := strSliceToIntSlice(fields)
+	if err != nil {
+		return Vec{}, fmt.Errorf("cannot parse %s as vector, %s", str, err.Error())
+	}
+	result := Vec{
+		x: ints[0],
+		y: ints[1],
+	}
+	return result, nil
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid map[Vec]int
+
+// Mark marks a point on the grid n times. Don't accept numbers &lt;0.
+func (g *Grid) Mark(entry Vec, n int) error {
+	if n &lt; 0 {
+		return fmt.Errorf("can only mark non-negative times")
+	}
+	// We don't have to handle non-existing values here since Go returns the zero value (0 for
+	// integers) for such entries.
+	(*g)[entry] = (*g)[entry] + n
+	return nil
+}
+
+// Count determines how often a point has been marked.
+func (g *Grid) Count(entry Vec) int {
+	return (*g)[entry]
+}
+
+// Has determines whether a point is on the grid.
+func (g *Grid) Has(entry Vec) bool {
+	_, ok := (*g)[entry]
+	return ok
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(*g, entry)
+}
+
+// Points returns an iterator over all points on the grid.
+func (g *Grid) Points() &lt;-chan Vec {
+	channel := make(chan Vec)
+	go func() {
+		for point := range *g {
+			channel &lt;- point
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// ReduceMarked sets the marking value of all points that are marked to the given value.
+func (g *Grid) ReduceMarked(val int) error {
+	if val &lt; 0 {
+		return fmt.Errorf("can only mark non-negative times")
+	}
+	for p := range g.Points() {
+		(*g)[p] = val
+	}
+	return nil
+}
+
+func (g *Grid) topLeft() (int, int) {
+	foundX, foundY := false, false
+	minX, minY := 0, 0
+	for p := range g.Points() {
+		if !foundX || p.x &lt; minX {
+			minX = p.x
+			foundX = true
+		}
+		if !foundY || p.y &lt; minY {
+			minY = p.y
+			foundY = true
+		}
+	}
+	return minX, minY
+}
+
+func (g *Grid) bottomRight() (int, int) {
+	foundX, foundY := false, false
+	maxX, maxY := 0, 0
+	for p := range g.Points() {
+		if !foundX || p.x &gt; maxX {
+			maxX = p.x
+			foundX = true
+		}
+		if !foundY || p.y &gt; maxY {
+			maxY = p.y
+			foundY = true
+		}
+	}
+	return maxX, maxY
+}
+
+// Pretty creates a pretty string representation of this grid.
+func (g *Grid) Pretty(digits int) string {
+	result := ""
+	empty := " "
+	maxVal := 10
+	for count := 1; count &lt; digits; count++ {
+		empty += " "
+		maxVal *= 10
+	}
+	formatStr := fmt.Sprintf("%%-%dd", digits)
+	minX, minY := g.topLeft()
+	maxX, maxY := g.bottomRight()
+	for y := minY; y &lt;= maxY; y++ {
+		for x := minX; x &lt;= maxX; x++ {
+			val := g.Count(Vec{x: x, y: y})
+			if val &gt; 0 {
+				result += fmt.Sprintf(formatStr, val)
+				if val &gt;= maxVal {
+					// Return the string up to the offending point so that the caller sees what the
+					// offending number was. This is a hack at best but good enough for me right
+					// now.
+					return result + "\nINCOMPLETE"
+				}
+			} else {
+				result += empty
+			}
+		}
+		result += "\n"
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_13"><a class="anchor" href="#_how_to_run_13"></a><a class="link" href="#_how_to_run_13">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run the solution.</p>
 </div>
 </div>
 </div>

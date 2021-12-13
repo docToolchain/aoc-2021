@@ -145,22 +145,22 @@
 <li><a href="#_mr_kaffee">mr-kaffee</a>
 <ul class="sectlevel2">
 <li><a href="#_about_me">About me</a></li>
-<li><a href="#_day_00_ruby">Day 00: ruby</a>
+<li><a href="#_day_00_rust">Day 00: rust</a>
 <ul class="sectlevel3">
 <li><a href="#_day_00_hello_world">Day 00: Hello World</a>
 <ul class="sectlevel4">
-<li><a href="#_solution">Solution</a></li>
-<li><a href="#_test">Test</a></li>
+<li><a href="#_general_structure">General structure</a></li>
+<li><a href="#_run_solutions">Run Solutions</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_day_00_rust">Day 00: rust</a>
+<li><a href="#_day_00_ruby">Day 00: ruby</a>
 <ul class="sectlevel3">
 <li><a href="#_day_00_hello_world_2">Day 00: Hello World</a>
 <ul class="sectlevel4">
-<li><a href="#_general_structure">General structure</a></li>
-<li><a href="#_run_solutions">Run Solutions</a></li>
+<li><a href="#_solution">Solution</a></li>
+<li><a href="#_test">Test</a></li>
 </ul>
 </li>
 </ul>
@@ -176,24 +176,24 @@
 </li>
 </ul>
 </li>
-<li><a href="#_day_02_ruby">Day 02: ruby</a>
+<li><a href="#_day_02_rust">Day 02: rust</a>
 <ul class="sectlevel3">
 <li><a href="#_day_02_dive">Day 02: Dive!</a>
 <ul class="sectlevel4">
 <li><a href="#_part_1_2">Part 1</a></li>
 <li><a href="#_part_2_2">Part 2</a></li>
-<li><a href="#_tests">Tests</a></li>
 <li><a href="#_today_i_learned_2">Today I learned</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_day_02_rust">Day 02: rust</a>
+<li><a href="#_day_02_ruby">Day 02: ruby</a>
 <ul class="sectlevel3">
 <li><a href="#_day_02_dive_2">Day 02: Dive!</a>
 <ul class="sectlevel4">
 <li><a href="#_part_1_3">Part 1</a></li>
 <li><a href="#_part_2_3">Part 2</a></li>
+<li><a href="#_tests">Tests</a></li>
 <li><a href="#_today_i_learned_3">Today I learned</a></li>
 </ul>
 </li>
@@ -355,71 +355,9 @@ Strava: <a href="https://www.strava.com/athletes/89256720">Peter Wieland</a></p>
 <a id="day00" />
 </div>
 <div class="sect2">
-<h3 id="_day_00_ruby"><a class="anchor" href="#_day_00_ruby"></a><a class="link" href="#_day_00_ruby">Day 00: ruby</a></h3>
-<div class="sect3">
-<h4 id="_day_00_hello_world"><a class="anchor" href="#_day_00_hello_world"></a><a class="link" href="#_day_00_hello_world">Day 00: Hello World</a></h4>
-<div class="paragraph">
-<p>Maybe I&#8217;ll try out some <a href="https://www.ruby-lang.org/">Ruby</a> this year. At least a hello world is done ;)</p>
-</div>
-<div class="sect4">
-<h5 id="_solution"><a class="anchor" href="#_solution"></a><a class="link" href="#_solution">Solution</a></h5>
-<div class="paragraph">
-<p>The actual solution resides in <code>solution.rb</code></p>
-</div>
-<div class="paragraph">
-<p>It will define classes, methods and similar to calculate the solution, e.g.,</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def say_hello(name = "World")
-  "Hello, #{name}!"
-end</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And a section to run the actual solution and measure time, like</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">if __FILE__ == $0
-  b = Benchmark.measure { puts say_hello }
-  puts "Solved in #{b.real}s"
-end</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The part <code>if <em>FILE</em> == $0</code> is taken from <a href="https://www.ruby-lang.org/en/documentation/quickstart/4/">Ruby in Twenty Minutes</a></p>
-</div>
-<div class="paragraph">
-<p>The solution is executed with <code>ruby solution.rb</code></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_test"><a class="anchor" href="#_test"></a><a class="link" href="#_test">Test</a></h5>
-<div class="paragraph">
-<p>To test my code, there will be a <code>solution_test.rb</code> file which defines a test class derived from <code>Test::Unit::TestCase</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
-  def test_say_hello
-    assert_equal "Hello, World!", say_hello
-    assert_equal "Hello, Eric Wastl!", say_hello("Eric Wastl")
-  end
-end</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Tests are executed with <code>ruby solution_test.rb</code></p>
-</div>
-<a id="day00" />
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_day_00_rust"><a class="anchor" href="#_day_00_rust"></a><a class="link" href="#_day_00_rust">Day 00: rust</a></h3>
 <div class="sect3">
-<h4 id="_day_00_hello_world_2"><a class="anchor" href="#_day_00_hello_world_2"></a><a class="link" href="#_day_00_hello_world_2">Day 00: Hello World</a></h4>
+<h4 id="_day_00_hello_world"><a class="anchor" href="#_day_00_hello_world"></a><a class="link" href="#_day_00_hello_world">Day 00: Hello World</a></h4>
 <div class="paragraph">
 <p>I am still undecided what language to use this year.
 I&#8217;ll start with <a href="https://www.rust-lang.org/">Rust</a>.</p>
@@ -491,6 +429,68 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>Run tests with <code>cargo test</code></p>
+</div>
+<a id="day00" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_00_ruby"><a class="anchor" href="#_day_00_ruby"></a><a class="link" href="#_day_00_ruby">Day 00: ruby</a></h3>
+<div class="sect3">
+<h4 id="_day_00_hello_world_2"><a class="anchor" href="#_day_00_hello_world_2"></a><a class="link" href="#_day_00_hello_world_2">Day 00: Hello World</a></h4>
+<div class="paragraph">
+<p>Maybe I&#8217;ll try out some <a href="https://www.ruby-lang.org/">Ruby</a> this year. At least a hello world is done ;)</p>
+</div>
+<div class="sect4">
+<h5 id="_solution"><a class="anchor" href="#_solution"></a><a class="link" href="#_solution">Solution</a></h5>
+<div class="paragraph">
+<p>The actual solution resides in <code>solution.rb</code></p>
+</div>
+<div class="paragraph">
+<p>It will define classes, methods and similar to calculate the solution, e.g.,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def say_hello(name = "World")
+  "Hello, #{name}!"
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And a section to run the actual solution and measure time, like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">if __FILE__ == $0
+  b = Benchmark.measure { puts say_hello }
+  puts "Solved in #{b.real}s"
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The part <code>if <em>FILE</em> == $0</code> is taken from <a href="https://www.ruby-lang.org/en/documentation/quickstart/4/">Ruby in Twenty Minutes</a></p>
+</div>
+<div class="paragraph">
+<p>The solution is executed with <code>ruby solution.rb</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_test"><a class="anchor" href="#_test"></a><a class="link" href="#_test">Test</a></h5>
+<div class="paragraph">
+<p>To test my code, there will be a <code>solution_test.rb</code> file which defines a test class derived from <code>Test::Unit::TestCase</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
+  def test_say_hello
+    assert_equal "Hello, World!", say_hello
+    assert_equal "Hello, Eric Wastl!", say_hello("Eric Wastl")
+  end
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Tests are executed with <code>ruby solution_test.rb</code></p>
 </div>
 <a id="day01" />
 </div>
@@ -604,103 +604,14 @@ pub fn count_increase_with_offset(data: &amp;[usize], offset: usize) -&gt; usize
 </div>
 </div>
 <div class="sect2">
-<h3 id="_day_02_ruby"><a class="anchor" href="#_day_02_ruby"></a><a class="link" href="#_day_02_ruby">Day 02: ruby</a></h3>
-<div class="sect3">
-<h4 id="_day_02_dive"><a class="anchor" href="#_day_02_dive"></a><a class="link" href="#_day_02_dive">Day 02: Dive!</a></h4>
-<div class="paragraph">
-<p><a href="https://www.ruby-lang.org">Ruby</a> solution to <a href="https://adventofcode.com/2021/day/2">AoC|2021|02</a>.</p>
-</div>
-<div class="sect4">
-<h5 id="_part_1_2"><a class="anchor" href="#_part_1_2"></a><a class="link" href="#_part_1_2">Part 1</a></h5>
-<div class="paragraph">
-<p>Generic function to calculate the position.
-Takes the input string, an initial value and a hash of lambdas updating the position</p>
-</div>
-<div class="paragraph">
-<p>The function iterates through the lines of the <code>input</code>. Each <code>line</code> is split in the command part <code>cmd</code> and the value part <code>v</code> (single space as separator). The command is used to select a lambda from the <code>steps</code> hash which is then called with the accumulator <code>acc</code> and the value <code>v</code> to udpate the accumulator.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position(input, init, steps)
-  input.split("\n")
-       .map { |line| line.split(' ') }
-       .inject(init) { |acc, cmd| steps[cmd.first].call acc, cmd.last.to_i }
-end</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For part 1, this function is called as follows:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_1(input)
-  calc_position(input, [0, 0], {
-    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1] - v] },
-    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1] + v] },
-    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1]] }
-  })
-end</code></pre>
-</div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_part_2_2"><a class="anchor" href="#_part_2_2"></a><a class="link" href="#_part_2_2">Part 2</a></h5>
-<div class="paragraph">
-<p>For part 2, the aim has to be considered as additional value and the update rules are changed:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_2(input)
-  calc_position(input, [0, 0, 0], {
-    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] - v] },
-    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] + v] },
-    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1] + acc[2] * v, acc[2]] }
-  })
-end</code></pre>
-</div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_tests"><a class="anchor" href="#_tests"></a><a class="link" href="#_tests">Tests</a></h5>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
-  CONTENT = %(forward 5
-down 5
-forward 8
-up 3
-down 8
-forward 2).freeze
-
-  def test_calc_position_1
-    assert_equal [15, 10], calc_position_1(CONTENT)
-  end
-
-  def test_calc_position_2
-    assert_equal [15, 60, 10], calc_position_2(CONTENT)
-  end
-end</code></pre>
-</div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_today_i_learned_2"><a class="anchor" href="#_today_i_learned_2"></a><a class="link" href="#_today_i_learned_2">Today I learned</a></h5>
-<div class="paragraph">
-<p>... that I don&#8217;t know how to set up VS Code for decent Ruby development :(</p>
-</div>
-<a id="day02" />
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_day_02_rust"><a class="anchor" href="#_day_02_rust"></a><a class="link" href="#_day_02_rust">Day 02: rust</a></h3>
 <div class="sect3">
-<h4 id="_day_02_dive_2"><a class="anchor" href="#_day_02_dive_2"></a><a class="link" href="#_day_02_dive_2">Day 02: Dive!</a></h4>
+<h4 id="_day_02_dive"><a class="anchor" href="#_day_02_dive"></a><a class="link" href="#_day_02_dive">Day 02: Dive!</a></h4>
 <div class="paragraph">
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/2">AoC|2021|02</a>.</p>
 </div>
 <div class="sect4">
-<h5 id="_part_1_3"><a class="anchor" href="#_part_1_3"></a><a class="link" href="#_part_1_3">Part 1</a></h5>
+<h5 id="_part_1_2"><a class="anchor" href="#_part_1_2"></a><a class="link" href="#_part_1_2">Part 1</a></h5>
 <div class="paragraph">
 <p>The most difficult part today was to parse the input. My rust knowledge obviously is slightly rusty&#8230;&#8203;
 Eventually I created an enum with a <code>parse</code> function as follows:</p>
@@ -784,7 +695,7 @@ pub fn calc_position(input: &amp;str) -&gt; (isize, isize) {
 </div>
 </div>
 <div class="sect4">
-<h5 id="_part_2_3"><a class="anchor" href="#_part_2_3"></a><a class="link" href="#_part_2_3">Part 2</a></h5>
+<h5 id="_part_2_2"><a class="anchor" href="#_part_2_2"></a><a class="link" href="#_part_2_2">Part 2</a></h5>
 <div class="paragraph">
 <p>The second part was an easy extension to the first part. Just add a third accumulator state for the aim (small trap: my horizontal position is called 'x' which is not the same as the 'X' in the puzzle description)</p>
 </div>
@@ -813,9 +724,98 @@ pub fn calc_position_with_aim(input: &amp;str) -&gt; (isize, isize, isize) {
 </div>
 </div>
 <div class="sect4">
-<h5 id="_today_i_learned_3"><a class="anchor" href="#_today_i_learned_3"></a><a class="link" href="#_today_i_learned_3">Today I learned</a></h5>
+<h5 id="_today_i_learned_2"><a class="anchor" href="#_today_i_learned_2"></a><a class="link" href="#_today_i_learned_2">Today I learned</a></h5>
 <div class="paragraph">
 <p>Parsing simple inputs does not require regular expressions &amp; creating enums with parse functions leads to a bit more code but looks much prettier</p>
+</div>
+<a id="day02" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_ruby"><a class="anchor" href="#_day_02_ruby"></a><a class="link" href="#_day_02_ruby">Day 02: ruby</a></h3>
+<div class="sect3">
+<h4 id="_day_02_dive_2"><a class="anchor" href="#_day_02_dive_2"></a><a class="link" href="#_day_02_dive_2">Day 02: Dive!</a></h4>
+<div class="paragraph">
+<p><a href="https://www.ruby-lang.org">Ruby</a> solution to <a href="https://adventofcode.com/2021/day/2">AoC|2021|02</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_3"><a class="anchor" href="#_part_1_3"></a><a class="link" href="#_part_1_3">Part 1</a></h5>
+<div class="paragraph">
+<p>Generic function to calculate the position.
+Takes the input string, an initial value and a hash of lambdas updating the position</p>
+</div>
+<div class="paragraph">
+<p>The function iterates through the lines of the <code>input</code>. Each <code>line</code> is split in the command part <code>cmd</code> and the value part <code>v</code> (single space as separator). The command is used to select a lambda from the <code>steps</code> hash which is then called with the accumulator <code>acc</code> and the value <code>v</code> to udpate the accumulator.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position(input, init, steps)
+  input.split("\n")
+       .map { |line| line.split(' ') }
+       .inject(init) { |acc, cmd| steps[cmd.first].call acc, cmd.last.to_i }
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For part 1, this function is called as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_1(input)
+  calc_position(input, [0, 0], {
+    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1] - v] },
+    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1] + v] },
+    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1]] }
+  })
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_3"><a class="anchor" href="#_part_2_3"></a><a class="link" href="#_part_2_3">Part 2</a></h5>
+<div class="paragraph">
+<p>For part 2, the aim has to be considered as additional value and the update rules are changed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">def calc_position_2(input)
+  calc_position(input, [0, 0, 0], {
+    'up' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] - v] },
+    'down' =&gt; -&gt;(acc, v) { [acc[0], acc[1], acc[2] + v] },
+    'forward' =&gt; -&gt;(acc, v) { [acc[0] + v, acc[1] + acc[2] * v, acc[2]] }
+  })
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests"><a class="anchor" href="#_tests"></a><a class="link" href="#_tests">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-ruby" data-lang="ruby">class TestSolution &lt; Test::Unit::TestCase
+  CONTENT = %(forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2).freeze
+
+  def test_calc_position_1
+    assert_equal [15, 10], calc_position_1(CONTENT)
+  end
+
+  def test_calc_position_2
+    assert_equal [15, 60, 10], calc_position_2(CONTENT)
+  end
+end</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_3"><a class="anchor" href="#_today_i_learned_3"></a><a class="link" href="#_today_i_learned_3">Today I learned</a></h5>
+<div class="paragraph">
+<p>... that I don&#8217;t know how to set up VS Code for decent Ruby development :(</p>
 </div>
 <a id="day03" />
 </div>
