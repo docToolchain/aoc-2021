@@ -1,68 +1,67 @@
-use std::{cmp, collections::BTreeSet, ops::Add};
+use std::{cmp, collections::HashSet, ops::Add};
 
 // tag::parse[]
-pub fn parse(content: &str) -> (BTreeSet<(usize, usize)>, Vec<(bool, usize)>) {
+pub fn parse(content: &str) -> (HashSet<(usize, usize)>, Vec<(bool, usize)>) {
     let mut parts = content.split("\n\n");
-    let points = parts.next().expect("No points");
-    let folds = parts.next().expect("No folds");
-    assert!(parts.next().is_none(), "Excess data");
-
-    let points = points
-        .lines()
-        .map(|line| {
-            let mut parts = line.split(",");
-            (
-                parts
-                    .next()
-                    .expect("No x coordinate")
-                    .parse()
-                    .expect("Could not parse x"),
-                parts
-                    .next()
-                    .expect("No y coordinate")
-                    .parse()
-                    .expect("Could not parse y"),
-            )
-        })
-        .collect();
-
-    let folds = folds
-        .lines()
-        .map(|line| {
-            let mut parts = line.split("=");
-            (
-                match parts.next() {
-                    Some("fold along y") => true,
-                    Some("fold along x") => false,
-                    _ => panic!("Unexpected fold instruction"),
-                },
-                parts
-                    .next()
-                    .expect("No fold coordinate")
-                    .parse()
-                    .expect("Could not parse fold coordinate"),
-            )
-        })
-        .collect();
-
-    (points, folds)
+    (
+        parts
+            .next()
+            .expect("No points")
+            .lines()
+            .map(|line| line.split(","))
+            .map(|mut point_parts| {
+                (
+                    point_parts
+                        .next()
+                        .expect("No x coordinate")
+                        .parse()
+                        .expect("Could not parse x"),
+                    point_parts
+                        .next()
+                        .expect("No y coordinate")
+                        .parse()
+                        .expect("Could not parse y"),
+                )
+            })
+            .collect(),
+        parts
+            .next()
+            .expect("No fold instructions")
+            .lines()
+            .map(|line| line.split("="))
+            .map(|mut fold_parts| {
+                (
+                    match fold_parts.next() {
+                        Some("fold along y") => true,
+                        Some("fold along x") => false,
+                        _ => panic!("Unexpected fold instruction"),
+                    },
+                    fold_parts
+                        .next()
+                        .expect("No fold coordinate")
+                        .parse()
+                        .expect("Could not parse fold coordinate"),
+                )
+            })
+            .collect(),
+    )
 }
 // end::parse[]
 
 // tag::fold[]
 /// perform a single fold
 pub fn fold(
-    points: &BTreeSet<(usize, usize)>,
+    points: &HashSet<(usize, usize)>,
     horizontal: bool,
-    fold_coordinate: usize,
-) -> BTreeSet<(usize, usize)> {
+    coord: usize,
+) -> HashSet<(usize, usize)> {
     points
         .iter()
         .map(|(x, y)| {
-            if horizontal && y > &fold_coordinate {
-                (*x, fold_coordinate - (*y - fold_coordinate))
-            } else if !horizontal && x > &fold_coordinate {
-                (fold_coordinate - (*x - fold_coordinate), *y)
+            if horizontal && y > &coord {
+                (*x, 2 * coord - *y)
+            } else if !horizontal && x > &coord {
+                (2 * coord - *x, *y)
             } else {
                 (*x, *y)
             }
@@ -73,20 +72,14 @@ pub fn fold(
 
 // tag::part1[]
 /// count points after first fold operation
-pub fn solution_1(points: &BTreeSet<(usize, usize)>, folds: &[(bool, usize)]) -> usize {
+pub fn solution_1(points: &HashSet<(usize, usize)>, folds: &[(bool, usize)]) -> usize {
     let (horizontal, fold_coordinate) = folds.first().expect("No folds");
     fold(points, *horizontal, *fold_coordinate).len()
 }
 // end::part1[]
 
 // tag::part2[]
-/// perform all fold operations and return result as a ``String``
-pub fn solution_2(points: &BTreeSet<(usize, usize)>, folds: &[(bool, usize)]) -> String {
-    let mut points = points.to_owned();
-    for (horizontal, fold_coordinate) in folds {
-        points = fold(&points, *horizontal, *fold_coordinate);
-    }
-
+pub fn points_to_string(points: &HashSet<(usize, usize)>) -> String {
     // calculate bounding box
     let (x_min, y_min, x_max, y_max) = points.iter().fold(
         (usize::MAX, usize::MAX, 0, 0),
@@ -104,11 +97,21 @@ pub fn solution_2(points: &BTreeSet<(usize, usize)>, folds: &[(bool, usize)]) ->
     (y_min..y_max)
         .map(|y| {
             (x_min..x_max)
-                .map(|x| if points.contains(&(x, y)) { '#' } else { ' ' })
+                .map(|x| if points.contains(&(x, y)) { '#' } else { '.' })
                 .collect::<String>()
         })
         .map(|line| line.add("\n"))
         .collect::<String>()
+}
+
+/// perform all fold operations and return result as a ``String``
+pub fn solution_2(points: &HashSet<(usize, usize)>, folds: &[(bool, usize)]) -> String {
+    let mut points = points.to_owned();
+    for (horizontal, fold_coordinate) in folds {
+        points = fold(&points, *horizontal, *fold_coordinate);
+    }
+
+    points_to_string(&points)
 }
 // end::part2[]
 
@@ -163,15 +166,15 @@ fold along x=5";
     const TEST_FOLDS: &[(bool, usize)] = &[(true, 7), (false, 5)];
 
     const TEST_RESULT: &str = "#####\n\
-                               #   #\n\
-                               #   #\n\
-                               #   #\n\
+                               #...#\n\
+                               #...#\n\
+                               #...#\n\
                                #####\n";
 
     #[test]
     fn test_parse() {
         let (points, folds) = parse(&TEST_CONTENT);
-        assert_eq!(BTreeSet::from(TEST_POINTS), points);
+        assert_eq!(HashSet::from(TEST_POINTS), points);
         assert_eq!(TEST_FOLDS, folds);
     }
 
