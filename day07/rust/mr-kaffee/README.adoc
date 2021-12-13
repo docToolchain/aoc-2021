@@ -18,7 +18,7 @@ Create a function that calculates the fuel need for a given alignment position (
 include::src/lib.rs[tags=get_fuel]
 ----
 
-For optimization, I did not even think about for something more clever than linear search. 
+I did not even think about anything more clever than linear search to solve the optimization problem. 
 
 [source,rust,numbered]
 ----
@@ -32,6 +32,30 @@ For part two I just use a different cost function: ``COST_LINEAR`` solves part 1
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=cost_functions]
+----
+
+=== Solution Revisited ===
+
+I learned about https://gitlab.com/akoeltringer/advent_of_code/-/tree/main/y2021/d07[something more clever than linear search from a colleague]:
+
+The solution to part 1 is the solution to the optimization problem ``min_p sum_i |p - pos[i]|``. Since the cost function to minimize is V-shaped, the optimization is solved by the median.
+
+The solution to part 2 is the solution to the optimization problem ``min_p sum_i |p - pos[i]| (|p - pos[i]| + 1) / 2``. This is the same as ``min_p (sum_i (p - pos[i])^2 / 2 + sum_i |p - pos[i]| / 2)``. 
+
+The solution to ``min_p (sum_i (p - pos[i])^2 / 2`` is given by the mean of the ``p[i]`` values, so I start from the mean and look in both directions to potentially find something better.
+
+You can run the direct solution using ``cargo run --release --features direct_solution``. Quite a bit faster than linear search ;)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solutions]
+----
+
+The median is calculated recursively:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=select]
 ----
 
 === Tests ===
