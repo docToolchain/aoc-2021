@@ -1,0 +1,36 @@
+== Day 13: Transparent Origami ==
+
+This is my implementation for both rounds of the transparent origami puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `grid.go`, which contains specifications of a grid and other
+geometrical functionality.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`grid.go`
+[source,go,numbered]
+----
+include::grid.go[tags=grid]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution.

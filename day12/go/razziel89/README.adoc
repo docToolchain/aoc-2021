@@ -1,0 +1,50 @@
+== Day 12: Passage Pathing ==
+
+This is my implementation for both rounds of the passage pathing puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where some helper functions are.
+This solution also re-uses the counting set implementation of day 3 in
+`set.go` but using integers instead of string tokens this time.
+It also contains a `stack.go` and a `node.go` that implement a stack and a node
+with connections, respectively.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`set.go`
+[source,go,numbered]
+----
+include::set.go[tags=set]
+----
+
+`stack.go`
+[source,go,numbered]
+----
+include::stack.go[tags=stack]
+----
+
+`node.go`
+[source,go,numbered]
+----
+include::node.go[tags=node]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run the solution for both parts.
+The solution for part 1 will be output first, followed by that for part 2.
