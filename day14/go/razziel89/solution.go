@@ -9,8 +9,10 @@ import (
 // tag::solution[]
 
 const (
-	buffer = 5
-	rounds = 10
+	// We make the buffer large to achieve some degree of parallelism with goroutines.
+	buffer      = 100000
+	roundsPart1 = 10
+	roundsPart2 = 40
 )
 
 func makeMap(replacements []Replacement) map[Match]rune {
@@ -22,10 +24,15 @@ func makeMap(replacements []Replacement) map[Match]rune {
 }
 
 func replace(input <-chan rune, output chan<- rune, replacements map[Match]rune) {
+	myReps := map[Match]rune{}
+	// Copy the map so that each goroutine has its own.
+	for key, val := range replacements {
+		myReps[key] = val
+	}
 	lastRune := <-input
 	for char := range input {
 		output <- lastRune
-		if match, ok := replacements[Match{Left: lastRune, Right: char}]; ok {
+		if match, ok := myReps[Match{Left: lastRune, Right: char}]; ok {
 			output <- match
 		}
 		lastRune = char
@@ -41,15 +48,15 @@ func feed(input string, channel chan<- rune) {
 	close(channel)
 }
 
-func count(input <-chan rune) map[string]int {
-	result := map[string]int{}
+func count(input <-chan rune) map[rune]int {
+	result := map[rune]int{}
 	for char := range input {
-		result[string(char)]++
+		result[char]++
 	}
 	return result
 }
 
-func max(input map[string]int) int {
+func max(input map[rune]int) int {
 	found := false
 	var max int
 	for _, val := range input {
@@ -61,7 +68,7 @@ func max(input map[string]int) int {
 	return max
 }
 
-func min(input map[string]int) int {
+func min(input map[rune]int) int {
 	found := false
 	var min int
 	for _, val := range input {
@@ -73,13 +80,9 @@ func min(input map[string]int) int {
 	return min
 }
 
-//nolint: funlen
-func main() {
-	input, replacements, err := ReadLinesAsReplacementsOrInput()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	reps := makeMap(replacements)
+// Run the polymerization riddle for a given number of rounds. Note how we never construct the full
+// string in memory.
+func runRounds(input string, reps map[Match]rune, rounds int) map[rune]int {
 	// Construct pipeline.
 	inChannel := make(chan rune, buffer)
 	var outChannel chan rune
@@ -91,7 +94,26 @@ func main() {
 		inChannel = outChannel
 	}
 	counts := count(outChannel)
-	fmt.Printf("Max: %d, min: %d, diff: %d\n", max(counts), min(counts), max(counts)-min(counts))
+	return counts
+}
+
+//nolint: funlen
+func main() {
+	input, replacements, err := ReadLinesAsReplacementsOrInput()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	reps := makeMap(replacements)
+	counts := runRounds(input, reps, roundsPart1)
+	fmt.Printf(
+		"Part 1: max: %d, min: %d, diff: %d\n",
+		max(counts), min(counts), max(counts)-min(counts),
+	)
+	counts = runRounds(input, reps, roundsPart2)
+	fmt.Printf(
+		"Part 2: max: %d, min: %d, diff: %d\n",
+		max(counts), min(counts), max(counts)-min(counts),
+	)
 }
 
 // end::solution[]
