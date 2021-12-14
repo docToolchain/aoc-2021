@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 // tag::parse[]
+/// porse content into a vector of chars and a map with pairs of chars as keys and the
+/// char to be inserted as value
 pub fn parse(content: &str) -> (Vec<char>, HashMap<(char, char), char>) {
     let mut parts = content.split("\n\n");
 
@@ -28,42 +30,58 @@ pub fn parse(content: &str) -> (Vec<char>, HashMap<(char, char), char>) {
 // end::parse[]
 
 // tag::simulate_rounds[]
-pub fn simulate_rounds(template: &[char], rules: &HashMap<(char, char), char>, rounds: usize) -> usize {
-    let mut counts = HashMap::new();
+/// simulate given number of rounds starting from polymer template and using given 
+/// rules
+pub fn simulate_rounds(
+    template: &[char],
+    rules: &HashMap<(char, char), char>,
+    rounds: usize,
+) -> usize {
+    // map of pairs to number of occurances of those
+    let mut pairs = HashMap::new();
     for (c1, c2) in template.iter().zip(template.iter().skip(1)) {
-        let cnt = counts.entry((*c1, *c2)).or_insert(0usize);
+        let cnt = pairs.entry((*c1, *c2)).or_insert(0usize);
         *cnt += 1;
     }
 
+    // in each round, update pairs
     for _ in 0..rounds {
         let mut upd = HashMap::new();
-        for ((c1, c2), cnt0) in &counts {
+        for ((c1, c2), cnt0) in &pairs {
             if let Some(d) = rules.get(&(*c1, *c2)) {
+                // if pair is found in rules, replace (c1, c2) by (c1, d) and (d, c2)
                 let cnt = upd.entry((*c1, *d)).or_insert(0);
                 *cnt += cnt0;
                 let cnt = upd.entry((*d, *c2)).or_insert(0);
                 *cnt += cnt0;
             } else {
+                // if pair is not found in rules, keep pair
                 let cnt = upd.entry((*c1, *c2)).or_insert(0);
                 *cnt += cnt0;
             }
         }
-        counts = upd;
+        pairs = upd;
     }
 
-    let mut symbols = HashMap::new();
-    symbols.insert(template[0], 1);
-    symbols.insert(template[template.len() - 1], 1);
-    for ((c1, c2), cnt) in &counts {
-        let count = symbols.entry(*c1).or_insert(0);
+    // count symbols in pairs
+    // each symbol contributes to two pairs except for the first and the last symbol
+    // start with count = 1 for first and last symbol to consistently count every symbol 
+    // twice
+    let mut counts = HashMap::new();
+    counts.insert(template[0], 1);
+    counts.insert(template[template.len() - 1], 1);
+    for ((c1, c2), cnt) in &pairs {
+        let count = counts.entry(*c1).or_insert(0);
         *count += cnt;
-        let count = symbols.entry(*c2).or_insert(0);
+        let count = counts.entry(*c2).or_insert(0);
         *count += cnt;
     }
 
-    let min = symbols.values().min().expect("No min");
-    let max = symbols.values().max().expect("No max");
+    // get (twice the) count for most and less frequent symbol
+    let min = counts.values().min().expect("No min");
+    let max = counts.values().max().expect("No max");
 
+    // return difference, divide by 2 because every symbol is counted twice
     (max - min) / 2
 }
 // end::simulate_rounds[]
