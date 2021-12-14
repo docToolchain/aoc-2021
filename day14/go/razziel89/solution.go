@@ -1,0 +1,97 @@
+// Package main is the main executable for razziel89's solution for this day's advent.
+package main
+
+import (
+	"fmt"
+	"log"
+)
+
+// tag::solution[]
+
+const (
+	buffer = 5
+	rounds = 10
+)
+
+func makeMap(replacements []Replacement) map[Match]rune {
+	result := map[Match]rune{}
+	for _, rep := range replacements {
+		result[rep.Match] = rep.Insert
+	}
+	return result
+}
+
+func replace(input <-chan rune, output chan<- rune, replacements map[Match]rune) {
+	lastRune := <-input
+	for char := range input {
+		output <- lastRune
+		if match, ok := replacements[Match{Left: lastRune, Right: char}]; ok {
+			output <- match
+		}
+		lastRune = char
+	}
+	output <- lastRune
+	close(output)
+}
+
+func feed(input string, channel chan<- rune) {
+	for _, char := range input {
+		channel <- char
+	}
+	close(channel)
+}
+
+func count(input <-chan rune) map[string]int {
+	result := map[string]int{}
+	for char := range input {
+		result[string(char)]++
+	}
+	return result
+}
+
+func max(input map[string]int) int {
+	found := false
+	var max int
+	for _, val := range input {
+		if !found || val > max {
+			found = true
+			max = val
+		}
+	}
+	return max
+}
+
+func min(input map[string]int) int {
+	found := false
+	var min int
+	for _, val := range input {
+		if !found || val < min {
+			found = true
+			min = val
+		}
+	}
+	return min
+}
+
+//nolint: funlen
+func main() {
+	input, replacements, err := ReadLinesAsReplacementsOrInput()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	reps := makeMap(replacements)
+	// Construct pipeline.
+	inChannel := make(chan rune, buffer)
+	var outChannel chan rune
+	// Run pipeline.
+	go feed(input, inChannel)
+	for roundIdx := 0; roundIdx < rounds; roundIdx++ {
+		outChannel = make(chan rune, buffer)
+		go replace(inChannel, outChannel, reps)
+		inChannel = outChannel
+	}
+	counts := count(outChannel)
+	fmt.Printf("Max: %d, min: %d, diff: %d\n", max(counts), min(counts), max(counts)-min(counts))
+}
+
+// end::solution[]
