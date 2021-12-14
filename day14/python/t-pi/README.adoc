@@ -1,0 +1,41 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-14: Extended Polymerization 
+https://adventofcode.com/2021/day/14
+
+=== Info
+
+Polymerization to protect the outer sub shell. Provided: initial polymer string and reactions (char pairs into which new char is inserted)
+
+* Star1 (*): 10 polymerization steps: highest element number - lowest element number
+
+* Star2 (**): 40 polymerization steps: highest element number - lowest element number
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into the polymer as well as a dict of reactions (e.g. 'AB': 'C').
+
+* Star1: Classic string action. 10 iterations work well. Easy to process and easy to count...
+
+* Star2: 40 iterations do not fit into RAM. New approach: Count and manage letter pairs. Worked well, except for own stupidity.
+
+=== Learned today
+
+Had all afternoon that feeling, that I just need to find the little glitch, as test data worked, but not real input. But I did not test the 40cyc test data...
+
+Only much too late found the error: no reset after the first 10 cycles to check for match with star1 --> ran 50 cycles 🤦‍♂️
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
