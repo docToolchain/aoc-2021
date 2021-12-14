@@ -1,0 +1,34 @@
+==  Day 14: Extended Polymerization  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/14
+
+For execution enter _kotlin day2114_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+fun poly() will read puzzle input. For each pair of letters in the initial template the rule is applied by building up a new string. After repeating this 10 times, count the occurency of all letters and return max - min. 
+[source, kotlin, numbered]
+....
+include::day2114_1_2.kts[tags=poly]
+....
+
+=== Second Star
+
+How does it work: +
+
+In theory, same function could work, but it takes much to long. So there is fun polyAdv(), each combination of a pair of letters will be stored with it's number of occurency and for the next round with applying the rules new pairs are generated. After repeating this 40 times,  count the occurency of all letters and return max - min.
+[source, kotlin, numbered]
+....
+include::day2114_1_2.kts[tags=polyAdv]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2114_1_2.kts[tags=output]
+....
