@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-12: Passage Pathing 
+https://adventofcode.com/2021/day/12
+
+=== Info
+
+Map cave system with small (lowercase) and large (highercase) caves
+
+* Star1 (*): How many distinct paths through most caves there are without visiting any smaller case twice?
+
+* Star2 (**): How many distinct paths through most caves there are without visiting A SINGLE smaller case twice?
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and prepocessed into list of caves and list of links.
+
+* Star1: Recursively run from cave through all cave's links, starting with 'start', ending with 'end'. Discard small caves if already in path. Remove double paths and those not ending in 'end' (coming from spawning a new path for every link, as my other approaches did not run reliably through all options... 🙄)
+
+* Star2: Repeat Star1, only this time allowing a small cave to spawn a new path twice, if no other small caves are already twice in path. Takes a while with my anti-optimized approach...
+
+=== Learned today
+
+Got reminded, that recursive without practice and template can be a long series of pitfalls (especially in a cave system 😉). Plus once more: Read the task thoroughly, as my VS Code crashed while trying to run through all paths with any number of small caves allowed twice...
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

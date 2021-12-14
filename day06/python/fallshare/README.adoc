@@ -1,0 +1,16 @@
+Advent of Code 2021
+
+== Python
+=== Star 1
+Easy peasy.
+
+=== Star 2
+This is a very cool task.
+The easy peasy implentation was sufficient efficient for Star 1.
+But now it is not anymore due to exponential growth. Hence a nother approach is required.
+It is especially nice that the first part is designed to lead you to a list based implentation.
+
+[source, python]
+....
+include::solution.py[]
+....

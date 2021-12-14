@@ -4,23 +4,31 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/12[AoC
 
 === Solution ===
 
-Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute.
+Again a kind of breadth first traversal and the first day in the 2021 edition where my solution takes significant time (more than a couple of ms) to compute. After some optimizations, I am now down to about 40ms for part 2.
 
-To start, I parse the input into a map with caves as keys and sets of all adjacent caves as values:
+==== Data Structure for the Cave Map ====
+
+To start, I parse the input into a struct ``CaveMap`` (see comments in code for details):
 
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=parse]
+include::src/lib.rs[tags=cavemap]
 ----
 
-Then the general soluton idea is to do a (breadth first) traversal on a graph of all possible pathes through the cave:
+In my initial implementation, I used a ``BTreeMap`` to map cave names to adjacent names. In the current version, I use cave IDs instead, which are the addresses to the fields in the CaveMap structure. This reduced the runtime by about 25%.
 
-. Add a path consisting of the ``start`` cave only to the queue
-. Take a path from the queue and look at all adjacent caves of the last cave on the path
+==== Searching for Paths ====
+
+The general soluton idea is to do a (breadth first) traversal on a graph of all possible paths through the cave (graph nodes are paths, not caves):
+
+. Push a path consisting of the ``start`` cave only to the queue
+. Pop a path from the queue, and look at all adjacent caves of the last cave on the path
 ** if the adjacent cave is ``start``, ignore it
-** if the adjacent cave is ``end``, a new path is found
+** if the adjacent cave is ``end``, the path is complete; increase the unqiue path counter
 ** if the adjacent cave is a large cave, append it to the path and push the extended path to the queue
-** if the adjacent cave is a small cave, and it is not yet on the path (part 1) or it is on the path and no small cave is on the path twice yet (part 2), append it to the path and push the extended path to the queue 
+** if the adjacent cave is a small cave, append it to the path and push the extended path to the queue if
+*** the small cave is not yet on the path (part 1 & 2) or 
+*** the small cave is already on the path and no small cave is on the path twice yet (part 2 only)
 . Repeat step 2 until queue is empty
 
 [source,rust,numbered]
@@ -28,7 +36,14 @@ Then the general soluton idea is to do a (breadth first) traversal on a graph of
 include::src/lib.rs[tags=get_path_count]
 ----
 
-In this function, a path is represented by a vector of caves and a boolean flag indicating whether the path is restricted to not be extended by a small cave already on the path. For part 1, this flag is always set to ``true`` (call function with ``no_duplicate_small = true``). For part 2, this flag is only set to ``true`` after a single small cave is on the path twice (call function with ``no_duplicate_small = false``). 
+Initially, I used ``Vec``s to represent paths. To extend a path by another cave, I copied the complete ``Vec``, added the cave's name and pushed the ``Vec`` to the queue. In the current version, I use kind of a linked list (each path element has a reference to the parent element). Since linked lists are something that does not go very well with Rust's ownership and borrowing system (or maybe I just don't know how to do that properly), I keep a ``Vec`` of all path elements (for part 2, a total of 427.805 path elements are created). Each path element is a tuple of a cave ID and and a parent pointer, which points to the parent path element in that ``Vec``. Because the start of a path has no parent, the parent pointer is wrapped in an ``Option``. This optimization reduced the runtime by about 75%.
+
+The check whether a cave ID is contained in a path is implemented as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=contains]
+----
 
 === Tests ===
 
