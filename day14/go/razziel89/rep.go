@@ -14,8 +14,25 @@ const (
 
 // Match described one match of two characters.
 type Match struct {
-	Left  rune
-	Right rune
+	Left      rune
+	Right     rune
+	LeftEdge  bool
+	RightEdge bool
+}
+
+func b2s(b bool) rune {
+	if b {
+		return '1'
+	}
+	return '0'
+}
+
+// ToString provides a nice string representation for a match.
+func (m Match) ToString() string {
+	return fmt.Sprintf(
+		"{%c%c [%c|%c]}",
+		m.Left, m.Right, b2s(m.LeftEdge), b2s(m.RightEdge),
+	)
 }
 
 // Replacement describes one replacement instruction by insertion.
