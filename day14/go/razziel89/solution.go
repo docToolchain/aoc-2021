@@ -23,7 +23,7 @@ func makeMap(replacements []Replacement) map[Match]rune {
 	return result
 }
 
-func replace(input <-chan rune, output chan<- rune, replacements map[Match]rune) {
+func replace(input <-chan rune, output chan<- rune, replacements map[Match]rune, idx int) {
 	myReps := map[Match]rune{}
 	// Copy the map so that each goroutine has its own.
 	for key, val := range replacements {
@@ -39,6 +39,7 @@ func replace(input <-chan rune, output chan<- rune, replacements map[Match]rune)
 	}
 	output <- lastRune
 	close(output)
+	fmt.Printf("Closing stage %d.\n", idx)
 }
 
 func feed(input string, channel chan<- rune) {
@@ -46,6 +47,7 @@ func feed(input string, channel chan<- rune) {
 		channel <- char
 	}
 	close(channel)
+	fmt.Println("Closing feeder.")
 }
 
 func count(input <-chan rune) map[rune]int {
@@ -90,7 +92,7 @@ func runRounds(input string, reps map[Match]rune, rounds int) map[rune]int {
 	go feed(input, inChannel)
 	for roundIdx := 0; roundIdx < rounds; roundIdx++ {
 		outChannel = make(chan rune, buffer)
-		go replace(inChannel, outChannel, reps)
+		go replace(inChannel, outChannel, reps, roundIdx)
 		inChannel = outChannel
 	}
 	counts := count(outChannel)
