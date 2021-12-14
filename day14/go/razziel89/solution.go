@@ -146,32 +146,11 @@ func translateMatch(match Match, reps *map[Match]rune) []Match {
 			LeftEdge:  false,
 			RightEdge: match.RightEdge,
 		}
-		// fmt.Printf(
-		// 	"Conv %s -> %s + %s\n",
-		// 	match.ToString(), leftMatch.ToString(), rightMatch.ToString(),
-		// )
 		return []Match{leftMatch, rightMatch}
 	}
 	// No match found, return the original one.
-	// fmt.Printf("Keep %s\n", match.ToString())
 	return []Match{match}
 }
-
-// func printMatches(input map[Match]int) {
-// 	fmt.Println()
-// 	for match, count := range input {
-// 		fmt.Printf("%d -> %s\n", count, match.ToString())
-// 	}
-// 	fmt.Println()
-// }
-//
-// func printCounts(input map[rune]int) {
-// 	fmt.Println()
-// 	for char, count := range input {
-// 		fmt.Printf("%c: %d\n", char, count)
-// 	}
-// 	fmt.Println()
-// }
 
 // Run the polymerization riddle for a given number of rounds, but do it differently. This approach
 // does not scale exponentially with the number of rounds.
@@ -244,8 +223,7 @@ func main() {
 		"Part 1: max: %d, min: %d, diff: %d\n",
 		max(counts), min(counts), max(counts)-min(counts),
 	)
-	// Part 2 cannot be solved this way, it just takes too long.
-	// counts = runRounds(input, reps, roundsPart2)
+	// Part 2 cannot be solved this way, it just takes too long. Thus, solve it differently.
 	counts = runRoundsDifferently(input, reps, roundsPart1)
 	fmt.Printf(
 		"Part 1 differently: max: %d, min: %d, diff: %d\n",
