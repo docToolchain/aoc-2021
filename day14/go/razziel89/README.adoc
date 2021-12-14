@@ -11,6 +11,13 @@ might be re-used later on reside.
 There is also a `rep.go`, which contains specifications of a replacement
 specification.
 
+There are two implementations here.
+The first uses goroutines and achieves some degree of parallelisation this way.
+It's by no means great, though.
+For example, you cannot solve part 2 with it, it's just now efficient enough.
+The second solution does not suffer from such exponential scaling.
+Thus, it can be used to solve both parts quickly.
+
 `solution.go`
 [source,go,numbered]
 ----
@@ -35,6 +42,3 @@ There are currently no tests.
 
 Assuming the required input is in a file `input.dat`, you only need to execute
 `cat input.dat | go run .` to run both solutions.
-Part 2 might take a while.
-It uses goroutines and achieves some degree of parallelisation this way.
-It's by no means great, though.
