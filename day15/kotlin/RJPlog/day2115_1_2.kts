@@ -9,6 +9,7 @@ fun followPath_15(): Int {
 	var searchPathNew = MutableList(0) { mutableListOf<Int>() }
 	var validPath = MutableList(0) { mutableListOf<Int>() }
 	var searchEnd: Boolean = false
+	var totalRiskPerTile = mutableMapOf<Int, Int>()
 
 
 	var ruleCheckPassed: Boolean = false
@@ -19,6 +20,7 @@ fun followPath_15(): Int {
 	var firstTotalRisk: Boolean = true
 	var totalRiskMin: Int = 0
 	var totalRisk: Int = 0
+	var tileRisk: Int = 0
 
 	// generate segments Pair(<x,y>,<x,y>) as in day12
 	// generate searchpath start value (0,0-0,1 , 0,0-1,0)
@@ -45,7 +47,7 @@ fun followPath_15(): Int {
 	//totalRiskMin = ((width + height) - 1) * 9
 
 	println("width $width, height $height")
-	println("risklevel: $riskLevel")
+//	println("risklevel: $riskLevel")
 	println("totalRiskMin: $totalRiskMin")
 
 	for (y in 0..height - 1) {
@@ -61,13 +63,17 @@ fun followPath_15(): Int {
 	currentPath.add(0)
 	currentPath.add(1)
 	searchPath.add(currentPath.toMutableList())
+	totalRiskPerTile.put(1, 0)
 	currentPath.clear()
 	currentPath.add(0)
 	currentPath.add(width)
 	searchPath.add(currentPath.toMutableList())
+	totalRiskPerTile.put(width, 0)
 
-	println("segments: $segments")
+//	println("segments: $segments")
 	println("searchPath: $searchPath")
+	println("totalRiskPerTile: $totalRiskPerTile")
+	println()
 
 
 	var ii: Int = 0
@@ -95,7 +101,7 @@ fun followPath_15(): Int {
 						if (totalRisk < totalRiskMin) {
 							totalRiskMin = totalRisk
 							validPath.add(newCurrentPath)
-							println("validPath:  $newCurrentPath found, , totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
+						//	println("validPath:  $newCurrentPath found, , totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
 						}
 
 
@@ -105,11 +111,17 @@ fun followPath_15(): Int {
 						for (i in 1..newCurrentPath.size - 1) {
 							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
 						}
-						ruleCheckPassed = !(currentPath.contains(it.second)) && totalRisk < totalRiskMin
+						if (totalRiskPerTile.contains(it.second)) {
+							ruleCheckPassed =
+								!(currentPath.contains(it.second)) && totalRisk < totalRiskPerTile.getValue(it.second)
+						} else {
+							ruleCheckPassed = !(currentPath.contains(it.second)) && totalRisk < totalRiskMin
+						}
 
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
-							//println(" path added at totalRisk $totalRisk, totalRiskMin $totalRiskMin")
+							totalRiskPerTile.put(it.second, totalRisk)
+							//	println(" path added at totalRisk $totalRisk, totalRiskMin $totalRiskMin, ${it.second}")
 							searchEnd = false
 						}
 						totalRisk = 0
@@ -126,7 +138,7 @@ fun followPath_15(): Int {
 						if (totalRisk < totalRiskMin) {
 							totalRiskMin = totalRisk
 							validPath.add(newCurrentPath)
-							println("validPath:  $newCurrentPath found, totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
+							//	println("validPath:  $newCurrentPath found, totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
 						}
 
 
@@ -135,22 +147,30 @@ fun followPath_15(): Int {
 						for (i in 1..newCurrentPath.size - 1) {
 							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
 						}
-						ruleCheckPassed = !(currentPath.contains(it.first)) && totalRisk < totalRiskMin
+						if (totalRiskPerTile.contains(it.first)) {
+							ruleCheckPassed =
+								!(currentPath.contains(it.first)) && totalRisk < totalRiskPerTile.getValue(it.first)
 
+						} else {
+							ruleCheckPassed = !(currentPath.contains(it.first)) && totalRisk < totalRiskMin
+
+						}
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
-							//println(" path added at totalRisk $totalRisk, totalRiskMin $totalRiskMin")
+							totalRiskPerTile.put(it.first, totalRisk)
+						//	println(" path $newCurrentPath added at totalRisk $totalRisk, totalRiskMin $totalRiskMin, $it.first}")
 							searchEnd = false
 						}
 						totalRisk = 0
 					}
-				} 
+				}
 			}
 		}
 		searchPath.clear()
 //		println("serachPath $searchPath")
 		searchPath.addAll(searchPathNew)
-//		println("serachPath $searchPath")
+		println("$ii searchPath.size ${searchPath.size}")
+	//	println("totalRiskPerTile $totalRiskPerTile")
 		searchPathNew.clear()
 //		println("serachPathNew $searchPathNew")
 	}
@@ -161,13 +181,11 @@ fun followPath_15(): Int {
 
 //	return validPath.size
 
-	println("validPath:")
+//	println("validPath:")
 	println()
 
 /*	validPath.forEach {
 		totalRisk = 0
-
-
 		for (i in 1..it.size - 1) {
 			totalRisk = totalRisk + riskLevel[it[i]]
 		}
@@ -178,7 +196,6 @@ fun followPath_15(): Int {
 			totalRiskMin = totalRisk
 		}
 		println("$it /totalRisk: $totalRisk")
-
 	}
 	println()
 	println("totalRiskMin: $totalRiskMin")
@@ -189,7 +206,7 @@ fun followPath_15(): Int {
 
 
 fun main(args: Array<String>) {
-
+	var t1 = System.currentTimeMillis()
 	var solution2: Int = 0
 
 	var solution1 = followPath_15()
@@ -207,5 +224,7 @@ fun main(args: Array<String>) {
 	println("Solution for part2")
 	println("   $solution2 ")
 	println()
+	t1 = System.currentTimeMillis() - t1
+	println("puzzle solved in ${t1} ms")
 // end::output[]
 }
