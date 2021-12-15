@@ -1,27 +1,28 @@
-== Day 15: ____ ==
+== Day 15: Chiton ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/15[AoC|2021|15].
 
-=== Part 1 ===
+=== Solution ===
 
-Parse
+Dijkstra!
+
+Parse:
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=part1]
-----
-
-=== Part 2 ===
+Solve (call with ``d = 1`` for part 1 and ``d = 5`` for part 2):
 
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=part2]
+include::src/lib.rs[tags=solve]
 ----
+
+I somehow messed up with part 2 and could not figure out what I did wrong. I generalized the code for part 1 to see whether it still solves part 1 and all of a sudden it also solved part 2. Don't know what I got wrong in the first place.
+
+Possible optimization: use A* with the min steps to target (``width - x + height - y``) as heuristic.
 
 === Tests ===
 
@@ -29,5 +30,3 @@ include::src/lib.rs[tags=part2]
 ----
 include::src/lib.rs[tags=tests]
 ----
-
-=== Today I learned ===

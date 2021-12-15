@@ -44,7 +44,10 @@ pub fn parse(content: &str) -> (Vec<usize>, usize) {
 }
 // end::parse[]
 
-pub fn solution(grid: &[usize], w: usize, n: usize) -> usize {
+// tag::solve[]
+pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
+    let h = grid.len() / w;
+
     let mut heap = BinaryHeap::new();
     let mut visited = vec![false; grid.len() * n * n];
 
@@ -64,15 +67,15 @@ pub fn solution(grid: &[usize], w: usize, n: usize) -> usize {
             (x.wrapping_sub(1), y),
             (x, y.wrapping_sub(1)),
         ] {
-            if x_a >= w * n || y_a >= w * n || visited[x_a + y_a * w * n] {
+            if x_a >= w * n || y_a >= h * n || visited[x_a + y_a * w * n] {
                 continue;
             }
 
-            let (x_0, y_0) = (x_a % w, y_a % w);
+            let (x_0, y_0) = (x_a % w, y_a % h);
 
             visited[x_a + y_a * w * n] = true;
             heap.push(Node {
-                risk: node.risk + ((grid[x_0 + y_0 * w] + x_a / w + y_a / w - 1) % 9) + 1,
+                risk: node.risk + ((grid[x_0 + y_0 * w] + x_a / w + y_a / h - 1) % 9) + 1,
                 idx: x_a + y_a * w * n,
             });
         }
@@ -80,16 +83,17 @@ pub fn solution(grid: &[usize], w: usize, n: usize) -> usize {
 
     panic!("No path found");
 }
+// end::solve[]
 
 // tag::part1[]
 pub fn solution_1(grid: &[usize], width: usize) -> usize {
-    solution(grid, width, 1)
+    solve(grid, width, 1)
 }
 // end::part1[]
 
 // tag::part2[]
 pub fn solution_2(grid: &[usize], width: usize) -> usize {
-    solution(grid, width, 5)
+    solve(grid, width, 5)
 }
 // end::part2[]
 
