@@ -20,5 +20,5 @@ Several optimizations later, I don't know how to proceed. Taking break. Current 
 
 Finally first part is solved. Takes 5min to run through, but it works. Definitely no good idea for second part, so at the end I again have to rethink my strategy. Obivous is, that example and puzzle input take no left or up steps, so I will try to use this in the next approach.
 
-New approach, much faster and way more efficent, now I have to add part 2
+New approach, much faster and way more efficent, now I have to add part 2. Part 2 added, for the example it works well, but for the real input not. So I have to start debugging.
 
