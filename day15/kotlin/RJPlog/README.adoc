@@ -14,3 +14,5 @@ So I have to rethink my approach. First, I still believe in the general approach
 
 Second try with rework all the string operations to lists, but still it does not work. Next part would be to calculate totalRisklevel while generating new pathes and add a rule to not add the path when exceeding already reached totalRisks with other pathes. Initvalue could be puzzle input straight from left to right and down.
 
+Third try with additional rule if path has a total risk level of (width*height-1)*9 now worked for the 10x10 example. But the puzzle input is oviosely to big. Next improvement would be to set the init value not on (width*height-1)*9 but as above described based on puzzle input from left to rigth and then down, second improvement will be to just dynamically adapt the totalRiskMin to already reached min pathes.
+

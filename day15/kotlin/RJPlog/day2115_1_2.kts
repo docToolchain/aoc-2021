@@ -1,6 +1,5 @@
 import java.io.File
 
-
 // tag::followPath_15[]
 fun followPath_15(): Int {
 	var segments = mutableListOf<Pair<Int, Int>>()  // changed from String, String to Int, Int
@@ -17,6 +16,10 @@ fun followPath_15(): Int {
 	var height: Int = 0
 	var riskLevel = mutableListOf<Int>()
 
+	var firstTotalRisk: Boolean = true
+	var totalRiskMin: Int = 0
+	var totalRisk: Int = 0
+
 	// generate segments Pair(<x,y>,<x,y>) as in day12
 	// generate searchpath start value (0,0-0,1 , 0,0-1,0)
 	// new: generate list with risk level: ((x,y-x,y), value)
@@ -29,6 +32,8 @@ fun followPath_15(): Int {
 		}
 		height += 1
 	}
+
+	totalRiskMin = ((width * height) - 1) * 9
 
 	println("width $width, height $height")
 	println("risklevel: $riskLevel")
@@ -67,15 +72,19 @@ fun followPath_15(): Int {
 			var lastSegment = currentPath.last()
 
 			segments.forEach {
-			//	println("${it.first},  ${it.second}")
+				//	println("${it.first},  ${it.second}")
 				if (lastSegment == it.first) {
 					newCurrentPath = currentPath.toMutableList()
 					newCurrentPath.add(it.second)
-			//		println("newCurrentPath $newCurrentPath")
+					//		println("newCurrentPath $newCurrentPath")
 					if (it.second == width * height - 1) {
 						validPath.add(newCurrentPath)
 					} else {
-						ruleCheckPassed = !(currentPath.contains(it.second))
+						for (i in 1..newCurrentPath.size - 1) {
+							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
+						}
+						ruleCheckPassed = !(currentPath.contains(it.second)) && totalRisk < totalRiskMin
+						totalRisk = 0
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
@@ -84,14 +93,14 @@ fun followPath_15(): Int {
 				} else if (lastSegment == it.second) {
 					newCurrentPath = currentPath.toMutableList()
 					newCurrentPath.add(it.first)
-			//		println("newCurrentPath $newCurrentPath")
+					//		println("newCurrentPath $newCurrentPath")
 					if (it.first == width * height - 1) {
 						validPath.add(newCurrentPath)
-					} else {
-						// extend rulecheck by already checking totalRisk.
-						// in a 3x3 grid, direct way is max 5*9, you can take also already the input data, every new path with higher totalRisk dont have to be added.
-						// or you check, if there is already a path reaching same spot with less totalRisk
-						ruleCheckPassed = !(currentPath.contains(it.first))   
+						for (i in 1..newCurrentPath.size - 1) {
+							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
+						}
+						ruleCheckPassed = !(currentPath.contains(it.first)) && totalRisk < totalRiskMin
+						totalRisk = 0
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
@@ -116,26 +125,25 @@ fun followPath_15(): Int {
 
 	println("validPath:")
 	println()
-	var firstTotalRisk: Boolean = true
-	var totalRiskMin: Int = 0
-     validPath.forEach{
-		 var totalRisk: Int = 0
+
+	validPath.forEach {
+		totalRisk = 0
 
 
-		 for(i in 1..it.size-1) {
-			 totalRisk = totalRisk + riskLevel[it[i]]
-			}
-		    if (firstTotalRisk) {
-				totalRiskMin = totalRisk
-				firstTotalRisk = false
-			} else if (totalRisk < totalRiskMin) {
-				totalRiskMin = totalRisk
-			} 
-	 	//println("$it /totalRisk: $totalRisk")
-
+		for (i in 1..it.size - 1) {
+			totalRisk = totalRisk + riskLevel[it[i]]
 		}
+		if (firstTotalRisk) {
+			totalRiskMin = totalRisk
+			firstTotalRisk = false
+		} else if (totalRisk < totalRiskMin) {
+			totalRiskMin = totalRisk
+		}
+		//println("$it /totalRisk: $totalRisk")
+
+	}
 	println()
-			    println("totalRiskMin: $totalRiskMin")
+	println("totalRiskMin: $totalRiskMin")
 
 	return totalRiskMin
 }
