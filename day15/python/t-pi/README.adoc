@@ -1,0 +1,43 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-15: Chiton 
+https://adventofcode.com/2021/day/15
+
+=== Info
+
+Another 2D cave with risk level per position, due to chiton covered cave walls
+
+* Star1 (*): What is the lowest risk level of all paths through cave
+
+* Star2 (**): Expand cave to 5x5 map with incremental risk levels. Get new path with lowest risk.
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and preprocessed into 2d list of risk levels. First approach was to aggregate first line into second line, as example had no complicated path. O naïve me... (It actually worked, just the result was wrong... 😁)
+
+So with several hints from Slack and Reddit I looked up Dijkstra and implemented it. My first version worked for star1, too, but was considerably slower than the online example. By swapping some lines and adjusting some others it got considerably faster, though
+
+* Star1: Dijkstra version 1 (by "me")
+
+* Star2: Expand risk layer, and use optimized Dijkstra (inspired by others 🤓)
+
+=== Learned today
+
+First Dijkstra implementation: Map risk layer to dict with (coord):risk and use accumulated path risk as priority for PriorityQueue. Store visited coords in dict (coord):accumulated_risk.
+
+I actually learned that it is much faster to put the adjacents directly to the visited list than the coordinates fresh from the queue. Probably avoids several re-visits of coords until all adjacents have been popped from the queue...
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
