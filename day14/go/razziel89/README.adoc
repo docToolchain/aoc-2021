@@ -1,0 +1,44 @@
+== Day 14: Extended Polymerization ==
+
+This is my implementation for both rounds of the extended polymerisation
+puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `rep.go`, which contains specifications of a replacement
+specification.
+
+There are two implementations here.
+The first uses goroutines and achieves some degree of parallelisation this way.
+It's by no means great, though.
+For example, you cannot solve part 2 with it, it's just now efficient enough.
+The second solution does not suffer from such exponential scaling.
+Thus, it can be used to solve both parts quickly.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`rep.go`
+[source,go,numbered]
+----
+include::rep.go[tags=rep]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.
