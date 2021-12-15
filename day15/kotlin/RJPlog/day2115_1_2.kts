@@ -1,90 +1,97 @@
 import java.io.File
 
 
- // tag::followPath_15[]
+// tag::followPath_15[]
 fun followPath_15(): Int {
-	var segments = mutableListOf<Pair<String, String>>()
-	var searchPath = mutableListOf<String>()
-	var searchPathNew = mutableListOf<String>()
-	var validPath = mutableListOf<String>()
+	var segments = mutableListOf<Pair<Int, Int>>()  // changed from String, String to Int, Int
+	var currentPath = mutableListOf<Int>()
+	var newCurrentPath = mutableListOf<Int>()
+	var searchPath = MutableList(0) { mutableListOf<Int>() }
+	var searchPathNew = MutableList(0) { mutableListOf<Int>() }
+	var validPath = MutableList(0) { mutableListOf<Int>() }
 	var searchEnd: Boolean = false
-	var currentPath: String
-	var newCurrentPath: String
+
+
 	var ruleCheckPassed: Boolean = false
 	var width: Int = 0
-	 var height: Int = 0
+	var height: Int = 0
 	var riskLevel = mutableListOf<Int>()
 
 	// generate segments Pair(<x,y>,<x,y>) as in day12
 	// generate searchpath start value (0,0-0,1 , 0,0-1,0)
 	// new: generate list with risk level: ((x,y-x,y), value)
 	// rule: single position is only allowed once
-	  
+
 	File("day2115_puzzle_input.txt").forEachLine {
 		width = it.length
-		it.forEach{
-		riskLevel.add(it.toString().toInt())
+		it.forEach {
+			riskLevel.add(it.toString().toInt())
 		}
 		height += 1
 	}
-	 
-	 println("width $width, height $height")
-	 println("risklevel: $riskLevel")
-	 
+
+	println("width $width, height $height")
+	println("risklevel: $riskLevel")
+
 	for (y in 0..height - 1) {
-		for (x in 0..width-1) {
-			if (x+1 < width) {
-			segments.add(Pair(x.toString()+","+y.toString(),(x+1).toString()+","+y.toString()))	
+		for (x in 0..width - 1) {
+			if (x + 1 < width) {
+				segments.add(Pair(x + y * width, (x + 1) + y * width))
 			}
-			if (y+1 <  height) {
-			segments.add(Pair(x.toString()+","+y.toString(),x.toString()+","+(y+1).toString()))
+			if (y + 1 < height) {
+				segments.add(Pair(x + y * width, x + (y + 1) * width))
 			}
 		}
 	}
-	searchPath.add("0,0-0,1")
-	searchPath.add("0,0-1,0")  
-	 
-	 println("segments: $segments")
-	 println("searchPath: $searchPath")
-	 
-	
-	 
-// var ii : Int = 0
+	currentPath.add(0)
+	currentPath.add(1)
+	searchPath.add(currentPath.toMutableList())
+	currentPath.clear()
+	currentPath.add(0)
+	currentPath.add(width)
+	searchPath.add(currentPath.toMutableList())
+
+	println("segments: $segments")
+	println("searchPath: $searchPath")
+
+
+	var ii: Int = 0
 	while (!searchEnd) {
-//ii += 1
+		ii += 1
 		searchEnd = true
-		
+
 		searchPath.forEach {
 			currentPath = it
 			//println("$ii: currentPath: $currentPath")
-			var instruction = it.split("-")
-			var lastSegment = instruction[instruction.size - 1]
+
+			var lastSegment = currentPath.last()
 
 			segments.forEach {
+			//	println("${it.first},  ${it.second}")
 				if (lastSegment == it.first) {
-					newCurrentPath = currentPath + "-" + it.second
-					if (it.second == (width-1).toString()+","+(height-1).toString()) {
-						//if (!validPath.contains(newCurrentPath)) {
-							validPath.add(newCurrentPath)
-						//}
+					newCurrentPath = currentPath.toMutableList()
+					newCurrentPath.add(it.second)
+			//		println("newCurrentPath $newCurrentPath")
+					if (it.second == width * height - 1) {
+						validPath.add(newCurrentPath)
 					} else {
-	
-							ruleCheckPassed = !(currentPath.contains(it.second))  // change!!
-
+						ruleCheckPassed = !(currentPath.contains(it.second))
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
 						}
 					}
 				} else if (lastSegment == it.second) {
-					newCurrentPath = currentPath + "-" + it.first
-					if (it.first == (width-1).toString()+","+(height-1).toString()) {
-						//if (!validPath.contains(newCurrentPath)) {
-							validPath.add(newCurrentPath)
-						//}
+					newCurrentPath = currentPath.toMutableList()
+					newCurrentPath.add(it.first)
+			//		println("newCurrentPath $newCurrentPath")
+					if (it.first == width * height - 1) {
+						validPath.add(newCurrentPath)
 					} else {
-						// check rule
-							ruleCheckPassed = !(currentPath.contains(it.first)) // change!!
+						// extend rulecheck by already checking totalRisk.
+						// in a 3x3 grid, direct way is max 5*9, you can take also already the input data, every new path with higher totalRisk dont have to be added.
+						// or you check, if there is already a path reaching same spot with less totalRisk
+						ruleCheckPassed = !(currentPath.contains(it.first))   
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
 							searchEnd = false
@@ -97,33 +104,40 @@ fun followPath_15(): Int {
 		searchPath.addAll(searchPathNew)
 		searchPathNew.clear()
 	}
-	 
-	 println("-- path search ended, now calculation risk level")
+
+	println()
+	println("-- path search ended, now calculation risk level")
+	println()
+
+	validPath.forEach {
+		println(it)
+	}
 //	return validPath.size
-	 
-	 println()
-	 var firstTotalRisk: Boolean = true
-	 var totalRiskMin: Int = 0
+
+	println("validPath:")
+	println()
+	var firstTotalRisk: Boolean = true
+	var totalRiskMin: Int = 0
      validPath.forEach{
 		 var totalRisk: Int = 0
-		 //	 	 println(it)
-		 var steps = it.split("-")
-		 for(i in 1..steps.size-1) {
-			 var positions = steps[i].split(",")
-			// 			 println(" ${steps[i]}, ${riskLevel[positions[0].toInt()+positions[1].toInt()*width]}")
-			 totalRisk = totalRisk + riskLevel[positions[0].toInt()+positions[1].toInt()*width]
+
+
+		 for(i in 1..it.size-1) {
+			 totalRisk = totalRisk + riskLevel[it[i]]
 			}
 		    if (firstTotalRisk) {
 				totalRiskMin = totalRisk
 				firstTotalRisk = false
 			} else if (totalRisk < totalRiskMin) {
 				totalRiskMin = totalRisk
-			}
-	 	//	println("totalRisk: $totalRisk")
-		 //   println("totalRiskMin: $totalRiskMin")
-		}
+			} 
+	 	//println("$it /totalRisk: $totalRisk")
 
-	 return totalRiskMin
+		}
+	println()
+			    println("totalRiskMin: $totalRiskMin")
+
+	return totalRiskMin
 }
 // end::followPath_15[]
 
@@ -131,9 +145,9 @@ fun followPath_15(): Int {
 fun main(args: Array<String>) {
 
 	var solution2: Int = 0
-	
+
 	var solution1 = followPath_15()
-	
+
 	// tag::output[]
 // print solution for part 1
 	println("***********************")

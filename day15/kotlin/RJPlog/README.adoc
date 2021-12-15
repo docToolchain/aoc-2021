@@ -12,3 +12,5 @@ Today I started very fast with adapting solution of day12, creating a list of po
 
 So I have to rethink my approach. First, I still believe in the general approach and add some modifications to improve timing, change all string based operations to int based operations, let's see how far it will get me.
 
+Second try with rework all the string operations to lists, but still it does not work. Next part would be to calculate totalRisklevel while generating new pathes and add a rule to not add the path when exceeding already reached totalRisks with other pathes. Initvalue could be puzzle input straight from left to right and down.
+
