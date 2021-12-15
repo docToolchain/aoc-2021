@@ -1,0 +1,33 @@
+== Day 13: ____ ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/13[AoC|2021|13].
+
+=== Part 1 ===
+
+Parse
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
