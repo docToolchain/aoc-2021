@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Aoc 2021: AlexisTM</title>
+    <meta charset="UTF-8">
+<meta name="google-site-verification" content="JZ7jk3duxzxHDLuOHKPxc-uoz0JPlSBLeaAxh3wGn9Q" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Just for fun">
+    <meta name="author" content="Ralf D. Müller">
+    <meta name="keywords" content="aoc">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/asciidoctor.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link href="../../../css/prettify.css" rel="stylesheet">
+      <link href="../../../css/retro.css" rel="stylesheet">
+      <style>
+      @media only screen and (min-width:768px){
+          #toctitle{font-size:1.375em}
+          #toc.toc{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto; padding-top: 60px;}
+          #toc.toc #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+          #toc.toc>ul{font-size:.9em;margin-bottom:0}
+          #toc.toc ul ul{margin-left:0;padding-left:1em}
+          #toc.toc ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+          body.toc2{ padding-left: 15.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:15em; padding-top: 60px;}
+      }
+      @media only screen and (min-width:1280px){
+          body.toc2{ padding-left: 20.5em;padding-right:0; width: 100% !important;}
+          body.toc2 div#wrap div.content {width: auto !important;}
+          #toc.toc{width:20em; padding-top: 60px;}
+          #toc.toc #toctitle{font-size:1.375em}
+          #toc.toc>ul{font-size:.95em}
+          #toc.toc ul ul{padding-left:1.25em}
+      }
+      body {
+          overflow-y: scroll;
+      }
+      html, body {
+          font-size: 1.06rem;
+      }
+      body.toc2{ overflow-x: auto}
+      #toc.toc ul {
+          padding-inline-start: 0;
+      }
+      :target::before {
+          content: "";
+          display: block;
+          height: 60px; /* fixed header height*/
+          margin: -60px 0 0; /* negative fixed header height */
+      }
+      .navbar {
+          background-image: url(/aoc-2021/images/treeback.png);
+          background-size: contain;
+          background-repeat: repeat-x;
+          border-bottom: 0;
+          padding-bottom: 20px;
+          background-color: transparent;
+          box-shadow: none;
+      }
+      html {
+          background: url(/aoc-2021/images/snowback.png) no-repeat center center fixed;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size: cover;
+      }
+
+      </style>
+      <script>
+          //smart redirectg
+          if (document.location.href.includes("netlify")) {
+              document.location.href=document.location.href.replace("aoc-2021.netlify.app/","doctoolchain.org/aoc-2021/");
+          }
+      </script>
+<!-- /aoc-2021/ -->
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+
+      <link rel="apple-touch-icon" sizes="180x180" href="/aoc-2021//apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/aoc-2021//favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/aoc-2021//favicon-16x16.png">
+      <link rel="manifest" href="/aoc-2021//site.webmanifest">
+      <link rel="mask-icon" href="/aoc-2021//safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+
+<body onload="prettyPrint()" class="toc2 toc-left" >
+<div id="wrap">
+
+	
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../">AoC-2021</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              
+                
+                  <li><a href="../../../rules/">Rules</a></li>
+                
+              
+                
+                  <li><a href="../../../solutions/">Solutions</a></li>
+                
+              
+                
+                  <li><a href="../../../about/">About</a></li>
+                
+              
+          </ul>
+            <!-- tag::search[] -->
+            <form class="navbar-form navbar-right" action="https://google.de/search" style="border: none;">
+                <div class="form-group">
+                    <input type="hidden" name="q" value="site:aoc-2021.netlify.com">
+                    <input type="text" name="q" class="form-control" id="search">
+                    <button type="submit" class="btn btn-default hidden-sm ">Find</button>
+                </div>
+            </form>
+            <!-- end::search[] -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container content">
+	<p><div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_alexistm">AlexisTM</a>
+<ul class="sectlevel2">
+<li><a href="#_about_me">About me</a></li>
+<li><a href="#_day_01_rockstar">Day 01: rockstar</a>
+<ul class="sectlevel3">
+<li><a href="#_rockstar">rockstar</a></li>
+</ul>
+</li>
+<li><a href="#_day_02_rockstar">Day 02: rockstar</a>
+<ul class="sectlevel3">
+<li><a href="#_rockstar_2">rockstar</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_alexistm"><a class="anchor" href="#_alexistm"></a><a class="link" href="#_alexistm">AlexisTM</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="https://avatars.githubusercontent.com/u/6976744?v=4" alt="6976744?v=4"></span></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>AlexisTM</strong><br>
+<span class="icon"><i class="fa fa-github"></i></span>: <a href="https://github.com/AlexisTM">AlexisTM</a></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_about_me"><a class="anchor" href="#_about_me"></a><a class="link" href="#_about_me">About me</a></h3>
+<div class="paragraph">
+<p>Nothing here yet. Update your profile at <a href="https://github.com/docToolchain/aoc-2021/blob/master/profiles/AlexisTM.adoc">/profiles/AlexisTM.adoc</a></p>
+</div>
+<a id="day01" />
+</div>
+<div class="sect2">
+<h3 id="_day_01_rockstar"><a class="anchor" href="#_day_01_rockstar"></a><a class="link" href="#_day_01_rockstar">Day 01: rockstar</a></h3>
+<div class="paragraph">
+<p><span class="small">this documentation is autogenerated. Add a <code>README.adoc</code> to your solution to take over the control of this :-)</span></p>
+</div>
+<div class="sect3">
+<h4 id="_rockstar"><a class="anchor" href="#_rockstar"></a><a class="link" href="#_rockstar">rockstar</a></h4>
+<div class="listingblock">
+<div class="title">step2.rock</div>
+<div class="content">
+<pre class="prettyprint highlight"><code>Demons wants entertainment 'n' hatred 'n' souls
+Cast souls into souls
+Cast hatred into hatred
+Cast entertainment into entertainment
+Put souls plus hatred plus entertainment into the destiny
+Give back the destiny
+
+Listen to the entertainment
+Listen to the hatred
+Listen to the souls
+
+Put Demons taking the entertainment, the hatred, and the souls into Hell
+My soul is nowhere
+While the entertainment ain't mysterious
+Put Demons taking the entertainment, the hatred, and the souls into Heaven
+If Heaven is greater than Hell
+Build my soul up
+
+Put the hatred in the entertainment
+Put the souls in the hatred
+Put Heaven in Hell
+Listen to the entertainment
+
+Whisper my soul</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">step1.rock</div>
+<div class="content">
+<pre class="prettyprint highlight"><code>My soul is nowhere
+Listen to the wind
+Listen to the fire
+While the fire ain't mysterious
+If the fire is greater than the wind
+Build my soul up
+
+Put the fire into the wind
+Listen to the fire
+
+Whisper my soul</code></pre>
+</div>
+</div>
+<a id="day02" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_02_rockstar"><a class="anchor" href="#_day_02_rockstar"></a><a class="link" href="#_day_02_rockstar">Day 02: rockstar</a></h3>
+<div class="paragraph">
+<p><span class="small">this documentation is autogenerated. Add a <code>README.adoc</code> to your solution to take over the control of this :-)</span></p>
+</div>
+<div class="sect3">
+<h4 id="_rockstar_2"><a class="anchor" href="#_rockstar_2"></a><a class="link" href="#_rockstar_2">rockstar</a></h4>
+<div class="listingblock">
+<div class="title">solution.rock</div>
+<div class="content">
+<pre class="prettyprint highlight"><code>The pirate is BlackBeard
+Black Beard is degenerated
+
+Pirates are delinquent
+Captain Seadog is recidivist
+Red Beard is despiteful
+
+Strength was for me
+Cast strength into my fist
+Listen to the rules
+While the rules ain't nothing
+Shatter the rules with my fist
+Put the rules at The pirate in Command
+Put the rules at Black Beard in the sea
+Cast the sea
+If Command is "forward"
+Let Captain Seadog be Captain Seadog with the sea
+Let Pirates be Pirates with Red Beard of the sea
+
+If Command is "down"
+Let Red Beard be Red Beard with the sea
+
+If Command is "up"
+Let Red Beard be Red Beard without the sea
+
+Listen to the rules
+
+Say Captain Seadog of Pirates</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></p>
+
+	</div>
+
+</div>
+<div id="push"></div>
+</div>
+
+
+    <div id="footer">
+      <div class="container">
+          <p class="muted credit">&copy; 2021 | Mixed with Bootstrap v3.1.1 | generated with <a href="https://doctoolchain.org">docToolchain</a> | Baked with JBake v2.6.4</p>
+      </div>
+    </div>
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script src="../../../js/prettify.js"></script>
+    
+
+
+</body>
+</html>
