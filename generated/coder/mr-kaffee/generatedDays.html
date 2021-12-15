@@ -248,6 +248,7 @@
 <ul class="sectlevel4">
 <li><a href="#_part_1_5">Part 1</a></li>
 <li><a href="#_part_2_5">Part 2</a></li>
+<li><a href="#_solution_revisited">Solution Revisited</a></li>
 <li><a href="#_tests_6">Tests</a></li>
 </ul>
 </li>
@@ -316,6 +317,17 @@
 <li><a href="#_part_1_10">Part 1</a></li>
 <li><a href="#_part_2_10">Part 2</a></li>
 <li><a href="#_tests_12">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_14_rust">Day 14: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_14">Day 14: <em>__</em></a>
+<ul class="sectlevel4">
+<li><a href="#_solution_3">Solution</a></li>
+<li><a href="#_tests_13">Tests</a></li>
+<li><a href="#_today_i_learned_7">Today I learned</a></li>
 </ul>
 </li>
 </ul>
@@ -1779,11 +1791,12 @@ mod direct_solution_test {
 </div>
 </div>
 <div class="paragraph">
-<p>For optimization, I did not even think about for something more clever than linear search.</p>
+<p>I did not even think about anything more clever than linear search to solve the optimization problem.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_optimal_positions_fuel(crabs: &amp;[usize], cost: fn(usize) -&gt; usize) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// linear search optimization
+pub fn get_optimal_positions_fuel(crabs: &amp;[usize], cost: fn(usize) -&gt; usize) -&gt; usize {
     let pos_min = *crabs.iter().min().expect("No min");
     let pos_max = *crabs.iter().max().expect("No max");
     (pos_min..=pos_max)
@@ -1801,8 +1814,145 @@ mod direct_solution_test {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const COST_LINEAR: fn(usize) -&gt; usize = |distance| distance;
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// cost function for part 1: identity
+pub const COST_LINEAR: fn(usize) -&gt; usize = |distance| distance;
+
+/// cost function for part 2: Euler formula for the sum 1 + ... + distance
 pub const COST_INCREASING: fn(usize) -&gt; usize = |distance| distance * (distance + 1) / 2;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_solution_revisited"><a class="anchor" href="#_solution_revisited"></a><a class="link" href="#_solution_revisited">Solution Revisited</a></h5>
+<div class="paragraph">
+<p>I learned about <a href="https://gitlab.com/akoeltringer/advent_of_code/-/tree/main/y2021/d07">something more clever than linear search from a colleague</a>:</p>
+</div>
+<div class="paragraph">
+<p>The solution to part 1 is the solution to the optimization problem <code>min_p sum_i |p - pos[i]|</code>. Since the cost function to minimize is V-shaped, the optimization is solved by the median.</p>
+</div>
+<div class="paragraph">
+<p>The solution to part 2 is the solution to the optimization problem <code>min_p sum_i |p - pos[i]| (|p - pos[i]| + 1) / 2</code>. This is the same as <code>min_p (sum_i (p - pos[i])^2 / 2 + sum_i |p - pos[i]| / 2)</code>.</p>
+</div>
+<div class="paragraph">
+<p>The solution to <code>min_p (sum_i (p - pos[i])^2 / 2</code> is given by the mean of the <code>p[i]</code> values, so I start from the mean and look in both directions to potentially find something better.</p>
+</div>
+<div class="paragraph">
+<p>You can run the direct solution using <code>cargo run --release --features direct_solution</code>. Quite a bit faster than linear search ;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// solution for part 1
+///
+/// default: linear search, see [get_optimal_positions_fuel] and [COST_LINEAR]
+///
+/// if feature ``direct_solution`` is selected, calculate median as solution, see [select]
+pub fn solution_1(crabs: &amp;[usize]) -&gt; usize {
+    if cfg!(feature = "direct_solution") {
+        // calculate median and comput cost for median
+        get_fuel(crabs, select(&amp;crabs, crabs.len() / 2), COST_LINEAR)
+    } else {
+        // linear search
+        get_optimal_positions_fuel(crabs, COST_LINEAR)
+    }
+}
+
+/// solution for part 1
+///
+/// default: linear search, see [get_optimal_positions_fuel] and [COST_INCREASING]
+///
+/// if feature ``direct_solution`` is selected, calculate mean and search for solution in neighborhood
+pub fn solution_2(crabs: &amp;[usize]) -&gt; usize {
+    if cfg!(feature = "direct_solution") {
+        // calculate mean and cost for mean
+        let mean = (crabs.iter().sum::&lt;usize&gt;() + crabs.len() - 1) / crabs.len();
+        let mut cost = get_fuel(crabs, mean, COST_INCREASING);
+
+        // search for improvements for increasing positions
+        let mut delta = 1;
+        loop {
+            let cost_upd = get_fuel(crabs, mean + delta, COST_INCREASING);
+            if cost_upd &gt;= cost {
+                break;
+            }
+
+            cost = cost_upd;
+            delta += 1;
+        }
+
+        // if no improvment found, search for improvements for decreasing positions
+        if delta == 1 {
+            loop {
+                let cost_upd = get_fuel(crabs, mean - delta, COST_INCREASING);
+                if cost_upd &gt;= cost {
+                    break;
+                }
+
+                cost = cost_upd;
+                delta += 1;
+            }
+        }
+
+        cost
+    } else {
+        // linear search
+        get_optimal_positions_fuel(crabs, COST_INCREASING)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The median is calculated recursively:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Recursive calculation of k-th element.
+///
+/// # Examples
+///
+/// ```
+/// # use mr_kaffee_2021_07::*;
+/// let data = vec![1,4,7,12,8,13,101];
+/// assert_eq!(8, select(&amp;data, data.len() / 2));
+/// ```
+pub fn select(data: &amp;[usize], k: usize) -&gt; usize {
+    if k &gt;= data.len() {
+        panic!(
+            "Cannot get select rank {} of list of size {}",
+            k,
+            data.len()
+        );
+    }
+
+    if data.len() == 1 {
+        return data[0];
+    }
+
+    let pivot = data[0];
+
+    let lows = data
+        .into_iter()
+        .filter(|d| d &lt; &amp;&amp;pivot)
+        .map(|d| *d)
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+    let pivots = data
+        .into_iter()
+        .filter(|d| d == &amp;&amp;pivot)
+        .map(|d| *d)
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+    let highs = data
+        .into_iter()
+        .filter(|d| d &gt; &amp;&amp;pivot)
+        .map(|d| *d)
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+
+    return if k &lt; lows.len() {
+        select(&amp;lows, k)
+    } else if k &lt; lows.len() + pivots.len() {
+        pivots[0]
+    } else {
+        select(&amp;highs, k - lows.len() - pivots.len())
+    };
+}</code></pre>
 </div>
 </div>
 </div>
@@ -1830,13 +1980,13 @@ mod tests {
     }
 
     #[test]
-    fn test_get_optimal_positions_fuel() {
-        assert_eq!(37, get_optimal_positions_fuel(DATA, COST_LINEAR));
+    fn test_solution_1() {
+        assert_eq!(37, solution_1(DATA));
     }
 
     #[test]
-    fn test_get_optimal_positions_fuel_2() {
-        assert_eq!(168, get_optimal_positions_fuel(DATA, COST_INCREASING));
+    fn test_solution_2() {
+        assert_eq!(168, solution_2(DATA));
     }
 }</code></pre>
 </div>
@@ -3023,51 +3173,50 @@ b-end";
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; (BTreeSet&lt;(usize, usize)&gt;, Vec&lt;(bool, usize)&gt;) {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; (HashSet&lt;(usize, usize)&gt;, Vec&lt;(bool, usize)&gt;) {
     let mut parts = content.split("\n\n");
-    let points = parts.next().expect("No points");
-    let folds = parts.next().expect("No folds");
-    assert!(parts.next().is_none(), "Excess data");
-
-    let points = points
-        .lines()
-        .map(|line| {
-            let mut parts = line.split(",");
-            (
-                parts
-                    .next()
-                    .expect("No x coordinate")
-                    .parse()
-                    .expect("Could not parse x"),
-                parts
-                    .next()
-                    .expect("No y coordinate")
-                    .parse()
-                    .expect("Could not parse y"),
-            )
-        })
-        .collect();
-
-    let folds = folds
-        .lines()
-        .map(|line| {
-            let mut parts = line.split("=");
-            (
-                match parts.next() {
-                    Some("fold along y") =&gt; true,
-                    Some("fold along x") =&gt; false,
-                    _ =&gt; panic!("Unexpected fold instruction"),
-                },
-                parts
-                    .next()
-                    .expect("No fold coordinate")
-                    .parse()
-                    .expect("Could not parse fold coordinate"),
-            )
-        })
-        .collect();
-
-    (points, folds)
+    (
+        parts
+            .next()
+            .expect("No points")
+            .lines()
+            .map(|line| line.split(","))
+            .map(|mut point_parts| {
+                (
+                    point_parts
+                        .next()
+                        .expect("No x coordinate")
+                        .parse()
+                        .expect("Could not parse x"),
+                    point_parts
+                        .next()
+                        .expect("No y coordinate")
+                        .parse()
+                        .expect("Could not parse y"),
+                )
+            })
+            .collect(),
+        parts
+            .next()
+            .expect("No fold instructions")
+            .lines()
+            .map(|line| line.split("="))
+            .map(|mut fold_parts| {
+                (
+                    match fold_parts.next() {
+                        Some("fold along y") =&gt; true,
+                        Some("fold along x") =&gt; false,
+                        _ =&gt; panic!("Unexpected fold instruction"),
+                    },
+                    fold_parts
+                        .next()
+                        .expect("No fold coordinate")
+                        .parse()
+                        .expect("Could not parse fold coordinate"),
+                )
+            })
+            .collect(),
+    )
 }</code></pre>
 </div>
 </div>
@@ -3078,17 +3227,17 @@ b-end";
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform a single fold
 pub fn fold(
-    points: &amp;BTreeSet&lt;(usize, usize)&gt;,
+    points: &amp;HashSet&lt;(usize, usize)&gt;,
     horizontal: bool,
-    fold_coordinate: usize,
-) -&gt; BTreeSet&lt;(usize, usize)&gt; {
+    coord: usize,
+) -&gt; HashSet&lt;(usize, usize)&gt; {
     points
         .iter()
         .map(|(x, y)| {
-            if horizontal &amp;&amp; y &gt; &amp;fold_coordinate {
-                (*x, fold_coordinate - (*y - fold_coordinate))
-            } else if !horizontal &amp;&amp; x &gt; &amp;fold_coordinate {
-                (fold_coordinate - (*x - fold_coordinate), *y)
+            if horizontal &amp;&amp; y &gt; &amp;coord {
+                (*x, 2 * coord - *y)
+            } else if !horizontal &amp;&amp; x &gt; &amp;coord {
+                (2 * coord - *x, *y)
             } else {
                 (*x, *y)
             }
@@ -3103,7 +3252,7 @@ pub fn fold(
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// count points after first fold operation
-pub fn solution_1(points: &amp;BTreeSet&lt;(usize, usize)&gt;, folds: &amp;[(bool, usize)]) -&gt; usize {
+pub fn solution_1(points: &amp;HashSet&lt;(usize, usize)&gt;, folds: &amp;[(bool, usize)]) -&gt; usize {
     let (horizontal, fold_coordinate) = folds.first().expect("No folds");
     fold(points, *horizontal, *fold_coordinate).len()
 }</code></pre>
@@ -3117,13 +3266,7 @@ pub fn solution_1(points: &amp;BTreeSet&lt;(usize, usize)&gt;, folds: &amp;[(boo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform all fold operations and return result as a ``String``
-pub fn solution_2(points: &amp;BTreeSet&lt;(usize, usize)&gt;, folds: &amp;[(bool, usize)]) -&gt; String {
-    let mut points = points.to_owned();
-    for (horizontal, fold_coordinate) in folds {
-        points = fold(&amp;points, *horizontal, *fold_coordinate);
-    }
-
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn points_to_string(points: &amp;HashSet&lt;(usize, usize)&gt;) -&gt; String {
     // calculate bounding box
     let (x_min, y_min, x_max, y_max) = points.iter().fold(
         (usize::MAX, usize::MAX, 0, 0),
@@ -3141,11 +3284,21 @@ pub fn solution_2(points: &amp;BTreeSet&lt;(usize, usize)&gt;, folds: &amp;[(boo
     (y_min..y_max)
         .map(|y| {
             (x_min..x_max)
-                .map(|x| if points.contains(&amp;(x, y)) { '#' } else { ' ' })
+                .map(|x| if points.contains(&amp;(x, y)) { '#' } else { '.' })
                 .collect::&lt;String&gt;()
         })
         .map(|line| line.add("\n"))
         .collect::&lt;String&gt;()
+}
+
+/// perform all fold operations and return result as a ``String``
+pub fn solution_2(points: &amp;HashSet&lt;(usize, usize)&gt;, folds: &amp;[(bool, usize)]) -&gt; String {
+    let mut points = points.to_owned();
+    for (horizontal, fold_coordinate) in folds {
+        points = fold(&amp;points, *horizontal, *fold_coordinate);
+    }
+
+    points_to_string(&amp;points)
 }</code></pre>
 </div>
 </div>
@@ -3207,15 +3360,15 @@ fold along x=5";
     const TEST_FOLDS: &amp;[(bool, usize)] = &amp;[(true, 7), (false, 5)];
 
     const TEST_RESULT: &amp;str = "#####\n\
-                               #   #\n\
-                               #   #\n\
-                               #   #\n\
+                               #...#\n\
+                               #...#\n\
+                               #...#\n\
                                #####\n";
 
     #[test]
     fn test_parse() {
         let (points, folds) = parse(&amp;TEST_CONTENT);
-        assert_eq!(BTreeSet::from(TEST_POINTS), points);
+        assert_eq!(HashSet::from(TEST_POINTS), points);
         assert_eq!(TEST_FOLDS, folds);
     }
 
@@ -3232,6 +3385,195 @@ fold along x=5";
     }
 }</code></pre>
 </div>
+</div>
+<a id="day14" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_14_rust"><a class="anchor" href="#_day_14_rust"></a><a class="link" href="#_day_14_rust">Day 14: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_14"><a class="anchor" href="#_day_14"></a><a class="link" href="#_day_14">Day 14: <em>__</em></a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/14">AoC|2021|14</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_solution_3"><a class="anchor" href="#_solution_3"></a><a class="link" href="#_solution_3">Solution</a></h5>
+<div class="paragraph">
+<p>Ough! Today&#8217;s was the biggest headache so far this year.</p>
+</div>
+<div class="paragraph">
+<p>I was aware when starting part 1 that a solution based on arrays will probably not solve part 2. It was good enough for part 1 though.</p>
+</div>
+<div class="paragraph">
+<p>But while implementing it, I was sure I will need linked lists for part 2 and I was afraid of it, because I really don&#8217;t know how to implement linked lists in Rust and the <code>LinkedList</code> Rust comes with did not help a lot. So I spent quite some time trying to implement a linked list in Rust and - again - failed. Switch to Java, where linked lists are no pain at all just to realize that no list based solution will work at all for today.</p>
+</div>
+<div class="paragraph">
+<p>With a little bit of thinking on the problem, I realized that it would be enough to just count the pairs. It does not really matter where they appear in the polymer. With this idea, the solution was not very complicated&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Parse the input:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// porse content into a vector of chars and a map with pairs of chars as keys and the
+/// char to be inserted as value
+pub fn parse(content: &amp;str) -&gt; (Vec&lt;char&gt;, HashMap&lt;(char, char), char&gt;) {
+    let mut parts = content.split("\n\n");
+
+    let template = parts
+        .next()
+        .expect("No template")
+        .chars()
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+
+    let rules = parts
+        .next()
+        .expect("No rules")
+        .lines()
+        .map(|line| {
+            let mut chars = line.chars();
+            let a = chars.next().expect("No first char");
+            let b = chars.next().expect("No second char");
+            let c = chars.skip(4).next().expect("No resulting char");
+            ((a, b), c)
+        })
+        .collect::&lt;HashMap&lt;_, _&gt;&gt;();
+
+    (template, rules)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Simulate rounds of insertions</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// simulate given number of rounds starting from polymer template and using given
+/// rules
+pub fn simulate_rounds(
+    template: &amp;[char],
+    rules: &amp;HashMap&lt;(char, char), char&gt;,
+    rounds: usize,
+) -&gt; usize {
+    // map of pairs to number of occurances of those
+    let mut pairs = HashMap::new();
+    for (c1, c2) in template.iter().zip(template.iter().skip(1)) {
+        let cnt = pairs.entry((*c1, *c2)).or_insert(0usize);
+        *cnt += 1;
+    }
+
+    // in each round, update pairs
+    for _ in 0..rounds {
+        let mut upd = HashMap::new();
+        for ((c1, c2), cnt0) in &amp;pairs {
+            if let Some(d) = rules.get(&amp;(*c1, *c2)) {
+                // if pair is found in rules, replace (c1, c2) by (c1, d) and (d, c2)
+                let cnt = upd.entry((*c1, *d)).or_insert(0);
+                *cnt += cnt0;
+                let cnt = upd.entry((*d, *c2)).or_insert(0);
+                *cnt += cnt0;
+            } else {
+                // if pair is not found in rules, keep pair
+                let cnt = upd.entry((*c1, *c2)).or_insert(0);
+                *cnt += cnt0;
+            }
+        }
+        pairs = upd;
+    }
+
+    // count symbols in pairs
+    // each symbol contributes to two pairs except for the first and the last symbol
+    // start with count = 1 for first and last symbol to consistently count every symbol
+    // twice
+    let mut counts = HashMap::new();
+    counts.insert(template[0], 1);
+    counts.insert(template[template.len() - 1], 1);
+    for ((c1, c2), cnt) in &amp;pairs {
+        let count = counts.entry(*c1).or_insert(0);
+        *count += cnt;
+        let count = counts.entry(*c2).or_insert(0);
+        *count += cnt;
+    }
+
+    // get (twice the) count for most and less frequent symbol
+    let min = counts.values().min().expect("No min");
+    let max = counts.values().max().expect("No max");
+
+    // return difference, divide by 2 because every symbol is counted twice
+    (max - min) / 2
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_13"><a class="anchor" href="#_tests_13"></a><a class="link" href="#_tests_13">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "NNCB
+
+CH -&gt; B
+HH -&gt; N
+CB -&gt; H
+NH -&gt; C
+HB -&gt; C
+HC -&gt; B
+HN -&gt; C
+NN -&gt; C
+BH -&gt; H
+NC -&gt; B
+NB -&gt; B
+BN -&gt; B
+BB -&gt; N
+BC -&gt; B
+CC -&gt; N
+CN -&gt; C";
+    const TEST_TEMPLATE: [char; 4] = ['N', 'N', 'C', 'B'];
+    const TEST_RULES: [((char, char), char); 16] = [
+        (('C', 'H'), 'B'),
+        (('H', 'H'), 'N'),
+        (('C', 'B'), 'H'),
+        (('N', 'H'), 'C'),
+        (('H', 'B'), 'C'),
+        (('H', 'C'), 'B'),
+        (('H', 'N'), 'C'),
+        (('N', 'N'), 'C'),
+        (('B', 'H'), 'H'),
+        (('N', 'C'), 'B'),
+        (('N', 'B'), 'B'),
+        (('B', 'N'), 'B'),
+        (('B', 'B'), 'N'),
+        (('B', 'C'), 'B'),
+        (('C', 'C'), 'N'),
+        (('C', 'N'), 'C'),
+    ];
+
+    #[test]
+    fn test_parse() {
+        let (template, rules) = parse(&amp;CONTENT);
+        assert_eq!(Vec::from(TEST_TEMPLATE), template);
+        assert_eq!(HashMap::from(TEST_RULES), rules);
+    }
+
+    #[test]
+    fn test_solution_1() {
+        assert_eq!(
+            1_588,
+            solution_1(&amp;Vec::from(TEST_TEMPLATE), &amp;HashMap::from(TEST_RULES))
+        );
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_7"><a class="anchor" href="#_today_i_learned_7"></a><a class="link" href="#_today_i_learned_7">Today I learned</a></h5>
+<div class="paragraph">
+<p>If Eric Wastl says "This polymer grows quickly" and the examples provided in the puzzle description produce numbers &gt; 2 Trillions, there is probably no list based implementation (be it linked or array based lists) that efficiently solve the puzzle.</p>
 </div>
 </div>
 </div>
