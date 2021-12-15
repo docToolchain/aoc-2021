@@ -1,30 +1,4 @@
-use std::{cmp::Ordering, collections::BinaryHeap};
-
-#[derive(PartialEq, Eq, Clone, Copy)]
-pub struct Node {
-    risk: usize,
-    idx: usize,
-}
-
-impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match self.risk.partial_cmp(&other.risk) {
-            Some(Ordering::Equal) => {}
-            ord => return ord.map(Ordering::reverse),
-        }
-        self.idx.partial_cmp(&other.idx).map(Ordering::reverse)
-    }
-}
-
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match self.risk.cmp(&other.risk) {
-            Ordering::Equal => {}
-            ord => return ord.reverse(),
-        }
-        self.idx.cmp(&other.idx).reverse()
-    }
-}
+use std::collections::BinaryHeap;
 
 // tag::parse[]
 ///
@@ -51,15 +25,15 @@ pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
     let mut heap = BinaryHeap::new();
     let mut visited = vec![false; grid.len() * n * n];
 
-    heap.push(Node { risk: 0, idx: 0 });
+    heap.push((usize::MAX, 0)); // nodes are tuples (usize::MAX - risk, idx)
     visited[0] = true;
 
-    while let Some(node) = heap.pop() {
-        if node.idx == grid.len() * n * n - 1 {
-            return node.risk;
+    while let Some((risk, idx)) = heap.pop() {
+        if idx == grid.len() * n * n - 1 {
+            return usize::MAX - risk;
         }
 
-        let (x, y) = (node.idx % (w * n), node.idx / (w * n));
+        let (x, y) = (idx % (w * n), idx / (w * n));
 
         for (x_a, y_a) in [
             (x + 1, y),
@@ -71,13 +45,10 @@ pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
                 continue;
             }
 
-            let (x_0, y_0) = (x_a % w, y_a % h);
+            let risk = risk - ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) - 1;
 
             visited[x_a + y_a * w * n] = true;
-            heap.push(Node {
-                risk: node.risk + ((grid[x_0 + y_0 * w] + x_a / w + y_a / h - 1) % 9) + 1,
-                idx: x_a + y_a * w * n,
-            });
+            heap.push((risk, x_a + y_a * w * n));
         }
     }
 
