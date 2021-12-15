@@ -16,3 +16,5 @@ Second try with rework all the string operations to lists, but still it does not
 
 Third try with additional rule if path has a total risk level of (width*height-1)*9 now worked for the 10x10 example. But the puzzle input is oviosely to big. Next improvement would be to set the init value not on (width*height-1)*9 but as above described based on puzzle input from left to rigth and then down, second improvement will be to just dynamically adapt the totalRiskMin to already reached min pathes.
 
+Several optimizations later, I don't know how to proceed. Taking break. Current status: Works for 10x10.
+

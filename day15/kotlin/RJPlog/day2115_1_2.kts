@@ -25,18 +25,28 @@ fun followPath_15(): Int {
 	// new: generate list with risk level: ((x,y-x,y), value)
 	// rule: single position is only allowed once
 
+
 	File("day2115_puzzle_input.txt").forEachLine {
 		width = it.length
 		it.forEach {
 			riskLevel.add(it.toString().toInt())
 		}
+		if (firstTotalRisk) {
+			for (i in 1..it.length - 1) {
+				totalRiskMin = totalRiskMin + it[i].toString().toInt()
+			}
+			firstTotalRisk = false
+		} else {
+			totalRiskMin = totalRiskMin + it.takeLast(1).toString().toInt()
+		}
 		height += 1
 	}
 
-	totalRiskMin = ((width * height) - 1) * 9
+	//totalRiskMin = ((width + height) - 1) * 9
 
 	println("width $width, height $height")
 	println("risklevel: $riskLevel")
+	println("totalRiskMin: $totalRiskMin")
 
 	for (y in 0..height - 1) {
 		for (x in 0..width - 1) {
@@ -78,55 +88,83 @@ fun followPath_15(): Int {
 					newCurrentPath.add(it.second)
 					//		println("newCurrentPath $newCurrentPath")
 					if (it.second == width * height - 1) {
-						validPath.add(newCurrentPath)
+						//validPath.add(newCurrentPath)
+						for (i in 1..newCurrentPath.size - 1) {
+							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
+						}
+						if (totalRisk < totalRiskMin) {
+							totalRiskMin = totalRisk
+							validPath.add(newCurrentPath)
+							println("validPath:  $newCurrentPath found, , totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
+						}
+
+
+						totalRisk = 0
+
 					} else {
 						for (i in 1..newCurrentPath.size - 1) {
 							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
 						}
 						ruleCheckPassed = !(currentPath.contains(it.second)) && totalRisk < totalRiskMin
-						totalRisk = 0
+
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
+							//println(" path added at totalRisk $totalRisk, totalRiskMin $totalRiskMin")
 							searchEnd = false
 						}
+						totalRisk = 0
 					}
 				} else if (lastSegment == it.second) {
 					newCurrentPath = currentPath.toMutableList()
 					newCurrentPath.add(it.first)
 					//		println("newCurrentPath $newCurrentPath")
 					if (it.first == width * height - 1) {
-						validPath.add(newCurrentPath)
+						//validPath.add(newCurrentPath)
+						for (i in 1..newCurrentPath.size - 1) {
+							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
+						}
+						if (totalRisk < totalRiskMin) {
+							totalRiskMin = totalRisk
+							validPath.add(newCurrentPath)
+							println("validPath:  $newCurrentPath found, totalRisk $totalRisk, totalRiskMin: $totalRiskMin")
+						}
+
+
+						totalRisk = 0
+					} else {
 						for (i in 1..newCurrentPath.size - 1) {
 							totalRisk = totalRisk + riskLevel[newCurrentPath[i]]
 						}
 						ruleCheckPassed = !(currentPath.contains(it.first)) && totalRisk < totalRiskMin
-						totalRisk = 0
+
 						if (ruleCheckPassed) {
 							searchPathNew.add(newCurrentPath)
+							//println(" path added at totalRisk $totalRisk, totalRiskMin $totalRiskMin")
 							searchEnd = false
 						}
+						totalRisk = 0
 					}
-				}
+				} 
 			}
 		}
 		searchPath.clear()
+//		println("serachPath $searchPath")
 		searchPath.addAll(searchPathNew)
+//		println("serachPath $searchPath")
 		searchPathNew.clear()
+//		println("serachPathNew $searchPathNew")
 	}
 
 	println()
 	println("-- path search ended, now calculation risk level")
 	println()
 
-	validPath.forEach {
-		println(it)
-	}
 //	return validPath.size
 
 	println("validPath:")
 	println()
 
-	validPath.forEach {
+/*	validPath.forEach {
 		totalRisk = 0
 
 
@@ -139,12 +177,12 @@ fun followPath_15(): Int {
 		} else if (totalRisk < totalRiskMin) {
 			totalRiskMin = totalRisk
 		}
-		//println("$it /totalRisk: $totalRisk")
+		println("$it /totalRisk: $totalRisk")
 
 	}
 	println()
 	println("totalRiskMin: $totalRiskMin")
-
+*/
 	return totalRiskMin
 }
 // end::followPath_15[]
