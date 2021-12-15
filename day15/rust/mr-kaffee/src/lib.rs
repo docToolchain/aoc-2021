@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "dijkstra", feature(map_first_last))]
 use std::collections::BinaryHeap;
 
 // tag::parse[]
@@ -18,19 +19,19 @@ pub fn parse(content: &str) -> (Vec<usize>, usize) {
 }
 // end::parse[]
 
-// tag::solve[]
+// tag::solve_simple[]
 pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
     let h = grid.len() / w;
 
     let mut heap = BinaryHeap::new();
-    let mut visited = vec![false; grid.len() * n * n];
+    let mut settled = vec![false; grid.len() * n * n];
 
     heap.push((usize::MAX, 0)); // nodes are tuples (usize::MAX - risk, idx)
-    visited[0] = true;
+    settled[0] = true;
 
     while let Some((risk, idx)) = heap.pop() {
         if idx == grid.len() * n * n - 1 {
-            return usize::MAX - risk;
+            return usize::MAX - risk; // target reached
         }
 
         let (x, y) = (idx % (w * n), idx / (w * n));
@@ -41,32 +42,94 @@ pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
             (x.wrapping_sub(1), y),
             (x, y.wrapping_sub(1)),
         ] {
-            if x_a >= w * n || y_a >= h * n || visited[x_a + y_a * w * n] {
-                continue;
+            if x_a >= w * n || y_a >= h * n || settled[x_a + y_a * w * n] {
+                continue; // out of bounds or visisted
             }
 
             let risk = risk - ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) - 1;
 
-            visited[x_a + y_a * w * n] = true;
+            settled[x_a + y_a * w * n] = true; // first visit settles
             heap.push((risk, x_a + y_a * w * n));
         }
     }
 
     panic!("No path found");
 }
-// end::solve[]
+// end::solve_simple[]
 
-// tag::part1[]
+#[cfg(not(feature = "dijkstra"))]
 pub fn solution_1(grid: &[usize], width: usize) -> usize {
     solve(grid, width, 1)
 }
-// end::part1[]
 
-// tag::part2[]
+#[cfg(not(feature = "dijkstra"))]
 pub fn solution_2(grid: &[usize], width: usize) -> usize {
     solve(grid, width, 5)
 }
-// end::part2[]
+
+#[cfg(feature = "dijkstra")]
+pub fn solution_1(grid: &[usize], width: usize) -> usize {
+    dijkstra::solve(grid, width, 1)
+}
+
+#[cfg(feature = "dijkstra")]
+pub fn solution_2(grid: &[usize], width: usize) -> usize {
+    dijkstra::solve(grid, width, 5)
+}
+
+#[cfg(feature = "dijkstra")]
+pub mod dijkstra {
+    use std::collections::BTreeSet;
+
+    // tag::solve_dijkstra[]
+    pub fn solve(grid: &[usize], w: usize, n: usize) -> usize {
+        let h = grid.len() / w;
+
+        let mut heap = BTreeSet::new();
+        let mut settled = vec![false; w * h * n * n];
+        let mut risks = vec![None; w * h * n * n];
+
+        heap.insert((0, 0)); // nodes are tuples (risk, idx)
+        risks[0] = Some(0); // keep track of best risks so far
+        settled[0] = true; // flag nodes which are settled
+
+        while let Some((risk, idx)) = heap.pop_first() {
+            if idx == grid.len() * n * n - 1 {
+                return risk; // target reached
+            }
+            settled[idx] = true; // no further improvement possible
+
+            let (x, y) = (idx % (w * n), idx / (w * n));
+            for (x_a, y_a) in [
+                (x + 1, y),
+                (x, y + 1),
+                (x.wrapping_sub(1), y),
+                (x, y.wrapping_sub(1)),
+            ] {
+                let idx_a = x_a + y_a * w * n;
+                if x_a >= w * n || y_a >= h * n || settled[idx_a] {
+                    continue; // out of bounds or settled
+                }
+
+                let risk_upd =
+                    risk + ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) + 1;
+                if let Some(risk_cur) = risks[idx_a] {
+                    if risk_upd >= risk_cur {
+                        continue; // no improvement
+                    }
+                    // unreachable!("Decrese key can never happen");
+                    heap.remove(&(risk_cur, idx_a)); // improved path to node seen previously
+                }
+
+                heap.insert((risk_upd, idx_a));
+                risks[idx_a] = Some(risk_upd);
+            }
+        }
+
+        panic!("No path found");
+    }
+    // end::solve_dijkstra[]
+}
 
 // tag::tests[]
 #[cfg(test)]
