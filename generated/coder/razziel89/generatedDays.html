@@ -280,6 +280,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_14_go">Day 14: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_14">Oveview</a></li>
+<li><a href="#_how_to_run_14">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3881,6 +3891,381 @@ func (g *Grid) Pretty(digits int) string {
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run the solution.</p>
+</div>
+<a id="day14" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_14_go"><a class="anchor" href="#_day_14_go"></a><a class="link" href="#_day_14_go">Day 14: go</a></h3>
+<div class="sect3">
+<h4 id="_day_14_extended_polymerization"><a class="anchor" href="#_day_14_extended_polymerization"></a><a class="link" href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the extended polymerisation
+puzzle.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_14"><a class="anchor" href="#_oveview_14"></a><a class="link" href="#_oveview_14">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a <code>rep.go</code>, which contains specifications of a replacement
+specification.</p>
+</div>
+<div class="paragraph">
+<p>There are two implementations here.
+The first uses goroutines and achieves some degree of parallelisation this way.
+It&#8217;s by no means great, though.
+For example, you cannot solve part 2 with it, it&#8217;s just now efficient enough.
+The second solution does not suffer from such exponential scaling.
+Thus, it can be used to solve both parts quickly.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	// We make the buffer large to achieve some degree of parallelism with goroutines.
+	buffer      = 100000
+	roundsPart1 = 10
+	roundsPart2 = 40
+)
+
+func makeMap(replacements []Replacement) map[Match]rune {
+	result := map[Match]rune{}
+	for _, rep := range replacements {
+		result[rep.Match] = rep.Insert
+	}
+	return result
+}
+
+func replace(input &lt;-chan rune, output chan&lt;- rune, replacements map[Match]rune, idx int) {
+	myReps := map[Match]rune{}
+	// Copy the map so that each goroutine has its own.
+	for key, val := range replacements {
+		myReps[key] = val
+	}
+	lastRune := &lt;-input
+	for char := range input {
+		output &lt;- lastRune
+		if match, ok := myReps[Match{Left: lastRune, Right: char}]; ok {
+			output &lt;- match
+		}
+		lastRune = char
+	}
+	output &lt;- lastRune
+	close(output)
+	fmt.Printf("Closing stage %d.\n", idx)
+}
+
+func feed(input string, channel chan&lt;- rune) {
+	for _, char := range input {
+		channel &lt;- char
+	}
+	close(channel)
+	fmt.Println("Closing feeder.")
+}
+
+func count(input &lt;-chan rune) map[rune]int {
+	result := map[rune]int{}
+	for char := range input {
+		result[char]++
+	}
+	return result
+}
+
+func max(input map[rune]int) int {
+	found := false
+	var max int
+	for _, val := range input {
+		if !found || val &gt; max {
+			found = true
+			max = val
+		}
+	}
+	return max
+}
+
+func min(input map[rune]int) int {
+	found := false
+	var min int
+	for _, val := range input {
+		if !found || val &lt; min {
+			found = true
+			min = val
+		}
+	}
+	return min
+}
+
+// Run the polymerization riddle for a given number of rounds. Note how we never construct the full
+// string in memory.
+func runRounds(input string, reps map[Match]rune, rounds int) map[rune]int {
+	// Construct pipeline.
+	inChannel := make(chan rune, buffer)
+	var outChannel chan rune
+	// Run pipeline.
+	go feed(input, inChannel)
+	for roundIdx := 0; roundIdx &lt; rounds; roundIdx++ {
+		outChannel = make(chan rune, buffer)
+		go replace(inChannel, outChannel, reps, roundIdx)
+		inChannel = outChannel
+	}
+	counts := count(outChannel)
+	return counts
+}
+
+// Split a string into pairs of characters. Each pair knows whether it's in the middle or at an
+// edge. If it's at an edge, it also knows which one.
+func stringToMatches(str string) []Match {
+	result := []Match{}
+	if len(str) == 0 {
+		// This is an error case that will never happen. Thus, don't catch it.
+		return []Match{}
+	}
+	split := strings.Split(str, "")
+	lastChar := rune(split[0][0])
+	for idx, c := range split[1:] {
+		char := rune(c[0])
+		var leftEdge, rightEdge bool
+		if idx == 0 {
+			leftEdge = true
+		}
+		if idx == len(split)-2 {
+			rightEdge = true
+		}
+		match := Match{Left: lastChar, Right: char, LeftEdge: leftEdge, RightEdge: rightEdge}
+		lastChar = char
+		result = append(result, match)
+	}
+	return result
+}
+
+// Perform one pair split according to the rules. That is, a pair is converted into two pairs by
+// inserting a letter in between. This also takes care of propagating the information of which
+// matches are at the edges.
+func translateMatch(match Match, reps *map[Match]rune) []Match {
+	// make sure to strip away the edge information. Otherwise, matches at the edges will never be
+	// found.
+	matchWithoutEdge := Match{Right: match.Right, Left: match.Left}
+	if insert, foundMatch := (*reps)[matchWithoutEdge]; foundMatch {
+		leftMatch := Match{
+			Left:      match.Left,
+			Right:     insert,
+			LeftEdge:  match.LeftEdge,
+			RightEdge: false,
+		}
+		rightMatch := Match{
+			Left:      insert,
+			Right:     match.Right,
+			LeftEdge:  false,
+			RightEdge: match.RightEdge,
+		}
+		return []Match{leftMatch, rightMatch}
+	}
+	// No match found, return the original one.
+	return []Match{match}
+}
+
+// Run the polymerization riddle for a given number of rounds, but do it differently. This approach
+// does not scale exponentially with the number of rounds.
+func runRoundsDifferently(input string, reps map[Match]rune, rounds int) map[rune]int {
+	matches := stringToMatches(input)
+	// We treat all identical matches the same way.
+	matchCounts := map[Match]int{}
+	for _, match := range matches {
+		matchCounts[match]++
+	}
+	// Run!
+	for round := 0; round &lt; rounds; round++ {
+		newMatchCounts := map[Match]int{}
+		for match, count := range matchCounts {
+			newMatches := translateMatch(match, &amp;reps)
+			for _, newM := range newMatches {
+				newMatchCounts[newM] += count
+			}
+		}
+		matchCounts = newMatchCounts
+	}
+	foundLeftEdge := false
+	foundRightEdge := false
+	// Count characters! Each char is in two pairs apart from the ones at the edges.
+	result := map[rune]int{}
+	// First, count all characters in all pairs. This will be twice the number we want.
+	for match, count := range matchCounts {
+		// Count each character in a pair for each pair that has it.
+		result[match.Right] += count
+		result[match.Left] += count
+		// Handle edge cases (pun very much intended).
+		if (match.LeftEdge || match.RightEdge) &amp;&amp; count != 1 {
+			// Error case, should never happen, so fatalling is OK if it does.
+			log.Fatal("more than one character at the left edge")
+		}
+		// Also add one for each character at an edge. This makes sure we also counted them twice.
+		if match.LeftEdge {
+			if foundLeftEdge {
+				log.Fatal("there can only be one left edge")
+			}
+			result[match.Left]++
+		}
+		if match.RightEdge {
+			if foundRightEdge {
+				log.Fatal("there can only be one right edge")
+			}
+			result[match.Right]++
+		}
+	}
+	// Then, divide all counts by two.
+	for char, count := range result {
+		if count%2 != 0 {
+			// Error case, should never happen, so fatalling is OK if it does.
+			log.Fatalf("cannot divide odd number %d by 2 for %c", count, char)
+		}
+		result[char] /= 2
+	}
+	return result
+}
+
+//nolint: funlen
+func main() {
+	input, replacements, err := ReadLinesAsReplacementsOrInput()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	reps := makeMap(replacements)
+	counts := runRounds(input, reps, roundsPart1)
+	fmt.Printf(
+		"Part 1: max: %d, min: %d, diff: %d\n",
+		max(counts), min(counts), max(counts)-min(counts),
+	)
+	// Part 2 cannot be solved this way, it just takes too long. Thus, solve it differently.
+	counts = runRoundsDifferently(input, reps, roundsPart1)
+	fmt.Printf(
+		"Part 1 differently: max: %d, min: %d, diff: %d\n",
+		max(counts), min(counts), max(counts)-min(counts),
+	)
+	counts = runRoundsDifferently(input, reps, roundsPart2)
+	fmt.Printf(
+		"Part 2 differently: max: %d, min: %d, diff: %d\n",
+		max(counts), min(counts), max(counts)-min(counts),
+	)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsReplacementsOrInput reads all lines from stdin as replacement instructions or input.
+func ReadLinesAsReplacementsOrInput() (string, []Replacement, error) {
+	var result []Replacement
+	var input string
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return input, result, nil
+		}
+		if err != nil {
+			return "", []Replacement{}, err
+		}
+		line = strings.TrimSpace(line)
+		if len(line) == 0 {
+			// Skip empty lines.
+			continue
+		}
+		if strings.Contains(line, repSep) {
+			// A line with a replacement.
+			parsed, err := RepFromString(line)
+			if err != nil {
+				return "", []Replacement{}, err
+			}
+			result = append(result, parsed)
+		} else {
+			// A line with the input string.
+			if len(input) != 0 {
+				err := fmt.Errorf("already processed input")
+				return "", []Replacement{}, err
+			}
+			input = line
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>rep.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Match described one match of two characters.
+type Match struct {
+	Left      rune
+	Right     rune
+	LeftEdge  bool
+	RightEdge bool
+}
+
+func b2s(b bool) rune {
+	if b {
+		return '1'
+	}
+	return '0'
+}
+
+// ToString provides a nice string representation for a match.
+func (m Match) ToString() string {
+	return fmt.Sprintf(
+		"{%c%c [%c|%c]}",
+		m.Left, m.Right, b2s(m.LeftEdge), b2s(m.RightEdge),
+	)
+}
+
+// Replacement describes one replacement instruction by insertion.
+type Replacement struct {
+	Match  Match
+	Insert rune
+}
+
+// RepFromString converts a sring into a replacement instruction.
+func RepFromString(str string) (Replacement, error) {
+	fields := trimStrings(strings.Split(str, repSep))
+	if len(fields) != tokensPerRep {
+		err := fmt.Errorf("cannot parse %v as rep, wrong number of fields", str)
+		return Replacement{}, err
+	}
+	if len(fields[0]) != tokensPerRep {
+		err := fmt.Errorf("cannot parse %v as rep, wrong number of characters", str)
+		return Replacement{}, err
+	}
+	if len(fields[1]) != 1 {
+		err := fmt.Errorf("cannot parse %v as rep, wrong number of insertions", str)
+		return Replacement{}, err
+	}
+	match := Match{
+		Left:  rune(fields[0][0]),
+		Right: rune(fields[0][1]),
+	}
+	rep := Replacement{
+		Match:  match,
+		Insert: rune(fields[1][0]),
+	}
+	return rep, nil
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_14"><a class="anchor" href="#_how_to_run_14"></a><a class="link" href="#_how_to_run_14">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
 </div>
 </div>
 </div>

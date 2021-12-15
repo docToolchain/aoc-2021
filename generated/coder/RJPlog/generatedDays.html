@@ -283,6 +283,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_14_kotlin">Day 14: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_14">First Star</a></li>
+<li><a href="#_second_star_14">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2070,6 +2080,204 @@
 		println()
 	}
 	println("   do you use to activate the infrared thermal imaging camera system")
+	println()</code></pre>
+</div>
+</div>
+<a id="day14" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_14_kotlin"><a class="anchor" href="#_day_14_kotlin"></a><a class="link" href="#_day_14_kotlin">Day 14: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_14_extended_polymerization"><a class="anchor" href="#_day_14_extended_polymerization"></a><a class="link" href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/14" class="bare">https://adventofcode.com/2021/day/14</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2114_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_14"><a class="anchor" href="#_first_star_14"></a><a class="link" href="#_first_star_14">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>fun poly() will read puzzle input. For each pair of letters in the initial template the rule is applied by building up a new string. After repeating this 10 times, count the occurency of all letters and return max - min.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun poly(input1: Int): Int {
+	var rules = mutableMapOf&lt;String, String&gt;()
+	var polyTemp: String = ""
+
+	File("day2114_puzzle_input.txt").forEachLine {
+		if (it != "") {
+			if (!it.contains("-&gt;")) {
+				polyTemp = it
+			} else {
+				var instruction = it.split(" -&gt; ")
+				rules.put(instruction[0], instruction[1])
+			}
+		}
+	}
+
+
+	//iterate input1 number of steps and create new string with replacement of each pair with given rules
+	var newPolyTemp: String = polyTemp.take(1)
+
+	for (i in 1..input1) {
+		for (j in 0..polyTemp.length - 2) {
+			if (rules.containsKey(polyTemp.subSequence(j, j + 2).toString())) {
+				newPolyTemp = newPolyTemp + rules.getValue(polyTemp.subSequence(j, j + 2).toString()) + polyTemp[j + 1]
+			} else
+				newPolyTemp = newPolyTemp + polyTemp[j + 1]
+		}
+		polyTemp = newPolyTemp
+		newPolyTemp = polyTemp.take(1)
+	}
+
+	// count elements and determine max and min value
+	var countMap = mutableMapOf&lt;Char, Int&gt;()
+	polyTemp.forEach {
+		if (countMap.contains(it)) {
+			countMap.set(it, countMap.getValue(it) + 1)
+		} else {
+			countMap.put(it, 1)
+		}
+	}
+
+	var max: Int = 0
+	var min: Int = 10000
+	countMap.forEach {
+		if (it.value &gt; max) {
+			max = it.value
+		} else if (it.value &lt; min) {
+			min = it.value
+		}
+	}
+	return max - min
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_14"><a class="anchor" href="#_second_star_14"></a><a class="link" href="#_second_star_14">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>In theory, same function could work, but it takes much to long. So there is fun polyAdv(), each combination of a pair of letters will be stored with it&#8217;s number of occurency and for the next round with applying the rules new pairs are generated. After repeating this 40 times,  count the occurency of all letters and return max - min.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun polyAdv(input1: Int): Long {
+
+	var rules = mutableMapOf&lt;String, String&gt;()
+	var polyTemp: String = ""
+
+	File("day2114_puzzle_input.txt").forEachLine {
+		if (it != "") {
+			if (!it.contains("-&gt;")) {
+				polyTemp = it
+			} else {
+				var instruction = it.split(" -&gt; ")
+				rules.put(instruction[0], instruction[1])
+			}
+		}
+	}
+
+	//setup Map with subSequences and counter for occurency
+	var polyPairs = mutableMapOf&lt;String, Long&gt;()
+	var newPolyPairs = mutableMapOf&lt;String, Long&gt;()
+
+	polyPairs.put(polyTemp.takeLast(1), 1)
+	for (j in 0..polyTemp.length - 2) {
+		if (polyPairs.containsKey(polyTemp.subSequence(j, j + 2).toString())) {
+			polyPairs.set(
+				polyTemp.subSequence(j, j + 2).toString(),
+				polyPairs.getValue(polyTemp.subSequence(j, j + 2).toString()) + 1
+			)
+		} else {
+			polyPairs.put(polyTemp.subSequence(j, j + 2).toString(), 1)
+		}
+	}
+
+	// iterate input1 number of steps and determine, how many new sequences will be created for the current step
+	for (i in 1..input1) {
+		polyPairs.forEach {
+			if (rules.contains(it.key)) {
+
+				var new1 = it.key.take(1) + rules.getValue(it.key)
+				var new2 = rules.getValue(it.key) + it.key.takeLast(1)
+
+				if (newPolyPairs.containsKey(new1)) {
+					newPolyPairs.put(
+						new1,
+						newPolyPairs.getValue(new1) + it.value
+					)
+				} else {
+					newPolyPairs.put(new1, it.value)
+				}
+				if (newPolyPairs.containsKey(new2)) {
+					newPolyPairs.put(new2, newPolyPairs.getValue(new2) + it.value)
+				} else {
+					newPolyPairs.put(new2, it.value)
+				}
+			} else {
+				newPolyPairs.put(it.key, it.value)
+			}
+		}
+		polyPairs.clear()
+		polyPairs.putAll(newPolyPairs)
+		newPolyPairs.clear()
+	}
+
+	// count elements and determine max and min value
+	var countMap = mutableMapOf&lt;String, Long&gt;()
+
+	for ((key, value) in polyPairs) {
+		if (countMap.contains(key.take(1))) {
+			countMap.set(key.take(1), countMap.getValue(key.take(1)) + value)
+		} else {
+			countMap.put(key.take(1), value)
+		}
+	}
+
+	var max: Long = countMap.getValue(polyTemp.take(1))
+	var min: Long = countMap.getValue(polyTemp.take(1))
+
+	countMap.forEach {
+		if (it.value &gt; max) {
+			max = it.value
+		} else if (it.value &lt; min) {
+			min = it.value
+		}
+	}
+
+	return (max - min)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("****************************************")
+	println("--- Day  14: Extended Polymerization ---")
+	println("****************************************")
+	println("Solution for part1")
+	println("   $solution1 you get if you take the quantity of the most common element and subtract the quantity of the least common element")
+	println()
+// print solution for part 2
+	println("*******************************")
+	println("Solution for part2")
+	println("   $solution2 you get if you take the quantity of the most common element and subtract the quantity of the least common element")
 	println()</code></pre>
 </div>
 </div>
