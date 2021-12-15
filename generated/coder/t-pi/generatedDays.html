@@ -306,6 +306,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_14_python">Day 14: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_14_extended_polymerization">AoC21-14: Extended Polymerization</a>
+<ul class="sectlevel4">
+<li><a href="#_info_14">Info</a></li>
+<li><a href="#_howto_14">HowTo</a></li>
+<li><a href="#_learned_today_14">Learned today</a></li>
+<li><a href="#_source_14">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1969,6 +1981,155 @@ def main():
     for row in star2_list:
         print(''.join(['█' if c == 1 else ' ' for c in row]))
     star2 = 's. above'
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day14" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_14_python"><a class="anchor" href="#_day_14_python"></a><a class="link" href="#_day_14_python">Day 14: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_14_extended_polymerization"><a class="anchor" href="#_aoc21_14_extended_polymerization"></a><a class="link" href="#_aoc21_14_extended_polymerization">AoC21-14: Extended Polymerization</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/14" class="bare">https://adventofcode.com/2021/day/14</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_14"><a class="anchor" href="#_info_14"></a><a class="link" href="#_info_14">Info</a></h5>
+<div class="paragraph">
+<p>Polymerization to protect the outer sub shell. Provided: initial polymer string and reactions (char pairs into which new char is inserted)</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1 (*): 10 polymerization steps: highest element number - lowest element number</p>
+</li>
+<li>
+<p>Star2 (**): 40 polymerization steps: highest element number - lowest element number</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_14"><a class="anchor" href="#_howto_14"></a><a class="link" href="#_howto_14">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and prepocessed into the polymer as well as a dict of reactions (e.g. 'AB': 'C').</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Classic string action. 10 iterations work well. Easy to process and easy to count&#8230;&#8203;</p>
+</li>
+<li>
+<p>Star2: 40 iterations do not fit into RAM. New approach: Count and manage letter pairs. Worked well, except for own stupidity.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_14"><a class="anchor" href="#_learned_today_14"></a><a class="link" href="#_learned_today_14">Learned today</a></h5>
+<div class="paragraph">
+<p>Had all afternoon that feeling, that I just need to find the little glitch, as test data worked, but not real input. But I did not test the 40cyc test data&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Only much too late found the error: no reset after the first 10 cycles to check for match with star1 -&#8594; ran 50 cycles 🤦‍♂️</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_14"><a class="anchor" href="#_source_14"></a><a class="link" href="#_source_14">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see README.adoc
+
+import math
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+    initial_polymer = local_list[0]
+    reactions = {item.split('-&gt;')[0].strip():item.split('-&gt;')[1].strip() for item in local_list[2:]}
+    return initial_polymer, reactions
+
+
+def single_step(polymer, reactions):
+    ''' Iterate one polymerization step by inserting monomers
+        Return new polymer
+    '''
+    new_polymer = ''
+    for i, c in enumerate(polymer[:-1]):
+        new_polymer += polymer[i]
+        interface = polymer[i:i+2]
+        if (interface in reactions.keys()):
+            new_polymer += reactions[interface]
+    new_polymer += polymer[-1]
+    return(new_polymer)
+
+
+def single_step_count(paircount, reactions):
+    ''' Iterate one polymerization step by counting and adapting the pairs
+        Return new dict of pair count
+    '''
+    for key, n in paircount.copy().items():
+        paircount[key] -= n
+        middle = reactions[key]
+        left, right = key
+        paircount[left + middle] = n if (left + middle not in paircount.keys()) else paircount[left + middle]+n
+        paircount[middle + right] = n if (middle + right not in paircount.keys()) else paircount[middle+right]+n
+    return paircount
+
+
+def count_pairs(initial_polymer, chars, polypairs):
+    ''' Count pairs as if in polymer
+        Return max count - min count
+    '''
+    char_count = dict()
+    for c in chars:
+        char_count[c] = 0
+        for k in polypairs.keys():
+            if (c == k[0]):
+                char_count[c] += polypairs[k]
+    char_count[initial_polymer[-1]] += 1
+    return max(char_count.values()) - min(char_count.values())
+
+
+def main():
+    polymer, reactions = read_daily_input('input14.txt')
+    new_polymer = polymer
+    for __ in range(10):
+        new_polymer = single_step(new_polymer, reactions)
+    chars = set([c for c in new_polymer])
+    char_count = dict()
+    for c in chars:
+        char_count[c] = new_polymer.count(c)
+    star1 = max(char_count.values()) - min(char_count.values())
+    print(f"Result (*): {star1}")
+
+    polypairs = dict()
+    for i in range(len(polymer)-1):
+        polypairs[polymer[i:i+2]] = 1 if (polymer[i:i+2] not in polypairs.keys()) else polypairs[polymer[i:i+2]] + 1
+    for __ in range(10):
+        polypairs = single_step_count(polypairs, reactions)
+    star1 = count_pairs(polymer, chars, polypairs)
+    print(f"Result (*) counting: {star1}")
+    for __ in range(30):
+        polypairs = single_step_count(polypairs, reactions)
+    star2 = count_pairs(polymer, chars, polypairs)
     print(f"Result (**): {star2}")
 
 
