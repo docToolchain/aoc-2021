@@ -1,0 +1,14 @@
+==  Day 15: Chiton  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/15
+
+For execution enter _kotlin day2115_1_2.kts_ in the command line.
+
+=== Today I learned
+
+Today I started very fast with adapting solution of day12, creating a list of possible segment changes and creating all possible pathes through the grid only visiting every place once. For very small solutions it worked well, but already the given example with 10x10 was not able to calculate in proper time. 
+
+So I have to rethink my approach. First, I still believe in the general approach and add some modifications to improve timing, change all string based operations to int based operations, let's see how far it will get me.
+
