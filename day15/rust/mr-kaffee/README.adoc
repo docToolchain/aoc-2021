@@ -10,13 +10,9 @@ When looking at the puzzle, I thought: "Obviously Dijkstra". Then I implemented 
 
 I realized my implementation was not Dijkstra when I tried to extend to https://en.wikipedia.org/wiki/A*_search_algorithm[A*] to figure out whether this improves performance. 
 
-Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target: ``width - 1 - x + height - 1 - y``) does not perform any better.
+Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target ``width - 1 - x + height - 1 - y`` as heuristic) does not perform any better.
 
-The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by uncommenting the line 
-[source,rust]
-----
-// unreachable!("Decrese key can never happen");
-----
+The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by using feature ``dijkstra_panic_decrease`` which results the program to panic on an attempt to decrease a key. Run puzzle with ``cargo run --release --features dijkstra_panic_release``.
 
 ==== Simple Algorithm ====
 

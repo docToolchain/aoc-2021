@@ -1,4 +1,4 @@
-== Day 14: ____ ==
+== Day 14: Extended Polymerization ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/14[AoC|2021|14].
 
