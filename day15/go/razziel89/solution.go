@@ -114,7 +114,7 @@ func main() {
 		}
 	}
 
-	nodes, startNode, endNode, err = gridToNodes(grid)
+	nodes, startNode, endNode, err = gridToNodes(largeGrid)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
