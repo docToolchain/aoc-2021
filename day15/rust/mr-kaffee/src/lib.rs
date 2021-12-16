@@ -117,7 +117,9 @@ pub mod dijkstra {
                     if risk_upd >= risk_cur {
                         continue; // no improvement
                     }
-                    // unreachable!("Decrese key can never happen");
+                    if cfg!(feature = "dijkstra_panic_decrease") {
+                        unreachable!("Decrese key can never happen");
+                    }
                     heap.remove(&(risk_cur, idx_a)); // improved path to node seen previously
                 }
 
