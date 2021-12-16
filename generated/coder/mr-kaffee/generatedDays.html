@@ -338,6 +338,7 @@
 <ul class="sectlevel4">
 <li><a href="#_solution_4">Solution</a></li>
 <li><a href="#_tests_14">Tests</a></li>
+<li><a href="#_today_i_learned_8">Today I Learned</a></li>
 </ul>
 </li>
 </ul>
@@ -3599,11 +3600,140 @@ CN -&gt; C";
 <div class="sect4">
 <h5 id="_solution_4"><a class="anchor" href="#_solution_4"></a><a class="link" href="#_solution_4">Solution</a></h5>
 <div class="paragraph">
-<p>Dijkstra!</p>
+<p><a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra!?</a></p>
 </div>
 <div class="paragraph">
-<p>Parse:</p>
+<p>When looking at the puzzle, I thought: "Obviously Dijkstra". Then I implemented a solution which I thought was Dijskstra while it actually was not. It still worked.</p>
 </div>
+<div class="paragraph">
+<p>I realized my implementation was not Dijkstra when I tried to extend to <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a> to figure out whether this improves performance.</p>
+</div>
+<div class="paragraph">
+<p>Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target: <code>width - 1 - x + height - 1 - y</code>) does not perform any better.</p>
+</div>
+<div class="paragraph">
+<p>The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by uncommenting the line</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-rust" data-lang="rust">// unreachable!("Decrese key can never happen");</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_simple_algorithm"><a class="anchor" href="#_simple_algorithm"></a><a class="link" href="#_simple_algorithm">Simple Algorithm</a></h6>
+<div class="paragraph">
+<p>The simple solution (my first solution) is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve(grid: &amp;[usize], w: usize, n: usize) -&gt; usize {
+    let h = grid.len() / w;
+
+    let mut heap = BinaryHeap::new();
+    let mut settled = vec![false; grid.len() * n * n];
+
+    heap.push((usize::MAX, 0)); // nodes are tuples (usize::MAX - risk, idx)
+    settled[0] = true;
+
+    while let Some((risk, idx)) = heap.pop() {
+        if idx == grid.len() * n * n - 1 {
+            return usize::MAX - risk; // target reached
+        }
+
+        let (x, y) = (idx % (w * n), idx / (w * n));
+
+        for (x_a, y_a) in [
+            (x + 1, y),
+            (x, y + 1),
+            (x.wrapping_sub(1), y),
+            (x, y.wrapping_sub(1)),
+        ] {
+            if x_a &gt;= w * n || y_a &gt;= h * n || settled[x_a + y_a * w * n] {
+                continue; // out of bounds or visisted
+            }
+
+            let risk = risk - ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) - 1;
+
+            settled[x_a + y_a * w * n] = true; // first visit settles
+            heap.push((risk, x_a + y_a * w * n));
+        }
+    }
+
+    panic!("No path found");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the simple solution, I "invert" the risk (<code>usize::MAX - risk</code>) because <code>BinaryHeap</code> returns the biggest element first.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_dijkstra"><a class="anchor" href="#_dijkstra"></a><a class="link" href="#_dijkstra">Dijkstra</a></h6>
+<div class="paragraph">
+<p>The Dijkstra implementatino looks as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    pub fn solve(grid: &amp;[usize], w: usize, n: usize) -&gt; usize {
+        let h = grid.len() / w;
+
+        let mut heap = BTreeSet::new();
+        let mut settled = vec![false; w * h * n * n];
+        let mut risks = vec![None; w * h * n * n];
+
+        heap.insert((0, 0)); // nodes are tuples (risk, idx)
+        risks[0] = Some(0); // keep track of best risks so far
+        settled[0] = true; // flag nodes which are settled
+
+        while let Some((risk, idx)) = heap.pop_first() {
+            if idx == grid.len() * n * n - 1 {
+                return risk; // target reached
+            }
+            settled[idx] = true; // no further improvement possible
+
+            let (x, y) = (idx % (w * n), idx / (w * n));
+            for (x_a, y_a) in [
+                (x + 1, y),
+                (x, y + 1),
+                (x.wrapping_sub(1), y),
+                (x, y.wrapping_sub(1)),
+            ] {
+                let idx_a = x_a + y_a * w * n;
+                if x_a &gt;= w * n || y_a &gt;= h * n || settled[idx_a] {
+                    continue; // out of bounds or settled
+                }
+
+                let risk_upd =
+                    risk + ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) + 1;
+                if let Some(risk_cur) = risks[idx_a] {
+                    if risk_upd &gt;= risk_cur {
+                        continue; // no improvement
+                    }
+                    // unreachable!("Decrese key can never happen");
+                    heap.remove(&amp;(risk_cur, idx_a)); // improved path to node seen previously
+                }
+
+                heap.insert((risk_upd, idx_a));
+                risks[idx_a] = Some(risk_upd);
+            }
+        }
+
+        panic!("No path found");
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I use a <code>BTreeSet</code> as heap. Decrease key is implemented as remove old node and insert new node (but actually never used, see above).</p>
+</div>
+<div class="paragraph">
+<p>The solution only compiles using the rust nightly channel because <code>BTreeSet::pop_first</code> is unstable. The simple version runs on rust stable.</p>
+</div>
+<div class="paragraph">
+<p>Run the Dijkstra version with <code>cargo run --release --features dijkstra</code>.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_parse"><a class="anchor" href="#_parse"></a><a class="link" href="#_parse">Parse</a></h6>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">///
@@ -3623,53 +3753,6 @@ pub fn parse(content: &amp;str) -&gt; (Vec&lt;usize&gt;, usize) {
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Solve (call with <code>d = 1</code> for part 1 and <code>d = 5</code> for part 2):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve(grid: &amp;[usize], w: usize, n: usize) -&gt; usize {
-    let h = grid.len() / w;
-
-    let mut heap = BinaryHeap::new();
-    let mut visited = vec![false; grid.len() * n * n];
-
-    heap.push((usize::MAX, 0)); // nodes are tuples (usize::MAX - risk, idx)
-    visited[0] = true;
-
-    while let Some((risk, idx)) = heap.pop() {
-        if idx == grid.len() * n * n - 1 {
-            return usize::MAX - risk;
-        }
-
-        let (x, y) = (idx % (w * n), idx / (w * n));
-
-        for (x_a, y_a) in [
-            (x + 1, y),
-            (x, y + 1),
-            (x.wrapping_sub(1), y),
-            (x, y.wrapping_sub(1)),
-        ] {
-            if x_a &gt;= w * n || y_a &gt;= h * n || visited[x_a + y_a * w * n] {
-                continue;
-            }
-
-            let risk = risk - ((grid[x_a % w + y_a % h * w] + x_a / w + y_a / h - 1) % 9) - 1;
-
-            visited[x_a + y_a * w * n] = true;
-            heap.push((risk, x_a + y_a * w * n));
-        }
-    }
-
-    panic!("No path found");
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>I somehow messed up with part 2 and could not figure out what I did wrong. I generalized the code for part 1 to see whether it still solves part 1 and all of a sudden it also solved part 2. Don&#8217;t know what I got wrong in the first place.</p>
-</div>
-<div class="paragraph">
-<p>Possible optimization: use A* with the min steps to target (<code>width - x + height - y</code>) as heuristic.</p>
 </div>
 </div>
 <div class="sect4">
@@ -3717,6 +3800,21 @@ mod tests {
     }
 }</code></pre>
 </div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_8"><a class="anchor" href="#_today_i_learned_8"></a><a class="link" href="#_today_i_learned_8">Today I Learned</a></h5>
+<div class="paragraph">
+<p>A possible way to implement Dijkstra on a simple graph with Rust.</p>
+</div>
+<div class="paragraph">
+<p>Remember how Dijkstra and A* really work and understand that Dijkstra is not always needed depending on the structure of the problem to solve.</p>
+</div>
+<div class="paragraph">
+<p>Use features for conditional compilation and use unstable Rust features.</p>
+</div>
+<div class="paragraph">
+<p>Unfortunately, I also learned that the Rust collections in <code>std::collections</code> offer a quite poor interface. The function <code>BTreeMap::pop_min</code> being unstable is sad.</p>
 </div>
 </div>
 </div>
