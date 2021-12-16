@@ -343,6 +343,17 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_16_rust">Day 16: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_13_packet_decoder">Day 13: Packet Decoder</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_11">Part 1</a></li>
+<li><a href="#_part_2_11">Part 2</a></li>
+<li><a href="#_tests_15">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3815,6 +3826,237 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>Unfortunately, I also learned that the Rust collections in <code>std::collections</code> offer a quite poor interface. The function <code>BTreeMap::pop_min</code> being unstable is sad.</p>
+</div>
+<a id="day16" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_16_rust"><a class="anchor" href="#_day_16_rust"></a><a class="link" href="#_day_16_rust">Day 16: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_13_packet_decoder"><a class="anchor" href="#_day_13_packet_decoder"></a><a class="link" href="#_day_13_packet_decoder">Day 13: Packet Decoder</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/13">AoC|2021|13</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_11"><a class="anchor" href="#_part_1_11"></a><a class="link" href="#_part_1_11">Part 1</a></h5>
+<div class="paragraph">
+<p>A lot to read today. But then it is just following the instructions.</p>
+</div>
+<div class="paragraph">
+<p>I implemented a structure <code>Packets</code> to keep track of the current position and read numbers from the bits &amp; bytes (I am particularly proud that I got the bit ordering right from the beginning):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub struct Packets {
+    data: Vec&lt;u8&gt;,
+    pos: usize,
+}
+
+impl Packets {
+    pub const SUM: usize = 0;
+    pub const PRODUCT: usize = 1;
+    pub const MIN: usize = 2;
+    pub const MAX: usize = 3;
+    pub const VALUE: usize = 4;
+    pub const GREATER: usize = 5;
+    pub const LESS: usize = 6;
+    pub const EQUAL: usize = 7;
+
+    pub const N_VERSION: usize = 3;
+    pub const N_TYPE_ID: usize = 3;
+    pub const N_FLAG: usize = 1;
+    pub const N_VALUE_PART: usize = 4;
+    pub const N_LENGTH_TYPE_ID: usize = 1;
+    pub const N_LENGTH: [usize; 2] = [15, 11];
+
+    pub fn from(bytes: &amp;[u8]) -&gt; Self {
+        Packets {
+            data: Vec::from(bytes),
+            pos: 0,
+        }
+    }
+
+    pub fn read_number(&amp;mut self, len: usize) -&gt; usize {
+        let mut v = 0usize;
+        for _ in 0..len {
+            v = v &lt;&lt; 1 | ((self.data[self.pos &gt;&gt; 2] &gt;&gt; (!self.pos &amp; 3)) &amp; 1) as usize;
+            self.pos += 1;
+        }
+
+        v
+    }
+
+    pub fn skip(&amp;mut self, len: usize) {
+        self.pos += len;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The input is parsed into that structure with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">///
+/// ```
+/// # use mr_kaffee_2021_16::*;
+/// assert_eq!(Packets::from(&amp;[0, 1, 10]), parse("01A"));
+/// ```
+pub fn parse(content: &amp;str) -&gt; Packets {
+    let data = content
+        .trim()
+        .chars()
+        .map(|c| match c {
+            '0'..='9' =&gt; c as u8 - '0' as u8,
+            'A'..='F' =&gt; c as u8 - 'A' as u8 + 10,
+            _ =&gt; panic!("Illegal character: {}", c),
+        })
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+    Packets::from(&amp;data)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, part 1 is solved with the function <code>sum_versions</code> which calls itself recursively:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn sum_versions(packets: &amp;mut Packets) -&gt; usize {
+    let mut versions_sum = packets.read_number(Packets::N_VERSION);
+
+    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    if type_id == Packets::VALUE {
+        loop {
+            let flag = packets.read_number(Packets::N_FLAG);
+            packets.skip(Packets::N_VALUE_PART); // skip value
+
+            if flag == 0 {
+                break; // last part's flag is 0
+            }
+        }
+    } else {
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+
+        if length_type_id == 1 {
+            for _ in 0..length {
+                versions_sum += sum_versions(packets);
+            }
+        } else {
+            let target = packets.pos + length;
+            while packets.pos &lt; target {
+                versions_sum += sum_versions(packets);
+            }
+        }
+    }
+
+    versions_sum
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_11"><a class="anchor" href="#_part_2_11"></a><a class="link" href="#_part_2_11">Part 2</a></h5>
+<div class="paragraph">
+<p>For part two the function <code>sum_versions</code> is modified to take into account the operators. The new function <code>process_packet</code> reads:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn process_packet(packets: &amp;mut Packets) -&gt; usize {
+    packets.skip(Packets::N_VERSION); // skip version
+
+    let mut value = 0;
+    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    if type_id == 4 {
+        loop {
+            let flag = packets.read_number(Packets::N_FLAG);
+            let value_part = packets.read_number(Packets::N_VALUE_PART);
+
+            value = value &lt;&lt; 4 | value_part;
+
+            if flag == 0 {
+                break; // last part's flag is 0
+            }
+        }
+    } else {
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+        let mut values = Vec::new();
+        if length_type_id == 1 {
+            for _ in 0..length {
+                values.push(process_packet(packets));
+            }
+        } else {
+            let target = packets.pos + length;
+            while packets.pos &lt; target {
+                values.push(process_packet(packets));
+            }
+        }
+
+        value = match type_id {
+            Packets::SUM =&gt; values.iter().sum(),
+            Packets::PRODUCT =&gt; values.iter().product(),
+            Packets::MIN =&gt; *values.iter().min().expect("No min"),
+            Packets::MAX =&gt; *values.iter().max().expect("No max"),
+            Packets::GREATER =&gt; (values[0] &gt; values[1]) as usize,
+            Packets::LESS =&gt; (values[0] &lt; values[1]) as usize,
+            Packets::EQUAL =&gt; (values[0] == values[1]) as usize,
+            _ =&gt; panic!("Illegal type ID: {}", type_id),
+        }
+    }
+
+    value
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_15"><a class="anchor" href="#_tests_15"></a><a class="link" href="#_tests_15">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT_1: &amp;str = "8A004A801A8002F478";
+    const CONTENT_2: &amp;str = "620080001611562C8802118E34";
+    const CONTENT_3: &amp;str = "C0015000016115A2E0802F182340";
+    const CONTENT_4: &amp;str = "A0016C880162017C3686B18A3D4780";
+
+    const DATA_0: &amp;[u8] = &amp;[0xD, 0x2, 0xF, 0xE, 0x2, 0x8];
+    const DATA_2: &amp;[u8] = &amp;[
+        6, 2, 0, 0, 8, 0, 0, 0, 1, 6, 1, 1, 5, 6, 2, 0xC, 8, 8, 0, 2, 1, 1, 8, 0xE, 3, 4,
+    ];
+
+    const SUM_0: usize = 6;
+    const SUM_1: usize = 16;
+    const SUM_2: usize = 12;
+    const SUM_3: usize = 23;
+    const SUM_4: usize = 31;
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(Packets::from(DATA_2), parse(CONTENT_2));
+    }
+
+    #[test]
+    fn test_solution_1() {
+        assert_eq!(SUM_0, solution_1(&amp;mut Packets::from(DATA_0)));
+        assert_eq!(SUM_1, solution_1(&amp;mut parse(CONTENT_1)));
+        assert_eq!(SUM_2, solution_1(&amp;mut Packets::from(DATA_2)));
+        assert_eq!(SUM_3, solution_1(&amp;mut parse(CONTENT_3)));
+        assert_eq!(SUM_4, solution_1(&amp;mut parse(CONTENT_4)));
+    }
+
+    #[test]
+    fn test_solution_2() {
+        assert_eq!(3, solution_2(&amp;mut parse("C200B40A82")));
+        assert_eq!(7, solution_2(&amp;mut parse("880086C3E88112")));
+        assert_eq!(1, solution_2(&amp;mut parse("9C0141080250320F1802104A08")));
+    }
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
