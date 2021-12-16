@@ -39,16 +39,6 @@ func strSliceToIntSlice(sli []string) ([]int, error) {
 
 // tag::utils[]
 
-// FindNode finds a node based on its ID in a list of them.
-func FindNode(nodes []*Node, id string) *Node {
-	for _, checkNode := range nodes {
-		if checkNode.ID == id {
-			return checkNode
-		}
-	}
-	return nil
-}
-
 // ReadLinesAsGrid reads all lines from stdin as a grid. That is, each point on the grid has a
 // value and a location.
 func ReadLinesAsGrid() (Grid, error) {

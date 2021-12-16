@@ -26,23 +26,14 @@ func (n *Node) AddConnection(connection *Node) {
 	n.Connections = append(n.Connections, connection)
 }
 
-// NodeToStr provides a string representation for a node.
-func NodeToStr(node *Node) string {
+// ToStr provides a string representation for a node.
+func (n *Node) ToStr() string {
 	connectionIDs := []string{}
-	for _, con := range node.Connections {
+	for _, con := range n.Connections {
 		connectionIDs = append(connectionIDs, con.ID)
 	}
 	connections := strings.Join(connectionIDs, ",")
-	str := fmt.Sprintf("{N: %s, L: %d, C: %d, N: %s}", node.ID, node.Limit, node.Value, connections)
-	return str
-}
-
-// NodesToStr provides a string representation for multiple nodes.
-func NodesToStr(nodes []*Node) string {
-	str := ""
-	for _, node := range nodes {
-		str += NodeToStr(node) + "\n"
-	}
+	str := fmt.Sprintf("{N: %s, L: %d, C: %d, N: %s}", n.ID, n.Limit, n.Value, connections)
 	return str
 }
 
