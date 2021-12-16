@@ -33,7 +33,7 @@ func gridToNodes(grid Grid) (map[*astar.Node]struct{}, *astar.Node, *astar.Node,
 			return result, start, end, err
 		}
 
-		node, err := astar.NewNode(fmt.Sprint(vec), cost, numNeigh)
+		node, err := astar.NewNode(fmt.Sprint(vec), cost, numNeigh, nil)
 		if err != nil {
 			return result, start, end, err
 		}
