@@ -323,7 +323,7 @@
 </li>
 <li><a href="#_day_14_rust">Day 14: rust</a>
 <ul class="sectlevel3">
-<li><a href="#_day_14">Day 14: <em>__</em></a>
+<li><a href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a>
 <ul class="sectlevel4">
 <li><a href="#_solution_3">Solution</a></li>
 <li><a href="#_tests_13">Tests</a></li>
@@ -345,7 +345,7 @@
 </li>
 <li><a href="#_day_16_rust">Day 16: rust</a>
 <ul class="sectlevel3">
-<li><a href="#_day_13_packet_decoder">Day 13: Packet Decoder</a>
+<li><a href="#_day_16_packet_decoder">Day 16: Packet Decoder</a>
 <ul class="sectlevel4">
 <li><a href="#_part_1_11">Part 1</a></li>
 <li><a href="#_part_2_11">Part 2</a></li>
@@ -3415,7 +3415,7 @@ fold along x=5";
 <div class="sect2">
 <h3 id="_day_14_rust"><a class="anchor" href="#_day_14_rust"></a><a class="link" href="#_day_14_rust">Day 14: rust</a></h3>
 <div class="sect3">
-<h4 id="_day_14"><a class="anchor" href="#_day_14"></a><a class="link" href="#_day_14">Day 14: <em>__</em></a></h4>
+<h4 id="_day_14_extended_polymerization"><a class="anchor" href="#_day_14_extended_polymerization"></a><a class="link" href="#_day_14_extended_polymerization">Day 14: Extended Polymerization</a></h4>
 <div class="paragraph">
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/14">AoC|2021|14</a>.</p>
 </div>
@@ -3620,15 +3620,10 @@ CN -&gt; C";
 <p>I realized my implementation was not Dijkstra when I tried to extend to <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a> to figure out whether this improves performance.</p>
 </div>
 <div class="paragraph">
-<p>Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target: <code>width - 1 - x + height - 1 - y</code>) does not perform any better.</p>
+<p>Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target <code>width - 1 - x + height - 1 - y</code> as heuristic) does not perform any better.</p>
 </div>
 <div class="paragraph">
-<p>The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by uncommenting the line</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-rust" data-lang="rust">// unreachable!("Decrese key can never happen");</code></pre>
-</div>
+<p>The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by using feature <code>dijkstra_panic_decrease</code> which results the program to panic on an attempt to decrease a key. Run puzzle with <code>cargo run --release --features dijkstra_panic_release</code>.</p>
 </div>
 <div class="sect5">
 <h6 id="_simple_algorithm"><a class="anchor" href="#_simple_algorithm"></a><a class="link" href="#_simple_algorithm">Simple Algorithm</a></h6>
@@ -3720,7 +3715,9 @@ CN -&gt; C";
                     if risk_upd &gt;= risk_cur {
                         continue; // no improvement
                     }
-                    // unreachable!("Decrese key can never happen");
+                    if cfg!(feature = "dijkstra_panic_decrease") {
+                        unreachable!("Decrese key can never happen");
+                    }
                     heap.remove(&amp;(risk_cur, idx_a)); // improved path to node seen previously
                 }
 
@@ -3834,9 +3831,9 @@ mod tests {
 <div class="sect2">
 <h3 id="_day_16_rust"><a class="anchor" href="#_day_16_rust"></a><a class="link" href="#_day_16_rust">Day 16: rust</a></h3>
 <div class="sect3">
-<h4 id="_day_13_packet_decoder"><a class="anchor" href="#_day_13_packet_decoder"></a><a class="link" href="#_day_13_packet_decoder">Day 13: Packet Decoder</a></h4>
+<h4 id="_day_16_packet_decoder"><a class="anchor" href="#_day_16_packet_decoder"></a><a class="link" href="#_day_16_packet_decoder">Day 16: Packet Decoder</a></h4>
 <div class="paragraph">
-<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/13">AoC|2021|13</a>.</p>
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/16">AoC|2021|16</a>.</p>
 </div>
 <div class="sect4">
 <h5 id="_part_1_11"><a class="anchor" href="#_part_1_11"></a><a class="link" href="#_part_1_11">Part 1</a></h5>
