@@ -318,6 +318,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_15_python">Day 15: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_15_chiton">AoC21-15: Chiton</a>
+<ul class="sectlevel4">
+<li><a href="#_info_15">Info</a></li>
+<li><a href="#_howto_15">HowTo</a></li>
+<li><a href="#_learned_today_15">Learned today</a></li>
+<li><a href="#_source_15">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2130,6 +2142,189 @@ def main():
     for __ in range(30):
         polypairs = single_step_count(polypairs, reactions)
     star2 = count_pairs(polymer, chars, polypairs)
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day15" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_15_python"><a class="anchor" href="#_day_15_python"></a><a class="link" href="#_day_15_python">Day 15: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_15_chiton"><a class="anchor" href="#_aoc21_15_chiton"></a><a class="link" href="#_aoc21_15_chiton">AoC21-15: Chiton</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/15" class="bare">https://adventofcode.com/2021/day/15</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_15"><a class="anchor" href="#_info_15"></a><a class="link" href="#_info_15">Info</a></h5>
+<div class="paragraph">
+<p>Another 2D cave with risk level per position, due to chiton covered cave walls</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1 (*): What is the lowest risk level of all paths through cave</p>
+</li>
+<li>
+<p>Star2 (**): Expand cave to 5x5 map with incremental risk levels. Get new path with lowest risk.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_15"><a class="anchor" href="#_howto_15"></a><a class="link" href="#_howto_15">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and preprocessed into 2d list of risk levels. First approach was to aggregate first line into second line, as example had no complicated path. O naïve me&#8230;&#8203; (It actually worked, just the result was wrong&#8230;&#8203; 😁)</p>
+</div>
+<div class="paragraph">
+<p>So with several hints from Slack and Reddit I looked up Dijkstra and implemented it. My first version worked for star1, too, but was considerably slower than the online example. By swapping some lines and adjusting some others it got considerably faster, though</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Dijkstra version 1 (by "me")</p>
+</li>
+<li>
+<p>Star2: Expand risk layer, and use optimized Dijkstra (inspired by others 🤓)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_15"><a class="anchor" href="#_learned_today_15"></a><a class="link" href="#_learned_today_15">Learned today</a></h5>
+<div class="paragraph">
+<p>First Dijkstra implementation: Map risk layer to dict with (coord):risk and use accumulated path risk as priority for PriorityQueue. Store visited coords in dict (coord):accumulated_risk.</p>
+</div>
+<div class="paragraph">
+<p>I actually learned that it is much faster to put the adjacents directly to the visited list than the coordinates fresh from the queue. Probably avoids several re-visits of coords until all adjacents have been popped from the queue&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_15"><a class="anchor" href="#_source_15"></a><a class="link" href="#_source_15">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see README.adoc
+
+import math
+from pprint import pprint
+from queue import PriorityQueue
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+    return_list = [[int(c) for c in line] for line in local_list]
+    return return_list
+
+
+def transpose_list(any_list):
+    ''' Transpose list for analysis
+    '''
+    return [[row[i] for row in any_list] for i in range(len(any_list[0]))]
+
+
+def eval_nextline(risk_layer, firstline = False):
+    ''' Evaluate risk for all positions in second line
+        Return new risklayer
+        Does not work if optimal path has to go up a line...
+    '''
+    less_risk_layer = [row[:] for row in risk_layer]
+    if (len(less_risk_layer) == 1):
+        return less_risk_layer
+    if firstline:
+        for i in range(len(risk_layer[0])):
+            risk_factors = [sum(risk_layer[0][:j+1])+sum(risk_layer[1][j:i+1])-risk_layer[0][0] for j in range(i+1)]
+            # print(i, risk_factors)
+            less_risk_layer[1][i] = min(risk_factors)
+    else:
+        min_risks = [sum(risk_layer[0]) for __ in range(len(risk_layer[0]))]
+        for start in range(len(risk_layer[0])):
+            risk_factors = [0 for __ in range(len(risk_layer[0]))]
+            for i in range(len(risk_layer[0])):
+                if (i&lt;start):
+                    risk_factors[i] = risk_layer[0][start] + sum(risk_layer[1][i:start])
+                else:
+                    risk_factors[i] = min([sum(risk_layer[0][start:j+1])+sum(risk_layer[1][j:i+1]) for j in range(start, i+1)])
+                if (risk_factors[i] &lt; min_risks[i]):
+                    min_risks[i] = risk_factors[i]
+                # print(i, risk_factors)
+        less_risk_layer[1] = min_risks
+    return less_risk_layer[1:]
+
+
+def get_path(risk_layer):
+    ''' First Djikstra approach: Create graph (dict) of risk layer and push connections to PriorityQueue.
+        Return lower right value
+    '''
+    risk_graph = {(x, y): r for x, line in enumerate(risk_layer) for y, r in enumerate(line)}
+    max_x = len(risk_layer)
+    max_y = len(risk_layer[0])
+    q = PriorityQueue()
+    q.put((0, (0, 0)))
+    visited = {(0, 0): 0}
+    while not q.empty():
+        _r, (_x, _y) = q.get()
+        for adj in {(-1, 0), (1, 0), (0, -1), (0, 1)}:
+            _nx = _x + adj[0]
+            _ny = _y + adj[1]
+            if ((_nx &lt; 0) or (_nx &gt;= max_x) or (_ny &lt; 0) or (_ny &gt;= max_y)):
+                continue
+            _nr = _r + risk_graph[(_nx, _ny)]
+            if (_nx, _ny) == (max_x - 1, max_y - 1):
+                return _nr
+            if (((_nx, _ny) in visited.keys()) and (visited[(_nx, _ny)] &lt;= _nr)):
+                continue
+            visited[(_nx, _ny)] = _nr
+            q.put((_nr, (_nx, _ny)))
+        # print(visited)
+
+
+def expand_risklayer(risk_layer):
+    ''' Expand map 4x to the right and to the bottom for star2
+        Increase risk level on each expansion by 1
+        Returns expanded risklayer
+    '''
+    large_risklayer = list(risk_layer).copy()
+    for x_add in range(4):
+        chunk = [[((r+x_add)%9+1) for r in line] for line in risk_layer]
+        for j in range(len(large_risklayer.copy())):
+            large_risklayer[j] = large_risklayer[j] + chunk[j]
+
+    basic_risklayer = large_risklayer.copy()
+    for y_add in range(4):
+        for j, line in enumerate(basic_risklayer):
+            new_line = [((r+y_add)%9+1) for r in line]
+            large_risklayer.append(new_line)
+        # print("-------------------")
+        # for line in new_risklayer:
+        #     print('.'.join(str(i) for i in line))
+    return large_risklayer
+
+
+def main():
+    risk_layer = read_daily_input('input15.txt')
+    # risk_layer = read_daily_input('input_test.txt')
+
+    # for line in risk_layer:
+    #     print('.'.join(str(i) for i in line))
+    star1 = get_path(risk_layer)
+    print(f"Result (*): {star1}")
+    huge_risklayer = expand_risklayer(risk_layer)
+    star2 = get_path(huge_risklayer)
     print(f"Result (**): {star2}")
 
 
