@@ -1,6 +1,6 @@
-== Day 13: Packet Decoder ==
+== Day 16: Packet Decoder ==
 
-https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/13[AoC|2021|13].
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/16[AoC|2021|16].
 
 === Part 1 ===
 
