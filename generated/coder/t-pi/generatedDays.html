@@ -330,6 +330,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_16_python">Day 16: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_16_packet_decoder">AoC21-16: Packet Decoder</a>
+<ul class="sectlevel4">
+<li><a href="#_info_16">Info</a></li>
+<li><a href="#_howto_16">HowTo</a></li>
+<li><a href="#_learned_today_16">Learned today</a></li>
+<li><a href="#_source_16">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2325,6 +2337,268 @@ def main():
     print(f"Result (*): {star1}")
     huge_risklayer = expand_risklayer(risk_layer)
     star2 = get_path(huge_risklayer)
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day16" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_16_python"><a class="anchor" href="#_day_16_python"></a><a class="link" href="#_day_16_python">Day 16: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_16_packet_decoder"><a class="anchor" href="#_aoc21_16_packet_decoder"></a><a class="link" href="#_aoc21_16_packet_decoder">AoC21-16: Packet Decoder</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/16" class="bare">https://adventofcode.com/2021/day/16</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_16"><a class="anchor" href="#_info_16"></a><a class="link" href="#_info_16">Info</a></h5>
+<div class="paragraph">
+<p>Decode long hexadecimal packet with several sub-packets</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Sum up version info from all packets and sub-packets.</p>
+</li>
+<li>
+<p>Star2: Carry out encoded operations in packets and calculate final score of main packet.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_16"><a class="anchor" href="#_howto_16"></a><a class="link" href="#_howto_16">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and preprocessed. Today single line and preprocessing is main task of star1&#8230;&#8203;</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Write parser to parse packet hierarchy and sum up version info.</p>
+</li>
+<li>
+<p>Star2: Improve parser to carry out operations as well and calculate final score of main packet. As parser from Star1 produced already recursively a list of all packets, the aggregation operations were just a small addition. Still did unelegantly copy the parser functions and separately implemented the code execution&#8230;&#8203; 🙄</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_16"><a class="anchor" href="#_learned_today_16"></a><a class="link" href="#_learned_today_16">Learned today</a></h5>
+<div class="paragraph">
+<p>Getting better with recursive stuff. There are probably lots of libs out there to do the parsing with two lines of regex, but my hands-on approach worked, too, in the end. Part 2 was thus quite easy to add in the end, after no more duplicate packets were in the final packet list 😁</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_16"><a class="anchor" href="#_source_16"></a><a class="link" href="#_source_16">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see README.adoc
+
+import math
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+    # local_list[0] = 'D2FE28'
+    # local_list[0] = '8A004A801A8002F478'
+    bin_list = [n for c in local_list[0] for n in format(int(c, 16), '04b')]
+    return bin_list
+
+
+def parse_input(main_stream, packets = []):
+    ''' Parse packet as list of bit-strings
+        Return list of packets
+    '''
+
+    def read_chunk(stream, n):
+        ''' Reads number n of bits of stream
+            Returns value of bits and returns rest of stream
+        '''
+        return int(''.join(stream[:n]), 2), stream[n:]
+
+    def read_literal(stream):
+        ''' Reads and splits sub-packets of 5 bit
+            Returns list of data numbers and rest of stream
+        '''
+        last = False
+        data = []
+        while not last:
+            data_packet = stream[:5]
+            if (data_packet[0] == '0'):
+                last = True
+            data.extend(data_packet[1:])
+            stream = stream[5:]
+        return int(''.join(data), 2), stream
+
+    def read_single_packet(stream):
+        ''' Reads single packet
+            Return list of dict(s) and rest of stream
+        '''
+        new_packet = {'ver': None, 'type': None, 'op_l': None, 'data': None}
+        # print(stream)
+        ver, stream = read_chunk(stream, 3)
+        new_packet['ver'] = ver
+        type, stream = read_chunk(stream, 3)
+        new_packet['type'] = type
+        # print(ver, type)
+        if (type == 4):
+            data, stream = read_literal(stream)
+            new_packet['data'] = data
+            # print("new literal packet\n", new_packet)
+            return [new_packet], stream
+        else:
+            op_l, stream = read_chunk(stream, 1)
+            new_packet['op_l'] = op_l
+            # print(op_l)
+            if (op_l == 0):
+                bit_length, stream = read_chunk(stream, 15)
+                sub_stream = stream[:bit_length]
+                new_0packets = []
+                while ((len(sub_stream) &gt; 10) and (sum([int(c) for c in sub_stream]) &gt; 0)):
+                    bit_packets, sub_stream = read_single_packet(sub_stream)
+                    new_0packets.extend(bit_packets)
+                return ([new_packet] + new_0packets), stream[bit_length:]
+            else:
+                packet_count, stream = read_chunk(stream, 11)
+                new_1packets = []
+                # print("sub_packetcount:", packet_count)
+                while len(new_1packets) &lt; packet_count:
+                    counted_packets, stream = read_single_packet(stream)
+                    new_1packets.extend(counted_packets)
+                    # print("new sub packets\n", new_packets)
+                # print("new 1 packet\n", new_packets)
+                return ([new_packet] + new_1packets), stream
+
+    # print("main stream: \n", main_stream)
+    while ((len(main_stream) &gt; 10) and (sum([int(c) for c in main_stream]) &gt; 0)):
+        new_packets, main_stream = read_single_packet(main_stream)
+        packets.extend(new_packets)
+        # print("packets \n", packets)
+    return packets
+
+
+def interpret_input(main_stream, packets = []):
+    ''' Parse packet as list of bit-strings and interpret op packets
+        Return score
+    '''
+
+    def read_chunk(stream, n):
+        ''' Reads number n of bits of stream
+            Returns value of bits and returns rest of stream
+        '''
+        return int(''.join(stream[:n]), 2), stream[n:]
+
+    def read_literal(stream):
+        ''' Reads and splits sub-packets of 5 bit
+            Returns list of data numbers and rest of stream
+        '''
+        last = False
+        data = []
+        while not last:
+            data_packet = stream[:5]
+            if (data_packet[0] == '0'):
+                last = True
+            data.extend(data_packet[1:])
+            stream = stream[5:]
+        return int(''.join(data), 2), stream
+
+    def do_the_op(op, packets):
+        ''' Carry out the operation from op code with data packets
+            Return result value
+        '''
+        if op == 0: # sum
+            return sum([p['data'] for p in packets])
+        if op == 1: # product
+            prod = 1
+            for p in packets:
+                prod = prod * p['data'] if p['data'] != None else prod
+            return prod
+        if op == 2: # min
+            return min([p['data'] for p in packets])
+        if op == 3: # max
+            return max([p['data'] for p in packets])
+        if op == 5: # p1 &gt; p2 ? 1 : 0
+            return 1 if packets[0]['data'] &gt; packets[1]['data'] else 0
+        if op == 6: # p1 &lt; p2 ? 1 : 0
+            return 1 if packets[0]['data'] &lt; packets[1]['data'] else 0
+        if op == 7: # p1 = p2 ? 1 : 0
+            return 1 if packets[0]['data'] == packets[1]['data'] else 0
+
+    def read_single_packet(stream):
+        ''' Reads single packet
+            Return list of dict(s) and rest of stream
+        '''
+        new_packet = {'ver': None, 'type': None, 'op_l': None, 'data': None}
+        # print(stream)
+        ver, stream = read_chunk(stream, 3)
+        new_packet['ver'] = ver
+        type, stream = read_chunk(stream, 3)
+        new_packet['type'] = type
+        # print(ver, type)
+        if (type == 4):
+            data, stream = read_literal(stream)
+            new_packet['data'] = data
+            # print("new literal packet\n", new_packet)
+            return [new_packet], stream
+        else:
+            op_l, stream = read_chunk(stream, 1)
+            new_packet['op_l'] = op_l
+            # print(op_l)
+            if (op_l == 0):
+                bit_length, stream = read_chunk(stream, 15)
+                sub_stream = stream[:bit_length]
+                new_0packets = []
+                while ((len(sub_stream) &gt; 10) and (sum([int(c) for c in sub_stream]) &gt; 0)):
+                    bit_packet, sub_stream = read_single_packet(sub_stream)
+                    new_0packets.extend(bit_packet)
+                result = do_the_op(type, new_0packets)
+                new_packet['data'] = result
+                return [new_packet], stream[bit_length:]
+            else:
+                packet_count, stream = read_chunk(stream, 11)
+                new_1packets = []
+                # print("sub_packetcount:", packet_count)
+                while len(new_1packets) &lt; packet_count:
+                    counted_packet, stream = read_single_packet(stream)
+                    new_1packets.extend(counted_packet)
+                    # print("new sub packets\n", new_packets)
+                # print("new 1 packet\n", new_packets)
+                result = do_the_op(type, new_1packets)
+                new_packet['data'] = result
+                return [new_packet], stream
+
+    # print("main stream: \n", main_stream)
+    while ((len(main_stream) &gt; 10) and (sum([int(c) for c in main_stream]) &gt; 0)):
+        new_packet, main_stream = read_single_packet(main_stream)
+        packets.extend(new_packet)
+        # print("packets \n", packets)
+    return packets
+
+
+def main():
+    main_packet = read_daily_input('input16.txt')
+    # print(''.join(main_packet))
+    packets = parse_input(main_packet.copy())
+    # pprint(packets)
+    star1 = sum([p['ver'] for p in packets])
+    print(f"Result (*): {star1}")
+    star2 = interpret_input(main_packet)[0]['data']
     print(f"Result (**): {star2}")
 
 
