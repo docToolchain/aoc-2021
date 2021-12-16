@@ -8,15 +8,22 @@ import (
 
 // tag::solution[]
 
-const (
-	numNeigh = 4
-	replicas = 5
-)
-}
-
 //nolint: funlen
 func main() {
-	fmt.Println("asdf")
+	lines, err := ReadLinesAsLines()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if len(lines) != 1 {
+		log.Fatal("wrong number of lines")
+	}
+
+	parsed, err := Parse(lines[0])
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	fmt.Println(parsed)
 }
 
 // end::solution[]

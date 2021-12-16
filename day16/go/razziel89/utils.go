@@ -2,10 +2,8 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -16,34 +14,11 @@ func readLine() (string, error) {
 	return reader.ReadString('\n')
 }
 
-func trimStrings(sli []string) []string {
-	result := make([]string, 0, len(sli))
-	for _, val := range sli {
-		result = append(result, strings.TrimSpace(val))
-	}
-	return result
-}
-
-func strSliceToIntSlice(sli []string) ([]int, error) {
-	// I wish Go had a map function...
-	result := make([]int, 0, len(sli))
-	for _, val := range sli {
-		conv, err := strconv.Atoi(val)
-		if err != nil {
-			return []int{}, err
-		}
-		result = append(result, conv)
-	}
-	return result, nil
-}
-
 // tag::utils[]
 
-// ReadLinesAsGrid reads all lines from stdin as a grid. That is, each point on the grid has a
-// value and a location.
-func ReadLinesAsGrid() (Grid, error) {
-	lineIdx := 0
-	result := make(Grid)
+// ReadLinesAsLines reads in some lines.
+func ReadLinesAsLines() ([]string, error) {
+	result := []string{}
 	for {
 		line, err := readLine()
 		if err == io.EOF {
@@ -51,28 +26,10 @@ func ReadLinesAsGrid() (Grid, error) {
 			return result, nil
 		}
 		if err != nil {
-			return Grid{}, err
+			return []string{}, err
 		}
 		line = strings.TrimSpace(line)
-		ints, err := strSliceToIntSlice(strings.Split(line, ""))
-		if err != nil {
-			return Grid{}, err
-		}
-		for rowIdx, val := range ints {
-			// This is lazy but I wanted to re-use old code.
-			point, err := VecFromStr(fmt.Sprintf("%d%s%d", lineIdx, vecSep, rowIdx))
-			if err != nil {
-				return Grid{}, err
-			}
-			err = result.Mark(point, val)
-			if err != nil {
-				return Grid{}, err
-			}
-		}
-		if err != nil {
-			return Grid{}, err
-		}
-		lineIdx++
+		result = append(result, line)
 	}
 }
 
