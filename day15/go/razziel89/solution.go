@@ -16,6 +16,10 @@ const (
 	// Somehow, this implementation is not all too efficient. Thus, we run it multiple times but
 	// start from the lowest cost found so far.
 	startingCostEnvVar = "LOWEST_COST"
+	// Select the algorithm. You should not use the slow one for anything other than very small
+	// examples.
+	algorithmSelectionEnvVar = "ALGO"
+	replicas                 = 5
 )
 
 // func printStack(stack *Stack) {
@@ -212,6 +216,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	// Part 1.
 	nodes := gridToNodes(grid)
 	fmt.Printf("Nodes: %s\n", NodesToStr(nodes))
 
@@ -220,42 +225,50 @@ func main() {
 	endX, endY := grid.BottomRight()
 	endNodeName := fmt.Sprintf("%2d-%2d", endX, endY)
 
-	startNodeCost := grid[Vec{x: startX, y: startY}]
-	endNodeCost := grid[Vec{x: endX, y: endY}]
-	fmt.Println("Start node cost: ", startNodeCost, " End node cost: ", endNodeCost)
+	//nolint:nestif
+	if os.Getenv(algorithmSelectionEnvVar) == "slow" {
 
-	cost := -1
-	// Allow overwriting the starting cost with an external value.
-	if startCostStr := os.Getenv(startingCostEnvVar); startCostStr != "" {
-		startCostStr = strings.TrimSpace(startCostStr)
-		if startCost, err := strconv.Atoi(startCostStr); err == nil {
-			cost = startCost
+		startNodeCost := grid[Vec{x: startX, y: startY}]
+		endNodeCost := grid[Vec{x: endX, y: endY}]
+		fmt.Println("Start node cost: ", startNodeCost, " End node cost: ", endNodeCost)
+
+		cost := -1
+		// Allow overwriting the starting cost with an external value.
+		if startCostStr := os.Getenv(startingCostEnvVar); startCostStr != "" {
+			startCostStr = strings.TrimSpace(startCostStr)
+			if startCost, err := strconv.Atoi(startCostStr); err == nil {
+				cost = startCost
+			}
 		}
-	}
-	fmt.Println("Starting with cost", cost)
+		fmt.Println("Starting with cost", cost)
 
-	costFilter := getCostFilterFn(&cost)
-	iterator, err := findConnections(nodes, startNodeName, endNodeName, costFilter)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var bestConnection []*Node
-	for con := range iterator {
-		set, err := setFromList(con)
+		costFilter := getCostFilterFn(&cost)
+		iterator, err := findConnections(nodes, startNodeName, endNodeName, costFilter)
 		if err != nil {
-			log.Fatal("internal error while filtering")
+			log.Fatal(err)
 		}
-		conCost := getCost(&set) - endNodeCost
-		fmt.Println("found cost ", cost)
-		if cost < 0 || conCost < cost {
-			cost = conCost
-			fmt.Println("lowest cost is", cost)
-			bestConnection = con
+
+		var bestConnection []*Node
+		for con := range iterator {
+			set, err := setFromList(con)
+			if err != nil {
+				log.Fatal("internal error while filtering")
+			}
+			conCost := getCost(&set) - endNodeCost
+			fmt.Println("found cost ", cost)
+			if cost < 0 || conCost < cost {
+				cost = conCost
+				fmt.Println("lowest cost is", cost)
+				bestConnection = con
+			}
 		}
+		fmt.Printf("lowest cost is %d\n", cost-startNodeCost+endNodeCost)
+		fmt.Println(NodesToStr(bestConnection))
+	} else {
+		fastAlgorithm(nodes, startNodeName, endNodeName)
 	}
-	fmt.Printf("lowest cost is %d\n", cost-startNodeCost+endNodeCost)
-	fmt.Println(NodesToStr(bestConnection))
+	// Part 2.
+	// Replicate grid. Then, run the fast algorithm
 }
 
 // end::solution[]
