@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -156,7 +155,7 @@ func getCostFilterFn(cost *int) validityFn {
 // Convert a grid element to a node. This also makes sure to create a new node and add it to `nodes`
 // in case that node does not yet exist. If a node already exists, it is returned.
 func gridElemToNode(elem Vec, grid Grid, nodes *[]*Node) *Node {
-	nodeName := fmt.Sprintf("%2d-%2d", elem.x, elem.y)
+	nodeName := fmt.Sprintf("%3d-%3d", elem.x, elem.y)
 	if foundNode := FindNode(*nodes, nodeName); foundNode != nil {
 		// Node already exists in list, return it.
 		return foundNode
@@ -177,7 +176,12 @@ func gridElemToNode(elem Vec, grid Grid, nodes *[]*Node) *Node {
 
 func gridToNodes(grid Grid) []*Node {
 	result := []*Node{}
+	count := 0
 	for p := range grid.Points() {
+		if count%100 == 0 {
+			fmt.Printf("Converted: %d / %d\n", count, len(grid))
+		}
+		count++
 		node := gridElemToNode(p, grid, &result)
 		for envP := range pointEnv(p) {
 			if !grid.Has(envP) {
@@ -194,19 +198,6 @@ func gridToNodes(grid Grid) []*Node {
 	if len(result) != len(grid) {
 		log.Fatal("length disagreement")
 	}
-	// Sort all nodes starting with low-rist connections.
-	overallLessFn := func(idx1, idx2 int) bool {
-		return result[idx1].Value < result[idx2].Value
-	}
-	sort.SliceStable(result, overallLessFn)
-	// // Sort each node's connections according to their position.
-	// for _, node := range result {
-	// 	lessFn := func(idx1, idx2 int) bool {
-	// 		return node.Connections[idx1].Value < node.Connections[idx2].Value
-	// 	}
-	// 	sort.SliceStable(node.Connections, lessFn)
-	// 	fmt.Println(NodesToStr(node.Connections))
-	// }
 	return result
 }
 
@@ -221,9 +212,9 @@ func main() {
 	fmt.Printf("Nodes: %s\n", NodesToStr(nodes))
 
 	startX, startY := grid.TopLeft()
-	startNodeName := fmt.Sprintf("%2d-%2d", startX, startY)
+	startNodeName := fmt.Sprintf("%3d-%3d", startX, startY)
 	endX, endY := grid.BottomRight()
-	endNodeName := fmt.Sprintf("%2d-%2d", endX, endY)
+	endNodeName := fmt.Sprintf("%3d-%3d", endX, endY)
 
 	//nolint:nestif
 	if os.Getenv(algorithmSelectionEnvVar) == "slow" {
@@ -269,6 +260,33 @@ func main() {
 	}
 	// Part 2.
 	// Replicate grid. Then, run the fast algorithm
+	largeGrid := Grid{}
+	for p := range grid {
+		for xRep := 0; xRep < replicas; xRep++ {
+			for yRep := 0; yRep < replicas; yRep++ {
+				newPoint := Vec{
+					x: p.x + xRep*(endX-startX+1),
+					y: p.y + yRep*(endY-startY+1),
+				}
+				newMarking := (grid.Count(p)-1+xRep+yRep)%9 + 1 //nolint:gomnd
+				if largeGrid.Has(newPoint) {
+					// Sanity check, we should never add a node twice.
+					log.Fatal("node already there")
+				}
+				_ = largeGrid.Mark(newPoint, newMarking)
+			}
+		}
+	}
+	fmt.Println("Grid expansion complete.")
+
+	startX, startY = largeGrid.TopLeft()
+	startNodeName = fmt.Sprintf("%3d-%3d", startX, startY)
+	endX, endY = largeGrid.BottomRight()
+	endNodeName = fmt.Sprintf("%3d-%3d", endX, endY)
+
+	manyNodes := gridToNodes(largeGrid)
+	fmt.Println("Grid conversion complete.")
+	fastAlgorithm(manyNodes, startNodeName, endNodeName)
 }
 
 // end::solution[]

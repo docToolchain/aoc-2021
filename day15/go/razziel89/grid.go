@@ -201,4 +201,36 @@ func (g *Grid) BottomRight() (int, int) {
 	return maxX, maxY
 }
 
+// Pretty creates a pretty string representation of this grid.
+func (g *Grid) Pretty(digits int) string {
+	result := ""
+	empty := " "
+	maxVal := 10
+	for count := 1; count < digits; count++ {
+		empty += " "
+		maxVal *= 10
+	}
+	formatStr := fmt.Sprintf("%%-%dd", digits)
+	minX, minY := g.TopLeft()
+	maxX, maxY := g.BottomRight()
+	for x := minX; x <= maxX; x++ {
+		for y := minY; y <= maxY; y++ {
+			val := g.Count(Vec{x: x, y: y})
+			if val > 0 {
+				result += fmt.Sprintf(formatStr, val)
+				if val >= maxVal {
+					// Return the string up to the offending point so that the caller sees what the
+					// offending number was. This is a hack at best but good enough for me right
+					// now.
+					return result + "\nINCOMPLETE"
+				}
+			} else {
+				result += empty
+			}
+		}
+		result += "\n"
+	}
+	return result
+}
+
 // end::grid[]
