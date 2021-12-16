@@ -4,9 +4,9 @@ use std::time::Instant;
 /// puzzle input
 pub const INPUT: &str = include_str!("../input.txt");
 /// expected result part 1
-pub const EXP_1: usize = 0;
+pub const EXP_1: usize = 883;
 /// expected result part 2
-pub const EXP_2: usize = 1;
+pub const EXP_2: usize = 1_675_198_555_015;
 
 fn main() {     
     let start = Instant::now();
