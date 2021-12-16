@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-16: Packet Decoder
+https://adventofcode.com/2021/day/16
+
+=== Info
+
+Decode long hexadecimal packet with several sub-packets
+
+* Star1: Sum up version info from all packets and sub-packets.
+
+* Star2: Carry out encoded operations in packets and calculate final score of main packet.
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and preprocessed. Today single line and preprocessing is main task of star1...
+
+* Star1: Write parser to parse packet hierarchy and sum up version info.
+
+* Star2: Improve parser to carry out operations as well and calculate final score of main packet. As parser from Star1 produced already recursively a list of all packets, the aggregation operations were just a small addition. Still did unelegantly copy the parser functions and separately implemented the code execution... 🙄
+
+=== Learned today
+
+Getting better with recursive stuff. There are probably lots of libs out there to do the parsing with two lines of regex, but my hands-on approach worked, too, in the end. Part 2 was thus quite easy to add in the end, after no more duplicate packets were in the final packet list 😁
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
