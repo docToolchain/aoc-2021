@@ -1,0 +1,44 @@
+== Day 13: Packet Decoder ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/13[AoC|2021|13].
+
+=== Part 1 ===
+
+A lot to read today. But then it is just following the instructions.
+
+I implemented a structure ``Packets`` to keep track of the current position and read numbers from the bits & bytes (I am particularly proud that I got the bit ordering right from the beginning):
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=packets]
+----
+
+The input is parsed into that structure with
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Then, part 1 is solved with the function ``sum_versions`` which calls itself recursively:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sum_versions]
+----
+
+=== Part 2 ===
+
+For part two the function ``sum_versions`` is modified to take into account the operators. The new function ``process_packet`` reads:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=process_packet]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
