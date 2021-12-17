@@ -1,0 +1,70 @@
+== Day 15: Chiton ==
+
+This is my implementation for both rounds of the chiton puzzle.
+
+This was a tough one, IMHO.
+At first, I was happy that this could be solved easily by re-using a combination
+of previous algorithms, one of which was the pathfinding one used to explore all
+possible paths through a cave.
+That turned out to be good enough for the sample, but not efficient enough for
+part 1, let alone part 2.
+
+I knew of the a-star algorithm but didn't know it in detail.
+Only that is is rather simple but still often a very good fit for pathfinding.
+Since I see the AOC mainly as a learning experience, I was reluctant to simply
+use some off-the-shelf algorithm.
+
+To cut a long story short: I ended up writing my own implementation in Golang,
+which can be found on my GitHub here: https://github.com/razziel89/astar
+
+The algorithm is writting in plain Go without any dependencies apart from
+standard ones for testing.
+This also allowed me to see how easy it is to distribute software that can then
+be re-used in other Go code.
+Simply create a repo and be done with it; another nice experience.
+The code using that self-written algorithm is in `fast.go`.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also a `grid.go`, which contains specifications of a grid of vectors.
+
+There are two implementations here.
+The first uses goroutines and achieves some degree of parallelisation this way.
+It's by no means great, though.
+For example, you cannot solve part 2 with it, it's just now efficient enough.
+The second solution does not suffer from such exponential scaling.
+Thus, it can be used to solve both parts quickly.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`grid.go`
+[source,go,numbered]
+----
+include::grid.go[tags=grid]
+----
+
+`fast.go`
+[source,go,numbered]
+----
+include::fast.go[tags=fast]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.
