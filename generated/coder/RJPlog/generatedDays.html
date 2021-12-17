@@ -293,6 +293,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_17_kotlin">Day 17: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_17_tick_shot">Day 17: Tick Shot</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_15">First Star</a></li>
+<li><a href="#_second_star_15">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2278,6 +2288,136 @@
 	println("*******************************")
 	println("Solution for part2")
 	println("   $solution2 you get if you take the quantity of the most common element and subtract the quantity of the least common element")
+	println()</code></pre>
+</div>
+</div>
+<a id="day17" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_17_kotlin"><a class="anchor" href="#_day_17_kotlin"></a><a class="link" href="#_day_17_kotlin">Day 17: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_17_tick_shot"><a class="anchor" href="#_day_17_tick_shot"></a><a class="link" href="#_day_17_tick_shot">Day 17: Tick Shot</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/17" class="bare">https://adventofcode.com/2021/day/17</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2117_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_15"><a class="anchor" href="#_first_star_15"></a><a class="link" href="#_first_star_15">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>First of all, read the puzzle input and determine target area.</p>
+</div>
+<div class="paragraph">
+<p>The trajectory can be separated in x part and y part. So first all possible x velocites, which are able to reach target area, are calculated and stored into a list <em>validXvel</em>. The range can be reduced to 1 (0 and negative will never reach) to xmax (&gt; xmax will overshoot already in first step).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// if x is  &gt; xmax, initial window will be missed already after the first step.
+	// find possible x velocities which are able to reach target window
+	for (i in 1..xmax) {
+		xvel = i
+		while (true) {
+			xpos = xpos + xvel
+			xvel = maxOf(xvel - 1, 0)
+			if (xpos &gt;= xmin &amp;&amp; xpos &lt;= xmax) {
+				validXvel.add(i)
+				break
+			} else if (xpos &gt; xmax) {
+				break
+			} else if (xvel == 0) {
+				break
+			}
+		}
+		xpos = 0
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The minimum x velocity will need the most steps, so that is also the velocity which will enable to reach highest y position. In the first version therefore all possible y velocities for only the smalles x velocity where calculated and the highest position reached is kept as result for part one.</p>
+</div>
+<div class="paragraph">
+<p>As a modification for part 2 all possible y velocities are not only calculated for the smallest x velocity, but for all possible x velocities. The sum of all possible x and y velocities is added up as a result for part2.
+Similar to narrowing the range of x velocities, y velocities can be narrowed from ymin (lower will already undershot in first step) to -ymin (asssuming a target area lower then 0 level and that a probe crossing zero will always have reached absolute value of starting velocity and therefore also definitly undershoot)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var ypos: Int = 0
+	var yvel: Int
+	var validYvel = mutableListOf&lt;Int&gt;()
+	var reachedYMax: Int = 0
+	var reachedYMaxOverall: Int = 0
+	var numberOfInit: Int = 0
+
+	validXvel.forEach {
+		xvel = it
+
+		// if starts lower ymin, target will already be missed with first step. If y &gt; abs(ymin), target will also be missed
+		for (i in ymin..-ymin) {
+			yvel = i
+			while (true) {
+				xpos = xpos + xvel
+				xvel = maxOf(xvel - 1, 0)
+				ypos = ypos + yvel
+				yvel = yvel - 1
+
+				if (ypos &gt; reachedYMax) {
+					reachedYMax = ypos
+				}
+
+				if (ypos &gt;= ymin &amp;&amp; ypos &lt;= ymax &amp;&amp; xpos &gt;= xmin &amp;&amp; xpos &lt;= xmax) {
+					validYvel.add(i)
+					if (reachedYMax &gt; reachedYMaxOverall) {
+						reachedYMaxOverall = reachedYMax
+					}
+					break
+				} else if (ypos &lt; ymin) {
+					break
+				}
+			}
+			xpos = 0
+			xvel = it
+			ypos = 0
+			reachedYMax = 0
+		}
+		numberOfInit = numberOfInit + validYvel.size
+		validYvel.clear()
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_15"><a class="anchor" href="#_second_star_15"></a><a class="link" href="#_second_star_15">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>See description above.</p>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">// print solution for part 1
+	println("*************************")
+	println("--- Day 17: Tick Shot ---")
+	println("*************************")
+	println("Solution for part1")
+	println("   $reachedYMaxOverall is the highest y position it reaches on this trajectory")
+	println()
+// print solution for part 2
+	println("*************************")
+	println("Solution for part2")
+	println("   $numberOfInit many distinct initial velocity values cause the probe to be within the target area after any step")
 	println()</code></pre>
 </div>
 </div>
