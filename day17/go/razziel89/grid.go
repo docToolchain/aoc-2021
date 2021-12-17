@@ -63,22 +63,15 @@ func AreaFromString(str string) (Area, error) {
 	return area, nil
 }
 
-// Distance determines the distance of a point to the area, Manhattan metric.
-func (a *Area) Distance(vec Vec) Vec {
-	distance := Vec{}
-	// X coordinate.
-	if vec.x < a.xMin {
-		distance.x += a.xMin - vec.x
-	} else if vec.x > a.xMax {
-		distance.x += vec.x - a.xMax
-	}
-	// Y coordinate.
-	if vec.y < a.yMin {
-		distance.y += a.yMin - vec.y
-	} else if vec.y > a.yMax {
-		distance.y += vec.y - a.yMax
-	}
-	return distance
+// Inside determines whether a point is inside the area.
+func (a *Area) Inside(vec Vec) bool {
+	return vec.x <= a.xMax && vec.x >= a.xMin && vec.y <= a.yMax && vec.y >= a.yMin
+}
+
+// Invalid determines whether a point is far off to the positive x direction or negative y
+// direction.
+func (a *Area) Invalid(vec Vec) bool {
+	return vec.x > a.xMax || vec.y < a.yMin
 }
 
 // end::grid[]
