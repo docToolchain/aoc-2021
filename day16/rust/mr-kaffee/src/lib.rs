@@ -103,22 +103,22 @@ pub fn sum_versions(packets: &mut Packets) -> usize {
 pub fn process_packet(packets: &mut Packets) -> usize {
     packets.skip(Packets::N_VERSION); // skip version
 
-    let mut value = 0;
     let type_id = packets.read_number(Packets::N_TYPE_ID);
     if type_id == 4 {
+        let mut value = 0;
         loop {
             let flag = packets.read_number(Packets::N_FLAG);
-            let value_part = packets.read_number(Packets::N_VALUE_PART);
-
-            value = value << 4 | value_part;
-
+            value = value << 4 | packets.read_number(Packets::N_VALUE_PART);
+            
             if flag == 0 {
                 break; // last part's flag is 0
             }
         }
+        value
     } else {
         let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
         let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+
         let mut values = Vec::new();
         if length_type_id == 1 {
             for _ in 0..length {
@@ -131,7 +131,7 @@ pub fn process_packet(packets: &mut Packets) -> usize {
             }
         }
 
-        value = match type_id {
+        match type_id {
             Packets::SUM => values.iter().sum(),
             Packets::PRODUCT => values.iter().product(),
             Packets::MIN => *values.iter().min().expect("No min"),
@@ -142,8 +142,6 @@ pub fn process_packet(packets: &mut Packets) -> usize {
             _ => panic!("Illegal type ID: {}", type_id),
         }
     }
-
-    value
 }
 // end::process_packet[]
 
