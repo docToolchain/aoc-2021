@@ -8,7 +8,7 @@ const (
 	areaInts = 4
 )
 
-// tag::grid[]
+// tag::area[]
 
 // Vec is a 2D vector. Most of it has been taken from a previous solution.
 type Vec struct {
@@ -22,25 +22,6 @@ func (v Vec) Add(delta Vec) Vec {
 		y: v.y + delta.y,
 	}
 	return result
-}
-
-// Mul multiplies each component of a vector with a number.
-func (v Vec) Mul(factor int) Vec {
-	result := Vec{
-		x: v.x * factor,
-		y: v.y * factor,
-	}
-	return result
-}
-
-// Inv inverts a vector.
-func (v Vec) Inv() Vec {
-	return v.Mul(-1)
-}
-
-// Sub subtracts a vector'v data from another one'v.
-func (v Vec) Sub(delta Vec) Vec {
-	return v.Add(delta.Inv())
 }
 
 // Area describes the target area.
@@ -74,4 +55,13 @@ func (a *Area) Invalid(vec Vec) bool {
 	return vec.x > a.xMax || vec.y < a.yMin
 }
 
-// end::grid[]
+// IsValid determines whether this is a valid area struct. For example, areas don't support negative
+// x values for laziness reasons.
+func (a *Area) IsValid() error {
+	if a.xMax < 0 || a.xMin < 0 {
+		return fmt.Errorf("areas with negative x values not supported")
+	}
+	return nil
+}
+
+// end::area[]

@@ -6,6 +6,8 @@ import (
 	"log"
 )
 
+// tag::solution[]
+
 const (
 	// Our algorithm does not end by itself since we can never really be sure that we have found the
 	// highest y-velocity that will still result in a hit. Thus, we end after this many velocities
@@ -15,8 +17,6 @@ const (
 	drag             = -1
 	gravity          = -1
 )
-
-// tag::solution[]
 
 // Generate valid velocity vectors up to a maximum x value and a minimum y value.
 func generateVelocities(xMax, yMin int) <-chan Vec {
@@ -46,7 +46,7 @@ func generateVelocities(xMax, yMin int) <-chan Vec {
 			}
 			distance++
 			// It is not guaranteed that we have found the solution, but we did ^^. So this hack is
-			// fine.
+			// fine to make the algorithm end by itself.
 			if numVelocities > maxNumVelocities {
 				break
 			}
@@ -62,8 +62,7 @@ func generateTrajectory(input <-chan Vec, drag, gravity int, area Area) <-chan i
 
 	go func() {
 		// Obtain one velocity vector and follow its trajectory.
-		for orgVel := range input {
-			vel := orgVel
+		for vel := range input {
 			if vel.x < 0 {
 				log.Fatal("negative x velocity detected")
 			}
@@ -71,17 +70,13 @@ func generateTrajectory(input <-chan Vec, drag, gravity int, area Area) <-chan i
 			trackedHeight := pos.y
 			inside := area.Inside(pos)
 			invalid := area.Invalid(pos)
-			step := 0
-			traj := []Vec{pos}
 			for !inside && !invalid {
-				// Explore the trajectory based on it.
+				// Explore the trajectory based on an initial velocity.
 				// We explore as long as our x position is not higher than the max and our y
 				// position is not lower than the min.
 
 				// Generate the next step in the trajectory.
 				pos = pos.Add(vel)
-				step++
-				traj = append(traj, pos)
 				// Update the velocity. We will never have negative x velocities.
 				if vel.x > 0 {
 					vel.x += drag
@@ -116,8 +111,8 @@ func main() {
 		log.Fatal("only one area expected")
 	}
 	area := areas[0]
-	if area.xMax < 0 || area.xMin < 0 {
-		log.Fatal("areas with negative x values not supported")
+	if err := area.IsValid(); err != nil {
+		log.Fatal(err.Error())
 	}
 	velocities := generateVelocities(area.xMax, area.yMin)
 	trajectories := generateTrajectory(velocities, drag, gravity, area)
