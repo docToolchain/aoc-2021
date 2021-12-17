@@ -38,6 +38,11 @@ func main() {
 	totalVersion := addVersionsUp(parsed)
 
 	fmt.Println("Sum of all version numbers is", totalVersion)
+
+	if len(parsed) != 1 {
+		log.Fatal("we were promised exactly one package")
+	}
+	fmt.Println("Value of outermost package is", parsed[0].Value())
 }
 
 // end::solution[]

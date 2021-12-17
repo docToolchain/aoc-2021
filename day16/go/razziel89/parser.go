@@ -66,7 +66,9 @@ func (s *BitStream) Done() bool {
 
 // Pad reads up to the next multiple of since one hexadecimal digit is four binary digits.
 func (s *BitStream) Pad() {
-	_ = s.Next(padding - s.pad)
+	if s.pad > 0 {
+		_ = s.Next(padding - s.pad)
+	}
 }
 
 // AddHex adds a hex string.
