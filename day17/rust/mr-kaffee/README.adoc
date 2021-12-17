@@ -1,26 +1,41 @@
-== Day 17: ____ ==
+== Day 17: Trick Shot ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/17[AoC|2021|17].
 
+Today it is about Projectile (or Probe) motion and calculating initial conditions to reach a target. I guess, it would be possible to calculate an analytical solution for both parts by solving quadratic equations and than re-constructing the integer solutions, but this is not the approach a took.
+
+My solution relies on the fact that the target lies to the right and below the starting point (the below part is actually important).
+
 === Part 1 ===
 
-Parse
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=parse]
-----
+For part 1, I only consider the ``y``-coordinate. If the probe is sent off with some initial velocity ``vy0``, it will come back to the initial ``y`` cordinate with velocity ``-vy0-1`` after some time. The next ``y`` coordinate seen is thus ``vy0+1`` units below the initial ``y``-coordinate. If the initial velocity is chosen such that this coordinate is just within the target region, this yields the trajectory with the highest possible maximum.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=part1]
 ----
 
+Of course, I also need to parse the input:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
 === Part 2 ===
+
+In part 2, it is about figuring out which limits for the initial conditions to check. See the comments in the code for what I come up with.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=part2]
+----
+
+For each candidate initial condition, I simulate the trajectory to check whether it reaches the target: 
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=is_target_reached]
 ----
 
 === Tests ===
@@ -29,5 +44,3 @@ include::src/lib.rs[tags=part2]
 ----
 include::src/lib.rs[tags=tests]
 ----
-
-=== Today I learned ===
