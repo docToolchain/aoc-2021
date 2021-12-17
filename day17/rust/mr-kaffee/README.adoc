@@ -2,13 +2,13 @@
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/17[AoC|2021|17].
 
-Today it is about Projectile (or Probe) motion and calculating initial conditions to reach a target. I guess, it would be possible to calculate an analytical solution for both parts by solving quadratic equations and than re-constructing the integer solutions, but this is not the approach a took.
+Today it is about Projectile (or Probe) motion and calculating initial conditions to reach a target. I guess, it would be possible to calculate an analytical solution for both parts by solving quadratic equations and than re-constructing the integer solutions, but this is not the approach I took.
 
-My solution relies on the fact that the target lies to the right and below the starting point (the below part is actually important).
+Note: My solution relies on the fact that the target lies to the right and below the starting point (the _below_ part is actually important).
 
 === Part 1 ===
 
-For part 1, I only consider the ``y``-coordinate. If the probe is sent off with some initial velocity ``vy0``, it will come back to the initial ``y`` cordinate with velocity ``-vy0-1`` after some time. The next ``y`` coordinate seen is thus ``vy0+1`` units below the initial ``y``-coordinate. If the initial velocity is chosen such that this coordinate is just within the target region, this yields the trajectory with the highest possible maximum.
+For part 1, I only consider the ``y``-coordinate. If the probe is sent off with some initial velocity ``vy0``, it will come back to the initial ``y`` cordinate with velocity ``-vy0-1`` after some time. The next ``y`` coordinate seen is thus ``vy0+1`` units below the initial ``y``-coordinate. If the initial velocity is chosen such that this coordinate is just within the target region, this yields the trajectory with the highest possible maximum. See the comments in the code below for some more details.
 
 [source,rust,numbered]
 ----
@@ -24,7 +24,7 @@ include::src/lib.rs[tags=parse]
 
 === Part 2 ===
 
-In part 2, it is about figuring out which limits for the initial conditions to check. See the comments in the code for what I come up with.
+In part 2, it is about figuring out which limits for the initial conditions to check. See the comments in the code for what I came up with.
 
 [source,rust,numbered]
 ----
