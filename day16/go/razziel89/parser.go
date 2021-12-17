@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -9,17 +10,8 @@ import (
 const (
 	hexBase    = 16
 	binarybase = 2
-	// Numerical values, there are a lot of them this time.
-	// literalType = 4
-	padding = 4
+	padding    = 4
 )
-
-// Package describes a package.
-type Package interface {
-	Version() int
-	Type() int
-	SubPackages() []Package
-}
 
 func hexToBinary(char rune) ([]bool, error) {
 	num, err := strconv.ParseInt(string(char), hexBase, 0)
@@ -47,15 +39,34 @@ type BitStream struct {
 
 // Next provides the next num bits.
 func (s *BitStream) Next(num int) []bool {
+	if s.read+num > len(s.bin) {
+		log.Fatalf("trying to read too much, remaining %s, reading %d", s.ToString(true), num)
+	}
+	if num <= 0 {
+		return []bool{}
+	}
 	result := s.bin[s.read : s.read+num : s.read+num]
 	s.read += num
-	s.pad = s.read % padding
+	s.pad = (s.pad + num) % padding
 	return result
+}
+
+// Done determines whether any characters are left. If only zeroes are left, we also exit.
+func (s *BitStream) Done() bool {
+	if s.read >= len(s.bin) {
+		return true
+	}
+	for _, bit := range s.bin[s.read:] {
+		if bit {
+			return false
+		}
+	}
+	return true
 }
 
 // Pad reads up to the next multiple of since one hexadecimal digit is four binary digits.
 func (s *BitStream) Pad() {
-	_ = s.Next(s.pad)
+	_ = s.Next(padding - s.pad)
 }
 
 // AddHex adds a hex string.
@@ -78,14 +89,41 @@ func (s *BitStream) AddHex(hex string) error {
 	return nil
 }
 
-// ToString converts to a binary string.
-func (s *BitStream) ToString() string {
+// ToString converts to a binary string. Specify whether you want truncated (true) or full (false)
+func (s *BitStream) ToString(truncated bool) string {
 	result := ""
-	for _, val := range s.bin {
+	start := 0
+	if truncated {
+		start = s.read
+	}
+	for _, val := range s.bin[start:] {
 		if val {
 			result += "1"
 		} else {
 			result += "0"
+		}
+	}
+	fmtStr := fmt.Sprintf("%%%ds", len(s.bin))
+	return fmt.Sprintf(fmtStr, result)
+}
+
+// LimitedStream creates a limited bit stream based on the next limit bits of this one.
+func (s *BitStream) LimitedStream(limit int) BitStream {
+	stream := BitStream{
+		bin:  s.Next(limit),
+		pad:  0,
+		read: 0,
+	}
+	return stream
+}
+
+// BitsToInt converts a stream of bits into an integer.
+func BitsToInt(bits []bool) int {
+	result := 0
+	for _, bit := range bits {
+		result *= 2
+		if bit {
+			result++
 		}
 	}
 	return result
@@ -93,10 +131,18 @@ func (s *BitStream) ToString() string {
 
 // Parse parses a string into packages and sub-packages.
 func Parse(input string) ([]Package, error) {
+	result := []Package{}
+
 	stream := BitStream{}
 	if err := stream.AddHex(input); err != nil {
 		return []Package{}, err
 	}
-	fmt.Println(stream.ToString())
-	return []Package{}, nil
+
+	for !stream.Done() {
+		pkg := FromBitStream(&stream)
+		result = append(result, pkg)
+		stream.Pad()
+	}
+
+	return result, nil
 }

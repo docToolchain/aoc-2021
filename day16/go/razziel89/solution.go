@@ -23,7 +23,21 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println(parsed)
+	// Declare here to allow recursion.
+	var addVersionsUp func([]Package) int
+
+	addVersionsUp = func(packages []Package) int {
+		result := 0
+		for _, pkg := range packages {
+			result += pkg.Version()
+			result += addVersionsUp(pkg.SubPackages())
+		}
+		return result
+	}
+
+	totalVersion := addVersionsUp(parsed)
+
+	fmt.Println("Sum of all version numbers is", totalVersion)
 }
 
 // end::solution[]
