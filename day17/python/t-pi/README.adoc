@@ -1,0 +1,39 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-17: Trick Shot 
+https://adventofcode.com/2021/day/17
+
+=== Info
+
+Shoot probe into target area under the influence of drag and gravity.
+
+* Star1 (*): What is the highest culmination point possible?
+
+* Star2 (**): How many start velocities are hitting the mark?
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and preprocessed into target_x and target_y ranges.
+
+* Star1: Determine min velocity_x to reach target. Iterate through large enough range to hit all possibilities. Return max height.
+
+* Star2: Use length of results list. Increase range of velocity_y to negative start values 😅
+
+=== Learned today
+
+There's always a range+1 initial value that might still hit the target 🙃
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....
