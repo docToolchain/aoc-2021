@@ -1,7 +1,8 @@
 package main
 
+// tag::literal[]
+
 const (
-	// Numerical values, there are a lot of them this time.
 	bitsPerLiteralSet = 4
 )
 
@@ -10,7 +11,6 @@ type Literal struct {
 	version  int
 	typeInfo int
 	value    int
-	// subPackages []*Literal
 }
 
 // Version provides the version number.
@@ -49,3 +49,5 @@ func NewLiteral(version, typeInfo int, stream *BitStream) Literal {
 		value:    num,
 	}
 }
+
+// end::literal[]

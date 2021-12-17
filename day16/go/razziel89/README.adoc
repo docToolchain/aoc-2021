@@ -1,0 +1,61 @@
+== Day 16: Packet Decoder ==
+
+This is my implementation for both rounds of the packet decoder puzzle.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where some helper functions that
+might be re-used later on reside.
+Then, there are these files describing the following things:
+
+* `package.go`: the general package interface definition
+* `parser.go`: the overall parser logic implementing a very simplistic bit stream
+* `operator.go`: the implementation of the operator type struct
+* `literal.go`: the implementation of the literal type struct
+
+Using interfaces meant I didn't have to handle differences between literal
+types and operator types explicitly.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`parser.go`
+[source,go,numbered]
+----
+include::parser.go[tags=parser]
+----
+
+`operator.go`
+[source,go,numbered]
+----
+include::operator.go[tags=operator]
+----
+
+`literal.go`
+[source,go,numbered]
+----
+include::literal.go[tags=literal]
+----
+
+`package.go`
+[source,go,numbered]
+----
+include::package.go[tags=package]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

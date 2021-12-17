@@ -1,5 +1,7 @@
 package main
 
+// tag::package[]
+
 const (
 	// Numerical values, there are a lot of them this time.
 	versionBits  = 3
@@ -16,7 +18,8 @@ type Package interface {
 	Value() int
 }
 
-// FromBitStream obtains a package from a bit stream. No padding on the stream is done.
+// FromBitStream obtains a package from a bit stream. No padding on the stream is done. Will create
+// operators or literals as mandated by the type information.
 func FromBitStream(stream *BitStream) Package {
 	version := BitsToInt(stream.Next(versionBits))
 	typeInfo := BitsToInt(stream.Next(typeInfoBits))
@@ -30,3 +33,5 @@ func FromBitStream(stream *BitStream) Package {
 	}
 	return pkg
 }
+
+// end::package[]
