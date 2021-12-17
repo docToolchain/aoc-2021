@@ -1,38 +1,29 @@
 == Day 00: Hello World ==
 
-I am still undecided what language to use this year.
-I'll start with https://www.rust-lang.org/[Rust].
+It'll be another day of https://www.rust-lang.org/[Rust] solutions for the 2021 edition of 
+https://adventofcode.com/2021[Advent of Code]
 
 === General structure ===
 
-Generally, my solutions will contain a `src/main.rs` file which reads inputs, calls the solution functions and measures time
+Generally, my solutions will contain a `src/main.rs` file which reads the input from `input.txt`, 
+calls the solution functions and measures time.
 
-[source,rust,numbered]
-----
-include::src/main.rs[tags=read_input]
-----
+The actual solution will be implemented in `src/lib.rs` file.
 
-[source,rust,numbered]
-----
-include::src/main.rs[tags=main]
-----
-
-The actual solution will be implemented in a `lib.rs` file
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=function]
-----
-
-The `lib.rs` file also contains the tests in a separate submodule.
-I will use this for test-driven development, e.g., based on the examples given in the puzzles.
-
-----
-include::src/lib.rs[tags=tests]
-----
+The `lib.rs` file also contains the tests in a separate submodule. I will use this for test-driven 
+development, e.g., based on the examples given in the puzzles.
 
 === Run Solutions ===
 
 Run solution with `cargo run` (or `cargo run --release` to see the effect of compiler optimization)
 
 Run tests with `cargo test`
+
+=== Run all Solutions ===
+
+My `day00` solution this year will run all my solutions. At this time, it looks as follows
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve]
+----

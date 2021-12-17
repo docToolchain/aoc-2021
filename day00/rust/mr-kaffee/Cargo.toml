@@ -6,3 +6,29 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+mr-kaffee-2021-01 = { path = "../../../day01/rust/mr-kaffee" }
+mr-kaffee-2021-02 = { path = "../../../day02/rust/mr-kaffee" }
+mr-kaffee-2021-03 = { path = "../../../day03/rust/mr-kaffee" }
+mr-kaffee-2021-04 = { path = "../../../day04/rust/mr-kaffee" }
+mr-kaffee-2021-05 = { path = "../../../day05/rust/mr-kaffee" }
+mr-kaffee-2021-06 = { path = "../../../day06/rust/mr-kaffee" }
+mr-kaffee-2021-07 = { path = "../../../day07/rust/mr-kaffee" }
+mr-kaffee-2021-08 = { path = "../../../day08/rust/mr-kaffee" }
+mr-kaffee-2021-09 = { path = "../../../day09/rust/mr-kaffee" }
+mr-kaffee-2021-10 = { path = "../../../day10/rust/mr-kaffee" }
+mr-kaffee-2021-11 = { path = "../../../day11/rust/mr-kaffee" }
+mr-kaffee-2021-12 = { path = "../../../day12/rust/mr-kaffee" }
+mr-kaffee-2021-13 = { path = "../../../day13/rust/mr-kaffee" }
+mr-kaffee-2021-14 = { path = "../../../day14/rust/mr-kaffee" }
+mr-kaffee-2021-15 = { path = "../../../day15/rust/mr-kaffee" }
+mr-kaffee-2021-16 = { path = "../../../day16/rust/mr-kaffee" }
+mr-kaffee-2021-17 = { path = "../../../day17/rust/mr-kaffee" }
+# mr-kaffee-2021-18 = { path = "../../../day18/rust/mr-kaffee" }
+# mr-kaffee-2021-19 = { path = "../../../day19/rust/mr-kaffee" }
+# mr-kaffee-2021-20 = { path = "../../../day20/rust/mr-kaffee" }
+# mr-kaffee-2021-21 = { path = "../../../day21/rust/mr-kaffee" }
+# mr-kaffee-2021-22 = { path = "../../../day22/rust/mr-kaffee" }
+# mr-kaffee-2021-23 = { path = "../../../day23/rust/mr-kaffee" }
+# mr-kaffee-2021-24 = { path = "../../../day24/rust/mr-kaffee" }
+# mr-kaffee-2021-25 = { path = "../../../day25/rust/mr-kaffee" }
