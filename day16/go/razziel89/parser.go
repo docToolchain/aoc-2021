@@ -1,5 +1,7 @@
 package main
 
+// tag::parser[]
+
 import (
 	"fmt"
 	"log"
@@ -18,6 +20,7 @@ func hexToBinary(char rune) ([]bool, error) {
 	if err != nil {
 		return []bool{}, err
 	}
+	// This is being lazy, but it's fast enough here.
 	binaryString := strconv.FormatInt(num, binarybase)
 	for len(binaryString) < padding {
 		binaryString = "0" + binaryString
@@ -64,7 +67,7 @@ func (s *BitStream) Done() bool {
 	return true
 }
 
-// Pad reads up to the next multiple of since one hexadecimal digit is four binary digits.
+// Pad reads up to the next multiple of `padding` since one hexadecimal digit is four binary digits.
 func (s *BitStream) Pad() {
 	if s.pad > 0 {
 		_ = s.Next(padding - s.pad)
@@ -109,7 +112,9 @@ func (s *BitStream) ToString(truncated bool) string {
 	return fmt.Sprintf(fmtStr, result)
 }
 
-// LimitedStream creates a limited bit stream based on the next limit bits of this one.
+// LimitedStream creates a limited bit stream based on the next limit bits of this one. This makes
+// it easy to read operators in the "limited number of bits" mode. Any zeroes at the end are then
+// part of the limited stream and the original one doesn't have to care.
 func (s *BitStream) LimitedStream(limit int) BitStream {
 	stream := BitStream{
 		bin:  s.Next(limit),
@@ -148,3 +153,5 @@ func Parse(input string) ([]Package, error) {
 
 	return result, nil
 }
+
+// end::parser[]

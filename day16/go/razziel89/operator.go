@@ -1,5 +1,7 @@
 package main
 
+// tag::operator[]
+
 const (
 	// Numerical values, there are a lot of them this time.
 	totalLengthModeBits      = 15
@@ -25,12 +27,7 @@ func (p *Operator) Type() int {
 
 // SubPackages provides a list of sub-packages.
 func (p *Operator) SubPackages() []Package {
-	result := make([]Package, 0, len(p.subPackages))
-	//nolint:gosimple
-	for _, pkg := range p.subPackages {
-		result = append(result, pkg)
-	}
-	return result
+	return p.subPackages
 }
 
 // Value determines the value of this package.
@@ -149,3 +146,5 @@ func NewOperator(version, typeInfo int, stream *BitStream) Operator {
 		subPackages: subPackages,
 	}
 }
+
+// end::operator[]

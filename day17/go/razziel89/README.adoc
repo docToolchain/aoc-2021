@@ -1,0 +1,63 @@
+== Day 17: Trick Shot ==
+
+This is my implementation for both rounds of the trick shot puzzle.
+
+This one was actually really interesting in Golang.
+I've never had to construct an exhaustive list of velocities or an exhaustive
+list of trajectories.
+Instead, I chained one goroutine that generates velocities and another one that
+analyses trajectories based on them.
+That second one only provides solutions that are acceptable, which I count and
+whose maximum achievable height I track.
+
+The problem with this problem (haha) is, that we never know whether another,
+higher starting velocity in y direction won't actually still allow us to reach
+the target area.
+That is, technically, a velocity of x=5, y=1million could still hit the target
+area.
+At least I could not come up with a quick way to assess when to stop.
+
+Instead, I base my solution on the assumption that acceptable velocities are
+small in magnitude.
+I then explore possible velocity vectors starting small following an increasing
+Manhattan metric from the origin.
+The algorithm quits after a maximum number of trajectories analyzed.
+Furthermore, I force the area's x values to be all positive and the starting
+position to be at lower x values.
+The algorithm can still be used after a simple coordinate transformation for all
+other cases.
+
+I am interested to see whether others have found other solutions that actually
+find a point when to stop.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `area.go`, which contains specifications of the target area.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`area.go`
+[source,go,numbered]
+----
+include::area.go[tags=rep]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

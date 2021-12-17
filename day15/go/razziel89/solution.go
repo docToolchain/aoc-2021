@@ -21,6 +21,8 @@ func gridToNodes(grid Grid) (map[*astar.Node]struct{}, *astar.Node, *astar.Node,
 	// Remember which node belonged to which location.
 	convertedNodes := map[Vec]*astar.Node{}
 
+	// Our grid is not guaranteed to be square. Thus, we extract the expected positions this way and
+	// error out if we cannot find them later on.
 	startX, startY := grid.TopLeft()
 	endX, endY := grid.BottomRight()
 	startVec := Vec{startX, startY}
@@ -33,7 +35,7 @@ func gridToNodes(grid Grid) (map[*astar.Node]struct{}, *astar.Node, *astar.Node,
 			return result, start, end, err
 		}
 
-		node, err := astar.NewNode(fmt.Sprint(vec), cost, numNeigh, nil)
+		node, err := astar.NewNode(fmt.Sprint(vec), cost, numNeigh, vec)
 		if err != nil {
 			return result, start, end, err
 		}
@@ -49,7 +51,7 @@ func gridToNodes(grid Grid) (map[*astar.Node]struct{}, *astar.Node, *astar.Node,
 		}
 	}
 	if start == nil || end == nil {
-		err := fmt.Errorf("cannot find start or end node")
+		err := fmt.Errorf("cannot find start or end node in grid")
 		return result, start, end, err
 	}
 	// Add pairwise connections. This might take a while.
@@ -61,8 +63,7 @@ func gridToNodes(grid Grid) (map[*astar.Node]struct{}, *astar.Node, *astar.Node,
 		}
 		for neigh := range pointEnv(vec) {
 			if !grid.Has(neigh) {
-				// Ignore nodes outside the grid.
-				continue
+				continue // Ignore nodes outside the grid.
 			}
 			neighNode, ok := convertedNodes[neigh]
 			if !ok {
