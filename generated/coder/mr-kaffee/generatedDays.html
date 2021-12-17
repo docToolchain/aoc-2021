@@ -151,6 +151,7 @@
 <ul class="sectlevel4">
 <li><a href="#_general_structure">General structure</a></li>
 <li><a href="#_run_solutions">Run Solutions</a></li>
+<li><a href="#_run_all_solutions">Run all Solutions</a></li>
 </ul>
 </li>
 </ul>
@@ -354,6 +355,17 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_17_rust">Day 17: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_17_trick_shot">Day 17: Trick Shot</a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_12">Part 1</a></li>
+<li><a href="#_part_2_12">Part 2</a></li>
+<li><a href="#_tests_16">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -393,67 +405,21 @@ Strava: <a href="https://www.strava.com/athletes/89256720">Peter Wieland</a></p>
 <div class="sect3">
 <h4 id="_day_00_hello_world"><a class="anchor" href="#_day_00_hello_world"></a><a class="link" href="#_day_00_hello_world">Day 00: Hello World</a></h4>
 <div class="paragraph">
-<p>I am still undecided what language to use this year.
-I&#8217;ll start with <a href="https://www.rust-lang.org/">Rust</a>.</p>
+<p>It&#8217;ll be another day of <a href="https://www.rust-lang.org/">Rust</a> solutions for the 2021 edition of
+<a href="https://adventofcode.com/2021">Advent of Code</a></p>
 </div>
 <div class="sect4">
 <h5 id="_general_structure"><a class="anchor" href="#_general_structure"></a><a class="link" href="#_general_structure">General structure</a></h5>
 <div class="paragraph">
-<p>Generally, my solutions will contain a <code>src/main.rs</code> file which reads inputs, calls the solution functions and measures time</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">fn read_input() -&gt; String {
-    fs::read_to_string("input.txt").expect("Could not read from file")
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">fn main() {
-    let instant = Instant::now();
-    write_output(&amp;read_input());
-    println!("Done in {:?}", instant.elapsed());
-}</code></pre>
-</div>
+<p>Generally, my solutions will contain a <code>src/main.rs</code> file which reads the input from <code>input.txt</code>,
+calls the solution functions and measures time.</p>
 </div>
 <div class="paragraph">
-<p>The actual solution will be implemented in a <code>lib.rs</code> file</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Write string to console
-///
-/// # Examples
-///
-/// ```
-/// // running documentation examples as tests is a great idea in general; in this specific case
-/// // there might be little value in the code and test
-/// let s = "Hello World!";
-/// mr_kaffee_2021_00::write_output(&amp;s);
-/// ```
-pub fn write_output(s: &amp;str) {
-    println!("{}", s);
-}</code></pre>
-</div>
+<p>The actual solution will be implemented in <code>src/lib.rs</code> file.</p>
 </div>
 <div class="paragraph">
-<p>The <code>lib.rs</code> file also contains the tests in a separate submodule.
-I will use this for test-driven development, e.g., based on the examples given in the puzzles.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_write_output() {
-        // very stupid test
-        write_output("Hello World!");
-    }
-}</pre>
-</div>
+<p>The <code>lib.rs</code> file also contains the tests in a separate submodule. I will use this for test-driven
+development, e.g., based on the examples given in the puzzles.</p>
 </div>
 </div>
 <div class="sect4">
@@ -463,6 +429,46 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>Run tests with <code>cargo test</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_run_all_solutions"><a class="anchor" href="#_run_all_solutions"></a><a class="link" href="#_run_all_solutions">Run all Solutions</a></h5>
+<div class="paragraph">
+<p>My <code>day00</code> solution this year will run all my solutions. At this time, it looks as follows</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve() {
+    let timer = Instant::now();
+    day00::solve();
+    day01::solve();
+    day02::solve();
+    day03::solve();
+    day04::solve();
+    day05::solve();
+    day06::solve();
+    day07::solve();
+    day08::solve();
+    day09::solve();
+    day10::solve();
+    day11::solve();
+    day12::solve();
+    day13::solve();
+    day14::solve();
+    day15::solve();
+    day16::solve();
+    day17::solve();
+    // day18::solve();
+    // day19::solve();
+    // day20::solve();
+    // day21::solve();
+    // day22::solve();
+    // day23::solve();
+    // day24::solve();
+    // day25::solve();
+    println!("Total time: {:?}", timer.elapsed());
+}</code></pre>
+</div>
 </div>
 <a id="day00" />
 </div>
@@ -4051,6 +4057,332 @@ mod tests {
         assert_eq!(3, solution_2(&amp;mut parse("C200B40A82")));
         assert_eq!(7, solution_2(&amp;mut parse("880086C3E88112")));
         assert_eq!(1, solution_2(&amp;mut parse("9C0141080250320F1802104A08")));
+    }
+}</code></pre>
+</div>
+</div>
+<a id="day17" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_17_rust"><a class="anchor" href="#_day_17_rust"></a><a class="link" href="#_day_17_rust">Day 17: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_17_trick_shot"><a class="anchor" href="#_day_17_trick_shot"></a><a class="link" href="#_day_17_trick_shot">Day 17: Trick Shot</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/17">AoC|2021|17</a>.</p>
+</div>
+<div class="paragraph">
+<p>Today it is about Projectile (or Probe) motion and calculating initial conditions to reach a target. I guess, it would be possible to calculate an analytical solution for both parts by solving quadratic equations and than re-constructing the integer solutions, but this is not the approach I took.</p>
+</div>
+<div class="paragraph">
+<p>Note: My solution relies on the fact that the target lies to the right and below the starting point (the <em>below</em> part is actually important).</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_12"><a class="anchor" href="#_part_1_12"></a><a class="link" href="#_part_1_12">Part 1</a></h5>
+<div class="paragraph">
+<p>For part 1, I only consider the <code>y</code>-coordinate. If the probe is sent off with some initial velocity <code>vy0</code>, it will come back to the initial <code>y</code> cordinate with velocity <code>-vy0-1</code> after some time. The next <code>y</code> coordinate seen is thus <code>vy0+1</code> units below the initial <code>y</code>-coordinate. If the initial velocity is chosen such that this coordinate is just within the target region, this yields the trajectory with the highest possible maximum. See the comments in the code below for some more details.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_1(target: (isize, isize, isize, isize)) -&gt; isize {
+    let (x_min, x_max, y_min, y_max) = target;
+
+    assert!(
+        x_min &gt; 0 &amp;&amp; x_max &gt; x_min &amp;&amp; y_max &lt; 0 &amp;&amp; y_min &lt; y_max,
+        "Solution assumes 0 &lt; x_min &lt; x_max and y_min &lt; y_max &lt; 0"
+    );
+
+    // max is reached if x coordinate ends up in target
+    // for given initial velocity vy0
+    //
+    // the max is reached at step k = vy0
+    // the max value is vy0 * (vy0 + 1) / 2
+    //
+    // at step k = 2 * vy0 + 1 the initial value y = 0 is reached again
+    // with velocity vy = -vy0 - 1
+    //
+    // the next step reaches
+    //   y = -vy0 - 1
+    //
+    // the highest max is reached, if y = -vy0 - 1 is just within the target
+    // zone, i.e., if y_min = -vy0 - 1 or vy0 = -y_min - 1
+
+    let vy0 = -y_min - 1;
+    vy0 * (vy0 + 1) / 2
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, I also need to parse the input:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">///
+/// ```
+/// # use mr_kaffee_2021_17::*;
+/// assert_eq!((-1, 2, 0, 10), parse("target area: x=-1..2, y=0..10"));
+/// ```
+pub fn parse(content: &amp;str) -&gt; (isize, isize, isize, isize) {
+    let mut parts = content.trim().split(", ");
+    let lhs = parts.next().expect("No lhs");
+    let rhs = parts.next().expect("No rhs");
+
+    let x_range = lhs.split("=").skip(1).next().expect("No x range");
+    let y_range = rhs.split("=").skip(1).next().expect("No y range");
+
+    let mut x_parts = x_range.split("..");
+    let mut y_parts = y_range.split("..");
+
+    let x1 = x_parts
+        .next()
+        .expect("No x1")
+        .parse()
+        .expect("Cound not parse x1");
+    let x2 = x_parts
+        .next()
+        .expect("No x2")
+        .parse()
+        .expect("Cound not parse x2");
+    let y1 = y_parts
+        .next()
+        .expect("No y1")
+        .parse()
+        .expect("Cound not parse y1");
+    let y2 = y_parts
+        .next()
+        .expect("No y2")
+        .parse()
+        .expect("Cound not parse y2");
+
+    (x1, x2, y1, y2)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_12"><a class="anchor" href="#_part_2_12"></a><a class="link" href="#_part_2_12">Part 2</a></h5>
+<div class="paragraph">
+<p>In part 2, it is about figuring out which limits for the initial conditions to check. See the comments in the code for what I came up with.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_2(target: (isize, isize, isize, isize)) -&gt; usize {
+    let (x_min, x_max, y_min, y_max) = target;
+
+    assert!(
+        x_min &gt; 0 &amp;&amp; x_max &gt; x_min &amp;&amp; y_max &lt; 0 &amp;&amp; y_min &lt; y_max,
+        "Solution assumes 0 &lt; x_min &lt; x_max and y_min &lt; y_max &lt; 0"
+    );
+
+    // vx[0] = vx0
+    // run for vx0 steps
+    // end at vx0 + (vx0 - 1) + ... = vx0 * (vx0 + 1) / 2
+    // find smallest absolute vx0 so that target is reached
+    let mut vx_min = 0;
+    while vx_min * (vx_min + 1) / 2 &lt;= x_min {
+        vx_min += 1;
+    }
+
+    // if vx0 is above this value, the first step overshoots
+    let vx_max = x_max;
+
+    // if below, first step ends below target
+    let vy_min = y_min;
+
+    // max from part 1
+    let vy_max = -y_min - 1;
+
+    let mut count = 0;
+    for vx in vx_min..=vx_max {
+        for vy in vy_min..=vy_max {
+            if is_target_reached(target, vx as usize, vy) {
+                count += 1;
+            }
+        }
+    }
+
+    count
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For each candidate initial condition, I simulate the trajectory to check whether it reaches the target:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn is_target_reached(target: (isize, isize, isize, isize), vx: usize, vy: isize) -&gt; bool {
+    let mut x = 0;
+    let mut y = 0;
+    let mut vx = vx as isize;
+    let mut vy = vy;
+
+    while (vy &gt; 0 || y &gt;= target.2) &amp;&amp; x &lt;= target.1 { // while target can be reached
+        x = x + vx;
+        y = y + vy;
+        vx = if vx &gt; 0 { vx - 1 } else { vx };
+        vy = vy - 1;
+
+        if x &gt;= target.0 &amp;&amp; x &lt;= target.1 &amp;&amp; y &gt;= target.2 &amp;&amp; y &lt;= target.3 {
+            return true;
+        }
+    }
+
+    false
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_16"><a class="anchor" href="#_tests_16"></a><a class="link" href="#_tests_16">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "target area: x=20..30, y=-10..-5";
+    const TEST_TARGET: (isize, isize, isize, isize) = (20, 30, -10, -5);
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(TEST_TARGET, parse(CONTENT));
+    }
+
+    #[test]
+    fn test_solution_1() {
+        assert_eq!(45, solution_1(TEST_TARGET));
+    }
+
+    #[test]
+    fn test_solution_2() {
+        assert_eq!(112, solution_2(TEST_TARGET));
+    }
+
+    #[test]
+    fn test_is_target_reached() {
+        let vs = &amp;[
+            (23, -10),
+            (25, -9),
+            (27, -5),
+            (29, -6),
+            (22, -6),
+            (21, -7),
+            (9, 0),
+            (27, -7),
+            (24, -5),
+            (25, -7),
+            (26, -6),
+            (25, -5),
+            (6, 8),
+            (11, -2),
+            (20, -5),
+            (29, -10),
+            (6, 3),
+            (28, -7),
+            (8, 0),
+            (30, -6),
+            (29, -8),
+            (20, -10),
+            (6, 7),
+            (6, 4),
+            (6, 1),
+            (14, -4),
+            (21, -6),
+            (26, -10),
+            (7, -1),
+            (7, 7),
+            (8, -1),
+            (21, -9),
+            (6, 2),
+            (20, -7),
+            (30, -10),
+            (14, -3),
+            (20, -8),
+            (13, -2),
+            (7, 3),
+            (28, -8),
+            (29, -9),
+            (15, -3),
+            (22, -5),
+            (26, -8),
+            (25, -8),
+            (25, -6),
+            (15, -4),
+            (9, -2),
+            (15, -2),
+            (12, -2),
+            (28, -9),
+            (12, -3),
+            (24, -6),
+            (23, -7),
+            (25, -10),
+            (7, 8),
+            (11, -3),
+            (26, -7),
+            (7, 1),
+            (23, -9),
+            (6, 0),
+            (22, -10),
+            (27, -6),
+            (8, 1),
+            (22, -8),
+            (13, -4),
+            (7, 6),
+            (28, -6),
+            (11, -4),
+            (12, -4),
+            (26, -9),
+            (7, 4),
+            (24, -10),
+            (23, -8),
+            (30, -8),
+            (7, 0),
+            (9, -1),
+            (10, -1),
+            (26, -5),
+            (22, -9),
+            (6, 5),
+            (7, 5),
+            (23, -6),
+            (28, -10),
+            (10, -2),
+            (11, -1),
+            (20, -9),
+            (14, -2),
+            (29, -7),
+            (13, -3),
+            (23, -5),
+            (24, -8),
+            (27, -9),
+            (30, -7),
+            (28, -5),
+            (21, -10),
+            (7, 9),
+            (6, 6),
+            (21, -5),
+            (27, -10),
+            (7, 2),
+            (30, -9),
+            (21, -8),
+            (22, -7),
+            (24, -9),
+            (20, -6),
+            (6, 9),
+            (29, -5),
+            (8, -2),
+            (27, -8),
+            (30, -5),
+            (24, -7),
+        ];
+        for (vx0, vy0) in vs {
+            assert!(
+                is_target_reached(TEST_TARGET, *vx0, *vy0),
+                "Failed at {}, {}",
+                vx0,
+                vy0
+            );
+        }
     }
 }</code></pre>
 </div>
