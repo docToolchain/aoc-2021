@@ -21,15 +21,15 @@ pub fn solve() {
     day15::solve();
     day16::solve();
     day17::solve();
-    day18::solve();
-    day19::solve();
-    day20::solve();
-    day21::solve();
-    day22::solve();
-    day23::solve();
-    day24::solve();
-    day25::solve();
-    println!("Done in {:?}", timer.elapsed());
+    // day18::solve();
+    // day19::solve();
+    // day20::solve();
+    // day21::solve();
+    // day22::solve();
+    // day23::solve();
+    // day24::solve();
+    // day25::solve();
+    println!("Total time: {:?}", timer.elapsed());
 }
 // end::solve[]
 
