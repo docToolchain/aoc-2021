@@ -71,3 +71,6 @@ include::src/lib.rs[tags=tests]
 The structure calls for a recursive data structure. I might give it a try later on. 
 
 For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don't like that it increases the overall runtime for all my solutions for this year so far by 40%!
+
+I have a solution based on recursice data structures. It is three times slower... Made some small optimizations in the vec based solution instead...
+
