@@ -8,6 +8,7 @@ const (
 // Reduce reduces a snailfish number.
 //nolint:funlen
 func Reduce(num Number) Number {
+	result := num.Copy()
 	for reduced := true; reduced; {
 
 		reduced = false
@@ -51,7 +52,7 @@ func Reduce(num Number) Number {
 				rawDigits = append(rawDigits, n.Val())
 			}
 		}
-		changeCheck(num, nil, 0, true)
+		changeCheck(result, nil, 0, true)
 
 		if explodeIdx >= 0 {
 			reduced = true
@@ -95,5 +96,5 @@ func Reduce(num Number) Number {
 			continue
 		}
 	}
-	return num
+	return result
 }

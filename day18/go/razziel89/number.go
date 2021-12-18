@@ -19,6 +19,7 @@ type Number interface {
 	Pointer() Number
 	String() string
 	Magnitude() int
+	Copy() Number
 }
 
 // NumberFromString converts a string to a number. Numbers are not reduced.
@@ -126,6 +127,11 @@ func (p *Pair) Magnitude() int {
 	return 3*p.left.Magnitude() + 2*p.right.Magnitude()
 }
 
+// Copy copies the number so that it will not be changed later on.
+func (p *Pair) Copy() Number {
+	return &Pair{left: p.left.Copy(), right: p.right.Copy()}
+}
+
 // Digit is an actual number containung two numbers.
 type Digit struct {
 	val int
@@ -183,7 +189,12 @@ func (d *Digit) Magnitude() int {
 	return d.val
 }
 
+// Copy copies the number so that it will not be changed later on.
+func (d *Digit) Copy() Number {
+	return &Digit{d.val}
+}
+
 // Add adds two numbers.
 func Add(n1, n2 Number) Number {
-	return &Pair{left: n1, right: n2}
+	return &Pair{left: n1.Copy(), right: n2.Copy()}
 }
