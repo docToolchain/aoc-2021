@@ -72,5 +72,9 @@ The structure calls for a recursive data structure. I might give it a try later 
 
 For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don't like that it increases the overall runtime for all my solutions for this year so far by 40%!
 
-I have a solution based on recursice data structures. It is three times slower... Made some small optimizations in the vec based solution instead...
+I have a solution based on recursice data structures. It is three times slower... Made some small optimizations in the vec based solution instead... (you can run the recursive solution with ``cargo run --release --features recursive``)
 
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=snail]
+----
