@@ -4484,12 +4484,12 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;Vec&lt;Token&gt;&gt; {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform single explode
 ///
 /// returns true if any explode performed, otherwise false
-pub fn explode(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
+pub fn explode(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
     let mut level = 0;
     let mut last_val = 0;
     let mut number_seen = false;
-    for k in 0..snailnumber.len() {
-        match snailnumber[k] {
+    for k in 0..snail.len() {
+        match snail[k] {
             Token::Op =&gt; {
                 number_seen = false;
                 level += 1;
@@ -4503,7 +4503,7 @@ pub fn explode(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
                     let prev = (0..k - 2)
                         .rev()
                         .filter_map(|j| {
-                            if let Token::Val(v) = snailnumber[j] {
+                            if let Token::Val(v) = snail[j] {
                                 Some((j, v))
                             } else {
                                 None
@@ -4511,12 +4511,12 @@ pub fn explode(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
                         })
                         .next();
                     if let Some((j, x)) = prev {
-                        snailnumber[j] = Token::Val(x + last_val);
+                        snail[j] = Token::Val(x + last_val);
                     }
 
-                    let next = (k + 2..snailnumber.len())
+                    let next = (k + 2..snail.len())
                         .filter_map(|j| {
-                            if let Token::Val(v) = snailnumber[j] {
+                            if let Token::Val(v) = snail[j] {
                                 Some((j, v))
                             } else {
                                 None
@@ -4524,25 +4524,12 @@ pub fn explode(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
                         })
                         .next();
                     if let Some((j, x)) = next {
-                        snailnumber[j] = Token::Val(x + val);
+                        snail[j] = Token::Val(x + val);
                     }
 
-                    assert_eq!(
-                        Token::Cl,
-                        snailnumber.remove(k + 1),
-                        "Expected to remove close"
-                    );
-                    assert_eq!(
-                        Token::Val(val),
-                        snailnumber.remove(k),
-                        "Expected to remove 2nd number"
-                    );
-                    assert_eq!(
-                        Token::Val(last_val),
-                        snailnumber.remove(k - 1),
-                        "Expected to remove 1st number"
-                    );
-                    snailnumber[k - 2] = Token::Val(0);
+                    // remove elements k-1, k, k+1
+                    snail.drain(k - 1..k + 2);
+                    snail[k - 2] = Token::Val(0);
 
                     return true;
                 } else {
@@ -4562,8 +4549,8 @@ pub fn explode(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform single split
 ///
 /// returns true if any split performed, otherwise false
-pub fn split(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
-    let find = snailnumber
+pub fn split(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
+    let find = snail
         .iter()
         .enumerate()
         .filter_map(|(k, e)| {
@@ -4580,12 +4567,12 @@ pub fn split(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
         .next();
 
     if let Some((k, v)) = find {
-        let a = v / 2;
+        let a = v &gt;&gt; 1;
         let b = v - a;
-        snailnumber[k] = Token::Op;
-        snailnumber.insert(k + 1, Token::Val(a));
-        snailnumber.insert(k + 2, Token::Val(b));
-        snailnumber.insert(k + 3, Token::Cl);
+        snail.splice(
+            k..k + 1,
+            [Token::Op, Token::Val(a), Token::Val(b), Token::Cl],
+        );
 
         true
     } else {
@@ -4597,8 +4584,8 @@ pub fn split(snailnumber: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// reduce snail number
-pub fn reduce(snailnumber: &amp;mut Vec&lt;Token&gt;) {
-    while explode(snailnumber) || split(snailnumber) {}
+pub fn reduce(snail: &amp;mut Vec&lt;Token&gt;) {
+    while explode(snail) || split(snail) {}
 }</code></pre>
 </div>
 </div>
@@ -4608,11 +4595,11 @@ pub fn reduce(snailnumber: &amp;mut Vec&lt;Token&gt;) {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// calculate sum over snailnumbers at given indices
-pub fn sum(snailnumbers: &amp;[Vec&lt;Token&gt;], mut indices: impl Iterator&lt;Item = usize&gt;) -&gt; Vec&lt;Token&gt; {
-    let mut sum = snailnumbers[indices.next().expect("Empty indices")].to_owned();
+pub fn sum(snail: &amp;[Vec&lt;Token&gt;], mut indices: impl Iterator&lt;Item = usize&gt;) -&gt; Vec&lt;Token&gt; {
+    let mut sum = snail[indices.next().expect("Empty indices")].to_owned();
     for k in indices {
         sum.insert(0, Token::Op);
-        for e in &amp;snailnumbers[k] {
+        for e in &amp;snail[k] {
             sum.push(*e);
         }
         sum.push(Token::Cl);
@@ -4627,21 +4614,21 @@ pub fn sum(snailnumbers: &amp;[Vec&lt;Token&gt;], mut indices: impl Iterator&lt;
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// recursively calculate magnitude for snailnumber at given position
 ///
 /// returns magnitude and position
-pub fn magnitude(snailnumber: &amp;[Token], k: usize) -&gt; (usize, usize) {
-    assert_eq!(Token::Op, snailnumber[k], "Do not start with open");
+pub fn magnitude(snail: &amp;[Token], k: usize) -&gt; (usize, usize) {
+    assert_eq!(Token::Op, snail[k], "Do not start with open");
 
-    let (a, j) = match snailnumber[k + 1] {
-        Token::Op =&gt; magnitude(&amp;snailnumber, k + 1),
+    let (a, j) = match snail[k + 1] {
+        Token::Op =&gt; magnitude(&amp;snail, k + 1),
         Token::Val(v) =&gt; (v, k + 2),
         Token::Cl =&gt; panic!("Unexpected close tag at {}", k + 1),
     };
-    let (b, j) = match snailnumber[j] {
-        Token::Op =&gt; magnitude(&amp;snailnumber, j),
+    let (b, j) = match snail[j] {
+        Token::Op =&gt; magnitude(&amp;snail, j),
         Token::Val(v) =&gt; (v, j + 1),
         Token::Cl =&gt; panic!("Unexpected close tag at {}", j),
     };
 
-    assert_eq!(Token::Cl, snailnumber[j], "Do not end with close");
+    assert_eq!(Token::Cl, snail[j], "Do not end with close");
 
     (3 * a + 2 * b, j + 1)
 }</code></pre>
@@ -4656,15 +4643,15 @@ pub fn magnitude(snailnumber: &amp;[Token], k: usize) -&gt; (usize, usize) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_2(snailnumbers: &amp;[Vec&lt;Token&gt;]) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_2(snails: &amp;[Vec&lt;Token&gt;]) -&gt; usize {
     let mut max = 0;
-    for k1 in 0..snailnumbers.len() {
-        for k2 in 0..snailnumbers.len() {
+    for k1 in 0..snails.len() {
+        for k2 in 0..snails.len() {
             if k1 == k2 {
                 continue;
             }
 
-            let sum = sum(snailnumbers, [k1, k2].into_iter());
+            let sum = sum(snails, [k1, k2].into_iter());
             let (m, _) = magnitude(&amp;sum, 0);
             if m &gt; max {
                 max = m;
@@ -4687,19 +4674,19 @@ mod tests {
 
     #[test]
     fn test_explode() {
-        let mut snailnumbers = parse("[[[[[9,8],1],2],3],4]\n[[[[0,9],2],3],4]");
-        assert!(explode(&amp;mut snailnumbers[0]), "Did not explode");
-        assert_eq!(snailnumbers[0], snailnumbers[1]);
+        let mut snails = parse("[[[[[9,8],1],2],3],4]\n[[[[0,9],2],3],4]");
+        assert!(explode(&amp;mut snails[0]), "Did not explode");
+        assert_eq!(snails[0], snails[1]);
 
-        let mut snailnumbers =
+        let mut snails =
             parse("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]\n[[[[0,7],4],[7,[[8,4],9]]],[1,1]]");
-        assert!(explode(&amp;mut snailnumbers[0]));
-        assert_eq!(snailnumbers[0], snailnumbers[1]);
+        assert!(explode(&amp;mut snails[0]));
+        assert_eq!(snails[0], snails[1]);
     }
 
     #[test]
     fn test_split() {
-        let mut snailnumbers = vec![
+        let mut snails = vec![
             vec![
                 Token::Op,
                 Token::Op,
@@ -4722,22 +4709,22 @@ mod tests {
                 Token::Cl,
             ],
         ];
-        assert!(split(&amp;mut snailnumbers[0]), "Did not split");
-        assert_eq!(snailnumbers[0], snailnumbers[1]);
+        assert!(split(&amp;mut snails[0]), "Did not split");
+        assert_eq!(snails[0], snails[1]);
     }
 
     #[test]
     fn test_reduce() {
-        let mut snailnumbers =
+        let mut snails =
             parse("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]\n[[[[0,7],4],[[7,8],[6,0]]],[8,1]]");
 
-        reduce(&amp;mut snailnumbers[0]);
-        assert_eq!(snailnumbers[0], snailnumbers[1]);
+        reduce(&amp;mut snails[0]);
+        assert_eq!(snails[0], snails[1]);
     }
 
     #[test]
     fn test_sum() {
-        let snailnumbers = parse(
+        let snails = parse(
             "[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
 [[[5,[2,8]],4],[5,[[9,9],0]]]
 [6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
@@ -4750,7 +4737,7 @@ mod tests {
 [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]",
         );
 
-        let sum = sum(&amp;snailnumbers, 0..snailnumbers.len());
+        let sum = sum(&amp;snails, 0..snails.len());
         assert_eq!(
             parse("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]")[0],
             sum
@@ -4759,10 +4746,10 @@ mod tests {
 
     #[test]
     fn test_magnitude() {
-        let snailnumbers = parse("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]");
-        let (m, j) = magnitude(&amp;snailnumbers[0], 0);
+        let snails = parse("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]");
+        let (m, j) = magnitude(&amp;snails[0], 0);
         assert_eq!(4140, m);
-        assert_eq!(snailnumbers[0].len(), j);
+        assert_eq!(snails[0].len(), j);
     }
 }</code></pre>
 </div>
@@ -4775,6 +4762,209 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don&#8217;t like that it increases the overall runtime for all my solutions for this year so far by 40%!</p>
+</div>
+<div class="paragraph">
+<p>I have a solution based on recursice data structures. It is three times slower&#8230;&#8203; Made some small optimizations in the vec based solution instead&#8230;&#8203; (you can run the recursive solution with <code>cargo run --release --features recursive</code>)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    #[derive(Clone, PartialEq, Eq)]
+    pub enum Snail {
+        Val(usize),
+        Pair(Box&lt;Snail&gt;, Box&lt;Snail&gt;),
+    }
+
+    impl fmt::Display for Snail {
+        fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+            match self {
+                Self::Val(v) =&gt; write!(f, "{}", v),
+                Self::Pair(lhs, rhs) =&gt; write!(f, "[{},{}]", lhs, rhs),
+            }
+        }
+    }
+
+    impl fmt::Debug for Snail {
+        fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+            match self {
+                Self::Val(v) =&gt; write!(f, "{}", v),
+                Self::Pair(lhs, rhs) =&gt; write!(f, "[{},{}]", lhs, rhs),
+            }
+        }
+    }
+
+    impl Snail {
+        /// parse a string representation of a snail number
+        ///
+        /// # Examples
+        /// ```
+        /// # use mr_kaffee_2021_18::*;
+        /// let snail = Snail::parse("[[1,2]\n, 3]");
+        /// assert_eq!("[[1,2],3]", format!("{}", snail));
+        /// ```
+        pub fn parse(data: &amp;str) -&gt; Self {
+            Self::parse_recursive(&amp;mut data.chars().filter(|c| !c.is_whitespace()).peekable())
+        }
+
+        fn parse_recursive(data: &amp;mut Peekable&lt;impl Iterator&lt;Item = char&gt;&gt;) -&gt; Self {
+            let token = data.next();
+            match token {
+                Some('[') =&gt; {
+                    let lhs = Self::parse_recursive(data);
+                    assert_eq!(Some(','), data.next());
+                    let rhs = Self::parse_recursive(data);
+                    assert_eq!(Some(']'), data.next());
+                    Snail::Pair(Box::new(lhs), Box::new(rhs))
+                }
+                Some(c) if c &gt;= '0' &amp;&amp; c &lt;= '9' =&gt; {
+                    let mut v = c as usize - '0' as usize;
+                    while let Some(d) = data
+                        .peek()
+                        .filter(|c| c.is_ascii_digit())
+                        .map(|c| *c as usize - '0' as usize)
+                    {
+                        data.next();
+                        v = 10 * v + d;
+                    }
+                    Snail::Val(v)
+                }
+                _ =&gt; panic!("Unexpected token: {:?}", token),
+            }
+        }
+
+        /// get the value wrapped in an option if this is a [Snail::Val]. Otherwise return ``None``.
+        pub fn get_value(&amp;self) -&gt; Option&lt;usize&gt; {
+            match self {
+                Self::Val(a) =&gt; Some(*a),
+                _ =&gt; None,
+            }
+        }
+
+        fn increment_first(&amp;mut self, inc: usize) {
+            match self {
+                Self::Pair(lhs, _) =&gt; {
+                    if let Some(val) = lhs.get_value() {
+                        let _ = std::mem::replace(lhs, Box::new(Snail::Val(val + inc)));
+                    } else {
+                        lhs.increment_first(inc);
+                    }
+                }
+                _ =&gt; {}
+            }
+        }
+
+        fn increment_last(&amp;mut self, inc: usize) {
+            match self {
+                Self::Pair(_, rhs) =&gt; {
+                    if let Some(val) = rhs.get_value() {
+                        let _ = std::mem::replace(rhs, Box::new(Snail::Val(val + inc)));
+                    } else {
+                        rhs.increment_last(inc);
+                    }
+                }
+                _ =&gt; {}
+            }
+        }
+
+        fn explode(&amp;mut self, level: usize) -&gt; (Option&lt;Self&gt;, Option&lt;(usize, usize)&gt;) {
+            match self {
+                Self::Val(_) =&gt; (None, None),
+                Self::Pair(lhs, rhs) =&gt; {
+                    if level == 4 {
+                        if let (Some(a), Some(b)) = (lhs.get_value(), rhs.get_value()) {
+                            (Some(Self::Val(0)), Some((a, b)))
+                        } else {
+                            (None, None)
+                        }
+                    } else if level &lt; 4 {
+                        if let (replace, Some((a, b))) = lhs.explode(level + 1) {
+                            if let Some(val) = rhs.get_value() {
+                                // increment rhs with b
+                                let _ = std::mem::replace(rhs, Box::new(Self::Val(val + b)));
+                            } else {
+                                // increment first number in rhs with b
+                                rhs.increment_first(b);
+                            }
+
+                            if let Some(replace) = replace {
+                                // replace exploded value
+                                let _ = std::mem::replace(lhs, Box::new(replace));
+                            }
+                            (None, Some((a, 0)))
+                        } else if let (replace, Some((a, b))) = rhs.explode(level + 1) {
+                            if let Some(val) = lhs.get_value() {
+                                // increment lhs with a
+                                let _ = std::mem::replace(lhs, Box::new(Self::Val(val + a)));
+                            } else {
+                                // increment last number in lhs with a
+                                lhs.increment_last(a);
+                            }
+
+                            if let Some(replace) = replace {
+                                // replace exploded value
+                                let _ = std::mem::replace(rhs, Box::new(replace));
+                            }
+
+                            (None, Some((0, b)))
+                        } else {
+                            (None, None)
+                        }
+                    } else {
+                        (None, None)
+                    }
+                }
+            }
+        }
+
+        fn split(&amp;mut self) -&gt; bool {
+            if let Self::Pair(lhs, rhs) = self {
+                if let Some(val) = lhs.get_value() {
+                    if val &gt; 9 {
+                        let a = Box::new(Self::Val(val &gt;&gt; 1));
+                        let b = Box::new(Self::Val((val &gt;&gt; 1) + (val &amp; 1)));
+                        let _ = std::mem::replace(lhs, Box::new(Self::Pair(a, b)));
+                        return true;
+                    }
+                }
+                if lhs.split() {
+                    return true;
+                }
+                if let Some(val) = rhs.get_value() {
+                    if val &gt; 9 {
+                        let a = Box::new(Self::Val(val &gt;&gt; 1));
+                        let b = Box::new(Self::Val((val &gt;&gt; 1) + (val &amp; 1)));
+                        let _ = std::mem::replace(rhs, Box::new(Self::Pair(a, b)));
+                        return true;
+                    }
+                }
+                return rhs.split();
+            }
+
+            false
+        }
+
+        pub fn reduce(&amp;mut self) {
+            loop {
+                let (_, r) = self.explode(0);
+                if r.is_none() &amp;&amp; !self.split() {
+                    break;
+                }
+            }
+        }
+
+        pub fn add(&amp;self, other: &amp;Snail) -&gt; Self {
+            let mut sum = Self::Pair(Box::new(self.clone()), Box::new(other.clone()));
+            sum.reduce();
+            sum
+        }
+
+        pub fn magnitude(&amp;self) -&gt; usize {
+            match self {
+                Self::Val(v) =&gt; *v,
+                Self::Pair(a, b) =&gt; 3 * a.magnitude() + 2 * b.magnitude(),
+            }
+        }
+    }</code></pre>
+</div>
 </div>
 </div>
 </div>
