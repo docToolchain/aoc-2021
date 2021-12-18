@@ -1,22 +1,58 @@
-== Day 18: ____ ==
+== Day 18: Snailfish ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/18[AoC|2021|18].
 
 === Part 1 ===
 
-Parse
+. Parse the snail numbers into vectors of tokens.
+. Implement functions that aapply explode and split steps until no further reduction possible
+. Calculate the sum over all snail numbers
+. Calculate magnitude
+
+==== Parse ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=token]
+----
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
+==== Reduction ====
+
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=part1]
+include::src/lib.rs[tags=explode]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=split]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=reduce]
+----
+
+==== Sum & Magnitude ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sum]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=magnitude]
 ----
 
 === Part 2 ===
+
+Simple extension
 
 [source,rust,numbered]
 ----
@@ -30,4 +66,8 @@ include::src/lib.rs[tags=part2]
 include::src/lib.rs[tags=tests]
 ----
 
-=== Today I learned ===
+=== Thoughts ===
+
+The structure calls for a recursive data structure. I might give it a try later on. 
+
+For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don't like that it increases the overall runtime for all my solutions for this year so far by 40%!
