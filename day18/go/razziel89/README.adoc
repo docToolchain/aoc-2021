@@ -1,0 +1,53 @@
+== Day 18: Snailfish ==
+
+This is my implementation for both rounds of the snailfish puzzle.
+
+This one had way too much recursion for my taste...
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `number.go`, which contains specifications of the two types
+implemeting the number interface, a pair and an actual digit.
+There is also a `reduction.go`, which contains a horrible reduction function,
+but it works.
+Just please don't ask me how it works.
+
+It's a bit hacked that I use the number interface for both pair and digit types
+while implementing some methods only for one type the other, but hey, it works.
+I did struggle quite a bit with interfaces in Go.
+It seems the language is a bit ambiguous about whether a type implementing an
+interface is an actual type or rather a pointer.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`number.go`
+[source,go,numbered]
+----
+include::number.go[tags=number]
+----
+
+`reduction.go`
+[source,go,numbered]
+----
+include::reduction.go[tags=reduction]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

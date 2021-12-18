@@ -1,5 +1,7 @@
 package main
 
+// tag::reduction[]
+
 import (
 	"fmt"
 	"log"
@@ -7,22 +9,22 @@ import (
 	"strings"
 )
 
-// Number describes properties of a number for snailfish.
+// Number describes properties of a number for snailfish. This interface is way too large and some
+// methods are only implemented for one of the types. Sadly, I fought quite a bit with pointer
+// receivers and non-pointer receivers...
 type Number interface {
 	IsPair() bool
 	SetLeft(Number)
 	SetRight(Number)
-	SetVal(int)
 	Left() Number
 	Right() Number
 	Val() *int
-	Pointer() Number
 	String() string
 	Magnitude() int
 	Copy() Number
 }
 
-// NumberFromString converts a string to a number. Numbers are not reduced.
+// NumberFromString converts a string to a number. Numbers are not reduced automatically.
 func NumberFromString(str string) (Number, error) {
 	split := strings.Split(str, "")
 	idx := 0
@@ -33,7 +35,9 @@ func NumberFromString(str string) (Number, error) {
 	return result, nil
 }
 
-// Recursively parse numbers.
+// Recursively parse numbers. This is done by going through the input slice and advancing the index
+// for every rune/char processed. The function still calls itself recursively to build up te
+// recursive data structure.
 func numFromStrSlice(sli []string, idx *int) (Number, error) {
 	if len(sli) == 0 {
 		return nil, fmt.Errorf("empty input")
@@ -70,13 +74,14 @@ func numFromStrSlice(sli []string, idx *int) (Number, error) {
 	}
 }
 
-// Pair is an actual number containung two numbers.
+// Pair is an "actual number" containung two numbers.
 type Pair struct {
 	left  Number
 	right Number
 }
 
-// IsPair says whether this is a pair.
+// IsPair says whether this is a pair. This is a hack since I didn't make type switches work with
+// pointer receivers in a way that allowed me to manipulate the switched-on variable.
 func (p *Pair) IsPair() bool {
 	return true
 }
@@ -91,12 +96,12 @@ func (p *Pair) SetRight(num Number) {
 	p.right = num
 }
 
-// Left sets the left value.
+// Left gets the left value.
 func (p *Pair) Left() Number {
 	return p.left
 }
 
-// Right sets the left value.
+// Right gets the left value.
 func (p *Pair) Right() Number {
 	return p.right
 }
@@ -107,19 +112,9 @@ func (p *Pair) Val() *int {
 	return nil
 }
 
-// SetVal sets the value.
-func (p *Pair) SetVal(int) {
-	log.Fatal("not implemented for pairs")
-}
-
-// Pointer gets a pointer to myself.
-func (p *Pair) Pointer() Number {
-	return p
-}
-
 // String gets a string representation.
 func (p *Pair) String() string {
-	return fmt.Sprintf("[ %s , %s ]", p.left.String(), p.right.String())
+	return fmt.Sprintf("[%s,%s]", p.left.String(), p.right.String())
 }
 
 // Magnitude returns the magnitude.
@@ -132,7 +127,7 @@ func (p *Pair) Copy() Number {
 	return &Pair{left: p.left.Copy(), right: p.right.Copy()}
 }
 
-// Digit is an actual number containung two numbers.
+// Digit is an actual digit. We wrap it here so that we can implement the interface for it.
 type Digit struct {
 	val int
 }
@@ -152,11 +147,6 @@ func (d *Digit) SetRight(Number) {
 	log.Fatal("not implemented for digits")
 }
 
-// SetVal sets the value.
-func (d *Digit) SetVal(num int) {
-	d.val = num
-}
-
 // Left gets the left value.
 func (d *Digit) Left() Number {
 	log.Fatal("not implemented for digits")
@@ -174,11 +164,6 @@ func (d *Digit) Val() *int {
 	return &d.val
 }
 
-// Pointer gets a pointer to myself.
-func (d *Digit) Pointer() Number {
-	return d
-}
-
 // String gets a string representation.
 func (d *Digit) String() string {
 	return fmt.Sprint(d.val)
@@ -194,7 +179,9 @@ func (d *Digit) Copy() Number {
 	return &Digit{d.val}
 }
 
-// Add adds two numbers.
+// Add adds two numbers. This is dead easy.
 func Add(n1, n2 Number) Number {
 	return &Pair{left: n1.Copy(), right: n2.Copy()}
 }
+
+// end::reduction[]
