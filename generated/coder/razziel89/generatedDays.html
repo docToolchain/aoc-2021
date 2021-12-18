@@ -320,6 +320,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_18_go">Day 18: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_18_snailfish">Day 18: Snailfish</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_18">Oveview</a></li>
+<li><a href="#_how_to_run_18">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -5536,6 +5546,263 @@ func ReadLinesAsAreas() ([]Area, error) {
 </div>
 <div class="sect4">
 <h5 id="_how_to_run_17"><a class="anchor" href="#_how_to_run_17"></a><a class="link" href="#_how_to_run_17">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
+</div>
+<a id="day18" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_18_go"><a class="anchor" href="#_day_18_go"></a><a class="link" href="#_day_18_go">Day 18: go</a></h3>
+<div class="sect3">
+<h4 id="_day_18_snailfish"><a class="anchor" href="#_day_18_snailfish"></a><a class="link" href="#_day_18_snailfish">Day 18: Snailfish</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the snailfish puzzle.</p>
+</div>
+<div class="paragraph">
+<p>This one had way too much recursion for my taste&#8230;&#8203;</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_18"><a class="anchor" href="#_oveview_18"></a><a class="link" href="#_oveview_18">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an <code>number.go</code>, which contains specifications of the two types
+implemeting the number interface, a pair and an actual digit.
+There is also a <code>reduction.go</code>, which contains a horrible reduction function,
+but it works.
+Just please don&#8217;t ask me how it works.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s a bit hacked that I use the number interface for both pair and digit types
+while implementing some methods only for one type the other, but hey, it works.
+I did struggle quite a bit with interfaces in Go.
+It seems the language is a bit ambiguous about whether a type implementing an
+interface is an actual type or rather a pointer.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">//nolint: funlen
+func main() {
+	numbers, err := ReadLinesAsNumbers()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if len(numbers) &lt; 2 { //nolint:gomnd
+		log.Fatal("we were promised some numbers")
+	}
+	fmt.Println("Part 1")
+	sum := numbers[0].Copy()
+	sum = Reduce(sum)
+	for _, addMe := range numbers[1:] {
+		sum = Add(sum, addMe)
+		sum = Reduce(sum)
+	}
+	fmt.Println(sum)
+	fmt.Println(sum.Magnitude())
+
+	fmt.Println("Part 2")
+	maxMagnitude := 0
+	for leftIdx, left := range numbers {
+		for rightIdx, right := range numbers {
+			if leftIdx == rightIdx {
+				// We cannot add a number to itself here.
+				continue
+			}
+			sum := Add(left, right)
+			sum = Reduce(sum)
+			magnitude := sum.Magnitude()
+			if magnitude &gt; maxMagnitude {
+				maxMagnitude = magnitude
+			}
+			sum = Add(right, left)
+			sum = Reduce(sum)
+			magnitude = sum.Magnitude()
+			if magnitude &gt; maxMagnitude {
+				maxMagnitude = magnitude
+			}
+		}
+	}
+	fmt.Println(maxMagnitude)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsNumbers reads all lines from stdin as replacement instructions or input.
+func ReadLinesAsNumbers() ([]Number, error) {
+	var result []Number
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []Number{}, err
+		}
+		line = strings.TrimSpace(line)
+		if len(line) == 0 {
+			// Skip empty lines.
+			continue
+		}
+		parsed, err := NumberFromString(line)
+		if err != nil {
+			return []Number{}, err
+		}
+		result = append(result, parsed)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>number.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go"></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>reduction.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	explodeLevel   = 4
+	splitThreshold = 10
+)
+
+// Reduce reduces a snailfish number.
+//nolint:funlen
+func Reduce(num Number) Number {
+	result := num.Copy()
+	for reduced := true; reduced; {
+		// Assume no reduction happened.
+		reduced = false
+
+		// Determine whether the number needs an explosion or a split.
+
+		// Explosion-related.
+		// Also remember pointers to the raw digits to be able to easily change the values later.
+		rawDigits := []*int{}
+		explodeIdx := -1
+		var explodeMyChild Number
+		var explodeLeftChild bool
+		// Split-related.
+		var splitMyChild Number
+		var splitLeftChild bool
+		splitIdx := -1
+
+		// Declare to use in recursion.
+		var changeCheck func(Number, Number, int, bool)
+		// Close over the above variables so that we can remember which numbers to change for splits
+		// or explosions.
+		// This function actually determines a lot. It checks whether an explosion or a split is
+		// needed.
+		changeCheck = func(n Number, parent Number, level int, left bool) {
+			//nolint:nestif
+			if n.IsPair() {
+				// A pair can only explode if it consists of actual numbers and nothing else.
+				if !n.Left().IsPair() &amp;&amp; !n.Right().IsPair() {
+					// Only explode if we are very far nested in and if no previous pair needs to
+					// explode.
+					if level &gt;= explodeLevel &amp;&amp; explodeMyChild == nil {
+						explodeMyChild = parent
+						explodeLeftChild = left
+						// Even though a number with this index hasn't been added yet, we
+						// already know it.
+						explodeIdx = len(rawDigits)
+					}
+				}
+				changeCheck(n.Left(), n, level+1, true)
+				changeCheck(n.Right(), n, level+1, false)
+			} else {
+				// Only split if we exceed the threshold and if no previous number needs splitting.
+				if *n.Val() &gt;= splitThreshold &amp;&amp; splitMyChild == nil {
+					splitMyChild = parent
+					splitLeftChild = left
+					// Even though a number with this index hasn't been added yet, we already know
+					// it.
+					splitIdx = len(rawDigits)
+				}
+				// Remember a pointer to our actual value. That way, explosions can easily be
+				// handled.
+				rawDigits = append(rawDigits, n.Val())
+			}
+		}
+
+		changeCheck(result, nil, 0, true)
+
+		// Process explision and splits. Explosions take precedence.
+
+		if explodeIdx &gt;= 0 {
+			reduced = true
+			// Explode!
+			// Add numbers to neighbours. We remembered pointers to all actual numbers, so this is
+			// easy.
+			if explodeIdx &gt; 0 {
+				// Add the left digit if the pair to its left neighbour, in whichever pair it is.
+				// Don't do that if there is no such neighbour.
+				*rawDigits[explodeIdx-1] += *rawDigits[explodeIdx]
+			}
+			if explodeIdx+1 &lt; len(rawDigits)-1 {
+				// Add the right digit if the pair to its right neighbour, in whichever pair it is.
+				// Don't do that if there is no such neighbour.
+				*rawDigits[explodeIdx+2] += *rawDigits[explodeIdx+1]
+			}
+			// Replace pair by a literal zero. This is where I struggled with pointer receivers in
+			// Go. But this works nicely since Go has a garbage collector. Otherwise, manually
+			// free'ing memory would be a nightmare with this hacked implementation.
+			if explodeLeftChild {
+				explodeMyChild.SetLeft(&amp;Digit{0})
+			} else {
+				explodeMyChild.SetRight(&amp;Digit{0})
+			}
+			// Start back at the beginning.
+			continue
+		}
+
+		if splitIdx &gt;= 0 {
+			reduced = true
+			// Split!
+			// Determine the values on the left and the right.
+			largeVal := *rawDigits[splitIdx]
+			// This is integer division, which is equivalent to rounding down.
+			left := largeVal / 2 //nolint:gomnd
+			// Take care of "rounding up". This way, we don't have to use floats to round up.
+			right := left + largeVal%2 //nolint:gomnd
+
+			newPair := Pair{left: &amp;Digit{left}, right: &amp;Digit{right}}
+			// Replace number by a new pair.
+			if splitLeftChild {
+				splitMyChild.SetLeft(&amp;newPair)
+			} else {
+				splitMyChild.SetRight(&amp;newPair)
+			}
+			// Start back at the beginning.
+			continue
+		}
+	}
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_18"><a class="anchor" href="#_how_to_run_18"></a><a class="link" href="#_how_to_run_18">How to run</a></h5>
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run both solutions.</p>
