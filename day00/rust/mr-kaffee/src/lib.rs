@@ -22,7 +22,7 @@ pub fn solve() {
     day16::solve();
     day17::solve();
     day18::solve();
-    // day19::solve();
+    day19::solve();
     // day20::solve();
     // day21::solve();
     // day22::solve();
@@ -517,10 +517,10 @@ pub mod day18 {
 }
 
 pub mod day19 {
-    // use mr_kaffee_2021_19::*;
+    use mr_kaffee_2021_19::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day19/rust/mr-kaffee/input.txt");
+    pub const INPUT: &str = include_str!("../../../../day19/rust/mr-kaffee/input.txt");
     pub const EXP_1: usize = 0;
     pub const EXP_2: usize = 0;
 
