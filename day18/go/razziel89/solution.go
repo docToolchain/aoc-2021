@@ -18,15 +18,13 @@ func main() {
 		log.Fatal("we were promised some numbers")
 	}
 	sum := numbers[0]
-	fmt.Println(sum)
 	sum = Reduce(sum)
-	fmt.Println(sum)
 	for _, addMe := range numbers[1:] {
 		sum = Add(sum, addMe)
-		fmt.Println(sum)
 		sum = Reduce(sum)
-		fmt.Println(sum)
 	}
+	fmt.Println(sum)
+	fmt.Println(sum.Magnitude())
 }
 
 // end::solution[]

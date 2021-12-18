@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 const (
 	explodeLevel   = 4
 	splitThreshold = 10
@@ -14,7 +10,6 @@ const (
 func Reduce(num Number) Number {
 	for reduced := true; reduced; {
 
-		fmt.Println(num, reduced)
 		reduced = false
 
 		// Determine whether the number needs an explosion or a split.

@@ -18,6 +18,7 @@ type Number interface {
 	Val() *int
 	Pointer() Number
 	String() string
+	Magnitude() int
 }
 
 // NumberFromString converts a string to a number. Numbers are not reduced.
@@ -120,6 +121,11 @@ func (p *Pair) String() string {
 	return fmt.Sprintf("[ %s , %s ]", p.left.String(), p.right.String())
 }
 
+// Magnitude returns the magnitude.
+func (p *Pair) Magnitude() int {
+	return 3*p.left.Magnitude() + 2*p.right.Magnitude()
+}
+
 // Digit is an actual number containung two numbers.
 type Digit struct {
 	val int
@@ -170,6 +176,11 @@ func (d *Digit) Pointer() Number {
 // String gets a string representation.
 func (d *Digit) String() string {
 	return fmt.Sprint(d.val)
+}
+
+// Magnitude returns the magnitude.
+func (d *Digit) Magnitude() int {
+	return d.val
 }
 
 // Add adds two numbers.
