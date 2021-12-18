@@ -26,12 +26,13 @@ pub enum Token {
 ///   ],
 ///   parse("[[0,1],1]"));
 /// ```
+#[cfg(not(feature = "recursive"))]
 pub fn parse(content: &str) -> Vec<Vec<Token>> {
     content
         .lines()
         .map(|line| {
             line.chars()
-                .filter(|c| *c != ',')
+                .filter(|c| !c.is_whitespace() && *c != ',')
                 .map(|c| match c {
                     '[' => Token::Op,
                     ']' => Token::Cl,
@@ -64,30 +65,23 @@ pub fn explode(snail: &mut Vec<Token>) -> bool {
             }
             Token::Val(val) => {
                 if number_seen && level == 5 {
-                    let prev = (0..k - 2)
-                        .rev()
-                        .filter_map(|j| {
-                            if let Token::Val(v) = snail[j] {
-                                Some((j, v))
-                            } else {
-                                None
-                            }
-                        })
-                        .next();
-                    if let Some((j, x)) = prev {
+                    if let Some((j, x)) = (0..k - 2).rev().find_map(|j| {
+                        if let Token::Val(v) = snail[j] {
+                            Some((j, v))
+                        } else {
+                            None
+                        }
+                    }) {
                         snail[j] = Token::Val(x + last_val);
                     }
 
-                    let next = (k + 2..snail.len())
-                        .filter_map(|j| {
-                            if let Token::Val(v) = snail[j] {
-                                Some((j, v))
-                            } else {
-                                None
-                            }
-                        })
-                        .next();
-                    if let Some((j, x)) = next {
+                    if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| {
+                        if let Token::Val(v) = snail[j] {
+                            Some((j, v))
+                        } else {
+                            None
+                        }
+                    }) {
                         snail[j] = Token::Val(x + val);
                     }
 
@@ -113,23 +107,17 @@ pub fn explode(snail: &mut Vec<Token>) -> bool {
 ///
 /// returns true if any split performed, otherwise false
 pub fn split(snail: &mut Vec<Token>) -> bool {
-    let find = snail
-        .iter()
-        .enumerate()
-        .filter_map(|(k, e)| {
-            if let Token::Val(v) = e {
-                if v > &9 {
-                    Some((k, v))
-                } else {
-                    None
-                }
+    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, e)| {
+        if let Token::Val(v) = e {
+            if v > &9 {
+                Some((k, v))
             } else {
                 None
             }
-        })
-        .next();
-
-    if let Some((k, v)) = find {
+        } else {
+            None
+        }
+    }) {
         let a = v >> 1;
         let b = v - a;
         snail.splice(
@@ -172,8 +160,6 @@ pub fn sum(snail: &[Vec<Token>], mut indices: impl Iterator<Item = usize>) -> Ve
 ///
 /// returns magnitude and position
 pub fn magnitude(snail: &[Token], k: usize) -> (usize, usize) {
-    assert_eq!(Token::Op, snail[k], "Do not start with open");
-
     let (a, j) = match snail[k + 1] {
         Token::Op => magnitude(&snail, k + 1),
         Token::Val(v) => (v, k + 2),
@@ -185,13 +171,12 @@ pub fn magnitude(snail: &[Token], k: usize) -> (usize, usize) {
         Token::Cl => panic!("Unexpected close tag at {}", j),
     };
 
-    assert_eq!(Token::Cl, snail[j], "Do not end with close");
-
     (3 * a + 2 * b, j + 1)
 }
 // end::magnitude[]
 
 // tag::part1[]
+#[cfg(not(feature = "recursive"))]
 pub fn solution_1(snails: &[Vec<Token>]) -> usize {
     let sum = sum(snails, 0..snails.len());
     let (m, _) = magnitude(&sum, 0);
@@ -200,6 +185,7 @@ pub fn solution_1(snails: &[Vec<Token>]) -> usize {
 // end::part1[]
 
 // tag::part2[]
+#[cfg(not(feature = "recursive"))]
 pub fn solution_2(snails: &[Vec<Token>]) -> usize {
     let mut max = 0;
     for k1 in 0..snails.len() {
@@ -219,6 +205,23 @@ pub fn solution_2(snails: &[Vec<Token>]) -> usize {
     max
 }
 // end::part2[]
+
+
+#[cfg(feature = "recursive")]
+pub fn parse(content: &str) -> Vec<recursive::Snail> {
+    recursive::parse(content)
+}
+
+#[cfg(feature = "recursive")]
+pub fn solution_1(snails: &[recursive::Snail]) -> usize {
+    recursive::solution_1(snails)
+}
+
+#[cfg(feature = "recursive")]
+pub fn solution_2(snails: &[recursive::Snail]) -> usize {
+    recursive::solution_2(snails)
+}
+
 
 // tag::tests[]
 #[cfg(test)]
@@ -307,6 +310,7 @@ mod tests {
 }
 // end::tests[]
 
+#[cfg(feature = "recursive")]
 pub mod recursive {
     use std::{fmt, iter::Peekable};
 
@@ -330,7 +334,7 @@ pub mod recursive {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             match self {
                 Self::Val(v) => write!(f, "{}", v),
-                Self::Pair(lhs, rhs) => write!(f, "[{},{}]", lhs, rhs),
+                Self::Pair(lhs, rhs) => write!(f, "[{:?},{:?}]", lhs, rhs),
             }
         }
     }
@@ -340,7 +344,7 @@ pub mod recursive {
         ///
         /// # Examples
         /// ```
-        /// # use mr_kaffee_2021_18::*;
+        /// # use mr_kaffee_2021_18::recursive::*;
         /// let snail = Snail::parse("[[1,2]\n, 3]");
         /// assert_eq!("[[1,2],3]", format!("{}", snail));
         /// ```
@@ -356,7 +360,7 @@ pub mod recursive {
                     assert_eq!(Some(','), data.next());
                     let rhs = Self::parse_recursive(data);
                     assert_eq!(Some(']'), data.next());
-                    Snail::Pair(Box::new(lhs), Box::new(rhs))
+                    Self::Pair(Box::new(lhs), Box::new(rhs))
                 }
                 Some(c) if c >= '0' && c <= '9' => {
                     let mut v = c as usize - '0' as usize;
@@ -368,25 +372,17 @@ pub mod recursive {
                         data.next();
                         v = 10 * v + d;
                     }
-                    Snail::Val(v)
+                    Self::Val(v)
                 }
                 _ => panic!("Unexpected token: {:?}", token),
-            }
-        }
-
-        /// get the value wrapped in an option if this is a [Snail::Val]. Otherwise return ``None``.
-        pub fn get_value(&self) -> Option<usize> {
-            match self {
-                Self::Val(a) => Some(*a),
-                _ => None,
             }
         }
 
         fn increment_first(&mut self, inc: usize) {
             match self {
                 Self::Pair(lhs, _) => {
-                    if let Some(val) = lhs.get_value() {
-                        let _ = std::mem::replace(lhs, Box::new(Snail::Val(val + inc)));
+                    if let Self::Val(val) = *lhs.as_ref() {
+                        let _ = std::mem::replace(lhs, Box::new(Self::Val(val + inc)));
                     } else {
                         lhs.increment_first(inc);
                     }
@@ -398,8 +394,8 @@ pub mod recursive {
         fn increment_last(&mut self, inc: usize) {
             match self {
                 Self::Pair(_, rhs) => {
-                    if let Some(val) = rhs.get_value() {
-                        let _ = std::mem::replace(rhs, Box::new(Snail::Val(val + inc)));
+                    if let Self::Val(val) = *rhs.as_ref() {
+                        let _ = std::mem::replace(rhs, Box::new(Self::Val(val + inc)));
                     } else {
                         rhs.increment_last(inc);
                     }
@@ -413,14 +409,14 @@ pub mod recursive {
                 Self::Val(_) => (None, None),
                 Self::Pair(lhs, rhs) => {
                     if level == 4 {
-                        if let (Some(a), Some(b)) = (lhs.get_value(), rhs.get_value()) {
-                            (Some(Self::Val(0)), Some((a, b)))
+                        if let (Self::Val(a), Self::Val(b)) = (lhs.as_ref(), rhs.as_ref()) {
+                            (Some(Self::Val(0)), Some((*a, *b)))
                         } else {
                             (None, None)
                         }
                     } else if level < 4 {
                         if let (replace, Some((a, b))) = lhs.explode(level + 1) {
-                            if let Some(val) = rhs.get_value() {
+                            if let Self::Val(val) = *rhs.as_ref() {
                                 // increment rhs with b
                                 let _ = std::mem::replace(rhs, Box::new(Self::Val(val + b)));
                             } else {
@@ -434,7 +430,7 @@ pub mod recursive {
                             }
                             (None, Some((a, 0)))
                         } else if let (replace, Some((a, b))) = rhs.explode(level + 1) {
-                            if let Some(val) = lhs.get_value() {
+                            if let Self::Val(val) = *lhs.as_ref() {
                                 // increment lhs with a
                                 let _ = std::mem::replace(lhs, Box::new(Self::Val(val + a)));
                             } else {
@@ -460,8 +456,8 @@ pub mod recursive {
 
         fn split(&mut self) -> bool {
             if let Self::Pair(lhs, rhs) = self {
-                if let Some(val) = lhs.get_value() {
-                    if val > 9 {
+                if let Self::Val(val) = lhs.as_ref() {
+                    if val > &9 {
                         let a = Box::new(Self::Val(val >> 1));
                         let b = Box::new(Self::Val((val >> 1) + (val & 1)));
                         let _ = std::mem::replace(lhs, Box::new(Self::Pair(a, b)));
@@ -471,8 +467,8 @@ pub mod recursive {
                 if lhs.split() {
                     return true;
                 }
-                if let Some(val) = rhs.get_value() {
-                    if val > 9 {
+                if let Self::Val(val) = rhs.as_ref() {
+                    if val > &9 {
                         let a = Box::new(Self::Val(val >> 1));
                         let b = Box::new(Self::Val((val >> 1) + (val & 1)));
                         let _ = std::mem::replace(rhs, Box::new(Self::Pair(a, b)));
@@ -560,7 +556,7 @@ pub mod recursive {
                 [[[[0,7],4],[[7,8],[6,0]]],[8,1]]";
 
             for line in data.lines() {
-                assert_eq!(line, format!("{}", Snail::parse(line)));
+                assert_eq!(line.trim(), format!("{}", Snail::parse(line)));
             }
         }
 
