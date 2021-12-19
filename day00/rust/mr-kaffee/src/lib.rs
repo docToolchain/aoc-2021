@@ -521,14 +521,20 @@ pub mod day19 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day19/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
-
+    pub const EXP_1: usize = 392;
+    pub const EXP_2: usize = 13_332;
+    
     pub fn solve() {
         let timer = Instant::now();
 
-        assert!(false, "Day 19 not yet implemented");
+        let data = parse(INPUT);
 
+        let timer_1_2 = Instant::now();
+        let (sol_1, sol_2) = solution_1_2(&data);
+        println!("Solved part 1 & 2 in {:?}: {:?} / {:?}", timer_1_2.elapsed(), sol_1, sol_2);
+        assert_eq!(EXP_1, sol_1);
+        assert_eq!(EXP_2, sol_2);
+    
         println!("-> Solved day 19 in {:?}\n", timer.elapsed());
     }
 }

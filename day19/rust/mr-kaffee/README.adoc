@@ -1,26 +1,44 @@
-== Day 19: ____ ==
+== Day 19: Beacon Scanner ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/19[AoC|2021|19].
 
-=== Part 1 ===
+The solution for today's puzzle takes ~10 seconds to complete in my current implementation (optimized from 30 seconds in the first version)! Currently, I have no idea how to simplify.
 
-Parse
+=== Parts 1 & 2 ===
+
+To keep the code clean, I created some shortcuts for 3D coordinates:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=coordinate]
+----
+
+The input is read as follows:
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=part1]
-----
-
-=== Part 2 ===
+Then I define all 24 possible transformations
 
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=part2]
+include::src/lib.rs[tags=trafos]
+----
+
+which are used to figure out whether two scanner's ranges (or two sets of beacons in their own coordinate systems) overlap:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=check_overlap]
+----
+
+With these elements, the solution to both parts is calculated as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solution]
 ----
 
 === Tests ===
@@ -29,5 +47,3 @@ include::src/lib.rs[tags=part2]
 ----
 include::src/lib.rs[tags=tests]
 ----
-
-=== Today I learned ===
