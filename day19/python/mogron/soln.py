@@ -16,7 +16,6 @@ class Point:
         return hash(self.x) + hash(self.y) + hash(self.z)
 
 
-Scanner = set[Point]
 RotationFunction = Callable[[Point], Point]
 
 
@@ -86,11 +85,11 @@ def make_rotation_functions() -> list[RotationFunction]:
     return reduced_rotations
 
 
-def compute_pairwise_distances(scanner: Scanner) -> set[int]:
+def compute_pairwise_distances(scanner: set[Point]) -> set[int]:
     return set([l1(a, b) for a, b in combinations(scanner, 2)])
 
 
-def is_match_possible(scanner_a: Scanner, scanner_b: Scanner) -> bool:
+def is_match_possible(scanner_a: set[Point], scanner_b: set[Point]) -> bool:
     """By comparing intra-scanner pairwise distances, check if there is any chance that scanner_a and scanner_b match."""
     dists_a = compute_pairwise_distances(scanner_a)
     dists_b = compute_pairwise_distances(scanner_b)
@@ -102,7 +101,7 @@ def is_match_possible(scanner_a: Scanner, scanner_b: Scanner) -> bool:
     return n_common >= n_required
 
 
-def find_next_match(q, scanners, rotations) -> tuple[int, Scanner, Point]:
+def find_next_match(q, scanners, rotations) -> tuple[int, set[Point], Point]:
     # find next scanner that matches one of the solved scanners
     for scanner_a in q:
         for scanner_b_idx, scanner_b in enumerate(scanners):
@@ -123,7 +122,7 @@ def find_next_match(q, scanners, rotations) -> tuple[int, Scanner, Point]:
     exit(1)
 
 
-def process(scanners: list[Scanner]) -> tuple[list[Scanner], int]:
+def process(scanners: list[set[Point]]) -> tuple[list[set[Point]], int]:
     rotations = make_rotation_functions()
     # scanner 0 is the reference scanner, first find a match with this one
     # q will contain matched scanners, with beacon coordinates transformed to coordinate system of scanner 0.
@@ -139,9 +138,9 @@ def process(scanners: list[Scanner]) -> tuple[list[Scanner], int]:
     return q, max_dist
 
 
-def parse_scanners(inp: list[str]) -> list[Scanner]:
+def parse_scanners(inp: list[str]) -> list[set[Point]]:
     scanners = []
-    scanner: Scanner = set()
+    scanner: set[Point] = set()
     for line in inp:
         if line == "" or line.startswith("---"):
             if scanner:
