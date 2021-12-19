@@ -374,6 +374,17 @@
 <li><a href="#_part_2_13">Part 2</a></li>
 <li><a href="#_tests_17">Tests</a></li>
 <li><a href="#_thoughts">Thoughts</a></li>
+<li><a href="#_today_i_learned_9">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_19_rust">Day 19: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a>
+<ul class="sectlevel4">
+<li><a href="#_parts_1_2_2">Parts 1 &amp; 2</a></li>
+<li><a href="#_tests_18">Tests</a></li>
 </ul>
 </li>
 </ul>
@@ -471,7 +482,7 @@ development, e.g., based on the examples given in the puzzles.</p>
     day16::solve();
     day17::solve();
     day18::solve();
-    // day19::solve();
+    day19::solve();
     // day20::solve();
     // day21::solve();
     // day22::solve();
@@ -4416,7 +4427,7 @@ mod tests {
 <p>Parse the snail numbers into vectors of tokens.</p>
 </li>
 <li>
-<p>Implement functions that aapply explode and split steps until no further reduction possible</p>
+<p>Implement functions that apply explode and split steps until no further reduction possible</p>
 </li>
 <li>
 <p>Calculate the sum over all snail numbers</p>
@@ -4458,12 +4469,13 @@ pub enum Token {
 ///   ],
 ///   parse("[[0,1],1]"));
 /// ```
+#[cfg(not(feature = "recursive"))]
 pub fn parse(content: &amp;str) -&gt; Vec&lt;Vec&lt;Token&gt;&gt; {
     content
         .lines()
         .map(|line| {
             line.chars()
-                .filter(|c| *c != ',')
+                .filter(|c| !c.is_whitespace() &amp;&amp; *c != ',')
                 .map(|c| match c {
                     '[' =&gt; Token::Op,
                     ']' =&gt; Token::Cl,
@@ -4500,30 +4512,23 @@ pub fn explode(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
             }
             Token::Val(val) =&gt; {
                 if number_seen &amp;&amp; level == 5 {
-                    let prev = (0..k - 2)
-                        .rev()
-                        .filter_map(|j| {
-                            if let Token::Val(v) = snail[j] {
-                                Some((j, v))
-                            } else {
-                                None
-                            }
-                        })
-                        .next();
-                    if let Some((j, x)) = prev {
+                    if let Some((j, x)) = (0..k - 2).rev().find_map(|j| {
+                        if let Token::Val(v) = snail[j] {
+                            Some((j, v))
+                        } else {
+                            None
+                        }
+                    }) {
                         snail[j] = Token::Val(x + last_val);
                     }
 
-                    let next = (k + 2..snail.len())
-                        .filter_map(|j| {
-                            if let Token::Val(v) = snail[j] {
-                                Some((j, v))
-                            } else {
-                                None
-                            }
-                        })
-                        .next();
-                    if let Some((j, x)) = next {
+                    if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| {
+                        if let Token::Val(v) = snail[j] {
+                            Some((j, v))
+                        } else {
+                            None
+                        }
+                    }) {
                         snail[j] = Token::Val(x + val);
                     }
 
@@ -4550,23 +4555,17 @@ pub fn explode(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
 ///
 /// returns true if any split performed, otherwise false
 pub fn split(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
-    let find = snail
-        .iter()
-        .enumerate()
-        .filter_map(|(k, e)| {
-            if let Token::Val(v) = e {
-                if v &gt; &amp;9 {
-                    Some((k, v))
-                } else {
-                    None
-                }
+    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, e)| {
+        if let Token::Val(v) = e {
+            if v &gt; &amp;9 {
+                Some((k, v))
             } else {
                 None
             }
-        })
-        .next();
-
-    if let Some((k, v)) = find {
+        } else {
+            None
+        }
+    }) {
         let a = v &gt;&gt; 1;
         let b = v - a;
         snail.splice(
@@ -4615,8 +4614,6 @@ pub fn sum(snail: &amp;[Vec&lt;Token&gt;], mut indices: impl Iterator&lt;Item = 
 ///
 /// returns magnitude and position
 pub fn magnitude(snail: &amp;[Token], k: usize) -&gt; (usize, usize) {
-    assert_eq!(Token::Op, snail[k], "Do not start with open");
-
     let (a, j) = match snail[k + 1] {
         Token::Op =&gt; magnitude(&amp;snail, k + 1),
         Token::Val(v) =&gt; (v, k + 2),
@@ -4627,8 +4624,6 @@ pub fn magnitude(snail: &amp;[Token], k: usize) -&gt; (usize, usize) {
         Token::Val(v) =&gt; (v, j + 1),
         Token::Cl =&gt; panic!("Unexpected close tag at {}", j),
     };
-
-    assert_eq!(Token::Cl, snail[j], "Do not end with close");
 
     (3 * a + 2 * b, j + 1)
 }</code></pre>
@@ -4643,7 +4638,8 @@ pub fn magnitude(snail: &amp;[Token], k: usize) -&gt; (usize, usize) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_2(snails: &amp;[Vec&lt;Token&gt;]) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(not(feature = "recursive"))]
+pub fn solution_2(snails: &amp;[Vec&lt;Token&gt;]) -&gt; usize {
     let mut max = 0;
     for k1 in 0..snails.len() {
         for k2 in 0..snails.len() {
@@ -4764,7 +4760,10 @@ mod tests {
 <p>For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don&#8217;t like that it increases the overall runtime for all my solutions for this year so far by 40%!</p>
 </div>
 <div class="paragraph">
-<p>I have a solution based on recursice data structures. It is three times slower&#8230;&#8203; Made some small optimizations in the vec based solution instead&#8230;&#8203; (you can run the recursive solution with <code>cargo run --release --features recursive</code>)</p>
+<p>I have a solution based on recursive data structures. It is three times slower&#8230;&#8203; Made some small optimizations in the vec based solution instead (use <code>drain</code> and <code>splice</code> instead of removing/inserting values one by one - see above).</p>
+</div>
+<div class="paragraph">
+<p>The recursive solution is also available as a variant and you can run the recursive solution with <code>cargo run --release --features recursive</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4787,7 +4786,7 @@ mod tests {
         fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
             match self {
                 Self::Val(v) =&gt; write!(f, "{}", v),
-                Self::Pair(lhs, rhs) =&gt; write!(f, "[{},{}]", lhs, rhs),
+                Self::Pair(lhs, rhs) =&gt; write!(f, "[{:?},{:?}]", lhs, rhs),
             }
         }
     }
@@ -4797,7 +4796,7 @@ mod tests {
         ///
         /// # Examples
         /// ```
-        /// # use mr_kaffee_2021_18::*;
+        /// # use mr_kaffee_2021_18::recursive::*;
         /// let snail = Snail::parse("[[1,2]\n, 3]");
         /// assert_eq!("[[1,2],3]", format!("{}", snail));
         /// ```
@@ -4813,7 +4812,7 @@ mod tests {
                     assert_eq!(Some(','), data.next());
                     let rhs = Self::parse_recursive(data);
                     assert_eq!(Some(']'), data.next());
-                    Snail::Pair(Box::new(lhs), Box::new(rhs))
+                    Self::Pair(Box::new(lhs), Box::new(rhs))
                 }
                 Some(c) if c &gt;= '0' &amp;&amp; c &lt;= '9' =&gt; {
                     let mut v = c as usize - '0' as usize;
@@ -4825,25 +4824,17 @@ mod tests {
                         data.next();
                         v = 10 * v + d;
                     }
-                    Snail::Val(v)
+                    Self::Val(v)
                 }
                 _ =&gt; panic!("Unexpected token: {:?}", token),
-            }
-        }
-
-        /// get the value wrapped in an option if this is a [Snail::Val]. Otherwise return ``None``.
-        pub fn get_value(&amp;self) -&gt; Option&lt;usize&gt; {
-            match self {
-                Self::Val(a) =&gt; Some(*a),
-                _ =&gt; None,
             }
         }
 
         fn increment_first(&amp;mut self, inc: usize) {
             match self {
                 Self::Pair(lhs, _) =&gt; {
-                    if let Some(val) = lhs.get_value() {
-                        let _ = std::mem::replace(lhs, Box::new(Snail::Val(val + inc)));
+                    if let Self::Val(val) = *lhs.as_ref() {
+                        let _ = std::mem::replace(lhs, Box::new(Self::Val(val + inc)));
                     } else {
                         lhs.increment_first(inc);
                     }
@@ -4855,8 +4846,8 @@ mod tests {
         fn increment_last(&amp;mut self, inc: usize) {
             match self {
                 Self::Pair(_, rhs) =&gt; {
-                    if let Some(val) = rhs.get_value() {
-                        let _ = std::mem::replace(rhs, Box::new(Snail::Val(val + inc)));
+                    if let Self::Val(val) = *rhs.as_ref() {
+                        let _ = std::mem::replace(rhs, Box::new(Self::Val(val + inc)));
                     } else {
                         rhs.increment_last(inc);
                     }
@@ -4870,14 +4861,14 @@ mod tests {
                 Self::Val(_) =&gt; (None, None),
                 Self::Pair(lhs, rhs) =&gt; {
                     if level == 4 {
-                        if let (Some(a), Some(b)) = (lhs.get_value(), rhs.get_value()) {
-                            (Some(Self::Val(0)), Some((a, b)))
+                        if let (Self::Val(a), Self::Val(b)) = (lhs.as_ref(), rhs.as_ref()) {
+                            (Some(Self::Val(0)), Some((*a, *b)))
                         } else {
                             (None, None)
                         }
                     } else if level &lt; 4 {
                         if let (replace, Some((a, b))) = lhs.explode(level + 1) {
-                            if let Some(val) = rhs.get_value() {
+                            if let Self::Val(val) = *rhs.as_ref() {
                                 // increment rhs with b
                                 let _ = std::mem::replace(rhs, Box::new(Self::Val(val + b)));
                             } else {
@@ -4891,7 +4882,7 @@ mod tests {
                             }
                             (None, Some((a, 0)))
                         } else if let (replace, Some((a, b))) = rhs.explode(level + 1) {
-                            if let Some(val) = lhs.get_value() {
+                            if let Self::Val(val) = *lhs.as_ref() {
                                 // increment lhs with a
                                 let _ = std::mem::replace(lhs, Box::new(Self::Val(val + a)));
                             } else {
@@ -4917,8 +4908,8 @@ mod tests {
 
         fn split(&amp;mut self) -&gt; bool {
             if let Self::Pair(lhs, rhs) = self {
-                if let Some(val) = lhs.get_value() {
-                    if val &gt; 9 {
+                if let Self::Val(val) = lhs.as_ref() {
+                    if val &gt; &amp;9 {
                         let a = Box::new(Self::Val(val &gt;&gt; 1));
                         let b = Box::new(Self::Val((val &gt;&gt; 1) + (val &amp; 1)));
                         let _ = std::mem::replace(lhs, Box::new(Self::Pair(a, b)));
@@ -4928,8 +4919,8 @@ mod tests {
                 if lhs.split() {
                     return true;
                 }
-                if let Some(val) = rhs.get_value() {
-                    if val &gt; 9 {
+                if let Self::Val(val) = rhs.as_ref() {
+                    if val &gt; &amp;9 {
                         let a = Box::new(Self::Val(val &gt;&gt; 1));
                         let b = Box::new(Self::Val((val &gt;&gt; 1) + (val &amp; 1)));
                         let _ = std::mem::replace(rhs, Box::new(Self::Pair(a, b)));
@@ -4964,6 +4955,288 @@ mod tests {
             }
         }
     }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_9"><a class="anchor" href="#_today_i_learned_9"></a><a class="link" href="#_today_i_learned_9">Today I learned</a></h5>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>a lot on recursive data structures and the <code>Box</code> structure in Rust but also how to insert / remove elements from a <code>Vec</code> as efficiently as possible.</p>
+</li>
+</ol>
+</div>
+<a id="day19" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_19_rust"><a class="anchor" href="#_day_19_rust"></a><a class="link" href="#_day_19_rust">Day 19: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_19_beacon_scanner"><a class="anchor" href="#_day_19_beacon_scanner"></a><a class="link" href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/19">AoC|2021|19</a>.</p>
+</div>
+<div class="paragraph">
+<p>The solution for today&#8217;s puzzle takes ~10 seconds to complete in my current implementation (optimized from 30 seconds in the first version)! Currently, I have no idea how to simplify.</p>
+</div>
+<div class="sect4">
+<h5 id="_parts_1_2_2"><a class="anchor" href="#_parts_1_2_2"></a><a class="link" href="#_parts_1_2_2">Parts 1 &amp; 2</a></h5>
+<div class="paragraph">
+<p>To keep the code clean, I created some shortcuts for 3D coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// type alias for 3D coordinate
+pub type Coord = (isize, isize, isize);
+
+/// basic math operations for coordinates
+pub trait CoordMath {
+    fn add(self, rhs: &amp;Self) -&gt; Self;
+    fn sub(self, rhs: &amp;Self) -&gt; Self;
+    fn abs(&amp;self) -&gt; usize;
+}
+
+impl CoordMath for Coord {
+    fn add(mut self, rhs: &amp;Self) -&gt; Self {
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
+        self
+    }
+
+    fn sub(mut self, rhs: &amp;Self) -&gt; Self {
+        self.0 -= rhs.0;
+        self.1 -= rhs.1;
+        self.2 -= rhs.2;
+        self
+    }
+
+    fn abs(&amp;self) -&gt; usize {
+        (self.0.abs() + self.1.abs() + self.2.abs()) as usize
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The input is read as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse the input into a vector of scanners
+///
+/// each scanner is a hash set of coordinates in the scanner's local
+/// coordinate system
+pub fn parse(content: &amp;str) -&gt; Vec&lt;HashSet&lt;Coord&gt;&gt; {
+    let mut scanners = Vec::new();
+
+    let mut beacons = HashSet::new();
+    for line in content.lines() {
+        let line = line.trim();
+        if line.len() == 0 {
+            continue;
+        } else if line.starts_with("---") {
+            if !beacons.is_empty() {
+                scanners.push(beacons);
+                beacons = HashSet::new();
+            }
+        } else {
+            let mut parts = line
+                .trim()
+                .split(',')
+                .map(|s| s.parse().expect("Could not parse."));
+            let p = (
+                parts.next().expect("No x"),
+                parts.next().expect("No y"),
+                parts.next().expect("No z"),
+            );
+            assert!(parts.next().is_none(), "More than three coordinates");
+            beacons.insert(p);
+        }
+    }
+    if !beacons.is_empty() {
+        scanners.push(beacons);
+    }
+
+    scanners
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then I define all 24 possible transformations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// transformation functions for all 24 possible transformations
+const TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
+    |(x, y, z)| (x, y, z),
+    |(x, y, z)| (x, -y, -z),
+    |(x, y, z)| (x, z, -y),
+    |(x, y, z)| (x, -z, y),
+    |(x, y, z)| (-x, y, -z),
+    |(x, y, z)| (-x, -y, z),
+    |(x, y, z)| (-x, z, y),
+    |(x, y, z)| (-x, -z, -y),
+    |(x, y, z)| (y, x, -z),
+    |(x, y, z)| (y, -x, z),
+    |(x, y, z)| (y, z, x),
+    |(x, y, z)| (y, -z, -x),
+    |(x, y, z)| (-y, x, z),
+    |(x, y, z)| (-y, -x, -z),
+    |(x, y, z)| (-y, z, -x),
+    |(x, y, z)| (-y, -z, x),
+    |(x, y, z)| (z, x, y),
+    |(x, y, z)| (z, -x, -y),
+    |(x, y, z)| (z, y, -x),
+    |(x, y, z)| (z, -y, x),
+    |(x, y, z)| (-z, x, -y),
+    |(x, y, z)| (-z, -x, y),
+    |(x, y, z)| (-z, y, x),
+    |(x, y, z)| (-z, -y, -x),
+];</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which are used to figure out whether two scanner&#8217;s ranges (or two sets of beacons in their own coordinate systems) overlap:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// check whether two sets of beacons overlap
+///
+/// find the transformation ``t`` for the second set, and a distance ``d`` of the references,
+/// so that at least ``threshold`` pairs of beacons (b1, b2) in the two sets exist that satisfy
+/// ``t(b2) - d = b1``
+pub fn check_overlap(
+    beacons1: &amp;HashSet&lt;Coord&gt;,
+    beacons2: &amp;HashSet&lt;Coord&gt;,
+    threshold: usize,
+) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
+    for t in TRAFOS {
+        // find all beacons with the same distance as b1[k1] to b2[k2]
+        for b1 in beacons1 {
+            for b2 in beacons2 {
+                // d = t(b2) - b1
+                // =&gt; b1 = t(b2) - d
+                let d = t(*b2).sub(b1);
+
+                let mut count = 0;
+                for _ in beacons2
+                    .iter()
+                    .map(|b2| t(*b2).sub(&amp;d))
+                    .filter(|b2| beacons1.contains(b2))
+                {
+                    // don't use iter.count() to avoid checking more elements onece threshold is reached
+                    count += 1;
+                    if count &gt;= threshold {
+                        return Some((t, d));
+                    }
+                }
+            }
+        }
+    }
+
+    None
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With these elements, the solution to both parts is calculated as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// check whether any unsettled scanner can be settled given the settled beacons
+///
+/// if so, return the index of that scanner, the beacons in the coordinates of the settled beacons, and the reference distance
+pub fn settle_any(
+    beacons: &amp;HashSet&lt;Coord&gt;,
+    scanners: &amp;[HashSet&lt;Coord&gt;],
+    settled: &amp;[bool],
+) -&gt; Option&lt;(usize, Vec&lt;Coord&gt;, Coord)&gt; {
+    for (k2, s2) in scanners.iter().enumerate().filter(|(k, _)| !settled[*k]) {
+        if let Some((t, d)) = check_overlap(&amp;beacons, s2, 12) {
+            return Some((k2, s2.iter().map(|p| t(*p).sub(&amp;d)).collect(), d));
+        }
+    }
+
+    None
+}
+
+/// determine number of unique beacons
+pub fn solution_1_2(scanners: &amp;[HashSet&lt;Coord&gt;]) -&gt; (usize, usize) {
+    // holds flags for settled scanners
+    let mut settled = vec![false; scanners.len()];
+    settled[0] = true; // start with first scanner settled
+
+    // holds distances from all scanners to first scanner.
+    // Used to calculate largest distance between any two scanners.
+    let mut deltas = Vec::with_capacity(scanners.len());
+    deltas.push((0, 0, 0));
+    let mut max_dist = 0;
+
+    // holds all settled beacons. Start with beacons in range of scanner 1
+    let mut beacons: HashSet&lt;Coord&gt; = scanners[0].clone();
+
+    // while any scanner has been settled
+    while let Some((k, iter, d)) = settle_any(&amp;beacons, &amp;scanners, &amp;settled) {
+        // update flag
+        settled[k] = true;
+        // add beacons to settled beacons
+        beacons.extend(iter);
+
+        // update max distance
+        for d0 in &amp;deltas {
+            let dist = d.sub(&amp;d0).abs();
+            if dist &gt; max_dist {
+                max_dist = dist;
+            }
+        }
+
+        // save distance to first scanner
+        deltas.push(d);
+    }
+
+    // return number of beacons and largest distance between any two scanners
+    (beacons.len(), max_dist)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_18"><a class="anchor" href="#_tests_18"></a><a class="link" href="#_tests_18">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = include_str!("../test.txt");
+
+    #[test]
+    fn test_parse() {
+        let scanners = parse(CONTENT);
+        assert_eq!(5, scanners.len());
+        assert!(scanners[2].contains(&amp;(-644, 584, -595)));
+        assert!(scanners[4].contains(&amp;(30, -46, -14)));
+    }
+
+    #[test]
+    fn test_compare() {
+        let scanners = parse(CONTENT);
+        let r = check_overlap(&amp;scanners[0], &amp;scanners[1], 12);
+        assert!(r.is_some(), "No transformation found");
+        let (t, d) = r.unwrap();
+
+        assert_eq!((-68, 1246, 43), d);
+        assert_eq!((-618, -824, -621), t((686, 422, 578)).sub(&amp;d));
+    }
+
+    #[test]
+    fn test_solution_1_2() {
+        let scanners = parse(CONTENT);
+        assert_eq!((79, 3621), solution_1_2(&amp;scanners));
+    }
+}</code></pre>
 </div>
 </div>
 </div>
