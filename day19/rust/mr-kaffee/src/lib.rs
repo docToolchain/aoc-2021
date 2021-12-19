@@ -158,7 +158,7 @@ pub fn check_overlap(
                     .filter(|(x, y, z)| RANGE.contains(x) && RANGE.contains(y) && RANGE.contains(z))
                     .filter(|b1| beacons_check.contains(b1))
                 {
-                    // don't use iter.count() to avoid checking more elements onece threshold is reached
+                    // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count >= threshold {
                         return Some((TRAFOS[t_idx], center));

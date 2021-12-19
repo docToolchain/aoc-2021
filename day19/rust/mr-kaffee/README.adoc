@@ -5,8 +5,9 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/19[AoC
 The solution for today's puzzle takes ~3 seconds to complete in my current implementation (optimized from 30 seconds in the first version and ~10 seconds in an intermediate step)! 
 
 The optimizations include:
+
 * check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set
-* use a kind of breadth first for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set ``settled = 1``) and continue to settle furhter sets that overlap with sets from the queue.
+* use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set ``settled = 1``) and continue to settle furhter sets that overlap with sets from the queue.
 
 === Parts 1 & 2 ===
 
