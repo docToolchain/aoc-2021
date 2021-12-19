@@ -193,6 +193,15 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_07_python">Day 07: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_8">Python</a>
+<ul class="sectlevel4">
+<li><a href="#_star_1_4">Star 1</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -841,6 +850,77 @@ for day in range(0, max_days):
 
 print("Star 2")
 print(f"After {max_days} days {sum(fish_counter)} fishes are found")</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_python"><a class="anchor" href="#_day_07_python"></a><a class="link" href="#_day_07_python">Day 07: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_8"><a class="anchor" href="#_python_8"></a><a class="link" href="#_python_8">Python</a></h4>
+<div class="sect4">
+<h5 id="_star_1_4"><a class="anchor" href="#_star_1_4"></a><a class="link" href="#_star_1_4">Star 1</a></h5>
+<div class="paragraph">
+<p>Done.
+=== Star 2
+Took me some time to remember the formula to calculate the fuel consumption.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">file1 = open('input.txt', 'r')
+string_list = file1.readline().rstrip().split(",")
+crab_positions = list(map(int, string_list))
+
+closest_crab = min(crab_positions)
+furthest_crab = max(crab_positions)
+
+max_distance = furthest_crab - closest_crab
+
+print(f"Closest crab: {closest_crab}")
+print(f"Furthest crab: {furthest_crab}")
+print(f"Crab distance: {max_distance}")
+
+min_distance = max_distance * len(crab_positions)
+
+distance_sum = 0
+best_position = max_distance
+for current_position in range(closest_crab, furthest_crab):
+    for crab_position in crab_positions:
+        distance_sum += abs(current_position - crab_position)
+    if distance_sum &lt; min_distance:
+        min_distance = distance_sum
+        best_position = current_position
+    distance_sum = 0
+
+print("Start 1")
+print(f"Best position is: {best_position}")
+print(f"Fuel to spend: {min_distance}")
+
+def distance_to_fuel_star2(distance):
+    return (distance * (distance + 1)) / 2
+
+min_distance = max_distance * len(crab_positions) * len(crab_positions)
+distance_sum = 0
+best_position = max_distance
+for current_position in range(closest_crab, furthest_crab):
+    for crab_position in crab_positions:
+        distance_sum += distance_to_fuel_star2(abs(current_position - crab_position))
+
+    if distance_sum &lt; min_distance:
+        min_distance = distance_sum
+        best_position = current_position
+    distance_sum = 0
+
+
+
+print("Start 2")
+print(f"Best position is: {best_position}")
+print(f"Fuel to spend: {min_distance}")</code></pre>
 </div>
 </div>
 </div>
