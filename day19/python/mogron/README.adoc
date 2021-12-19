@@ -19,5 +19,6 @@ So the intersection of the set of all pairwise distances for the first scanner, 
 must contain at least 66 elements.
 
 So we can skip a deep comparison for any pair of scanners with less than 65 elements in the pairwise distance intersection.
+For my specific input, this heuristic eliminates all fruitless in-depth matching attempts.
 
 
