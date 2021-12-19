@@ -8,8 +8,8 @@ const (
 	dims = 3
 )
 
-func allRots() []mat.Matrix {
-	result := []mat.Matrix{}
+func allRots() []*mat.Dense {
+	result := []*mat.Dense{}
 
 	indices := []mat.Vector{
 		mat.NewVecDense(dims, []float64{0., 1., 2.}),
@@ -43,7 +43,10 @@ func allRots() []mat.Matrix {
 				sig := sign.AtVec(orgDim)
 				rotMat.Set(int(orgDim), int(targetDim), sig)
 			}
-			result = append(result, rotMat)
+			// Ignore left-handed coordinate systems.
+			if mat.Det(rotMat) > 0 {
+				result = append(result, rotMat)
+			}
 		}
 	}
 
