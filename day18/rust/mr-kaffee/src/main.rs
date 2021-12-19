@@ -6,35 +6,18 @@ pub const EXP_1: usize = 4_243;
 pub const EXP_2: usize = 4_701;
 
 fn main() {
-    if cfg!(feature = "recursive") {
-        let timer = Instant::now();
-        let snails = recursive::parse(INPUT);
-    
-        let timer_1 = Instant::now();
-        let sol_1 = recursive::solution_1(&snails);
-        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
-        assert_eq!(EXP_1, sol_1);
-    
-        let timer_2 = Instant::now();
-        let sol_2 = recursive::solution_2(&snails);
-        println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
-        assert_eq!(EXP_2, sol_2);
-    
-        println!("-> Solved day 18 in {:?}\n", timer.elapsed());
-    } else {
-        let timer = Instant::now();
-        let snails = parse(INPUT);
-    
-        let timer_1 = Instant::now();
-        let sol_1 = solution_1(&snails);
-        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
-        assert_eq!(EXP_1, sol_1);
-    
-        let timer_2 = Instant::now();
-        let sol_2 = solution_2(&snails);
-        println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
-        assert_eq!(EXP_2, sol_2);
-    
-        println!("-> Solved day 18 in {:?}\n", timer.elapsed());
-    }
+    let timer = Instant::now();
+    let snails = parse(INPUT);
+
+    let timer_1 = Instant::now();
+    let sol_1 = solution_1(&snails);
+    println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
+    assert_eq!(EXP_1, sol_1);
+
+    let timer_2 = Instant::now();
+    let sol_2 = solution_2(&snails);
+    println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
+    assert_eq!(EXP_2, sol_2);
+
+    println!("-> Solved day 18 in {:?}\n", timer.elapsed());
 }
