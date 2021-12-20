@@ -1,0 +1,98 @@
+== Day 19: Beacon Scanner ==
+
+This is my implementation for both rounds of the beacon scanner puzzle.
+
+This one was actually not really that interesting as I have been doing many
+co-ordinate transformations in the past.
+Thus, after reading the task, I came up with a solution that should work, albeit
+inefficiently, quite soon.
+Turns out it did work, and here is my implementation.
+More details below.
+
+Furthermore, this task taught me one thing: don't do linear algebra in Go, just
+don't (at least I won't anymore).
+It's cumbersome and inefficient in my opinion.
+Being used to something like "Eigen" in C++ or even "NumPy" in Python makes the
+linalg library "gonum" that I've used feel difficult to work with in my view.
+Even still, I've decided to do this AoC in Go and that's why I implemented this
+one in Go, too.
+
+My implementation also contains a (commented out) sanity check.
+As soon as it has been switched on, no solution could be found anymore.
+Either I have made a mistake in the implementation (the likely scenario), or I
+have misunderstood the task (also quite likely), or there is something wrong
+with the task (least likely scenario).
+More details below.
+Any comments are appreciated.
+The problem already pops up for the real-sized example data.
+
+=== Implementation strategy ===
+
+I've decided to follow the straightforward approach: instead of solving a system
+of equations, I simply try out all possible rotations and translations and
+simply count matching positions.
+If at least 12 matching beacons can be found for any rotation and translation, I
+consider the current rotation and translation to be viable and merge the sensor
+data sets in that representation, discarding duplicate data.
+The number 12 has even been given in the task.
+Rinse repeat until just one set of beacon positions remains.
+
+The 24 possible rotation matrices are known in advance.
+
+When comparing two sets of data, possible translations are obtained as the
+pairwise differences in all beacon positions in both sets.
+Counting matches for all such translations takes a while for large sets of
+points, but it works.
+
+=== Sanity check ===
+
+The task states that:
+
+> Each scanner is capable of detecting all beacons in a large cube centered on
+> the scanner; beacons that are at most 1000 units away from the scanner in each
+> of the three axes (x, y, and z) have their precise position determined
+> relative to the scanner.
+
+That means, even if 12 matches could be found between two sets of data A and B,
+if there is at least one point in B within 1000 (included) in any direction from
+any sensor in A, the two sets cannot be a match.
+The reason is that the sensors in A would have had to pick up on the point as
+it is within their range of 1000.
+The same holds if A and B were swapped.
+I've implemented such a test.
+Switching it on, though, results in no matches being found.
+Leaving it out yield in the correct results, so it's not that important.
+I'm still curious where the misunderstanding or incorrect implementation lies.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `rot.go`, which contains code to generate all viable rotation
+matrices.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`rot.go`
+[source,go,numbered]
+----
+include::rot.go[tags=rot]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.
