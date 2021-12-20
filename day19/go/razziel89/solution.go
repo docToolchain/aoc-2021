@@ -9,6 +9,7 @@ import (
 
 const (
 	numReqMatches = 12
+	// maxDist       = 1000.
 	// tol           = 1e-7
 )
 
@@ -47,37 +48,68 @@ func findMatchIndices(posRef, posCheck []mat.Vector) map[int]struct{} {
 	return matches
 }
 
-func countMatches(posRef, posCheck []mat.Vector) int {
+func countMatches(posRef, posCheck, refSens, checkSens []mat.Vector) int {
 	matches := 0
 	for _, ref := range posRef {
+		// matched := false
 		for _, check := range posCheck {
 			// Try actual equality first, we might need to switch to EqualApprox, which is something
 			// like an all-close.
 			if mat.Equal(ref, check) {
+				// matched = true
 				matches++
 				break
 			}
 		}
+		// if !matched {
+		// 	for _, sens := range refSens {
+		// 		for _, check := range posCheck {
+		// 			// Check whether any check pos is closer to any of the ref sensors than maxDist.
+		// 			// If so, this cannot be a match.
+		// 			dist := mat.NewVecDense(dims, nil)
+		// 			dist.SubVec(check, sens)
+		// 			//nolint:gomnd
+		// 			if dist.AtVec(0) <= maxDist || dist.AtVec(1) <= maxDist ||
+		// 				dist.AtVec(2) <= maxDist {
+		// 				// log.Println("excluded due to cube check")
+		// 				return 0
+		// 			}
+		// 		}
+		// 	}
+		// 	for _, sens := range checkSens {
+		// 		for _, ref := range posRef {
+		// 			// Check whether any check pos is closer to any of the ref sensors than maxDist.
+		// 			// If so, this cannot be a match.
+		// 			dist := mat.NewVecDense(dims, nil)
+		// 			dist.SubVec(ref, sens)
+		// 			//nolint:gomnd
+		// 			if dist.AtVec(0) <= maxDist || dist.AtVec(1) <= maxDist ||
+		// 				dist.AtVec(2) <= maxDist {
+		// 				// log.Println("excluded due to cube check")
+		// 				return 0
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 	return matches
 }
 
-func assessMatch(rot *mat.Dense, refPositions, checkPositions []mat.Vector) (mat.Vector, bool) {
+func assessMatch(
+	rot *mat.Dense, refPositions, checkPositions, refSens, checkSens []mat.Vector,
+) (mat.Vector, bool) {
 	rotated := rotate(rot, checkPositions)
+	rotatedSens := rotate(rot, checkSens)
 	for _, refPosRef := range refPositions {
 		diff := mat.NewVecDense(dims, nil)
 
 		for _, refPosCheck := range rotated {
 			diff.SubVec(refPosRef, refPosCheck)
-			// printMat(rot)
-			// printVecs(diff)
-			// printVecs(refPosRef)
-			// printVecs(refPosCheck)
 
 			checkPosTranslated := translate(diff, rotated)
-			// printVec(checkPosTranslated)
+			checkSensTranslated := translate(diff, rotatedSens)
 
-			matches := countMatches(refPositions, checkPosTranslated)
+			matches := countMatches(refPositions, checkPosTranslated, refSens, checkSensTranslated)
 			if matches >= numReqMatches {
 				return diff, true
 			}
@@ -94,13 +126,13 @@ func printMat(matrix *mat.Dense) {
 
 }
 
-func printVecs(vec mat.Vector) {
+func printVec(vec mat.Vector) {
 	fmt.Println(vec)
 	fmt.Println()
 
 }
 
-func printVec(vecs []mat.Vector) {
+func printVecs(vecs []mat.Vector) {
 	for _, vec := range vecs {
 		fmt.Println(vec)
 	}
@@ -108,19 +140,24 @@ func printVec(vecs []mat.Vector) {
 
 }
 
-func mergeOneMatch(data map[int][]mat.Vector, rots []*mat.Dense) bool {
+func mergeOneMatch(data, sensorPositions map[int][]mat.Vector, rots []*mat.Dense) bool {
 	for refIdx, ref := range data {
 		for checkIdx, check := range data {
 			if checkIdx == refIdx {
 				// Don't merge a sensor's data with its own data.
 				continue
 			}
+			log.Printf("assessing %d and %d", refIdx, checkIdx)
 			for _, rot := range rots {
-				if diff, matching := assessMatch(rot, ref, check); matching {
+				refSens := sensorPositions[refIdx]
+				checkSens := sensorPositions[checkIdx]
+
+				if diff, matching := assessMatch(rot, ref, check, refSens, checkSens); matching {
 					// Merge start.
 					log.Println("merging", checkIdx, "into", refIdx)
 
 					adjusted := translate(diff, rotate(rot, check))
+					adjSens := translate(diff, rotate(rot, checkSens))
 
 					// Determine matching sensor data.
 					matchingIdx := findMatchIndices(ref, adjusted)
@@ -140,6 +177,13 @@ func mergeOneMatch(data map[int][]mat.Vector, rots []*mat.Dense) bool {
 					data[refIdx] = ref
 					delete(data, checkIdx)
 
+					// Remember the sensor positions for cube sanity checks.
+					refSens = append(refSens, adjSens...)
+
+					// Remember the updated base sensor and remove the sensor data of the merge.
+					sensorPositions[refIdx] = refSens
+					delete(sensorPositions, checkIdx)
+
 					return true
 					// Merge end.
 				}
@@ -147,6 +191,27 @@ func mergeOneMatch(data map[int][]mat.Vector, rots []*mat.Dense) bool {
 		}
 	}
 	return false
+}
+
+func maxSensorDist(sensorData map[int][]mat.Vector) float64 {
+	result := 0.
+	for _, sensors := range sensorData {
+		if len(sensors) <= 1 {
+			// Don't process sensor data sets that don't yet have enough data.
+			continue
+		}
+		for _, sens := range sensors {
+			for _, otherSens := range sensors {
+				diff := mat.NewVecDense(dims, nil)
+				diff.SubVec(sens, otherSens)
+				norm := mat.Norm(diff, 1)
+				if norm > result {
+					result = norm
+				}
+			}
+		}
+	}
+	return result
 }
 
 func main() {
@@ -162,15 +227,21 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	for _, data := range sensorData {
-		printVec(data)
+		printVecs(data)
+	}
+	sensorPositions := map[int][]mat.Vector{}
+	for idx := range sensorData {
+		sensorPositions[idx] = []mat.Vector{mat.NewVecDense(dims, []float64{0., 0., 0.})}
 	}
 
 	// Continuously merge sensor data until only one remains.
 	for len(sensorData) != 1 {
-		merged := mergeOneMatch(sensorData, rots)
+		merged := mergeOneMatch(sensorData, sensorPositions, rots)
 		if !merged {
 			log.Fatal("did not find any match")
 		}
+		log.Printf("%d remaining", len(sensorData))
+		log.Println("max sensor dist is", maxSensorDist(sensorPositions))
 	}
 
 	for _, dat := range sensorData {
@@ -178,5 +249,5 @@ func main() {
 	}
 
 	// This line stops Go complaining that this helper function was unused.
-	_ = printVecs
+	_ = printVec
 }
