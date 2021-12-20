@@ -4,10 +4,14 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// tag::rot[]
+
 const (
 	dims = 3
 )
 
+// Determine all possible rotation matrices. This means swap all axes and flip app axes.
+// Filter out co-ordinate systems that we don't support.
 func allRots() []*mat.Dense {
 	result := []*mat.Dense{}
 
@@ -52,3 +56,5 @@ func allRots() []*mat.Dense {
 
 	return result
 }
+
+// end::rot[]

@@ -7,9 +7,11 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// tag::solution[]
+
 const (
 	numReqMatches = 12
-	// maxDist       = 1000.
+	maxDist       = 1000.
 	// tol           = 1e-7
 )
 
@@ -51,16 +53,19 @@ func findMatchIndices(posRef, posCheck []mat.Vector) map[int]struct{} {
 func countMatches(posRef, posCheck, refSens, checkSens []mat.Vector) int {
 	matches := 0
 	for _, ref := range posRef {
-		// matched := false
+		matched := false
 		for _, check := range posCheck {
 			// Try actual equality first, we might need to switch to EqualApprox, which is something
 			// like an all-close.
 			if mat.Equal(ref, check) {
-				// matched = true
+				matched = true
 				matches++
 				break
 			}
 		}
+		// // Following is a sanity check that is supposed to ensure that no point that is not
+		// // matched is within 1000 of another sensor. Switching it on causes there to be no
+		// // matches. The implementation is likely incorrect.
 		// if !matched {
 		// 	for _, sens := range refSens {
 		// 		for _, check := range posCheck {
@@ -69,8 +74,8 @@ func countMatches(posRef, posCheck, refSens, checkSens []mat.Vector) int {
 		// 			dist := mat.NewVecDense(dims, nil)
 		// 			dist.SubVec(check, sens)
 		// 			//nolint:gomnd
-		// 			if dist.AtVec(0) <= maxDist || dist.AtVec(1) <= maxDist ||
-		// 				dist.AtVec(2) <= maxDist {
+		// 			if math.Abs(dist.AtVec(0)) <= maxDist && math.Abs(dist.AtVec(1)) <= maxDist &&
+		// 				math.Abs(dist.AtVec(2)) <= maxDist {
 		// 				// log.Println("excluded due to cube check")
 		// 				return 0
 		// 			}
@@ -83,18 +88,22 @@ func countMatches(posRef, posCheck, refSens, checkSens []mat.Vector) int {
 		// 			dist := mat.NewVecDense(dims, nil)
 		// 			dist.SubVec(ref, sens)
 		// 			//nolint:gomnd
-		// 			if dist.AtVec(0) <= maxDist || dist.AtVec(1) <= maxDist ||
-		// 				dist.AtVec(2) <= maxDist {
+		// 			if math.Abs(dist.AtVec(0)) <= maxDist && math.Abs(dist.AtVec(1)) <= maxDist &&
+		// 				math.Abs(dist.AtVec(2)) <= maxDist {
 		// 				// log.Println("excluded due to cube check")
 		// 				return 0
 		// 			}
 		// 		}
 		// 	}
 		// }
+		_ = matched
+		_ = maxDist
 	}
 	return matches
 }
 
+// Returns true if a match is found. Also returns the translation vector needed to translate
+// one set of co-ordinates to the other to match.
 func assessMatch(
 	rot *mat.Dense, refPositions, checkPositions, refSens, checkSens []mat.Vector,
 ) (mat.Vector, bool) {
@@ -168,7 +177,7 @@ func mergeOneMatch(data, sensorPositions map[int][]mat.Vector, rots []*mat.Dense
 					// Keep all the data from the base list.
 					// Only add those not yet present from the merge list.
 					for mergeIdx, merge := range adjusted {
-						if _, ok := matchingIdx[mergeIdx]; !ok {
+						if _, exists := matchingIdx[mergeIdx]; !exists {
 							ref = append(ref, merge)
 						}
 					}
@@ -177,7 +186,7 @@ func mergeOneMatch(data, sensorPositions map[int][]mat.Vector, rots []*mat.Dense
 					data[refIdx] = ref
 					delete(data, checkIdx)
 
-					// Remember the sensor positions for cube sanity checks.
+					// Remember the translated sensor positions merged in for cube sanity checks.
 					refSens = append(refSens, adjSens...)
 
 					// Remember the updated base sensor and remove the sensor data of the merge.
@@ -251,3 +260,5 @@ func main() {
 	// This line stops Go complaining that this helper function was unused.
 	_ = printVec
 }
+
+// end::solution[]
