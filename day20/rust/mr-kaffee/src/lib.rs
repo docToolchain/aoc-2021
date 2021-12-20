@@ -28,6 +28,11 @@ pub fn parse(content: &str) -> (Vec<bool>, Image) {
         .map(|c| c == '#')
         .collect::<Vec<_>>();
 
+    // if algo[0] is set, all pixels extendig in any direction are lit after the first step
+    // to ensure a finite number of pixels is lit after an odd number of steps, the last element 
+    // of the algorithm must not be set
+    assert!(algo[0] ^ algo[algo.len() - 1], "Algorithm will lit infinitely many pixels forever");
+
     let mut data = Vec::new();
     let mut bbox = (isize::MAX, isize::MAX, isize::MIN, isize::MIN);
     let neg = false;
