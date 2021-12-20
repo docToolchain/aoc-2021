@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::RangeInclusive};
 
 // tag::coordinate[]
 /// type alias for 3D coordinate
@@ -90,6 +90,9 @@ pub const INV_TRAFOS: [fn(Coord) -> Coord; 24] = [
 ];
 // end::trafos[]
 
+/// range of scanner
+const RANGE: RangeInclusive<isize> = -1000..=1000;
+
 // tag::parse[]
 /// parse the input into a vector of scanners
 ///
@@ -152,17 +155,10 @@ pub fn check_overlap(
                 for _ in beacons_settled
                     .iter()
                     .map(|b1| INV_TRAFOS[t_idx](b1.add(&center)))
-                    .filter(|(x, y, z)| {
-                        x >= &-1000
-                            && x <= &1000
-                            && y >= &-1000
-                            && y <= &1000
-                            && z >= &-1000
-                            && z <= &1000
-                    })
+                    .filter(|(x, y, z)| RANGE.contains(x) && RANGE.contains(y) && RANGE.contains(z))
                     .filter(|b1| beacons_check.contains(b1))
                 {
-                    // don't use iter.count() to avoid checking more elements onece threshold is reached
+                    // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count >= threshold {
                         return Some((TRAFOS[t_idx], center));
