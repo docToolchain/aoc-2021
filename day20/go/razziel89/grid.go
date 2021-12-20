@@ -12,9 +12,9 @@ type Vec struct {
 }
 
 const (
-	allZeroesAsDec = 0
-	allOnesAsDec   = 511
-	buffer         = 9
+	allZeroesAsDecimal = 0
+	allOnesAsDecimal   = 511
+	buffer             = 9
 )
 
 var (
@@ -37,7 +37,7 @@ var (
 	}
 )
 
-// Obtain an iterator over all relevant points.
+// Obtain an iterator over all relevant points. That is, all neighbours and the point itself.
 func relevantPoints(point Vec) <-chan Vec {
 	channel := make(chan Vec, buffer)
 	go func() {
@@ -88,8 +88,9 @@ type Grid struct {
 // Mark marks a point on the grid as true or false. Any markings equal to the background are
 // ignored.
 func (g *Grid) Mark(entry Vec, val bool) {
-	// We don't have to handle non-existing values here since Go returns the zero value (0 for
-	// integers) for such entries.
+	// We don't have to handle non-existing values here since Go returns the zero value (false for
+	// boolean values) for such entries. Accepting any boolean value here allows us to ignore the
+	// background setting and always call Mark the same way.
 	if val != g.background {
 		g.data[entry] = val
 	}
@@ -184,15 +185,11 @@ func (g *Grid) Pretty(border int) string {
 
 func newPointVal(g *Grid, point *Vec, algo *[]bool) bool {
 	// Convert binary to decimal.
-	bin := ""
 	index := 0
 	for p := range relevantPoints(*point) {
 		index *= 2
 		if g.Marked(p) {
 			index++
-			bin += "1"
-		} else {
-			bin += "0"
 		}
 	}
 	if index > len(*algo) {
@@ -203,14 +200,15 @@ func newPointVal(g *Grid, point *Vec, algo *[]bool) bool {
 	return newVal
 }
 
-// Convert converts a grid to another one according to the algorithm.
+// Convert converts a grid to another one according to the algorithm. It also takes care of
+// converting the background as needed.
 func (g *Grid) Convert(algo []bool) Grid {
 	// Determine background of new grid.
 	var newBackground bool
 	if g.background {
-		newBackground = algo[allOnesAsDec]
+		newBackground = algo[allOnesAsDecimal]
 	} else {
-		newBackground = algo[allZeroesAsDec]
+		newBackground = algo[allZeroesAsDecimal]
 	}
 	grid := Grid{background: newBackground, data: make(map[Vec]bool)}
 

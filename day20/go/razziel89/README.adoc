@@ -1,0 +1,50 @@
+== Day 20: Trench Map ==
+
+This is my implementation for both rounds of the trench map puzzle.
+
+This one was fun.
+But I'm also pretty glad I checked in advance whether the background for the
+full example will always contain empty pixels.
+Turns out it doesn't.
+The background flips after every enhancement step.
+Thus, it is important to track the background.
+
+I've again decided against using an actual 2d grid but instead used a grid (hash
+map) that only contains and tracks points that differ from its background.
+Still, it permits querying the data for any point.
+
+With such a grid, I've only had to compute the new value at each point that is
+actually being tracked and for each neighbour of such a point.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `grid.go`, which contains the aforementioned grid mapping
+positions to boolean values.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`grid.go`
+[source,go,numbered]
+----
+include::grid.go[tags=grid]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.
