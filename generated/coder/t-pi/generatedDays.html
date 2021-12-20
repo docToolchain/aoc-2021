@@ -366,6 +366,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_20_python">Day 20: python</a>
+<ul class="sectlevel3">
+<li><a href="#_aoc21_20_trench_map">AoC21-20: Trench Map</a>
+<ul class="sectlevel4">
+<li><a href="#_info_19">Info</a></li>
+<li><a href="#_howto_19">HowTo</a></li>
+<li><a href="#_learned_today_19">Learned today</a></li>
+<li><a href="#_source_19">Source</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3014,6 +3026,192 @@ def main():
             buffer2 = evaluate_expression(input2.copy(), False)
             mags.append(get_magnitude(buffer2))
     star2 = max(mags)
+    print(f"Result (**): {star2}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+</div>
+<a id="day20" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_python"><a class="anchor" href="#_day_20_python"></a><a class="link" href="#_day_20_python">Day 20: python</a></h3>
+<style>
+    ul p, ol p, ul>li p, ol>li p {
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+</style>
+<div class="sect3">
+<h4 id="_aoc21_20_trench_map"><a class="anchor" href="#_aoc21_20_trench_map"></a><a class="link" href="#_aoc21_20_trench_map">AoC21-20: Trench Map</a></h4>
+<div class="paragraph">
+<p><a href="https://adventofcode.com/2021/day/20" class="bare">https://adventofcode.com/2021/day/20</a></p>
+</div>
+<div class="sect4">
+<h5 id="_info_19"><a class="anchor" href="#_info_19"></a><a class="link" href="#_info_19">Info</a></h5>
+<div class="paragraph">
+<p>Improve 2-bit image with image processing (3x3 sliding window to determine position in image processing table)</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1 (*): Amount of pixels after two iterations of image processing</p>
+</li>
+<li>
+<p>Star2 (**): Amount of pixels after 50 iterations&#8230;&#8203;</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_howto_19"><a class="anchor" href="#_howto_19"></a><a class="link" href="#_howto_19">HowTo</a></h5>
+<div class="paragraph">
+<p>Data is read from the file 'input&lt;two-digit-day&gt;.txt' line by line and preprocessed into dict of bright pixels (1) and image_processor list. The catch (thanks to reddit!) was, that 9 unlit pixel generate a lit one and vice versa - on an infinite canvas&#8230;&#8203; 🙄. Two things follow:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Every uneven iteration leads to an infinite canvas of lit pixels &#8594; an even number of iterations is necessary to have a countable results.</p>
+</li>
+<li>
+<p>By simply iterating the image processing with a growing canvas, the border starts to get ugly from unhandled border conditions and spoil the result.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The approach here is to "pump" the canvas: every uneven iteration grows (by 8 pixels on every side, empiric determination&#8230;&#8203;) to generate a solid border of lit pixels, then every even iteration&#8217;s canvas gets reduced (by -4 pixels per side, same procedure&#8230;&#8203;) to avoid the ugly border condition and end in a cleanly lit border.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Star1: Iterate manually twice</p>
+</li>
+<li>
+<p>Star2: Further(!) iterate 48 times</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Result canvas is plotted.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_learned_today_19"><a class="anchor" href="#_learned_today_19"></a><a class="link" href="#_learned_today_19">Learned today</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Same bug was found <strong>much</strong> faster this time, that iteration happend 52 times 😁</p>
+</li>
+<li>
+<p>Eric can be mean with his puzzles. Reddit can be useful 🙃</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_source_19"><a class="anchor" href="#_source_19"></a><a class="link" href="#_source_19">Source</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python"># see README.adoc
+
+import math
+from pprint import pprint
+
+def read_daily_input(filename):
+    ''' Read lines from file with given input name
+        cast to daily required type and return list
+    '''
+    with open(filename) as input_file:
+        local_list = [item.strip() for item in input_file.readlines()]
+    image_processor = list()
+    dots = set()
+    read_dots = False
+    for i, line in enumerate(local_list):
+        if line == '':
+            read_dots = True
+            line_shift = i + round((len(local_list) - i)/2)
+        if not read_dots:
+            image_processor.extend([1 if c == '#' else 0 for c in line])
+        else:
+            col_shift = round(len(line)/2)
+            dots.update({(i-line_shift, j-col_shift) for j, c in enumerate(line) if c == '#'})
+    return image_processor, dots
+
+def process_raw(dots, image_processor, border, verbose = True):
+    ''' Process one iteration of image
+        Returns new dots
+    '''
+    def get_niner(dots, x, y, verbose):
+        ''' Get value of niner-block as bits
+        '''
+        niner = ['1' if (dx, dy) in dots else '0' for dx in range(x-1, x+2) for dy in range(y-1, y+2)]
+        if verbose:
+            print(''.join(niner), int(''.join(niner),2), image_processor[int(''.join(niner),2)])
+        return int(''.join(niner),2)
+
+    min_x = min([x for x, y in dots])
+    max_x = max([x for x, y in dots])
+    min_y = min([y for x, y in dots])
+    max_y = max([y for x, y in dots])
+    proc_dots = set()
+    if image_processor[get_niner(dots, 0, 0, verbose)] == 1:
+        proc_dots.add((0, 0))
+    for x in range(min_x-border, max_x+border+1):
+        for y in range(min_y-border, max_y+border+1):
+                if image_processor[get_niner(dots, x, y, verbose)] == 1:
+                    proc_dots.add((x, y))
+    ### Trying to fix catch by starting in center... no difference
+    # for dx in range(1, max_x+border):
+    #     for dy in range(1, max_y+border):
+    #         for x in range(-dx, dx):
+    #             if image_processor[get_niner(dots, x, dy, verbose)] == 1:
+    #                 proc_dots.add((x, dy))
+    #             if image_processor[get_niner(dots, x, -dy, verbose)] == 1:
+    #                 proc_dots.add((x, -dy))
+    #         for y in range(-dy, dy):
+    #             if image_processor[get_niner(dots, dx, y, verbose)] == 1:
+    #                 proc_dots.add((dx, y))
+    #             if image_processor[get_niner(dots, -dx, y, verbose)] == 1:
+    #                 proc_dots.add((-dx, y))
+    if verbose:
+        plot_dots(proc_dots)
+    return proc_dots
+
+
+def plot_dots(dots):
+    ''' Print dots matrix
+    '''
+    print()
+    min_x = min([x for x, y in dots])
+    max_x = max([x for x, y in dots])
+    min_y = min([y for x, y in dots])
+    max_y = max([y for x, y in dots])
+    for x in range(min_x-1, max_x+2):
+        line = ['#' if (x, y) in dots else '.' for y in range(min_y-1, max_y+2)]
+        print(''.join(line))
+    print()
+
+
+def main():
+    image_processor, dots = read_daily_input('input20.txt')
+    # image_processor, dots = read_daily_input('input_test.txt')
+    plot_dots(dots)
+    print('\n\n...processing...\n\n')
+    dots = process_raw(dots, image_processor, 8, False)
+    dots = process_raw(dots, image_processor, -4, False)
+    plot_dots(dots)
+    star1 = len(dots)
+    print(f"Result (*): {star1}")
+    for i in range(24):
+        dots = process_raw(dots, image_processor, 8, False)
+        dots = process_raw(dots, image_processor, -4, False)
+    plot_dots(dots)
+    star2 = len(dots)
+    print(f"Result (*): {star1}")
     print(f"Result (**): {star2}")
 
 
