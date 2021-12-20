@@ -27,8 +27,8 @@ func readLine() (string, error) {
 // tag::utils[]
 
 // ReadLinesAsSensorData reads line in as sensor data.
-func ReadLinesAsSensorData() ([][]mat.Vector, error) {
-	var result [][]mat.Vector
+func ReadLinesAsSensorData() (map[int][]mat.Vector, error) {
+	result := map[int][]mat.Vector{}
 	var data []mat.Vector
 	for {
 		line, err := readLine()
@@ -37,32 +37,32 @@ func ReadLinesAsSensorData() ([][]mat.Vector, error) {
 			return result, nil
 		}
 		if err != nil {
-			return [][]mat.Vector{}, err
+			return map[int][]mat.Vector{}, err
 		}
 		line = strings.TrimSpace(line)
 		//nolint:nestif
 		if len(line) == 0 {
-			result = append(result, data)
+			result[len(result)] = data
 		} else if line[0] == scannerStart && line[1] == scannerStart && line[2] == scannerStart {
 			var scannerIdx int
 			count, err := fmt.Sscanf(line, scannerFormat, &scannerIdx)
 			if err != nil {
-				return [][]mat.Vector{}, err
+				return map[int][]mat.Vector{}, err
 			}
 			if scannerIdx != len(result) || count != 1 {
 				err := fmt.Errorf("error parsing line %s", line)
-				return [][]mat.Vector{}, err
+				return map[int][]mat.Vector{}, err
 			}
 			data = []mat.Vector{}
 		} else {
 			var vecData [vectorDims]float64
 			count, err := fmt.Sscanf(line, vectorFormat, &vecData[0], &vecData[1], &vecData[2])
 			if err != nil {
-				return [][]mat.Vector{}, err
+				return map[int][]mat.Vector{}, err
 			}
 			if count != vectorDims {
 				err := fmt.Errorf("error parsing line %s", line)
-				return [][]mat.Vector{}, err
+				return map[int][]mat.Vector{}, err
 			}
 			data = append(data, mat.NewVecDense(vectorDims, vecData[:]))
 		}
