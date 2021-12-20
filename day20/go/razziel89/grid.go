@@ -1,5 +1,9 @@
 package main
 
+import (
+	"log"
+)
+
 // tag::grid[]
 
 // Vec is a 2D vector. Most of it has been taken from a previous solution.
@@ -7,36 +11,44 @@ type Vec struct {
 	x, y int
 }
 
-var (
-// unitX = Vec{x: 1}
-// unitY = Vec{y: 1}
-// pointEnvDisps = []Vec{
-// 	// x==1
-// 	unitX.Add(unitY),
-// 	unitX,
-// 	unitX.Sub(unitY),
-// 	// x==0
-// 	unitY,
-// 	unitY.Inv(),
-// 	// x==-1
-// 	unitX.Inv().Add(unitY),
-// 	unitX.Inv(),
-// 	unitX.Inv().Sub(unitY),
-// }
+const (
+	allZeroesAsDec = 0
+	allOnesAsDec   = 511
+	buffer         = 9
 )
 
-// // Obtain an iterator over a point's environment.
-// func pointEnv(point Vec) <-chan Vec {
-// 	channel := make(chan Vec)
-// 	go func() {
-// 		for _, disp := range pointEnvDisps {
-// 			displaced := point.Add(disp)
-// 			channel <- displaced
-// 		}
-// 		close(channel)
-// 	}()
-// 	return channel
-// }
+var (
+	unitX = Vec{x: 1}
+	unitY = Vec{y: 1}
+	// The order of these relevant disps is important for binary to decimal conversion!
+	relevantDisps = []Vec{
+		// y==-1
+		unitX.Inv().Sub(unitY),
+		unitY.Inv(),
+		unitX.Sub(unitY),
+		// y==0
+		unitX.Inv(),
+		Vec{},
+		unitX,
+		// y==1
+		unitX.Inv().Add(unitY),
+		unitY,
+		unitX.Add(unitY),
+	}
+)
+
+// Obtain an iterator over all relevant points.
+func relevantPoints(point Vec) <-chan Vec {
+	channel := make(chan Vec, buffer)
+	go func() {
+		for _, disp := range relevantDisps {
+			displaced := point.Add(disp)
+			channel <- displaced
+		}
+		close(channel)
+	}()
+	return channel
+}
 
 // Add adds one vector to another one.
 func (v Vec) Add(delta Vec) Vec {
@@ -104,7 +116,7 @@ func (g *Grid) RemoveAll(entry Vec) {
 
 // Points returns an iterator over all points on the grid that deviate from the background.
 func (g *Grid) Points() <-chan Vec {
-	channel := make(chan Vec)
+	channel := make(chan Vec, buffer)
 	go func() {
 		for point := range g.data {
 			if g.Marked(point) != g.background {
@@ -151,17 +163,14 @@ func (g *Grid) BottomRight() (int, int) {
 }
 
 // Pretty creates a pretty string representation of this grid.
-func (g *Grid) Pretty() string {
+func (g *Grid) Pretty(border int) string {
 	result := ""
 	empty := "."
 	filled := "#"
-	if g.background {
-		empty, filled = filled, empty
-	}
 	minX, minY := g.TopLeft()
 	maxX, maxY := g.BottomRight()
-	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
+	for y := minY - border; y <= maxY+border; y++ {
+		for x := minX - border; x <= maxX+border; x++ {
 			if g.Marked(Vec{x: x, y: y}) {
 				result += filled
 			} else {
@@ -171,6 +180,52 @@ func (g *Grid) Pretty() string {
 		result += "\n"
 	}
 	return result
+}
+
+func newPointVal(g *Grid, point *Vec, algo *[]bool) bool {
+	// Convert binary to decimal.
+	bin := ""
+	index := 0
+	for p := range relevantPoints(*point) {
+		index *= 2
+		if g.Marked(p) {
+			index++
+			bin += "1"
+		} else {
+			bin += "0"
+		}
+	}
+	if index > len(*algo) {
+		log.Fatalf("algorithm not long enough for %d", index)
+	}
+	// Extract new value.
+	newVal := (*algo)[index]
+	return newVal
+}
+
+// Convert converts a grid to another one according to the algorithm.
+func (g *Grid) Convert(algo []bool) Grid {
+	// Determine background of new grid.
+	var newBackground bool
+	if g.background {
+		newBackground = algo[allOnesAsDec]
+	} else {
+		newBackground = algo[allZeroesAsDec]
+	}
+	grid := Grid{background: newBackground, data: make(map[Vec]bool)}
+
+	// Fill all points. We need to check each neighbour of each point for whether it needs to be
+	// marked.
+	// This algorithm will mark some points multiple times. But that's OK, we'll just be wasting
+	// time but not causing any errors that way.
+	for p := range g.Points() {
+		for markMe := range relevantPoints(p) {
+			newVal := newPointVal(g, &markMe, &algo)
+			grid.Mark(markMe, newVal)
+		}
+	}
+
+	return grid
 }
 
 // end::grid[]

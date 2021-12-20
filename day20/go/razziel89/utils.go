@@ -24,27 +24,34 @@ func readLine() (string, error) {
 // tag::utils[]
 
 // ReadLinesAsPixelGrid reads lines in as a pixel grid.
-func ReadLinesAsPixelGrid() (string, Grid, error) {
+func ReadLinesAsPixelGrid() ([]bool, Grid, error) {
 	result := Grid{background: false, data: map[Vec]bool{}}
-	var algo string
+	var algo []bool
 	rowIdx := 0
 	for {
 		line, err := readLine()
 		if err == io.EOF {
 			if len(algo) != enhancementLength {
 				err := fmt.Errorf("enhancement algorithm not of correct length")
-				return "", Grid{}, err
+				return []bool{}, Grid{}, err
 			}
 			// Success case, no more input to read.
 			return algo, result, nil
 		}
 		if err != nil {
-			return "", Grid{}, err
+			return []bool{}, Grid{}, err
 		}
 		line = strings.TrimSpace(line)
 		//nolint:nestif
 		if len(line) == enhancementLength {
-			algo = line
+			algo = make([]bool, 0, len(line))
+			for _, char := range line {
+				algo = append(algo, char == full)
+				if char != full && char != empty {
+					err := fmt.Errorf("unknown character %c", char)
+					return []bool{}, Grid{}, err
+				}
+			}
 		} else if len(line) == 0 {
 			continue
 		} else {
@@ -53,7 +60,7 @@ func ReadLinesAsPixelGrid() (string, Grid, error) {
 				result.Mark(pos, char == full)
 				if char != full && char != empty {
 					err := fmt.Errorf("unknown character %c", char)
-					return "", Grid{}, err
+					return []bool{}, Grid{}, err
 				}
 			}
 			rowIdx++
