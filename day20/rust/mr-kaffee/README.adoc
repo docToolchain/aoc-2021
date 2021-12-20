@@ -20,7 +20,7 @@ I use this to parse the input into an algorithm (vector of booleans) and an imag
 include::src/lib.rs[tags=parse]
 ----
 
-The main part of the solution is a function that performs single update steps (see <<Today I learned>> for an explanation on why I create the intermediate ``grid``):
+The main part of the solution is a function that performs single update steps (see <<day20-til,Today I learned>> for an explanation on why I create the intermediate ``grid``):
 
 [source,rust,numbered]
 ----
@@ -41,6 +41,7 @@ include::src/lib.rs[tags=solution]
 include::src/lib.rs[tags=tests]
 ----
 
+[#day20-til]
 === Today I learned ===
 
 Today I learned a lot about performance.
