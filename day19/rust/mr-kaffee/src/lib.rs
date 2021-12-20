@@ -1,4 +1,8 @@
-use std::{collections::HashSet, ops::RangeInclusive};
+use std::{
+    cmp,
+    collections::{HashMap, HashSet},
+    ops::RangeInclusive,
+};
 
 // tag::coordinate[]
 /// type alias for 3D coordinate
@@ -97,28 +101,36 @@ const RANGE: RangeInclusive<isize> = -1000..=1000;
 /// parse the input into a vector of scanners
 ///
 /// each scanner is a hash set of coordinates in the scanner's local
-/// coordinate system
-pub fn parse(content: &str) -> Vec<HashSet<Coord>> {
-    let mut scanners = Vec::new();
+/// coordinate system and a hashmap of pairwise distances as keys and number of
+/// occurance of this distance as value
+pub fn parse(content: &str) -> Vec<(HashSet<Coord>, HashMap<usize, usize>)> {
+    let mut scanners: Vec<(HashSet<Coord>, HashMap<usize, usize>)> = Vec::new();
 
     let mut beacons = HashSet::new();
+    let mut distances = HashMap::new();
     for line in content.lines().map(|l| l.trim()).filter(|l| l.len() > 0) {
         if line.starts_with("---") {
             if !beacons.is_empty() {
-                scanners.push(beacons);
+                scanners.push((beacons, distances));
                 beacons = HashSet::new();
+                distances = HashMap::new();
             }
         } else {
             let mut parts = line.split(',');
-            beacons.insert((
+            let b_new = (
                 parts.next().unwrap().parse().unwrap(),
                 parts.next().unwrap().parse().unwrap(),
                 parts.next().unwrap().parse().unwrap(),
-            ));
+            );
+            for b_old in &beacons {
+                // update pairwise distances
+                *distances.entry(b_old.sub(&b_new).abs()).or_insert(0) += 1;
+            }
+            beacons.insert(b_new);
         }
     }
     if !beacons.is_empty() {
-        scanners.push(beacons);
+        scanners.push((beacons, distances));
     }
 
     scanners
@@ -135,10 +147,22 @@ pub fn parse(content: &str) -> Vec<HashSet<Coord>> {
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    beacons_settled: &HashSet<Coord>,
-    beacons_check: &HashSet<Coord>,
+    (beacons_settled, distances_settled): &(HashSet<Coord>, HashMap<usize, usize>),
+    (beacons_check, distances_check): &(HashSet<Coord>, HashMap<usize, usize>),
     threshold: usize,
 ) -> Option<(fn(Coord) -> Coord, Coord)> {
+    // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
+    let mut common_distances = 0;
+    for (distance, count) in distances_settled {
+        common_distances += cmp::min(distances_check.get(distance).unwrap_or(&0), count);
+        if common_distances >= threshold * (threshold - 1) / 2 {
+            break;
+        }
+    }
+    if common_distances < threshold * (threshold - 1) / 2 {
+        return None; // not enough common distances, no overlap possible
+    }
+
     for t_idx in 0..24 {
         // find all beacons with the same distance as b1[k1] to b2[k2]
         for b1 in beacons_settled {
@@ -175,7 +199,7 @@ pub fn check_overlap(
 // tag::solution[]
 /// determine number of unique beacons and max Manhatten distance between
 /// any two scanners
-pub fn solution_1_2(scanners: &[HashSet<Coord>]) -> (usize, usize) {
+pub fn solution_1_2(scanners: &[(HashSet<Coord>, HashMap<usize, usize>)]) -> (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
@@ -193,7 +217,7 @@ pub fn solution_1_2(scanners: &[HashSet<Coord>]) -> (usize, usize) {
     let mut max_dist = 0;
 
     // holds all settled beacons. Start with beacons in range of scanner 1
-    let mut beacons: HashSet<Coord> = scanners[0].clone();
+    let mut beacons: HashSet<Coord> = scanners[0].0.clone();
 
     while let Some(k1) = settled.iter().position(|s| s == &1) {
         for k2 in 0..settled.len() {
@@ -203,10 +227,10 @@ pub fn solution_1_2(scanners: &[HashSet<Coord>]) -> (usize, usize) {
 
             if let Some((t, c)) = check_overlap(&scanners[k1], &scanners[k2], 12) {
                 // update scanner to settled coordinates
-                scanners[k2] = scanners[k2].iter().map(|b| t(*b).sub(&c)).collect();
+                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).sub(&c)).collect();
 
                 // add beacons to unique set
-                beacons.extend(&scanners[k2]);
+                beacons.extend(&scanners[k2].0);
 
                 // update settled to 1 = enqueue
                 settled[k2] = 1;
@@ -244,8 +268,8 @@ mod tests {
     fn test_parse() {
         let scanners = parse(CONTENT);
         assert_eq!(5, scanners.len());
-        assert!(scanners[2].contains(&(-644, 584, -595)));
-        assert!(scanners[4].contains(&(30, -46, -14)));
+        assert!(scanners[2].0.contains(&(-644, 584, -595)));
+        assert!(scanners[4].0.contains(&(30, -46, -14)));
     }
 
     #[test]

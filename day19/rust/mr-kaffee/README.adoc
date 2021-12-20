@@ -2,12 +2,14 @@
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/19[AoC|2021|19].
 
-The solution for today's puzzle takes ~3 seconds to complete in my current implementation (optimized from 30 seconds in the first version and ~10 seconds in an intermediate step)! 
+The solution for today's puzzle takes ~180ms to complete in my current implementation (optimized from 30 seconds in the first version to ~10 and ~3 seconds in intermediate steps).
 
-The optimizations include:
+The optimizations to get down to three seconds include:
 
 * check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set
 * use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set ``settled = 1``) and continue to settle furhter sets that overlap with sets from the queue.
+
+The final optimization to achieve solution times below 1s are taken from https://github.com/mogron[[Moritz Gronbach]: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.
 
 === Parts 1 & 2 ===
 
@@ -18,7 +20,7 @@ To keep the code clean, I created some shortcuts for 3D coordinates:
 include::src/lib.rs[tags=coordinate]
 ----
 
-The input is read as follows:
+The input is read as follows (create sets of beacons and maps of pairwise distances):
 
 [source,rust,numbered]
 ----
