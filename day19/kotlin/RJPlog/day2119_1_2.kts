@@ -316,6 +316,7 @@ class scanX(field: List<Triple<Int, Int, Int>>) {
 }
 
 fun main(args: Array<String>) {
+	    var t1 = System.currentTimeMillis()
 	var solution1: Int = 0
 	var solution2: Int = 0
 
@@ -362,106 +363,131 @@ fun main(args: Array<String>) {
 		println(it.beaconsFlipRot)
 	}
 
-	// check if flipRot is working
-	//	for (i in 0..23) {
-	//	matchedScans[0].flipRotate(i)
-	//	print("$i:  ")
-	//		matchedScans.forEach {
-	//	print(it.beaconsFlipRot)
-	//}
-	//	println()
-	//}
-
-	// solange allScans nicht leer ist, nimm ein Element aus matchedScans und prüfe für alle allScans, ob ein Match (nach all den Flips etc. exisitert),
-	// wenn ja, addiere zu matched List und lösche aus all List
-
-	// für ein given object aus matchedScans und eines aus allScans prüfe match > 11 für alle 23 orientations, wie geht das?
-	// wenn ich das Match habe, adaptiere den offset des opjects aus allScans und schiebe es in matchedscans liste
-
-
-	// wenn allScans leer ist, füge für alle objecte aus matchedPairs die coord. in eine Liste falls nicht schon enthalten., die Lösung ist die Anzahl der Elemente.
-
-	var test = mutableListOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-	var test2 = mutableListOf<Int>(2, 3, 6, 7)
-
-	println(test.intersect(test2).size)
-
-
 	// while (allSize.isNotEmpty()) {
 
+
 	var m: Int = 0
+	var mm: Int = 0
+
 
 	println()
+	println("---------------------------")
 	println("-- Start searching match --")
-	Loop@ for (ii in 0..47) {
-		allScans[m].flipRotate(ii)
+		println("---------------------------")
+	println()
 
-		println("ii: $ii")
-		for (j in 0..matchedScans[0].beaconsFlipRot.size - 1) {
-			var beacon1 = matchedScans[0].beaconsFlipRot[j]
-			//		println("j: $j   beacon1 $beacon1")
-			for (i in 0..allScans[m].beaconsFlipRot.size - 1) {
+	var count: Int = 0
+	// while (count < 1) {//while (allScans.isNotEmpty()) {
+	count += 1
 
-				var beacon2 = allScans[m].beaconsFlipRot[i]
-				println("j: $j i: $i  ") //   beacon2 $beacon2")
+	var matchList = mutableListOf<Int>()
 
-				var x_off = beacon1.first - beacon2.first
-				var y_off = beacon1.second - beacon2.second
-				var z_off = beacon1.third - beacon2.third
-				// println("$x_off, $y_off, $z_off")
-				allScans[m].shiftByOffset(x_off, y_off, z_off)
-				//println("${matchedScans[0].beaconsFlipRot}")
-				//println("${allScans[m].beaconsFlipRot}")
 
-				println(matchedScans[0].beaconsFlipRot.intersect(allScans[m].beaconsFlipRot).size)
-				if (matchedScans[0].beaconsFlipRot.intersect(allScans[m].beaconsFlipRot).size > 5) {  // set to 11
-					println("x_off: $x_off, y_off: $y_off, z_off: $z_off, ii: $ii")
-					break@Loop
+	//for (mm in 0..3) {
+	while (allScans.size > 0) {
+
+		
+		for (m in 0..allScans.size - 1) {
+
+			println("m: =$m, allScans.size ${allScans.size}")
+
+			Loop@ for (ii in 0..47) {
+				allScans[m].flipRotate(ii)
+
+				//println("ii: $ii")
+				for (j in 0..matchedScans[mm].beaconsFlipRot.size - 1) {
+					var beacon1 = matchedScans[mm].beaconsFlipRot[j]
+					//		println("j: $j   beacon1 $beacon1")
+					for (i in 0..allScans[m].beaconsFlipRot.size - 1) {
+
+						var beacon2 = allScans[m].beaconsFlipRot[i]
+						//println("j: $j i: $i  ") //   beacon2 $beacon2")
+
+						var x_off = beacon1.first - beacon2.first
+						var y_off = beacon1.second - beacon2.second
+						var z_off = beacon1.third - beacon2.third
+						// println("$x_off, $y_off, $z_off")
+						allScans[m].shiftByOffset(x_off, y_off, z_off)
+						//println("${matchedScans[0].beaconsFlipRot}")
+						//println("${allScans[m].beaconsFlipRot}")
+
+						//println(matchedScans[mm].beaconsFlipRot.intersect(allScans[m].beaconsFlipRot).size)
+						if (matchedScans[mm].beaconsFlipRot.intersect(allScans[m].beaconsFlipRot).size > 11) {  // set to 11
+							println("x_off: $x_off, y_off: $y_off, z_off: $z_off, ii: $ii")
+							// shift allScan into matchedScan and remove from allScan
+							matchedScans.add(allScans[m])
+							matchList.add(m)
+							//allScans.removeAt(m)
+							//mm += 1
+							break@Loop
+						}
+						//println("--?--")
+					}
+
+					//allScans[0].beaconsFlipRot.forEach {
+					//println("comp1 $comp1, ${Triple(comp1.first + x,comp1.second + y,comp1.third +z)}")
 				}
-				//println("--?--")
 			}
+		}
+		//}
 
-			//allScans[0].beaconsFlipRot.forEach {
-			//println("comp1 $comp1, ${Triple(comp1.first + x,comp1.second + y,comp1.third +z)}")
+		matchList.sortDescending()
+		matchList.forEach {
+			allScans.removeAt(it)
+		}
+		
+		println("matchList $matchList")
+		matchList.clear()
+
+		println()
+
+		println("allScans:")
+		allScans.forEach {
+			println(it.beaconsFlipRot)
+		}
+		println()
+		println("matchedScans:")
+		matchedScans.forEach {
+			println(it.beaconsFlipRot)
+		}
+		println()
+		
+		mm += 1
+	}
+
+	var beaconsList = mutableListOf<Triple<Int, Int, Int>>()
+
+	
+	println()
+	matchedScans.forEach {
+		it.beaconsFlipRot.forEach {
+			if (!beaconsList.contains(it)) {
+				beaconsList.add(it)
+			}
 		}
 	}
 	
-		println("allScans:")
-	allScans.forEach {
-		println(it.beaconsFlipRot)
-	}
-	println()
-	println("matchedScans:")
-	matchedScans.forEach {
-		println(it.beaconsFlipRot)
-	}
+	solution1 = beaconsList.size
 	
-	
-//	} 
-
-// das ist so uferlos. Mögliche Alternative: in einem matchedScan für jeden Punkt die 24 Vektoren zu den anderen ausrechnen,
-//	dann im allScan für jeden Punkt ebenfalls, wenn 11 vektoren übereinstimmen --> match, kann man sogar nach 13 Punkten abbrechen
-// damit enfallen die Schleifen für flip&rot, und 3 x -3000 - 3000
-// Müsste noch überlegen, wie man dann das Grid aufbaut, aber man kann von einem fiktiven Punkt 0,0 mit den Vektoren das Grid aufbauen?
-
-
-// } // while (allSize.isNotEmpty())
+	println("beaconsList.size ${beaconsList.size}")
 
 
 	println()
 
 // tag::output[]
 // print solution for part 1
-	println("*******************************")
-	println("--- Day  ---")
-	println("*******************************")
+	println("******************************")
+	println("--- Day 19: Beacon Scanner ---")
+	println("******************************")
 	println("Solution for part1")
-	println("   $solution1 ")
+	println("   $solution1 beacons are there")
 	println()
 // print solution for part 2
-	println("*******************************")
+	println("******************************")
 	println("Solution for part2")
-	println("   $solution2 ")
+	println("   $solution2 is the largest Manhattan distance between any two scanners")
 	println()
 // end::output[]
+					t1 = System.currentTimeMillis()-t1
+	println("puzzle solved in ${t1} ms")
 }
