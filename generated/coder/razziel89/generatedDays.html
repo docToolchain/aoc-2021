@@ -330,6 +330,28 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_19_go">Day 19: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a>
+<ul class="sectlevel4">
+<li><a href="#_implementation_strategy">Implementation strategy</a></li>
+<li><a href="#_sanity_check">Sanity check</a></li>
+<li><a href="#_oveview_19">Oveview</a></li>
+<li><a href="#_how_to_run_19">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_20_go">Day 20: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_20_trench_map">Day 20: Trench Map</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_20">Oveview</a></li>
+<li><a href="#_how_to_run_20">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -5803,6 +5825,844 @@ func Reduce(num Number) Number {
 </div>
 <div class="sect4">
 <h5 id="_how_to_run_18"><a class="anchor" href="#_how_to_run_18"></a><a class="link" href="#_how_to_run_18">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
+</div>
+<a id="day19" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_19_go"><a class="anchor" href="#_day_19_go"></a><a class="link" href="#_day_19_go">Day 19: go</a></h3>
+<div class="sect3">
+<h4 id="_day_19_beacon_scanner"><a class="anchor" href="#_day_19_beacon_scanner"></a><a class="link" href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the beacon scanner puzzle.</p>
+</div>
+<div class="paragraph">
+<p>This one was actually not really that interesting as I have been doing many
+co-ordinate transformations in the past.
+Thus, after reading the task, I came up with a solution that should work, albeit
+inefficiently, quite soon.
+Turns out it did work, and here is my implementation.
+More details below.</p>
+</div>
+<div class="paragraph">
+<p>Furthermore, this task taught me one thing: don&#8217;t do linear algebra in Go, just
+don&#8217;t (at least I won&#8217;t anymore).
+It&#8217;s cumbersome and inefficient in my opinion.
+Being used to something like "Eigen" in C++ or even "NumPy" in Python makes the
+linalg library "gonum" that I&#8217;ve used feel difficult to work with in my view.
+Even still, I&#8217;ve decided to do this AoC in Go and that&#8217;s why I implemented this
+one in Go, too.</p>
+</div>
+<div class="paragraph">
+<p>My implementation also contains a (commented out) sanity check.
+As soon as it has been switched on, no solution could be found anymore.
+Either I have made a mistake in the implementation (the likely scenario), or I
+have misunderstood the task (also quite likely), or there is something wrong
+with the task (least likely scenario).
+More details below.
+Any comments are appreciated.
+The problem already pops up for the real-sized example data.</p>
+</div>
+<div class="sect4">
+<h5 id="_implementation_strategy"><a class="anchor" href="#_implementation_strategy"></a><a class="link" href="#_implementation_strategy">Implementation strategy</a></h5>
+<div class="paragraph">
+<p>I&#8217;ve decided to follow the straightforward approach: instead of solving a system
+of equations, I simply try out all possible rotations and translations and
+simply count matching positions.
+If at least 12 matching beacons can be found for any rotation and translation, I
+consider the current rotation and translation to be viable and merge the sensor
+data sets in that representation, discarding duplicate data.
+The number 12 has even been given in the task.
+Rinse repeat until just one set of beacon positions remains.</p>
+</div>
+<div class="paragraph">
+<p>The 24 possible rotation matrices are known in advance.</p>
+</div>
+<div class="paragraph">
+<p>When comparing two sets of data, possible translations are obtained as the
+pairwise differences in all beacon positions in both sets.
+Counting matches for all such translations takes a while for large sets of
+points, but it works.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_sanity_check"><a class="anchor" href="#_sanity_check"></a><a class="link" href="#_sanity_check">Sanity check</a></h5>
+<div class="paragraph">
+<p>The task states that:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Each scanner is capable of detecting all beacons in a large cube centered on
+the scanner; beacons that are at most 1000 units away from the scanner in each
+of the three axes (x, y, and z) have their precise position determined
+relative to the scanner.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>That means, even if 12 matches could be found between two sets of data A and B,
+if there is at least one point in B within 1000 (included) in any direction from
+any sensor in A, the two sets cannot be a match.
+The reason is that the sensors in A would have had to pick up on the point as
+it is within their range of 1000.
+The same holds if A and B were swapped.
+I&#8217;ve implemented such a test.
+Switching it on, though, results in no matches being found.
+Leaving it out yield in the correct results, so it&#8217;s not that important.
+I&#8217;m still curious where the misunderstanding or incorrect implementation lies.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_oveview_19"><a class="anchor" href="#_oveview_19"></a><a class="link" href="#_oveview_19">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an <code>rot.go</code>, which contains code to generate all viable rotation
+matrices.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	numReqMatches = 12
+	maxDist       = 1000.
+	// tol           = 1e-7
+)
+
+func rotate(rot *mat.Dense, vecs []mat.Vector) []mat.Vector {
+	result := make([]mat.Vector, 0, len(vecs))
+	for _, vec := range vecs {
+		resultVec := mat.NewVecDense(dims, nil)
+		resultVec.MulVec(rot, vec)
+		result = append(result, resultVec)
+	}
+	return result
+}
+
+func translate(trans mat.Vector, vecs []mat.Vector) []mat.Vector {
+	result := make([]mat.Vector, 0, len(vecs))
+	for _, vec := range vecs {
+		resultVec := mat.NewVecDense(dims, nil)
+		resultVec.AddVec(trans, vec)
+		result = append(result, resultVec)
+	}
+	return result
+}
+
+func findMatchIndices(posRef, posCheck []mat.Vector) map[int]struct{} {
+	matches := make(map[int]struct{}, len(posCheck))
+	for _, ref := range posRef {
+		for checkIdx, check := range posCheck {
+			// Try actual equality first, we might need to switch to EqualApprox, which is something
+			// like an all-close.
+			if mat.Equal(ref, check) {
+				matches[checkIdx] = struct{}{}
+				break
+			}
+		}
+	}
+	return matches
+}
+
+func countMatches(posRef, posCheck, refSens, checkSens []mat.Vector) int {
+	matches := 0
+	for _, ref := range posRef {
+		matched := false
+		for _, check := range posCheck {
+			// Try actual equality first, we might need to switch to EqualApprox, which is something
+			// like an all-close.
+			if mat.Equal(ref, check) {
+				matched = true
+				matches++
+				break
+			}
+		}
+		// // Following is a sanity check that is supposed to ensure that no point that is not
+		// // matched is within 1000 of another sensor. Switching it on causes there to be no
+		// // matches. The implementation is likely incorrect.
+		// if !matched {
+		// 	for _, sens := range refSens {
+		// 		for _, check := range posCheck {
+		// 			// Check whether any check pos is closer to any of the ref sensors than maxDist.
+		// 			// If so, this cannot be a match.
+		// 			dist := mat.NewVecDense(dims, nil)
+		// 			dist.SubVec(check, sens)
+		// 			//nolint:gomnd
+		// 			if math.Abs(dist.AtVec(0)) &lt;= maxDist &amp;&amp; math.Abs(dist.AtVec(1)) &lt;= maxDist &amp;&amp;
+		// 				math.Abs(dist.AtVec(2)) &lt;= maxDist {
+		// 				// log.Println("excluded due to cube check")
+		// 				return 0
+		// 			}
+		// 		}
+		// 	}
+		// 	for _, sens := range checkSens {
+		// 		for _, ref := range posRef {
+		// 			// Check whether any check pos is closer to any of the ref sensors than maxDist.
+		// 			// If so, this cannot be a match.
+		// 			dist := mat.NewVecDense(dims, nil)
+		// 			dist.SubVec(ref, sens)
+		// 			//nolint:gomnd
+		// 			if math.Abs(dist.AtVec(0)) &lt;= maxDist &amp;&amp; math.Abs(dist.AtVec(1)) &lt;= maxDist &amp;&amp;
+		// 				math.Abs(dist.AtVec(2)) &lt;= maxDist {
+		// 				// log.Println("excluded due to cube check")
+		// 				return 0
+		// 			}
+		// 		}
+		// 	}
+		// }
+		_ = matched
+		_ = maxDist
+	}
+	return matches
+}
+
+// Returns true if a match is found. Also returns the translation vector needed to translate
+// one set of co-ordinates to the other to match.
+func assessMatch(
+	rot *mat.Dense, refPositions, checkPositions, refSens, checkSens []mat.Vector,
+) (mat.Vector, bool) {
+	rotated := rotate(rot, checkPositions)
+	rotatedSens := rotate(rot, checkSens)
+	for _, refPosRef := range refPositions {
+		diff := mat.NewVecDense(dims, nil)
+
+		for _, refPosCheck := range rotated {
+			diff.SubVec(refPosRef, refPosCheck)
+
+			checkPosTranslated := translate(diff, rotated)
+			checkSensTranslated := translate(diff, rotatedSens)
+
+			matches := countMatches(refPositions, checkPosTranslated, refSens, checkSensTranslated)
+			if matches &gt;= numReqMatches {
+				return diff, true
+			}
+		}
+	}
+	return nil, false
+}
+
+func printMat(matrix *mat.Dense) {
+	for row := 0; row &lt; dims; row++ {
+		fmt.Println(matrix.RowView(row))
+	}
+	fmt.Println()
+
+}
+
+func printVec(vec mat.Vector) {
+	fmt.Println(vec)
+	fmt.Println()
+
+}
+
+func printVecs(vecs []mat.Vector) {
+	for _, vec := range vecs {
+		fmt.Println(vec)
+	}
+	fmt.Println()
+
+}
+
+func mergeOneMatch(data, sensorPositions map[int][]mat.Vector, rots []*mat.Dense) bool {
+	for refIdx, ref := range data {
+		for checkIdx, check := range data {
+			if checkIdx == refIdx {
+				// Don't merge a sensor's data with its own data.
+				continue
+			}
+			log.Printf("assessing %d and %d", refIdx, checkIdx)
+			for _, rot := range rots {
+				refSens := sensorPositions[refIdx]
+				checkSens := sensorPositions[checkIdx]
+
+				if diff, matching := assessMatch(rot, ref, check, refSens, checkSens); matching {
+					// Merge start.
+					log.Println("merging", checkIdx, "into", refIdx)
+
+					adjusted := translate(diff, rotate(rot, check))
+					adjSens := translate(diff, rotate(rot, checkSens))
+
+					// Determine matching sensor data.
+					matchingIdx := findMatchIndices(ref, adjusted)
+					if len(matchingIdx) &lt; numReqMatches {
+						log.Fatalf("found only %d matches", len(matchingIdx))
+					}
+
+					// Keep all the data from the base list.
+					// Only add those not yet present from the merge list.
+					for mergeIdx, merge := range adjusted {
+						if _, exists := matchingIdx[mergeIdx]; !exists {
+							ref = append(ref, merge)
+						}
+					}
+
+					// Remember the updated base data and remove the data that has been merged in.
+					data[refIdx] = ref
+					delete(data, checkIdx)
+
+					// Remember the translated sensor positions merged in for cube sanity checks.
+					refSens = append(refSens, adjSens...)
+
+					// Remember the updated base sensor and remove the sensor data of the merge.
+					sensorPositions[refIdx] = refSens
+					delete(sensorPositions, checkIdx)
+
+					return true
+					// Merge end.
+				}
+			}
+		}
+	}
+	return false
+}
+
+func maxSensorDist(sensorData map[int][]mat.Vector) float64 {
+	result := 0.
+	for _, sensors := range sensorData {
+		if len(sensors) &lt;= 1 {
+			// Don't process sensor data sets that don't yet have enough data.
+			continue
+		}
+		for _, sens := range sensors {
+			for _, otherSens := range sensors {
+				diff := mat.NewVecDense(dims, nil)
+				diff.SubVec(sens, otherSens)
+				norm := mat.Norm(diff, 1)
+				if norm &gt; result {
+					result = norm
+				}
+			}
+		}
+	}
+	return result
+}
+
+func main() {
+	// Create all valid rotation matrices.
+	rots := allRots()
+	for _, rot := range rots {
+		printMat(rot)
+	}
+
+	// Read data.
+	sensorData, err := ReadLinesAsSensorData()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	for _, data := range sensorData {
+		printVecs(data)
+	}
+	sensorPositions := map[int][]mat.Vector{}
+	for idx := range sensorData {
+		sensorPositions[idx] = []mat.Vector{mat.NewVecDense(dims, []float64{0., 0., 0.})}
+	}
+
+	// Continuously merge sensor data until only one remains.
+	for len(sensorData) != 1 {
+		merged := mergeOneMatch(sensorData, sensorPositions, rots)
+		if !merged {
+			log.Fatal("did not find any match")
+		}
+		log.Printf("%d remaining", len(sensorData))
+		log.Println("max sensor dist is", maxSensorDist(sensorPositions))
+	}
+
+	for _, dat := range sensorData {
+		fmt.Println("There are", len(dat), "beacons in total.")
+	}
+
+	// This line stops Go complaining that this helper function was unused.
+	_ = printVec
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsSensorData reads line in as sensor data.
+func ReadLinesAsSensorData() (map[int][]mat.Vector, error) {
+	result := map[int][]mat.Vector{}
+	var data []mat.Vector
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return map[int][]mat.Vector{}, err
+		}
+		line = strings.TrimSpace(line)
+		//nolint:nestif
+		if len(line) == 0 {
+			result[len(result)] = data
+		} else if line[0] == scannerStart &amp;&amp; line[1] == scannerStart &amp;&amp; line[2] == scannerStart {
+			var scannerIdx int
+			count, err := fmt.Sscanf(line, scannerFormat, &amp;scannerIdx)
+			if err != nil {
+				return map[int][]mat.Vector{}, err
+			}
+			if scannerIdx != len(result) || count != 1 {
+				err := fmt.Errorf("error parsing line %s", line)
+				return map[int][]mat.Vector{}, err
+			}
+			data = []mat.Vector{}
+		} else {
+			var vecData [vectorDims]float64
+			count, err := fmt.Sscanf(line, vectorFormat, &amp;vecData[0], &amp;vecData[1], &amp;vecData[2])
+			if err != nil {
+				return map[int][]mat.Vector{}, err
+			}
+			if count != vectorDims {
+				err := fmt.Errorf("error parsing line %s", line)
+				return map[int][]mat.Vector{}, err
+			}
+			data = append(data, mat.NewVecDense(vectorDims, vecData[:]))
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>rot.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	dims = 3
+)
+
+// Determine all possible rotation matrices. This means swap all axes and flip app axes.
+// Filter out co-ordinate systems that we don't support.
+func allRots() []*mat.Dense {
+	result := []*mat.Dense{}
+
+	indices := []mat.Vector{
+		mat.NewVecDense(dims, []float64{0., 1., 2.}),
+		mat.NewVecDense(dims, []float64{0., 2., 1.}),
+		mat.NewVecDense(dims, []float64{1., 0., 2.}),
+		mat.NewVecDense(dims, []float64{1., 2., 0.}),
+		mat.NewVecDense(dims, []float64{2., 0., 1.}),
+		mat.NewVecDense(dims, []float64{2., 1., 0.}),
+	}
+
+	signs := []mat.Vector{
+		mat.NewVecDense(dims, []float64{1., 1., 1.}),
+		mat.NewVecDense(dims, []float64{1., 1., -1.}),
+		mat.NewVecDense(dims, []float64{1., -1., 1.}),
+		mat.NewVecDense(dims, []float64{1., -1., -1.}),
+		mat.NewVecDense(dims, []float64{-1., 1., 1.}),
+		mat.NewVecDense(dims, []float64{-1., 1., -1.}),
+		mat.NewVecDense(dims, []float64{-1., -1., 1.}),
+		mat.NewVecDense(dims, []float64{-1., -1., -1.}),
+	}
+
+	for _, targetIdx := range indices {
+		for _, sign := range signs {
+			rotMatIdx := mat.VecDenseCopyOf(targetIdx)
+			rotMatIdx.MulElemVec(rotMatIdx, sign)
+
+			rotMat := mat.NewDense(dims, dims, []float64{0., 0., 0., 0., 0., 0., 0., 0., 0.})
+
+			for orgDim := 0; orgDim &lt; dims; orgDim++ {
+				targetDim := targetIdx.AtVec(orgDim)
+				sig := sign.AtVec(orgDim)
+				rotMat.Set(int(orgDim), int(targetDim), sig)
+			}
+			// Ignore left-handed coordinate systems.
+			if mat.Det(rotMat) &gt; 0 {
+				result = append(result, rotMat)
+			}
+		}
+	}
+
+	return result
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_19"><a class="anchor" href="#_how_to_run_19"></a><a class="link" href="#_how_to_run_19">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
+</div>
+<a id="day20" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_go"><a class="anchor" href="#_day_20_go"></a><a class="link" href="#_day_20_go">Day 20: go</a></h3>
+<div class="sect3">
+<h4 id="_day_20_trench_map"><a class="anchor" href="#_day_20_trench_map"></a><a class="link" href="#_day_20_trench_map">Day 20: Trench Map</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the trench map puzzle.</p>
+</div>
+<div class="paragraph">
+<p>This one was fun.
+But I&#8217;m also pretty glad I checked in advance whether the background for the
+full example will always contain empty pixels.
+Turns out it doesn&#8217;t.
+The background flips after every enhancement step.
+Thus, it is important to track the background.</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve again decided against using an actual 2d grid but instead used a grid (hash
+map) that only contains and tracks points that differ from its background.
+Still, it permits querying the data for any point.</p>
+</div>
+<div class="paragraph">
+<p>With such a grid, I&#8217;ve only had to compute the new value at each point that is
+actually being tracked and for each neighbour of such a point.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_20"><a class="anchor" href="#_oveview_20"></a><a class="link" href="#_oveview_20">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an <code>grid.go</code>, which contains the aforementioned grid mapping
+positions to boolean values.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	numConvPart1     = 2
+	numConvPart2     = 50
+	startBorderPart1 = 4
+	startBorderPart2 = 52
+)
+
+func main() {
+	algo, grid, err := ReadLinesAsPixelGrid()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	gridP1 := grid
+	gridP2 := grid
+
+	// Convert image twice for part 1. Take care of the background!
+	for count := 0; count &lt; numConvPart1; count++ {
+		gridP1 = gridP1.Convert(algo)
+	}
+
+	// Convert image 50 times for part 2. Take care of the background!
+	for count := 0; count &lt; numConvPart2; count++ {
+		gridP2 = gridP2.Convert(algo)
+	}
+
+	fmt.Println("Part 2, final image follows")
+	fmt.Println(gridP2.Pretty(startBorderPart2 - numConvPart2))
+	fmt.Println("Part 1, final image follows")
+	fmt.Println(gridP1.Pretty(startBorderPart1 - numConvPart1))
+
+	fmt.Println("Part 2, solution follows")
+	fmt.Println(len(gridP2.data))
+	fmt.Println("Part 1, solution follows")
+	fmt.Println(len(gridP1.data))
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsPixelGrid reads lines in as a pixel grid.
+func ReadLinesAsPixelGrid() ([]bool, Grid, error) {
+	result := Grid{background: false, data: map[Vec]bool{}}
+	var algo []bool
+	rowIdx := 0
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			if len(algo) != enhancementLength {
+				err := fmt.Errorf("enhancement algorithm not of correct length")
+				return []bool{}, Grid{}, err
+			}
+			// Success case, no more input to read.
+			return algo, result, nil
+		}
+		if err != nil {
+			return []bool{}, Grid{}, err
+		}
+		line = strings.TrimSpace(line)
+		//nolint:nestif
+		if len(line) == enhancementLength {
+			algo = make([]bool, 0, len(line))
+			for _, char := range line {
+				algo = append(algo, char == full)
+				if char != full &amp;&amp; char != empty {
+					err := fmt.Errorf("unknown character %c", char)
+					return []bool{}, Grid{}, err
+				}
+			}
+		} else if len(line) == 0 {
+			continue
+		} else {
+			for colIdx, char := range line {
+				pos := Vec{x: colIdx, y: rowIdx}
+				result.Mark(pos, char == full)
+				if char != full &amp;&amp; char != empty {
+					err := fmt.Errorf("unknown character %c", char)
+					return []bool{}, Grid{}, err
+				}
+			}
+			rowIdx++
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Vec is a 2D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y int
+}
+
+const (
+	allZeroesAsDecimal = 0
+	allOnesAsDecimal   = 511
+	buffer             = 9
+)
+
+var (
+	unitX = Vec{x: 1}
+	unitY = Vec{y: 1}
+	// The order of these relevant disps is important for binary to decimal conversion!
+	relevantDisps = []Vec{
+		// y==-1
+		unitX.Inv().Sub(unitY),
+		unitY.Inv(),
+		unitX.Sub(unitY),
+		// y==0
+		unitX.Inv(),
+		Vec{},
+		unitX,
+		// y==1
+		unitX.Inv().Add(unitY),
+		unitY,
+		unitX.Add(unitY),
+	}
+)
+
+// Obtain an iterator over all relevant points. That is, all neighbours and the point itself.
+func relevantPoints(point Vec) &lt;-chan Vec {
+	channel := make(chan Vec, buffer)
+	go func() {
+		for _, disp := range relevantDisps {
+			displaced := point.Add(disp)
+			channel &lt;- displaced
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+	}
+	return result
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid struct {
+	data       map[Vec]bool
+	background bool
+}
+
+// Mark marks a point on the grid as true or false. Any markings equal to the background are
+// ignored.
+func (g *Grid) Mark(entry Vec, val bool) {
+	// We don't have to handle non-existing values here since Go returns the zero value (false for
+	// boolean values) for such entries. Accepting any boolean value here allows us to ignore the
+	// background setting and always call Mark the same way.
+	if val != g.background {
+		g.data[entry] = val
+	}
+}
+
+// Marked determines whether a point has been marked.
+func (g *Grid) Marked(entry Vec) bool {
+	if val, found := g.data[entry]; found {
+		return val
+	}
+	return g.background
+}
+
+// Has determines whether a point is on the grid.
+func (g *Grid) Has(entry Vec) bool {
+	_, ok := g.data[entry]
+	return ok
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(g.data, entry)
+}
+
+// Points returns an iterator over all points on the grid that deviate from the background.
+func (g *Grid) Points() &lt;-chan Vec {
+	channel := make(chan Vec, buffer)
+	go func() {
+		for point := range g.data {
+			if g.Marked(point) != g.background {
+				channel &lt;- point
+			}
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// TopLeft returns the coordinates of the top left node.
+func (g *Grid) TopLeft() (int, int) {
+	foundX, foundY := false, false
+	minX, minY := 0, 0
+	for p := range g.Points() {
+		if !foundX || p.x &lt; minX {
+			minX = p.x
+			foundX = true
+		}
+		if !foundY || p.y &lt; minY {
+			minY = p.y
+			foundY = true
+		}
+	}
+	return minX, minY
+}
+
+// BottomRight returns the coordinates of the bottom right node.
+func (g *Grid) BottomRight() (int, int) {
+	foundX, foundY := false, false
+	maxX, maxY := 0, 0
+	for p := range g.Points() {
+		if !foundX || p.x &gt; maxX {
+			maxX = p.x
+			foundX = true
+		}
+		if !foundY || p.y &gt; maxY {
+			maxY = p.y
+			foundY = true
+		}
+	}
+	return maxX, maxY
+}
+
+// Pretty creates a pretty string representation of this grid.
+func (g *Grid) Pretty(border int) string {
+	result := ""
+	empty := "."
+	filled := "#"
+	minX, minY := g.TopLeft()
+	maxX, maxY := g.BottomRight()
+	for y := minY - border; y &lt;= maxY+border; y++ {
+		for x := minX - border; x &lt;= maxX+border; x++ {
+			if g.Marked(Vec{x: x, y: y}) {
+				result += filled
+			} else {
+				result += empty
+			}
+		}
+		result += "\n"
+	}
+	return result
+}
+
+func newPointVal(g *Grid, point *Vec, algo *[]bool) bool {
+	// Convert binary to decimal.
+	index := 0
+	for p := range relevantPoints(*point) {
+		index *= 2
+		if g.Marked(p) {
+			index++
+		}
+	}
+	if index &gt; len(*algo) {
+		log.Fatalf("algorithm not long enough for %d", index)
+	}
+	// Extract new value.
+	newVal := (*algo)[index]
+	return newVal
+}
+
+// Convert converts a grid to another one according to the algorithm. It also takes care of
+// converting the background as needed.
+func (g *Grid) Convert(algo []bool) Grid {
+	// Determine background of new grid.
+	var newBackground bool
+	if g.background {
+		newBackground = algo[allOnesAsDecimal]
+	} else {
+		newBackground = algo[allZeroesAsDecimal]
+	}
+	grid := Grid{background: newBackground, data: make(map[Vec]bool)}
+
+	// Fill all points. We need to check each neighbour of each point for whether it needs to be
+	// marked.
+	// This algorithm will mark some points multiple times. But that's OK, we'll just be wasting
+	// time but not causing any errors that way.
+	for p := range g.Points() {
+		for markMe := range relevantPoints(p) {
+			newVal := newPointVal(g, &amp;markMe, &amp;algo)
+			grid.Mark(markMe, newVal)
+		}
+	}
+
+	return grid
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_20"><a class="anchor" href="#_how_to_run_20"></a><a class="link" href="#_how_to_run_20">How to run</a></h5>
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run both solutions.</p>
