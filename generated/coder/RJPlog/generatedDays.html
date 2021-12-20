@@ -313,6 +313,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_20_kotlin">Day 20: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_20_trench_map">Day 20: Trench Map</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_17">First Star</a></li>
+<li><a href="#_second_star_17">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2714,6 +2724,191 @@ solution1 = snailFishNumber[0]</code></pre>
 	println("**************************")
 	println("Solution for part2")
 	println("   $solution2 ")
+	println()</code></pre>
+</div>
+</div>
+<a id="day20" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_kotlin"><a class="anchor" href="#_day_20_kotlin"></a><a class="link" href="#_day_20_kotlin">Day 20: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_20_trench_map"><a class="anchor" href="#_day_20_trench_map"></a><a class="link" href="#_day_20_trench_map">Day 20: Trench Map</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/20" class="bare">https://adventofcode.com/2021/day/20</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2120_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_17"><a class="anchor" href="#_first_star_17"></a><a class="link" href="#_first_star_17">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>First of all puzzle input is read into <em>enhAlg</em> string for the ruleset and <em>inputImage</em> map for the first image</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var width: Int = 0
+	var height: Int = 0
+
+	var enhAlg: String = ""
+
+	var inputImage = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Int&gt;()
+
+
+	File("day2120_puzzle_input.txt").forEachLine {
+		if (it.length == 512) {
+			enhAlg = it
+		} else if (it.length != 0) {
+			width = it.length
+			for (x in 0..it.length - 1) {
+				var light: Int
+				if (it[x].toString() == ".") {
+					light = 0
+				} else {
+					light = 1
+				}
+				inputImage.put(Pair(x, height), light)
+			}
+			height = height + 1
+		}
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After reading puzzle input, the enhancement algorithm is applied n times. After each time the lights which are on are conunted and at n == 2 solution for part 1 is available.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var outputImage = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Int&gt;()
+
+	for (n in 1..50) {
+		// iterate over input
+		var numLights = 0
+		for (y in 0 - 5 - n..height - 1 + n + 5) {
+			for (x in 0 - 5 - n..width - 1 + n + 5) {
+
+				var xpos = x
+				var ypos = y
+				var index: String = ""
+
+				// find index for each tile
+				for (yy in ypos - 1..ypos + 1) {
+					for (xx in xpos - 1..xpos + 1) {
+						if (inputImage.containsKey(Pair(xx, yy))) {
+							index = index + inputImage.getValue(Pair(xx, yy)).toString()
+						} else {
+							if (n % 2 == 0) {
+								index = index + "1"
+							} else {
+								index = index + "0"
+							}
+						}
+					}
+				}
+
+				// get value out of enhancedment algorithm and put Value in outputImage
+				if (enhAlg[index.toInt(2)] == '#') {
+					outputImage.put(Pair(x, y), 1)
+					numLights = numLights + 1
+					if (n == 2) {
+						solution1 = numLights
+					} else if (n == 50) {
+						solution2 = numLights
+					}
+				} else {
+					outputImage.put(Pair(x, y), 0)
+				}
+			}
+		}
+
+		inputImage.clear()
+		inputImage.putAll(outputImage)
+		outputImage.clear()
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_17"><a class="anchor" href="#_second_star_17"></a><a class="link" href="#_second_star_17">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Just continue after n == 2 of part 1 until n reachd 50, then the counted lights are solution for part 2</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var outputImage = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Int&gt;()
+
+	for (n in 1..50) {
+		// iterate over input
+		var numLights = 0
+		for (y in 0 - 5 - n..height - 1 + n + 5) {
+			for (x in 0 - 5 - n..width - 1 + n + 5) {
+
+				var xpos = x
+				var ypos = y
+				var index: String = ""
+
+				// find index for each tile
+				for (yy in ypos - 1..ypos + 1) {
+					for (xx in xpos - 1..xpos + 1) {
+						if (inputImage.containsKey(Pair(xx, yy))) {
+							index = index + inputImage.getValue(Pair(xx, yy)).toString()
+						} else {
+							if (n % 2 == 0) {
+								index = index + "1"
+							} else {
+								index = index + "0"
+							}
+						}
+					}
+				}
+
+				// get value out of enhancedment algorithm and put Value in outputImage
+				if (enhAlg[index.toInt(2)] == '#') {
+					outputImage.put(Pair(x, y), 1)
+					numLights = numLights + 1
+					if (n == 2) {
+						solution1 = numLights
+					} else if (n == 50) {
+						solution2 = numLights
+					}
+				} else {
+					outputImage.put(Pair(x, y), 0)
+				}
+			}
+		}
+
+		inputImage.clear()
+		inputImage.putAll(outputImage)
+		outputImage.clear()
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// print solution for part 1
+	println("**************************")
+	println("--- Day 20: Trench Map ---")
+	println("**************************")
+	println("Solution for part1")
+	println("   $solution1 pixels are lit in the resulting image")
+	println()
+	// print solution for part 2
+	println("**************************")
+	println("Solution for part2")
+	println("   $solution2 pixels are lit in the resulting image")
 	println()</code></pre>
 </div>
 </div>

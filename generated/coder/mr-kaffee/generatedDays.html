@@ -389,6 +389,17 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_20_rust">Day 20: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_20_trench_map">Day 20: Trench Map</a>
+<ul class="sectlevel4">
+<li><a href="#_parts_1_2_3">Parts 1 &amp; 2</a></li>
+<li><a href="#_tests_19">Tests</a></li>
+<li><a href="#_today_i_learned_10">Today I learned</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -483,7 +494,7 @@ development, e.g., based on the examples given in the puzzles.</p>
     day17::solve();
     day18::solve();
     day19::solve();
-    // day20::solve();
+    day20::solve();
     // day21::solve();
     // day22::solve();
     // day23::solve();
@@ -4982,9 +4993,17 @@ mod tests {
 <p>The solution for today&#8217;s puzzle takes ~3 seconds to complete in my current implementation (optimized from 30 seconds in the first version and ~10 seconds in an intermediate step)!</p>
 </div>
 <div class="paragraph">
-<p>The optimizations include:
-* check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set
-* use a kind of breadth first for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set <code>settled = 1</code>) and continue to settle furhter sets that overlap with sets from the queue.</p>
+<p>The optimizations include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set</p>
+</li>
+<li>
+<p>use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set <code>settled = 1</code>) and continue to settle furhter sets that overlap with sets from the queue.</p>
+</li>
+</ul>
 </div>
 <div class="sect4">
 <h5 id="_parts_1_2_2"><a class="anchor" href="#_parts_1_2_2"></a><a class="link" href="#_parts_1_2_2">Parts 1 &amp; 2</a></h5>
@@ -5156,17 +5175,10 @@ pub fn check_overlap(
                 for _ in beacons_settled
                     .iter()
                     .map(|b1| INV_TRAFOS[t_idx](b1.add(&amp;center)))
-                    .filter(|(x, y, z)| {
-                        x &gt;= &amp;-1000
-                            &amp;&amp; x &lt;= &amp;1000
-                            &amp;&amp; y &gt;= &amp;-1000
-                            &amp;&amp; y &lt;= &amp;1000
-                            &amp;&amp; z &gt;= &amp;-1000
-                            &amp;&amp; z &lt;= &amp;1000
-                    })
+                    .filter(|(x, y, z)| RANGE.contains(x) &amp;&amp; RANGE.contains(y) &amp;&amp; RANGE.contains(z))
                     .filter(|b1| beacons_check.contains(b1))
                 {
-                    // don't use iter.count() to avoid checking more elements onece threshold is reached
+                    // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count &gt;= threshold {
                         return Some((TRAFOS[t_idx], center));
@@ -5300,6 +5312,227 @@ mod tests {
     }
 }</code></pre>
 </div>
+</div>
+<a id="day20" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_rust"><a class="anchor" href="#_day_20_rust"></a><a class="link" href="#_day_20_rust">Day 20: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_20_trench_map"><a class="anchor" href="#_day_20_trench_map"></a><a class="link" href="#_day_20_trench_map">Day 20: Trench Map</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/20">AoC|2021|20</a>.</p>
+</div>
+<div class="paragraph">
+<p>There is essentially one trap in today&#8217;s puzzle hidden in the instruction <em>&#8230;&#8203; being careful to account for the infinite size of the images</em>: while in the test data, the algorithm starts with <code>.</code>, my (and I guess everyone else&#8217;s) puzzle input&#8217;s algorithm starts with <code>#</code>. Hence, after applying the algorithm once, all pixels extending forever in any direction are set. To handle this, I store the negative of an image in that case. All images produced by odd numbers of update steps will actually be negative images.</p>
+</div>
+<div class="sect4">
+<h5 id="_parts_1_2_3"><a class="anchor" href="#_parts_1_2_3"></a><a class="link" href="#_parts_1_2_3">Parts 1 &amp; 2</a></h5>
+<div class="paragraph">
+<p>I store images in an <code>Image</code> structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// structure storing image data
+///
+/// * ``data`` is a list of all set pixels
+/// * ``bbox = (x_min, x_max, y_min, y_max)`` is the bounding box of set pixels
+///   with exclusive upper bounds
+/// * ``neg`` is a flag indicating whether pixels are inverted (i.e., this is a
+///   negative image)
+#[derive(Debug, Clone)]
+pub struct Image {
+    pub data: Vec&lt;(isize, isize)&gt;,
+    pub bbox: (isize, isize, isize, isize),
+    pub neg: bool,
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I use this to parse the input into an algorithm (vector of booleans) and an image:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse content in algorithm (first line) and image (other non blank lines)
+pub fn parse(content: &amp;str) -&gt; (Vec&lt;bool&gt;, Image) {
+    let mut lines = content.lines();
+    let algo = lines
+        .next()
+        .expect("No algo")
+        .trim()
+        .chars()
+        .map(|c| match c {
+            '.' =&gt; false,
+            '#' =&gt; true,
+            _ =&gt; panic!("Illegal character: {}", c),
+        })
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+
+    let mut data = Vec::new();
+    let mut bbox = (isize::MAX, isize::MAX, isize::MIN, isize::MIN);
+    let neg = false;
+    for (y, line) in lines
+        .map(|line| line.trim())
+        .filter(|line| line.len() &gt; 0)
+        .enumerate()
+    {
+        for (x, _) in line.chars().enumerate().filter(|(_, c)| c == &amp;'#') {
+            data.push((x as isize, y as isize));
+            bbox.0 = cmp::min(bbox.0, x as isize);
+            bbox.1 = cmp::min(bbox.1, y as isize);
+            bbox.2 = cmp::max(bbox.2, x as isize + 1);
+            bbox.3 = cmp::max(bbox.3, y as isize + 1);
+        }
+    }
+
+    (algo, Image { data, bbox, neg })
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The main part of the solution is a function that performs single update steps (see <a href="#_today_i_learned">Today I learned</a> for an explanation on why I create the intermediate <code>grid</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// perform single update step
+///
+/// create a new image; if ``algo[0]`` is set, the ``neg`` flag of the image will flip
+pub fn update_step(algo: &amp;[bool], image: &amp;Image) -&gt; Image {
+    let mut data = Vec::with_capacity(image.data.len() * 2);
+    let mut bbox = (isize::MAX, isize::MAX, isize::MIN, isize::MIN);
+    let neg = algo[0] ^ image.neg;
+
+    // it is cheaper to put everything in a grid compared to looking up values repeatedly
+    // in a set or map
+    // make the grid big enough to not have to check out of bounds in loop later on
+    let (x_mn, y_mn, x_mx, y_mx) = image.bbox;
+    let x0 = x_mn - 2;
+    let y0 = y_mn - 2;
+    let w = (x_mx - x_mn) as usize + 4;
+    let h = (y_mx - y_mn) as usize + 4;
+    let mut grid = vec![false; w * h];
+    for (x, y) in &amp;image.data {
+        grid[(x - x0) as usize + w * (y - y0) as usize] = true;
+    }
+
+    for x in x_mn - 1..x_mx + 1 {
+        for y in y_mn - 1..y_mx + 1 {
+            let k = (x - x0) as usize + w * (y - y0) as usize;
+            let mut idx = 0;
+            for j in [
+                k - w - 1,
+                k - w,
+                k - w + 1,
+                k - 1,
+                k,
+                k + 1,
+                k + w - 1,
+                k + w,
+                k + w + 1,
+            ] {
+                idx = idx &lt;&lt; 1 | (image.neg ^ grid[j]) as usize;
+            }
+            if neg ^ algo[idx] {
+                data.push((x, y));
+                bbox.0 = cmp::min(bbox.0, x);
+                bbox.1 = cmp::min(bbox.1, y);
+                bbox.2 = cmp::max(bbox.2, x + 1);
+                bbox.3 = cmp::max(bbox.3, y + 1);
+            }
+        }
+    }
+
+    Image { data, bbox, neg }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The solution is calculated as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn update_steps(algo: &amp;[bool], image: &amp;Image, steps: usize) -&gt; Image {
+    assert!(steps &gt;= 1, "Cannot perform less than one update step");
+    let mut image = update_step(&amp;algo, image);
+    for _ in 1..steps {
+        image = update_step(algo, &amp;image);
+    }
+    image
+}
+
+pub fn solution_1(algo: &amp;[bool], image: &amp;Image) -&gt; usize {
+    update_steps(algo, image, 2).data.len()
+}
+pub fn solution_2(algo: &amp;[bool], image: &amp;Image) -&gt; usize {
+    update_steps(algo, image, 50).data.len()
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_19"><a class="anchor" href="#_tests_19"></a><a class="link" href="#_tests_19">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str =
+        "..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..##\
+        #..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###\
+        .######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#.\
+        .#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....\
+        .#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..\
+        ...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....\
+        ..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#
+\
+        #..#.\n\
+        #....\n\
+        ##..#\n\
+        ..#..\n\
+        ..###";
+
+    #[test]
+    fn test_parse() {
+        let (algo, image) = parse(CONTENT);
+        assert_eq!(512, algo.len());
+        assert_eq!((0, 0, 5, 5), image.bbox);
+        assert_eq!(
+            Vec::from([
+                (0, 0),
+                (3, 0),
+                (0, 1),
+                (0, 2),
+                (1, 2),
+                (4, 2),
+                (2, 3),
+                (2, 4),
+                (3, 4),
+                (4, 4)
+            ]),
+            image.data
+        );
+        assert!(!image.neg);
+    }
+
+    #[test]
+    fn test_update_steps() {
+        let (algo, image) = parse(CONTENT);
+        assert_eq!(35, update_steps(&amp;algo, &amp;image, 2).data.len());
+        assert_eq!(3_351, update_steps(&amp;algo, &amp;image, 50).data.len());
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_today_i_learned_10"><a class="anchor" href="#_today_i_learned_10"></a><a class="link" href="#_today_i_learned_10">Today I learned</a></h5>
+<div class="paragraph">
+<p>Today I learned a lot about performance.</p>
+</div>
+<div class="paragraph">
+<p>In my first version, I stored the lit pixels of the image in a hash set with <code>HashSet::contains</code> calls in the nested loop in my <code>update_step</code> function. Building a <code>grid</code> for direct lookup and replacing the hash set by a vector reduced the runtime for my solution (both parts) from ~500ms to ~25ms by a factor of 20! Pretty impressive.</p>
 </div>
 </div>
 </div>
