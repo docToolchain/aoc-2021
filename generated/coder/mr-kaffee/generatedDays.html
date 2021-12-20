@@ -395,7 +395,7 @@
 <ul class="sectlevel4">
 <li><a href="#_parts_1_2_3">Parts 1 &amp; 2</a></li>
 <li><a href="#_tests_19">Tests</a></li>
-<li><a href="#_today_i_learned_10">Today I learned</a></li>
+<li><a href="#day20-til">Today I learned</a></li>
 </ul>
 </li>
 </ul>
@@ -4990,10 +4990,10 @@ mod tests {
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/19">AoC|2021|19</a>.</p>
 </div>
 <div class="paragraph">
-<p>The solution for today&#8217;s puzzle takes ~3 seconds to complete in my current implementation (optimized from 30 seconds in the first version and ~10 seconds in an intermediate step)!</p>
+<p>The solution for today&#8217;s puzzle takes ~180ms to complete in my current implementation (optimized from 30 seconds in the first version to ~10 and ~3 seconds in intermediate steps).</p>
 </div>
 <div class="paragraph">
-<p>The optimizations include:</p>
+<p>The optimizations to get down to three seconds include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -5004,6 +5004,9 @@ mod tests {
 <p>use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set <code>settled = 1</code>) and continue to settle furhter sets that overlap with sets from the queue.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The final optimization to achieve solution times below 1s are taken from <a href="https://github.com/mogron">[Moritz Gronbach</a>: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.</p>
 </div>
 <div class="sect4">
 <h5 id="_parts_1_2_2"><a class="anchor" href="#_parts_1_2_2"></a><a class="link" href="#_parts_1_2_2">Parts 1 &amp; 2</a></h5>
@@ -5044,35 +5047,43 @@ impl CoordMath for Coord {
 </div>
 </div>
 <div class="paragraph">
-<p>The input is read as follows:</p>
+<p>The input is read as follows (create sets of beacons and maps of pairwise distances):</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse the input into a vector of scanners
 ///
 /// each scanner is a hash set of coordinates in the scanner's local
-/// coordinate system
-pub fn parse(content: &amp;str) -&gt; Vec&lt;HashSet&lt;Coord&gt;&gt; {
-    let mut scanners = Vec::new();
+/// coordinate system and a hashmap of pairwise distances as keys and number of
+/// occurance of this distance as value
+pub fn parse(content: &amp;str) -&gt; Vec&lt;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)&gt; {
+    let mut scanners: Vec&lt;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)&gt; = Vec::new();
 
     let mut beacons = HashSet::new();
+    let mut distances = HashMap::new();
     for line in content.lines().map(|l| l.trim()).filter(|l| l.len() &gt; 0) {
         if line.starts_with("---") {
             if !beacons.is_empty() {
-                scanners.push(beacons);
+                scanners.push((beacons, distances));
                 beacons = HashSet::new();
+                distances = HashMap::new();
             }
         } else {
             let mut parts = line.split(',');
-            beacons.insert((
+            let b_new = (
                 parts.next().unwrap().parse().unwrap(),
                 parts.next().unwrap().parse().unwrap(),
                 parts.next().unwrap().parse().unwrap(),
-            ));
+            );
+            for b_old in &amp;beacons {
+                // update pairwise distances
+                *distances.entry(b_old.sub(&amp;b_new).abs()).or_insert(0) += 1;
+            }
+            beacons.insert(b_new);
         }
     }
     if !beacons.is_empty() {
-        scanners.push(beacons);
+        scanners.push((beacons, distances));
     }
 
     scanners
@@ -5155,10 +5166,22 @@ pub const INV_TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    beacons_settled: &amp;HashSet&lt;Coord&gt;,
-    beacons_check: &amp;HashSet&lt;Coord&gt;,
+    (beacons_settled, distances_settled): &amp;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;),
+    (beacons_check, distances_check): &amp;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;),
     threshold: usize,
 ) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
+    // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
+    let mut common_distances = 0;
+    for (distance, count) in distances_settled {
+        common_distances += cmp::min(distances_check.get(distance).unwrap_or(&amp;0), count);
+        if common_distances &gt;= threshold * (threshold - 1) / 2 {
+            break;
+        }
+    }
+    if common_distances &lt; threshold * (threshold - 1) / 2 {
+        return None; // not enough common distances, no overlap possible
+    }
+
     for t_idx in 0..24 {
         // find all beacons with the same distance as b1[k1] to b2[k2]
         for b1 in beacons_settled {
@@ -5199,7 +5222,7 @@ pub fn check_overlap(
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// determine number of unique beacons and max Manhatten distance between
 /// any two scanners
-pub fn solution_1_2(scanners: &amp;[HashSet&lt;Coord&gt;]) -&gt; (usize, usize) {
+pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)]) -&gt; (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
@@ -5217,7 +5240,7 @@ pub fn solution_1_2(scanners: &amp;[HashSet&lt;Coord&gt;]) -&gt; (usize, usize) 
     let mut max_dist = 0;
 
     // holds all settled beacons. Start with beacons in range of scanner 1
-    let mut beacons: HashSet&lt;Coord&gt; = scanners[0].clone();
+    let mut beacons: HashSet&lt;Coord&gt; = scanners[0].0.clone();
 
     while let Some(k1) = settled.iter().position(|s| s == &amp;1) {
         for k2 in 0..settled.len() {
@@ -5227,10 +5250,10 @@ pub fn solution_1_2(scanners: &amp;[HashSet&lt;Coord&gt;]) -&gt; (usize, usize) 
 
             if let Some((t, c)) = check_overlap(&amp;scanners[k1], &amp;scanners[k2], 12) {
                 // update scanner to settled coordinates
-                scanners[k2] = scanners[k2].iter().map(|b| t(*b).sub(&amp;c)).collect();
+                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).sub(&amp;c)).collect();
 
                 // add beacons to unique set
-                beacons.extend(&amp;scanners[k2]);
+                beacons.extend(&amp;scanners[k2].0);
 
                 // update settled to 1 = enqueue
                 settled[k2] = 1;
@@ -5272,8 +5295,8 @@ mod tests {
     fn test_parse() {
         let scanners = parse(CONTENT);
         assert_eq!(5, scanners.len());
-        assert!(scanners[2].contains(&amp;(-644, 584, -595)));
-        assert!(scanners[4].contains(&amp;(30, -46, -14)));
+        assert!(scanners[2].0.contains(&amp;(-644, 584, -595)));
+        assert!(scanners[4].0.contains(&amp;(30, -46, -14)));
     }
 
     #[test]
@@ -5362,11 +5385,7 @@ pub fn parse(content: &amp;str) -&gt; (Vec&lt;bool&gt;, Image) {
         .expect("No algo")
         .trim()
         .chars()
-        .map(|c| match c {
-            '.' =&gt; false,
-            '#' =&gt; true,
-            _ =&gt; panic!("Illegal character: {}", c),
-        })
+        .map(|c| c == '#')
         .collect::&lt;Vec&lt;_&gt;&gt;();
 
     let mut data = Vec::new();
@@ -5391,7 +5410,7 @@ pub fn parse(content: &amp;str) -&gt; (Vec&lt;bool&gt;, Image) {
 </div>
 </div>
 <div class="paragraph">
-<p>The main part of the solution is a function that performs single update steps (see <a href="#_today_i_learned">Today I learned</a> for an explanation on why I create the intermediate <code>grid</code>):</p>
+<p>The main part of the solution is a function that performs single update steps (see <a href="#day20-til">Today I learned</a> for an explanation on why I create the intermediate <code>grid</code>):</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5485,8 +5504,8 @@ mod tests {
         .#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....\
         .#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..\
         ...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....\
-        ..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#
-\
+        ..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#\n\
+        \
         #..#.\n\
         #....\n\
         ##..#\n\
@@ -5527,7 +5546,7 @@ mod tests {
 </div>
 </div>
 <div class="sect4">
-<h5 id="_today_i_learned_10"><a class="anchor" href="#_today_i_learned_10"></a><a class="link" href="#_today_i_learned_10">Today I learned</a></h5>
+<h5 id="day20-til"><a class="anchor" href="#day20-til"></a><a class="link" href="#day20-til">Today I learned</a></h5>
 <div class="paragraph">
 <p>Today I learned a lot about performance.</p>
 </div>
