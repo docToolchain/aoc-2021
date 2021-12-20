@@ -1,0 +1,48 @@
+== Day 20: Trench Map ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/20[AoC|2021|20].
+
+There is essentially one trap in today's puzzle hidden in the instruction _... being careful to account for the infinite size of the images_: while in the test data, the algorithm starts with ``.``, my (and I guess everyone else's) puzzle input's algorithm starts with ``#``. Hence, after applying the algorithm once, all pixels extending forever in any direction are set. To handle this, I store the negative of an image in that case. All images produced by odd numbers of update steps will actually be negative images.
+
+=== Parts 1 & 2 ===
+
+I store images in an ``Image`` structure:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=image]
+----
+
+I use this to parse the input into an algorithm (vector of booleans) and an image:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+The main part of the solution is a function that performs single update steps (see <<Today I learned>> for an explanation on why I create the intermediate ``grid``):
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=update_step]
+----
+
+The solution is calculated as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solution]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
+
+Today I learned a lot about performance.
+
+In my first version, I stored the lit pixels of the image in a hash set with ``HashSet::contains`` calls in the nested loop in my ``update_step`` function. Building a ``grid`` for direct lookup and replacing the hash set by a vector reduced the runtime for my solution (both parts) from ~500ms to ~25ms by a factor of 20! Pretty impressive.

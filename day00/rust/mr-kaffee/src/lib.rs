@@ -21,9 +21,9 @@ pub fn solve() {
     day15::solve();
     day16::solve();
     day17::solve();
-    // day18::solve();
-    // day19::solve();
-    // day20::solve();
+    day18::solve();
+    day19::solve();
+    day20::solve();
     // day21::solve();
     // day22::solve();
     // day23::solve();
@@ -471,63 +471,101 @@ pub mod day17 {
     pub const INPUT: &str = include_str!("../../../../day17/rust/mr-kaffee/input.txt");
     pub const EXP_1: isize = 2_701;
     pub const EXP_2: usize = 1_070;
-    
+
     pub fn solve() {
         let timer = Instant::now();
         let target = parse(INPUT);
-    
+
         let timer_1 = Instant::now();
         let sol_1 = solution_1(target);
         println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
         assert_eq!(EXP_1, sol_1);
-    
+
         let timer_2 = Instant::now();
         let sol_2 = solution_2(target);
         println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
         assert_eq!(EXP_2, sol_2);
-    
+
         println!("-> Solved day 17 in {:?}\n", timer.elapsed());
     }
 }
 
 pub mod day18 {
-    // use mr_kaffee_2021_18::*;
+    use mr_kaffee_2021_18::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day18/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
+    pub const INPUT: &str = include_str!("../../../../day18/rust/mr-kaffee/input.txt");
+    pub const EXP_1: usize = 4_243;
+    pub const EXP_2: usize = 4_701;
 
     pub fn solve() {
         let timer = Instant::now();
+        let snailnumbers = parse(INPUT);
+
+        let timer_1 = Instant::now();
+        let sol_1 = solution_1(&snailnumbers);
+        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
+        assert_eq!(EXP_1, sol_1);
+
+        let timer_2 = Instant::now();
+        let sol_2 = solution_2(&snailnumbers);
+        println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
+        assert_eq!(EXP_2, sol_2);
+
         println!("-> Solved day 18 in {:?}\n", timer.elapsed());
     }
 }
 
 pub mod day19 {
-    // use mr_kaffee_2021_19::*;
+    use mr_kaffee_2021_19::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day19/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
+    pub const INPUT: &str = include_str!("../../../../day19/rust/mr-kaffee/input.txt");
+    pub const EXP_1: usize = 392;
+    pub const EXP_2: usize = 13_332;
 
     pub fn solve() {
         let timer = Instant::now();
+
+        let data = parse(INPUT);
+
+        let timer_1_2 = Instant::now();
+        let (sol_1, sol_2) = solution_1_2(&data);
+        println!(
+            "Solved part 1 & 2 in {:?}: {:?} / {:?}",
+            timer_1_2.elapsed(),
+            sol_1,
+            sol_2
+        );
+        assert_eq!(EXP_1, sol_1);
+        assert_eq!(EXP_2, sol_2);
+
         println!("-> Solved day 19 in {:?}\n", timer.elapsed());
     }
 }
 
 pub mod day20 {
-    // use mr_kaffee_2021_20::*;
+    use mr_kaffee_2021_20::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day20/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
+    pub const INPUT: &str = include_str!("../../../../day20/rust/mr-kaffee/input.txt");
+    pub const EXP_1: usize = 5_316;
+    pub const EXP_2: usize = 16_728;
 
     pub fn solve() {
         let timer = Instant::now();
+        let (algo, image) = parse(INPUT);
+
+        let timer_1 = Instant::now();
+        let sol_1 = solution_1(&algo, &image);
+        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
+        assert_eq!(EXP_1, sol_1);
+
+        let timer_2 = Instant::now();
+        let sol_2 = solution_2(&algo, &image);
+        println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
+        assert_eq!(EXP_2, sol_2);
+
         println!("-> Solved day 20 in {:?}\n", timer.elapsed());
     }
 }
@@ -542,6 +580,9 @@ pub mod day21 {
 
     pub fn solve() {
         let timer = Instant::now();
+
+        assert!(false, "Day 21 not yet implemented");
+
         println!("-> Solved day 21 in {:?}\n", timer.elapsed());
     }
 }
@@ -556,6 +597,9 @@ pub mod day22 {
 
     pub fn solve() {
         let timer = Instant::now();
+
+        assert!(false, "Day 22 not yet implemented");
+
         println!("-> Solved day 22 in {:?}\n", timer.elapsed());
     }
 }
@@ -570,6 +614,9 @@ pub mod day23 {
 
     pub fn solve() {
         let timer = Instant::now();
+
+        assert!(false, "Day 23 not yet implemented");
+
         println!("-> Solved day 23 in {:?}\n", timer.elapsed());
     }
 }
@@ -584,6 +631,9 @@ pub mod day24 {
 
     pub fn solve() {
         let timer = Instant::now();
+
+        assert!(false, "Day 24 not yet implemented");
+
         println!("-> Solved day 24 in {:?}\n", timer.elapsed());
     }
 }
@@ -598,6 +648,9 @@ pub mod day25 {
 
     pub fn solve() {
         let timer = Instant::now();
+
+        assert!(false, "Day 25 not yet implemented");
+
         println!("-> Solved day 25 in {:?}\n", timer.elapsed());
     }
 }

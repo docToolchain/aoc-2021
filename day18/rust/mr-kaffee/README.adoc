@@ -1,0 +1,86 @@
+== Day 18: Snailfish ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/18[AoC|2021|18].
+
+=== Part 1 ===
+
+. Parse the snail numbers into vectors of tokens.
+. Implement functions that apply explode and split steps until no further reduction possible
+. Calculate the sum over all snail numbers
+. Calculate magnitude
+
+==== Parse ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=token]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+==== Reduction ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=explode]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=split]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=reduce]
+----
+
+==== Sum & Magnitude ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sum]
+----
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=magnitude]
+----
+
+=== Part 2 ===
+
+Simple extension
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Thoughts ===
+
+The structure calls for a recursive data structure. I might give it a try later on. 
+
+For now, the puzzle is solved. Not a solution I am particularly proud of. Specifically, I don't like that it increases the overall runtime for all my solutions for this year so far by 40%!
+
+I have a solution based on recursive data structures. It is three times slower... Made some small optimizations in the vec based solution instead (use ``drain`` and ``splice`` instead of removing/inserting values one by one - see above). 
+
+The recursive solution is also available as a variant and you can run the recursive solution with ``cargo run --release --features recursive``.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=snail]
+----
+
+=== Today I learned ===
+
+... a lot on recursive data structures and the ``Box`` structure in Rust but also how to insert / remove elements from a ``Vec`` as efficiently as possible.
