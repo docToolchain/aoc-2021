@@ -1,4 +1,4 @@
-== Day 21: ____ ==
+== Day 21: Dirac Dice ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/21[AoC|2021|21].
 
