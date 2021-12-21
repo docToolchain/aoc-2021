@@ -151,6 +151,7 @@
 <ul class="sectlevel4">
 <li><a href="#_general_structure">General structure</a></li>
 <li><a href="#_run_solutions">Run Solutions</a></li>
+<li><a href="#_personal_challenges">Personal Challenges</a></li>
 <li><a href="#_run_all_solutions">Run all Solutions</a></li>
 </ul>
 </li>
@@ -402,12 +403,11 @@
 </li>
 <li><a href="#_day_21_rust">Day 21: rust</a>
 <ul class="sectlevel3">
-<li><a href="#_day_21">Day 21: <em>__</em></a>
+<li><a href="#_day_21_dirac_dice">Day 21: Dirac Dice</a>
 <ul class="sectlevel4">
 <li><a href="#_part_1_14">Part 1</a></li>
 <li><a href="#_part_2_14">Part 2</a></li>
 <li><a href="#_tests_20">Tests</a></li>
-<li><a href="#_thoughts_2">Thoughts</a></li>
 </ul>
 </li>
 </ul>
@@ -471,10 +471,29 @@ development, e.g., based on the examples given in the puzzles.</p>
 <div class="sect4">
 <h5 id="_run_solutions"><a class="anchor" href="#_run_solutions"></a><a class="link" href="#_run_solutions">Run Solutions</a></h5>
 <div class="paragraph">
-<p>Run solution with <code>cargo run</code> (or <code>cargo run --release</code> to see the effect of compiler optimization)</p>
+<p>Run solution with <code>cargo run --release</code></p>
 </div>
 <div class="paragraph">
-<p>Run tests with <code>cargo test</code></p>
+<p>Run tests with <code>cargo test</code> or <code>cargo test --release</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_personal_challenges"><a class="anchor" href="#_personal_challenges"></a><a class="link" href="#_personal_challenges">Personal Challenges</a></h5>
+<div class="paragraph">
+<p>It is December 21st in the meantime. I got that far trying to</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Keep the overall time for all solutions as small as possible (&lt; 500ms would be great)</p>
+</li>
+<li>
+<p>Do not use anything but out of the box Rust</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see whether I can keep up with these constraints until the end.</p>
 </div>
 </div>
 <div class="sect4">
@@ -508,11 +527,17 @@ development, e.g., based on the examples given in the puzzles.</p>
     day19::solve();
     day20::solve();
     day21::solve();
-    // day22::solve();
-    // day23::solve();
-    // day24::solve();
-    // day25::solve();
-    println!("Total time: {:?}", timer.elapsed());
+    // day22::solve(verbose);
+    // day23::solve(verbose);
+    // day24::solve(verbose);
+    // day25::solve(verbose);
+    let days = 21;
+    let elapsed = timer.elapsed();
+    let elapsed_per_day = elapsed.checked_div(days).unwrap();
+    println!(
+        "Total time for {} days: {:?} ({:?} per day)",
+        days, elapsed, elapsed_per_day
+    );
 }</code></pre>
 </div>
 </div>
@@ -5580,7 +5605,7 @@ mod tests {
 <div class="sect2">
 <h3 id="_day_21_rust"><a class="anchor" href="#_day_21_rust"></a><a class="link" href="#_day_21_rust">Day 21: rust</a></h3>
 <div class="sect3">
-<h4 id="_day_21"><a class="anchor" href="#_day_21"></a><a class="link" href="#_day_21">Day 21: <em>__</em></a></h4>
+<h4 id="_day_21_dirac_dice"><a class="anchor" href="#_day_21_dirac_dice"></a><a class="link" href="#_day_21_dirac_dice">Day 21: Dirac Dice</a></h4>
 <div class="paragraph">
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/21">AoC|2021|21</a>.</p>
 </div>
@@ -5594,27 +5619,27 @@ mod tests {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play with a deterministic dice, winning threshold: 1000
 ///
 /// return the looser's score times the number the dice was thrown
-pub fn solution_1((mut pos_1, mut pos_2): (usize, usize)) -&gt; usize {
-    let mut score_1 = 0;
-    let mut score_2 = 0;
+pub fn solution_1((mut p1, mut p2): (usize, usize)) -&gt; usize {
+    let mut s1 = 0;
+    let mut s2 = 0;
 
     let mut dice = 0;
 
-    let mut turn_1 = true;
-    while score_1 &lt; 1000 &amp;&amp; score_2 &lt; 1000 {
-        if turn_1 {
-            pos_1 = (pos_1 + 3 * dice + 6 - 1) % 10 + 1;
-            score_1 += pos_1;
+    let mut t = true;
+    while s1 &lt; 1000 &amp;&amp; s2 &lt; 1000 {
+        if t {
+            p1 = (p1 + 3 * dice + 6 - 1) % 10 + 1;
+            s1 += p1;
         } else {
-            pos_2 = (pos_2 + 3 * dice + 6 - 1) % 10 + 1;
-            score_2 += pos_2;
+            p2 = (p2 + 3 * dice + 6 - 1) % 10 + 1;
+            s2 += p2;
         }
 
         dice += 3;
-        turn_1 = !turn_1;
+        t = !t;
     }
 
-    dice * cmp::min(score_1, score_2)
+    dice * cmp::min(s1, s2)
 }</code></pre>
 </div>
 </div>
@@ -5622,7 +5647,7 @@ pub fn solution_1((mut pos_1, mut pos_2): (usize, usize)) -&gt; usize {
 <div class="sect4">
 <h5 id="_part_2_14"><a class="anchor" href="#_part_2_14"></a><a class="link" href="#_part_2_14">Part 2</a></h5>
 <div class="paragraph">
-<p>For part 2, I use a depth first traversal through play states. I push play states with multiplicities on a stack.</p>
+<p>For part 2, my first attempt was to use a depth first traversal through play states. I push play states with multiplicities on a stack.</p>
 </div>
 <div class="paragraph">
 <p>Each state popped from the stack results in 7 new states for the seven different outcomes of throwing a 3-sided dice three times: (1 x 3, 3 x 4, 6 x 5, 7 x 6, 6 x 7, 3 x 8, 1 x 9).</p>
@@ -5635,69 +5660,155 @@ pub fn solution_1((mut pos_1, mut pos_2): (usize, usize)) -&gt; usize {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play with dirac quantum dice
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// 7 possible outcomes with three dice
+///
+/// * 3 - 1: (1 1 1)
+/// * 4 - 3: (1 1 2) (1 2 1) (2 1 1)
+/// * 5 - 6: (1 1 3) (1 2 2) (1 3 1) (2 1 2) (2 2 1) (3 1 1)
+/// * 6 - 7: (1 2 3) (1 3 2) (2 1 3) (2 2 2) (2 3 1) (3 1 2) (3 2 1)
+/// * 7 - 6: (1 3 3) (2 2 3) (2 3 2) (3 1 3) (3 2 2) (3 3 1)
+/// * 8 - 3: (2 3 3) (3 2 3) (3 3 2)
+/// * 9 - 1: (3 3 3)
+pub const DICE_MULTS: [(usize, usize); 7] =
+    [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
+
+#[cfg(feature = "stack")]
+/// play with dirac quantum dice (stack based)
 ///
 /// return the number of universes won by the player who wins more often
-pub fn solution_2((pos_1, pos_2): (usize, usize)) -&gt; usize {
-    // 7 possible outcomes with three dice
-    // 3 - 1      (1 1 1)
-    // 4 - 3      (1 1 2) (1 2 1) (2 1 1)
-    // 5 - 6      (1 1 3) (1 2 2) (1 3 1) (2 1 2) (2 2 1) (3 1 1)
-    // 6 - 7      (1 2 3) (1 3 2) (2 1 3) (2 2 2) (2 3 1) (3 1 2) (3 2 1)
-    // 7 - 6      (1 3 3) (2 2 3) (2 3 2) (3 1 3) (3 2 2) (3 3 1)
-    // 8 - 3      (2 3 3) (3 2 3) (3 3 2)
-    // 9 - 1      (3 3 3)
-
+pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
     // push states with multiplicty on stack
     // since I push to the end and pop from the end, this is depth first search
     let mut stack = Vec::new();
-    stack.push((pos_1, pos_2, 0, 0, 1, true));
+    stack.push((p1, p2, 0, 0, true, 1));
 
-    // counters for wins
-    let mut wins_1 = 0;
-    let mut wins_2 = 0;
-
-    let mut max_stack_size = 1;
-    let mut rounds = 0;
+    // win counts
+    let mut w1 = 0;
+    let mut w2 = 0;
 
     // while there are unprocessed states
-    while let Some((pos_1, pos_2, score_1, score_2, mult_state, turn_1)) = stack.pop() {
+    while let Some((p1, p2, s1, s2, t, mult)) = stack.pop() {
         // loop over dice outcomes with multiplicity
-        for (dice, mult_dice) in [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)] {
-            if turn_1 { // player 1's turn
+        for (v, n) in DICE_MULTS {
+            if t {
+                // player 1's turn
                 // update position and score
-                let pos = (pos_1 + dice - 1) % 10 + 1;
-                let score = score_1 + pos;
-                if score &gt;= 21 {
+                let p1_upd = (p1 + v - 1) % 10 + 1;
+                let s1_upd = s1 + p1_upd;
+                if s1_upd &gt;= 21 {
                     // win
-                    wins_1 += mult_dice * mult_state;
+                    w1 += n * mult;
                 } else {
                     // continue to play later
-                    stack.push((pos, pos_2, score, score_2, mult_dice * mult_state, false));
+                    stack.push((p1_upd, p2, s1_upd, s2, false, n * mult));
                 }
-            } else { // player 2's turn
+            } else {
+                // player 2's turn
                 // update position and score
-                let pos = (pos_2 + dice - 1) % 10 + 1;
-                let score = score_2 + pos;
-                if score &gt;= 21 {
+                let p2_upd = (p2 + v - 1) % 10 + 1;
+                let s2_upd = s2 + p2_upd;
+                if s2_upd &gt;= 21 {
                     // win
-                    wins_2 += mult_dice * mult_state;
+                    w2 += n * mult;
                 } else {
                     // continue to play later
-                    stack.push((pos_1, pos, score_1, score, mult_dice * mult_state, true));
+                    stack.push((p1, p2_upd, s1, s2_upd, true, n * mult));
                 }
             }
         }
-
-        max_stack_size = cmp::max(max_stack_size, stack.len());
-        rounds += 1;
     }
 
-    println!("Max stack size in {} rounds: {}", rounds, max_stack_size);
-
-    cmp::max(wins_1, wins_2)
+    cmp::max(w1, w2)
 }</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for each positions / scores it might be player 1&#8217;s or player 2&#8217;s turn). Yet, my stack based solution processes ~17 million items from the stack, i.e,. each state more than 200 times. There seems to be potential for optimization.</p>
+</div>
+<div class="paragraph">
+<p>I created a second solution which is based on a flat list of multiplicities for every possible state. I processes each state sorted by total score of both players. Because the total score increases in every round played, I am sure that a state processed once will never occur again. Here is my second solution:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(not(feature = "stack"))]
+/// play with dirac quantum dice (state list based)
+///
+/// return the number of universes won by the player who wins more often
+pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
+    // index to state multiplicity list
+    const F_IDX: fn(usize, usize, usize, usize, usize) -&gt; usize =
+        |p1, p2, s1, s2, t| p1 + 10 * p2 + 100 * s1 + 2100 * s2 + 44100 * t;
+
+    // state multiplicity list
+    let mut mults = vec![0; 10 * 10 * 21 * 21 * 2];
+
+    // insert at pos_1 - 1 and pos_2 - 1 because position is zero based internally
+    mults[F_IDX(p1 - 1, p2 - 1, 0, 0, 0)] = 1;
+
+    // win counts
+    let mut w1 = 0;
+    let mut w2 = 0;
+
+    for sum in 0..=40 {
+        for s1 in if sum &gt; 20 { sum - 20..=20 } else { 0..=sum } {
+            let s2 = sum - s1;
+
+            for p1 in 0..10 {
+                for p2 in 0..10 {
+                    let mult_1 = mults[F_IDX(p1, p2, s1, s2, 0)];
+                    let mult_2 = mults[F_IDX(p1, p2, s1, s2, 1)];
+
+                    if mult_1 == 0 &amp;&amp; mult_2 == 0 {
+                        continue; // don't loop if no need
+                    }
+
+                    for (v, n) in DICE_MULTS {
+                        let p1_upd = (p1 + v) % 10;
+                        let s1_upd = s1 + p1_upd + 1;
+                        if s1_upd &gt;= 21 {
+                            w1 += mult_1 * n;
+                        } else {
+                            mults[F_IDX(p1_upd, p2, s1_upd, s2, 1)] += mult_1 * n;
+                        }
+
+                        let p2_upd = (p2 + v) % 10;
+                        let s2_upd = s2 + p2_upd + 1;
+                        if s2_upd &gt;= 21 {
+                            w2 += mult_2 * n;
+                        } else {
+                            mults[F_IDX(p1, p2_upd, s1, s2_upd, 0)] += mult_2 * n;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    cmp::max(w1, w2)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quick runtime comparison:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Stack based solution: ~450ms</p>
+</li>
+<li>
+<p>List based solution: ~3ms</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>List based is faster by a factor 150!</p>
+</div>
+<div class="paragraph">
+<p>Hence, list based is my default ;)</p>
+</div>
+<div class="paragraph">
+<p>If you still want to run the stack based solution, you can do so with <code>cargo run --release --features stack</code></p>
 </div>
 </div>
 <div class="sect4">
@@ -5719,12 +5830,6 @@ mod tests {
     }
 }</code></pre>
 </div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_thoughts_2"><a class="anchor" href="#_thoughts_2"></a><a class="link" href="#_thoughts_2">Thoughts</a></h5>
-<div class="paragraph">
-<p>The number of possible states is actually not that high: 10 positions for each player + 20 scores for each player + a flag who&#8217;s turn it is = 10 * 10 * 20 * 20 * 2 = 80k states. So it would be possible to store the multiplicities of all states in a list and update that list starting from low scores to higher scores with a breadth first traversal. That might be faster than my solution where the same state with different multiplicities occurs several times on the stack. Actually, in my solution, I process 17,332,965 states from the stack, i.e., every state is on the stack on average 200 times.</p>
 </div>
 </div>
 </div>
