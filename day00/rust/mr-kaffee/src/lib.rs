@@ -1,40 +1,50 @@
 use std::time::Instant;
 
 // tag::solve[]
-pub fn solve() {
+const DAYS: &[fn()] = &[
+    day00::solve,
+    day01::solve,
+    day02::solve,
+    day03::solve,
+    day04::solve,
+    day05::solve,
+    day06::solve,
+    day07::solve,
+    day08::solve,
+    day09::solve,
+    day10::solve,
+    day11::solve,
+    day12::solve,
+    day13::solve,
+    day14::solve,
+    day15::solve,
+    day16::solve,
+    day17::solve,
+    day18::solve,
+    day19::solve,
+    day20::solve,
+    day21::solve,
+    day22::solve,
+    day23::solve,
+    day24::solve,
+    day25::solve,
+];
+
+pub fn solve(indices: impl Iterator<Item = usize>) {
     let timer = Instant::now();
-    day00::solve();
-    day01::solve();
-    day02::solve();
-    day03::solve();
-    day04::solve();
-    day05::solve();
-    day06::solve();
-    day07::solve();
-    day08::solve();
-    day09::solve();
-    day10::solve();
-    day11::solve();
-    day12::solve();
-    day13::solve();
-    day14::solve();
-    day15::solve();
-    day16::solve();
-    day17::solve();
-    day18::solve();
-    day19::solve();
-    day20::solve();
-    day21::solve();
-    day22::solve();
-    // day23::solve();
-    // day24::solve();
-    // day25::solve();
-    let days = 21;
+
+    let mut count = 0;
+    for idx in indices {
+        DAYS[idx]();
+        count += 1;
+    }
+
     let elapsed = timer.elapsed();
-    let elapsed_per_day = elapsed.checked_div(days).unwrap();
     println!(
         "Total time for {} days: {:?} ({:?} per day)",
-        days, elapsed, elapsed_per_day
+        count,
+        elapsed,
+        elapsed.checked_div(count).unwrap()
     );
 }
 // end::solve[]
