@@ -313,12 +313,22 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_19_kotlin">Day 19: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_17">First Star</a></li>
+<li><a href="#_second_star_17">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#_day_20_kotlin">Day 20: kotlin</a>
 <ul class="sectlevel3">
 <li><a href="#_day_20_trench_map">Day 20: Trench Map</a>
 <ul class="sectlevel4">
-<li><a href="#_first_star_17">First Star</a></li>
-<li><a href="#_second_star_17">Second Star</a></li>
+<li><a href="#_first_star_18">First Star</a></li>
+<li><a href="#_second_star_18">Second Star</a></li>
 </ul>
 </li>
 </ul>
@@ -2727,6 +2737,244 @@ solution1 = snailFishNumber[0]</code></pre>
 	println()</code></pre>
 </div>
 </div>
+<a id="day19" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_19_kotlin"><a class="anchor" href="#_day_19_kotlin"></a><a class="link" href="#_day_19_kotlin">Day 19: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_19_beacon_scanner"><a class="anchor" href="#_day_19_beacon_scanner"></a><a class="link" href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/19" class="bare">https://adventofcode.com/2021/day/19</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2119_1_2.kts</em> in the command line.</p>
+</div>
+<div class="paragraph">
+<p>For the solution of this puzzle at first I created a class which holds for each scan the scanner id, the position of the scanner (which are at the beginning only placeholders) and the raw data. There are three functions for this class, one to flip and rotate the raw data in the 24 different views, one to adapt an offset to the data, and a function to set the position after it is caluclated. The class is implemented with a lot of copy-paste-modify for the flip/rot operations, which are not very elegant, but at the end it worked and I have already put to much time into it. If you are really interested, you can find the code in the repository.</p>
+</div>
+<div class="paragraph">
+<p>The puzzle input is read and the scans are put into an object of the above described class and put into a list <em>allScans</em>. The first one is already move out into a second list _matchedScans with position of the scanner set to (0,0,0).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// setup for reading puzzle input
+	var scanInput = mutableListOf&lt;Triple&lt;Int, Int, Int&gt;&gt;()
+	var allScans = mutableListOf&lt;scanX&gt;()
+	var scanID: String = ""
+
+	// read all scans of puzzle input into scanX classes and add them to a list of unmathced scans (allScans)
+	File("day2119_puzzle_input.txt").forEachLine {
+		if (it.contains("--")) {
+			scanInput.clear()
+			scanID = it.drop(4).dropLast(4).replace(" ", "-")
+		} else if (it.length &gt; 1) {
+			var position = it.split(",")
+			scanInput.add(
+				Triple(
+					position[0].toString().toInt(),
+					position[1].toString().toInt(),
+					position[2].toString().toInt()
+				)
+			)
+		} else {
+			//println(scanInput.sortedWith(compareBy({ it.first }, { it.second }, { it.third }))):  not necessary, does not bring any benefit
+			allScans.add(scanX(scanInput.toList(), scanID))
+		}
+	}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now for all remaining objects out of <em>allScans</em> an element is picked and a second loop is nested to flip and rotate it in all directions. With each result, all beacons of last <em>matchedSans</em> objects are compared with <em>allScans</em>. Therefore over all beacons the offset necessary to match a single beacons is caluclated and the complete dataset of the object is shifted. If then there are 12 or more matches, the object is moved into <em>matchedScans</em> and removed out of <em>allScans</em>. At this time already also the absolut position of the new matched object is determined and stored.</p>
+</div>
+<div class="paragraph">
+<p>At the end the list <em>matchedScans</em> contains all scans flipped and rotated in the right position with their absolute position stored.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// initialize list with matched scans (matchedScans) with first element of allScans list
+	var matchedScans = mutableListOf&lt;scanX&gt;()
+	matchedScans.add(allScans[0])
+	matchedScans[0].flipRotate(0)
+	matchedScans[0].scanPosX = 0
+	matchedScans[0].scanPosY = 0
+	matchedScans[0].scanPosY = 0
+
+	allScans.removeAt(0)
+
+	// allScans contains the unmatched scans, if a match is detected the object will be moved to matchedScans
+	// so if allScans is empty, no scan to match is left, job done
+	var matchList = mutableListOf&lt;Int&gt;()
+	var mm: Int = 0
+
+	while (allScans.isNotEmpty()) {
+
+		for (m in 0..allScans.size - 1) {
+
+			Loop@ for (ii in 0..23) {
+
+				allScans[m].flipRotate(ii)
+
+				for (j in 0..matchedScans[mm].beaconsFlipRot.size - 1) {
+
+					var beacon1 = matchedScans[mm].beaconsFlipRot[j]
+
+					for (i in 0..allScans[m].beaconsFlipRot.size - 1) {
+
+						var beacon2 = allScans[m].beaconsFlipRot[i]
+						var beacon2Raw = allScans[m].beacons[i]
+
+						var x_off = beacon1.first - beacon2.first
+						var y_off = beacon1.second - beacon2.second
+						var z_off = beacon1.third - beacon2.third
+
+						allScans[m].shiftByOffset(x_off, y_off, z_off)
+
+						if (matchedScans[mm].beaconsFlipRot.intersect(allScans[m].beaconsFlipRot).size &gt; 11) {
+
+							// this is the right place to set positions of scans:
+							// beacon1 is used as first input. beacon2 is already shifted and transformed, so we need var beacon2Raw = allScans[m].beacons[i]
+							allScans[m].setPosition(beacon1, beacon2Raw, ii)
+
+							// shift allScan into matchedScan
+							matchedScans.add(allScans[m])
+							matchList.add(m)
+							break@Loop
+						}
+					}
+				}
+			}
+		}
+
+		// this is used to know which objects out of allScans where transfered into matchedScans and therefor can be deleted
+		matchList.sortDescending()
+		matchList.forEach {
+			allScans.removeAt(it)
+		}
+		matchList.clear()
+
+		mm += 1
+	}</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_first_star_17"><a class="anchor" href="#_first_star_17"></a><a class="link" href="#_first_star_17">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>For the first star, all beacons out ouf all scans of <em>matchesScans</em> are stored in a new list without dublicates. The size of the list is result of part 1</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// for part1 print all beacons in a list without dublicates and count
+	var beaconsList = mutableListOf&lt;Triple&lt;Int, Int, Int&gt;&gt;()
+
+	matchedScans.forEach {
+		it.beaconsFlipRot.forEach {
+			if (!beaconsList.contains(it)) {
+				beaconsList.add(it)
+			}
+		}
+	}
+
+	solution1 = beaconsList.size
+	// end::part1[]
+
+	// for part2 iterate through absolute coordinates of all Scans and calculate manhatten distance
+	var manhattenDistMax: Int  = 0
+	var manhattenDist: Int = 0
+
+	for (i in 0..matchedScans.size-1) {
+		for( j in 0..matchedScans.size-1) {
+			if (i!=j) {
+				manhattenDist = abs(matchedScans[i].scanPosX - matchedScans[j].scanPosX)
+				manhattenDist = manhattenDist + abs(matchedScans[i].scanPosY - matchedScans[j].scanPosY)
+				manhattenDist = manhattenDist + abs(matchedScans[i].scanPosZ - matchedScans[j].scanPosZ)
+
+				if (manhattenDist &gt; manhattenDistMax) {
+					manhattenDistMax = manhattenDist
+				}
+			}
+		}
+	}
+
+	solution2 = manhattenDistMax
+
+	// print solution for part 1
+	println("******************************")
+	println("--- Day 19: Beacon Scanner ---")
+	println("******************************")
+	println("Solution for part1")
+	println("   $solution1 beacons are there")
+	println()
+	// print solution for part 2
+	println("******************************")
+	println("Solution for part2")
+	println("   $solution2 is the largest Manhattan distance between any two scanners")
+	println()
+	t1 = System.currentTimeMillis() - t1
+	println("puzzle solved in ${t1} ms")
+//}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_17"><a class="anchor" href="#_second_star_17"></a><a class="link" href="#_second_star_17">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>For the second star all positions out of all objects in <em>matchedScans</em> are compared to each other by calculating the manhatten distance. The max value is solution for part 2</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// for part2 iterate through absolute coordinates of all Scans and calculate manhatten distance
+	var manhattenDistMax: Int  = 0
+	var manhattenDist: Int = 0
+
+	for (i in 0..matchedScans.size-1) {
+		for( j in 0..matchedScans.size-1) {
+			if (i!=j) {
+				manhattenDist = abs(matchedScans[i].scanPosX - matchedScans[j].scanPosX)
+				manhattenDist = manhattenDist + abs(matchedScans[i].scanPosY - matchedScans[j].scanPosY)
+				manhattenDist = manhattenDist + abs(matchedScans[i].scanPosZ - matchedScans[j].scanPosZ)
+
+				if (manhattenDist &gt; manhattenDistMax) {
+					manhattenDistMax = manhattenDist
+				}
+			}
+		}
+	}
+
+	solution2 = manhattenDistMax</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out. Be patient, it takes around 20 seconds.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// print solution for part 1
+	println("******************************")
+	println("--- Day 19: Beacon Scanner ---")
+	println("******************************")
+	println("Solution for part1")
+	println("   $solution1 beacons are there")
+	println()
+	// print solution for part 2
+	println("******************************")
+	println("Solution for part2")
+	println("   $solution2 is the largest Manhattan distance between any two scanners")
+	println()
+	t1 = System.currentTimeMillis() - t1
+	println("puzzle solved in ${t1} ms")</code></pre>
+</div>
+</div>
 <a id="day20" />
 </div>
 </div>
@@ -2745,7 +2993,7 @@ solution1 = snailFishNumber[0]</code></pre>
 <p>For execution enter <em>kotlin day2120_1_2.kts</em> in the command line.</p>
 </div>
 <div class="sect4">
-<h5 id="_first_star_17"><a class="anchor" href="#_first_star_17"></a><a class="link" href="#_first_star_17">First Star</a></h5>
+<h5 id="_first_star_18"><a class="anchor" href="#_first_star_18"></a><a class="link" href="#_first_star_18">First Star</a></h5>
 <div class="paragraph">
 <p>How does it work:<br></p>
 </div>
@@ -2836,7 +3084,7 @@ solution1 = snailFishNumber[0]</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_second_star_17"><a class="anchor" href="#_second_star_17"></a><a class="link" href="#_second_star_17">Second Star</a></h5>
+<h5 id="_second_star_18"><a class="anchor" href="#_second_star_18"></a><a class="link" href="#_second_star_18">Second Star</a></h5>
 <div class="paragraph">
 <p>How does it work:<br></p>
 </div>
