@@ -4,12 +4,7 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/21[AoC
 
 === Part 1 ===
 
-Parse
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=parse]
-----
+Part 1 is pretty straight forward:
 
 [source,rust,numbered]
 ----
@@ -17,6 +12,14 @@ include::src/lib.rs[tags=part1]
 ----
 
 === Part 2 ===
+
+For part 2, I use a depth first traversal through play states. I push play states with multiplicities on a stack. 
+
+Each state popped from the stack results in 7 new states for the seven different outcomes of throwing a 3-sided dice three times: (1 x 3, 3 x 4, 6 x 5, 7 x 6, 6 x 7, 3 x 8, 1 x 9).
+
+If a state is a win for either player, the win counter is increased. Otherwise the new state with the new multiplicity is pushed to the stack.
+
+I came up with the idea quite quickly. Still took some time to finish part 2 because of a stupid bug: I updated position and score for the 2nd, 3rd, ... outcome of throwing a dice not based on the current state but based on the 1st, 2nd, ... outcome of throwing a dice...
 
 [source,rust,numbered]
 ----
@@ -30,4 +33,6 @@ include::src/lib.rs[tags=part2]
 include::src/lib.rs[tags=tests]
 ----
 
-=== Today I learned ===
+=== Thoughts ===
+
+The number of possible states is actually not that high: 10 positions for each player + 20 scores for each player + a flag who's turn it is = 10 * 10 * 20 * 20 * 2 = 80k states. So it would be possible to store the multiplicities of all states in a list and update that list starting from low scores to higher scores with a breadth first traversal. That might be faster than my solution where the same state with different multiplicities occurs several times on the stack. Actually, in my solution, I process 17,332,965 states from the stack, i.e., every state is on the stack on average 200 times.
