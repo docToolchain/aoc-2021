@@ -15,9 +15,18 @@ development, e.g., based on the examples given in the puzzles.
 
 === Run Solutions ===
 
-Run solution with `cargo run` (or `cargo run --release` to see the effect of compiler optimization)
+Run solution with `cargo run --release`
 
-Run tests with `cargo test`
+Run tests with `cargo test` or `cargo test --release`
+
+=== Personal Challenges ===
+
+It is December 21st in the meantime. I got that far trying to 
+
+* Keep the overall time for all solutions as small as possible (< 500ms would be great)
+* Do not use anything but out of the box Rust
+
+Let's see whether I can keep up with these constraints until the end.
 
 === Run all Solutions ===
 

@@ -25,11 +25,17 @@ pub fn solve() {
     day19::solve();
     day20::solve();
     day21::solve();
-    // day22::solve();
-    // day23::solve();
-    // day24::solve();
-    // day25::solve();
-    println!("Total time: {:?}", timer.elapsed());
+    // day22::solve(verbose);
+    // day23::solve(verbose);
+    // day24::solve(verbose);
+    // day25::solve(verbose);
+    let days = 21;
+    let elapsed = timer.elapsed();
+    let elapsed_per_day = elapsed.checked_div(days).unwrap();
+    println!(
+        "Total time for {} days: {:?} ({:?} per day)",
+        days, elapsed, elapsed_per_day
+    );
 }
 // end::solve[]
 
