@@ -352,6 +352,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_21_go">Day 21: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_21_dirac_dice">Day 21: Dirac Dice</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_21">Oveview</a></li>
+<li><a href="#_how_to_run_21">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -6663,6 +6673,299 @@ func (g *Grid) Convert(algo []bool) Grid {
 </div>
 <div class="sect4">
 <h5 id="_how_to_run_20"><a class="anchor" href="#_how_to_run_20"></a><a class="link" href="#_how_to_run_20">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
+</div>
+<a id="day21" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_21_go"><a class="anchor" href="#_day_21_go"></a><a class="link" href="#_day_21_go">Day 21: go</a></h3>
+<div class="sect3">
+<h4 id="_day_21_dirac_dice"><a class="anchor" href="#_day_21_dirac_dice"></a><a class="link" href="#_day_21_dirac_dice">Day 21: Dirac Dice</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the Dirac dice puzzle.</p>
+</div>
+<div class="paragraph">
+<p>This one was fun, too.
+The first part was straightforward.
+Simply implement what the task states.
+The only possible pitfalls could be off-by-one errors.</p>
+</div>
+<div class="paragraph">
+<p>The second part took more thinking.
+It was clear right from the start that following all possible games one at a
+time was not an option.
+Instead, like in some cases before, one would have to track all possible game
+states (i.e. universes) and count how many there were.
+I&#8217;ve decided to use the word "metaverse" for related code :) .</p>
+</div>
+<div class="paragraph">
+<p>Some back-of-the-napkin math can be used to assess whether tracking all possible
+game states for the duration of the game is viable:
+The board consists of 10 spaces and there are two players.
+Hence, there are 100 possible arrangements of players.
+Then, for each player, there are 30 possible scores before a game ends, 0
+through 29.
+In the worst case, a player with score 20 rolls a 9, arriving at a total winning
+score of 29.
+Thus, there are 900 possible score combinations.
+Overall, there are 900*100 = 90,000 possible game states before a game is
+guaranteed to have ended.
+Assuming you need store all game states and a count of how many universes are in
+each state, that means you need to store 450,000 numbers, 5 integers per game
+state.
+If an Integer is, say, 8 bytes, that&#8217;s roughly 3.5MB, an amount of storage
+modern hardware can easily handle.</p>
+</div>
+<div class="paragraph">
+<p>Thus, during each step of the game, for each current game state, the code
+checks what are the 7 possible new game states and counts how many there are
+for each (number of current games times number of die rolls arriving at that
+score).
+After each turn, games where one of the two players has won are counted and
+removed from the metaverse.
+Rinse repeat until the metaverse is empty.</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve also decided to simplify the algorithm a bit by always treating it as if
+player 1 had their turn and swapping the players after every turn.
+There is no actual swapping, it&#8217;s just that the new game state is build up by
+using player 1&#8217;s data for player 2 and vice versa.</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_21"><a class="anchor" href="#_oveview_21"></a><a class="link" href="#_oveview_21">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an <code>metaverse.go</code>, which contains the code solving part 2.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	boardSize = 10
+	dieSize   = 100
+	numRolls  = 3
+	winScore  = 1000
+)
+
+// Player is a player of the die game.
+type Player struct {
+	ID        int
+	Pos       int
+	Score     int
+	BoardSize int
+}
+
+// Update updates a player with a roll.
+func (p *Player) Update(roll int) {
+	// Positions will be in [1,10]
+	p.Pos = (p.Pos-1+roll)%p.BoardSize + 1
+	p.Score += p.Pos
+}
+
+// String provides a string representation.
+func (p *Player) String() string {
+	return fmt.Sprintf("{id: %d, pos: %d, s: %d}", p.ID, p.Pos, p.Score)
+}
+
+// DetDie is a deterministic die.
+type DetDie struct {
+	LastRoll int
+	DieSize  int
+	NumRools int
+}
+
+// Roll rolls the dice the required number of times.
+func (d *DetDie) Roll() int {
+	result := 0
+	for rollIdx := 0; rollIdx &lt; d.NumRools; rollIdx++ {
+		d.LastRoll++
+		result += d.LastRoll
+		d.LastRoll = d.LastRoll % d.DieSize
+	}
+	return result
+}
+
+func maxScore(players []Player) int {
+	result := 0
+	found := false
+	for _, player := range players {
+		if !found || player.Score &gt; result {
+			found = true
+			result = player.Score
+		}
+	}
+	return result
+}
+
+func main() {
+	players, err := ReadLinesAsPlayers()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Println(players)
+
+	pos1, pos2 := players[0].Pos, players[1].Pos
+
+	die := DetDie{LastRoll: 0, DieSize: dieSize, NumRools: numRolls}
+
+	rollCount := 0
+	for playerIdx := 0; maxScore(players) &lt; winScore; playerIdx = (playerIdx + 1) % len(players) {
+		roll := die.Roll()
+		rollCount += numRolls
+		players[playerIdx].Update(roll)
+	}
+
+	fmt.Printf("We have a winner! Results after %d rolls are:\n", rollCount)
+	for _, player := range players {
+		fmt.Println(player.String(), "Relevant value is:", rollCount*player.Score)
+	}
+
+	buildMetaverse(pos1, pos2)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsPlayers reads lines in as players.
+func ReadLinesAsPlayers() ([]Player, error) {
+	result := []Player{}
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, nil
+		}
+		if err != nil {
+			return []Player{}, err
+		}
+		line = strings.TrimSpace(line)
+		//nolint:nestif
+		var player Player
+		count, err := fmt.Sscanf(line, inputFormat, &amp;player.ID, &amp;player.Pos)
+		player.BoardSize = boardSize
+		if err != nil {
+			return []Player{}, err
+		}
+		if count != inputNums {
+			return []Player{}, fmt.Errorf("cannot parse %s as player", line)
+		}
+		result = append(result, player)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>metaverse.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// Game describes the state of one two-player game.
+type Game struct {
+	Pos1, Pos2     int
+	Score1, Score2 int
+}
+
+const (
+	diracSize     = 3
+	winScoreDirac = 21
+)
+
+// Metaverse tracks how many universes there are for each game state.
+type Metaverse map[Game]int
+
+// I'm too lazy to write out all possible rolls and counts when rolling a 3-sided die 3 times in a
+// row. Hence, I compute that once.
+func dieRolls(diracSize, numRolls int) map[int]int {
+	state := map[int]int{1: 1, 2: 1, 3: 1}
+	for rollIdx := 1; rollIdx &lt; numRolls; rollIdx++ {
+		newState := map[int]int{}
+		for dieRoll := 1; dieRoll &lt;= diracSize; dieRoll++ {
+			for val, count := range state {
+				newState[val+dieRoll] += count
+			}
+		}
+		state = newState
+	}
+	return state
+}
+
+// We always assume it's player 1's turn. But we swap players so that each has their turn after the
+// other.
+func updateMetaverse(meta Metaverse, dieRolls map[int]int, boardSize int) Metaverse {
+	newMeta := Metaverse{}
+	for game, gameCount := range meta {
+		// Deconstruct the game data.
+		pos1 := game.Pos1
+		pos2 := game.Pos2
+		score1 := game.Score1
+		score2 := game.Score2
+		// Update the new metaverse for each possible outcome.
+		for roll, rollCount := range dieRolls {
+			newPos := (pos1+roll-1)%boardSize + 1
+			newGame := Game{
+				Pos1:   pos2,
+				Pos2:   newPos,
+				Score1: score2,
+				Score2: score1 + newPos,
+			}
+			newMeta[newGame] += gameCount * rollCount
+		}
+	}
+	return newMeta
+}
+
+func countAndRemoveWins(meta *Metaverse) int {
+	wins := 0
+	for game, count := range *meta {
+		// The score that has last been updated will always be score 2 due to the fact that we swap
+		// players all the time.
+		if game.Score2 &gt;= winScoreDirac {
+			wins += count
+			// Deleting from a map while iterating over it is not a problem in Go.
+			delete(*meta, game)
+		}
+	}
+	return wins
+}
+
+func buildMetaverse(pos1, pos2 int) {
+	rollUpdate := dieRolls(diracSize, numRolls)
+	fmt.Println(rollUpdate)
+	// Set up the starting metaverse. During each round, we will update the metaverse.
+	meta := Metaverse{}
+	startGame := Game{Pos1: pos1, Pos2: pos2, Score1: 0, Score2: 0}
+	meta[startGame] = 1
+	// Count how many victories there were for each player. Go's zero value for integers is zero, so
+	// we don't need to initialise the map.
+	numPlayers := 2
+	wins := map[int]int{}
+	// Update the metaverse.
+	for playerIdx := 0; len(meta) &gt; 0; playerIdx = (playerIdx + 1) % numPlayers {
+		meta = updateMetaverse(meta, rollUpdate, boardSize)
+		wins[playerIdx] += countAndRemoveWins(&amp;meta)
+	}
+	fmt.Println("Wins player 1:", wins[0])
+	fmt.Println("Wins player 2:", wins[1])
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_21"><a class="anchor" href="#_how_to_run_21"></a><a class="link" href="#_how_to_run_21">How to run</a></h5>
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run both solutions.</p>
