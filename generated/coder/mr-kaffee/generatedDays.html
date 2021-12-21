@@ -400,6 +400,18 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_21_rust">Day 21: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_21">Day 21: <em>__</em></a>
+<ul class="sectlevel4">
+<li><a href="#_part_1_14">Part 1</a></li>
+<li><a href="#_part_2_14">Part 2</a></li>
+<li><a href="#_tests_20">Tests</a></li>
+<li><a href="#_thoughts_2">Thoughts</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -495,7 +507,7 @@ development, e.g., based on the examples given in the puzzles.</p>
     day18::solve();
     day19::solve();
     day20::solve();
-    // day21::solve();
+    day21::solve();
     // day22::solve();
     // day23::solve();
     // day24::solve();
@@ -5388,6 +5400,14 @@ pub fn parse(content: &amp;str) -&gt; (Vec&lt;bool&gt;, Image) {
         .map(|c| c == '#')
         .collect::&lt;Vec&lt;_&gt;&gt;();
 
+    // if algo[0] is set, all pixels extendig in any direction are lit after the first step
+    // to ensure a finite number of pixels is lit after an odd number of steps, the last element
+    // of the algorithm must not be set
+    assert!(
+        !algo[0] || !algo[algo.len() - 1],
+        "Algorithm will lit infinitely many pixels forever"
+    );
+
     let mut data = Vec::new();
     let mut bbox = (isize::MAX, isize::MAX, isize::MIN, isize::MIN);
     let neg = false;
@@ -5552,6 +5572,159 @@ mod tests {
 </div>
 <div class="paragraph">
 <p>In my first version, I stored the lit pixels of the image in a hash set with <code>HashSet::contains</code> calls in the nested loop in my <code>update_step</code> function. Building a <code>grid</code> for direct lookup and replacing the hash set by a vector reduced the runtime for my solution (both parts) from ~500ms to ~25ms by a factor of 20! Pretty impressive.</p>
+</div>
+<a id="day21" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_21_rust"><a class="anchor" href="#_day_21_rust"></a><a class="link" href="#_day_21_rust">Day 21: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_21"><a class="anchor" href="#_day_21"></a><a class="link" href="#_day_21">Day 21: <em>__</em></a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/21">AoC|2021|21</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="_part_1_14"><a class="anchor" href="#_part_1_14"></a><a class="link" href="#_part_1_14">Part 1</a></h5>
+<div class="paragraph">
+<p>Part 1 is pretty straight forward:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play with a deterministic dice, winning threshold: 1000
+///
+/// return the looser's score times the number the dice was thrown
+pub fn solution_1((mut pos_1, mut pos_2): (usize, usize)) -&gt; usize {
+    let mut score_1 = 0;
+    let mut score_2 = 0;
+
+    let mut dice = 0;
+
+    let mut turn_1 = true;
+    while score_1 &lt; 1000 &amp;&amp; score_2 &lt; 1000 {
+        if turn_1 {
+            pos_1 = (pos_1 + 3 * dice + 6 - 1) % 10 + 1;
+            score_1 += pos_1;
+        } else {
+            pos_2 = (pos_2 + 3 * dice + 6 - 1) % 10 + 1;
+            score_2 += pos_2;
+        }
+
+        dice += 3;
+        turn_1 = !turn_1;
+    }
+
+    dice * cmp::min(score_1, score_2)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_part_2_14"><a class="anchor" href="#_part_2_14"></a><a class="link" href="#_part_2_14">Part 2</a></h5>
+<div class="paragraph">
+<p>For part 2, I use a depth first traversal through play states. I push play states with multiplicities on a stack.</p>
+</div>
+<div class="paragraph">
+<p>Each state popped from the stack results in 7 new states for the seven different outcomes of throwing a 3-sided dice three times: (1 x 3, 3 x 4, 6 x 5, 7 x 6, 6 x 7, 3 x 8, 1 x 9).</p>
+</div>
+<div class="paragraph">
+<p>If a state is a win for either player, the win counter is increased. Otherwise the new state with the new multiplicity is pushed to the stack.</p>
+</div>
+<div class="paragraph">
+<p>I came up with the idea quite quickly. Still took some time to finish part 2 because of a stupid bug: I updated position and score for the 2nd, 3rd, &#8230;&#8203; outcome of throwing a dice not based on the current state but based on the 1st, 2nd, &#8230;&#8203; outcome of throwing a dice&#8230;&#8203;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play with dirac quantum dice
+///
+/// return the number of universes won by the player who wins more often
+pub fn solution_2((pos_1, pos_2): (usize, usize)) -&gt; usize {
+    // 7 possible outcomes with three dice
+    // 3 - 1      (1 1 1)
+    // 4 - 3      (1 1 2) (1 2 1) (2 1 1)
+    // 5 - 6      (1 1 3) (1 2 2) (1 3 1) (2 1 2) (2 2 1) (3 1 1)
+    // 6 - 7      (1 2 3) (1 3 2) (2 1 3) (2 2 2) (2 3 1) (3 1 2) (3 2 1)
+    // 7 - 6      (1 3 3) (2 2 3) (2 3 2) (3 1 3) (3 2 2) (3 3 1)
+    // 8 - 3      (2 3 3) (3 2 3) (3 3 2)
+    // 9 - 1      (3 3 3)
+
+    // push states with multiplicty on stack
+    // since I push to the end and pop from the end, this is depth first search
+    let mut stack = Vec::new();
+    stack.push((pos_1, pos_2, 0, 0, 1, true));
+
+    // counters for wins
+    let mut wins_1 = 0;
+    let mut wins_2 = 0;
+
+    let mut max_stack_size = 1;
+    let mut rounds = 0;
+
+    // while there are unprocessed states
+    while let Some((pos_1, pos_2, score_1, score_2, mult_state, turn_1)) = stack.pop() {
+        // loop over dice outcomes with multiplicity
+        for (dice, mult_dice) in [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)] {
+            if turn_1 { // player 1's turn
+                // update position and score
+                let pos = (pos_1 + dice - 1) % 10 + 1;
+                let score = score_1 + pos;
+                if score &gt;= 21 {
+                    // win
+                    wins_1 += mult_dice * mult_state;
+                } else {
+                    // continue to play later
+                    stack.push((pos, pos_2, score, score_2, mult_dice * mult_state, false));
+                }
+            } else { // player 2's turn
+                // update position and score
+                let pos = (pos_2 + dice - 1) % 10 + 1;
+                let score = score_2 + pos;
+                if score &gt;= 21 {
+                    // win
+                    wins_2 += mult_dice * mult_state;
+                } else {
+                    // continue to play later
+                    stack.push((pos_1, pos, score_1, score, mult_dice * mult_state, true));
+                }
+            }
+        }
+
+        max_stack_size = cmp::max(max_stack_size, stack.len());
+        rounds += 1;
+    }
+
+    println!("Max stack size in {} rounds: {}", rounds, max_stack_size);
+
+    cmp::max(wins_1, wins_2)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_20"><a class="anchor" href="#_tests_20"></a><a class="link" href="#_tests_20">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_play_deterministic() {
+        assert_eq!(739_785, solution_1((4, 8)))
+    }
+
+    #[test]
+    fn test_play_dirac() {
+        assert_eq!(444_356_092_776_315, solution_2((4, 8)))
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_thoughts_2"><a class="anchor" href="#_thoughts_2"></a><a class="link" href="#_thoughts_2">Thoughts</a></h5>
+<div class="paragraph">
+<p>The number of possible states is actually not that high: 10 positions for each player + 20 scores for each player + a flag who&#8217;s turn it is = 10 * 10 * 20 * 20 * 2 = 80k states. So it would be possible to store the multiplicities of all states in a list and update that list starting from low scores to higher scores with a breadth first traversal. That might be faster than my solution where the same state with different multiplicities occurs several times on the stack. Actually, in my solution, I process 17,332,965 states from the stack, i.e., every state is on the stack on average 200 times.</p>
 </div>
 </div>
 </div>
