@@ -25,10 +25,10 @@ pub fn solve() {
     day19::solve();
     day20::solve();
     day21::solve();
-    // day22::solve(verbose);
-    // day23::solve(verbose);
-    // day24::solve(verbose);
-    // day25::solve(verbose);
+    day22::solve();
+    // day23::solve();
+    // day24::solve();
+    // day25::solve();
     let days = 21;
     let elapsed = timer.elapsed();
     let elapsed_per_day = elapsed.checked_div(days).unwrap();
@@ -606,7 +606,7 @@ pub mod day22 {
     // use mr_kaffee_2021_22::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day22/rust/mr-kaffee/input.txt");
+    pub const INPUT: &str = include_str!("../../../../day22/rust/mr-kaffee/input.txt");
     pub const EXP_1: usize = 0;
     pub const EXP_2: usize = 0;
 
