@@ -31,9 +31,10 @@ state.
 If an Integer is, say, 8 bytes, that's roughly 3.5MB, an amount of storage
 modern hardware can easily handle.
 
-Thus, during each step of the game, for each current game state, the code checks
-what are the 6 possible new game states and counts how many there are for each
-(number of current games times number of die rolls arriving at that score).
+Thus, during each step of the game, for each current game state, the code
+checks what are the 7 possible new game states and counts how many there are
+for each (number of current games times number of die rolls arriving at that
+score).
 After each turn, games where one of the two players has won are counted and
 removed from the metaverse.
 Rinse repeat until the metaverse is empty.
