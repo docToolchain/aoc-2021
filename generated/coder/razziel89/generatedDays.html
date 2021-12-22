@@ -362,6 +362,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_22_go">Day 22: go</a>
+<ul class="sectlevel3">
+<li><a href="#_day_22_reactor_reboot">Day 22: Reactor Reboot</a>
+<ul class="sectlevel4">
+<li><a href="#_oveview_22">Oveview</a></li>
+<li><a href="#_how_to_run_22">How to run</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -6966,6 +6976,725 @@ func buildMetaverse(pos1, pos2 int) {
 </div>
 <div class="sect4">
 <h5 id="_how_to_run_21"><a class="anchor" href="#_how_to_run_21"></a><a class="link" href="#_how_to_run_21">How to run</a></h5>
+<div class="paragraph">
+<p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
+<code>cat input.dat | go run .</code> to run both solutions.</p>
+</div>
+<a id="day22" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_22_go"><a class="anchor" href="#_day_22_go"></a><a class="link" href="#_day_22_go">Day 22: go</a></h3>
+<div class="sect3">
+<h4 id="_day_22_reactor_reboot"><a class="anchor" href="#_day_22_reactor_reboot"></a><a class="link" href="#_day_22_reactor_reboot">Day 22: Reactor Reboot</a></h4>
+<div class="paragraph">
+<p>This is my implementation for both rounds of the reactor reboot puzzle.</p>
+</div>
+<div class="paragraph">
+<p>This one was touch to crack, just because I made oh so many mistakes.
+The approaches worked out in the end.</p>
+</div>
+<div class="paragraph">
+<p>For part 1, simply take a grid of 101x101x101 and mark and unmark points on it
+as needed.
+I&#8217;ve used another lazy grid, but it basically does the same thing.</p>
+</div>
+<div class="paragraph">
+<p>For part 2, it was clear that tracking all marked points in space was no option.
+Instead, I&#8217;ve decided to track non-verlapping areas in space of positive values.
+I&#8217;ve also decided to use the old "start included, end excluded" way of writing
+down cuboids, so cuboid "on x=10..12,y=10..12,z=10..12" would be "on
+x=10..13,y=10..13,z=10..13" for my code, but encompassing the same space.</p>
+</div>
+<div class="paragraph">
+<p>When adding a coboid, check for overlaps with existing ones.
+If an overlap is found, split the previous cuboid up into up to 26 cuboids that
+do not overlap with the new one but are fully within the old one.
+Remember those up to 26 cuboids.
+If this was "switching on" operation, also remember the new cuboid.
+Otherwise, don&#8217;t remember the new cuboid.
+The space overlapping between the new one and the old ones has been forgotten
+anyway.</p>
+</div>
+<div class="paragraph">
+<p>If there is no overlap, simply remember all cuboids as they are.
+If an existing cuboid is fully within the new one, discard the old one.
+If this is a "switching on" operation, the new one will contain the same space.
+If it is a "switching off" one, the old cuboud would need to be removed anyway.</p>
+</div>
+<div class="paragraph">
+<p>Sorry if this description is brief, but I won&#8217;t have much more time to play
+around with the AoC this year.
+Don&#8217;t be surprised to see no more solutions from me.
+It was fun!</p>
+</div>
+<div class="sect4">
+<h5 id="_oveview_22"><a class="anchor" href="#_oveview_22"></a><a class="link" href="#_oveview_22">Oveview</a></h5>
+<div class="paragraph">
+<p>This solution contains a <code>solution.go</code>, which defines the main executable.
+There is also a <code>utils.go</code>, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an <code>grid.go</code>, which contains a lazy grid mostly taken from
+previosu solutions but extended to 3 dimensions.
+There is also a vector and a cuboid with some helper methods defined here.</p>
+</div>
+<div class="paragraph">
+<p><code>solution.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	clampVal   = 50
+	maxNumCubs = 26
+)
+
+func max(num1, num2 int) int {
+	if num1 &gt; num2 {
+		return num1
+	}
+	return num2
+}
+
+func min(num1, num2 int) int {
+	if num1 &lt; num2 {
+		return num1
+	}
+	return num2
+}
+
+// One cuboid eats a chunk out of another cuboid, splitting the first one into up to 26 new ones.
+//nolint:funlen,gomnd,dupl
+func eatChunk(onCub, offCub Cuboid) ([]Cuboid, bool) {
+	result := make([]Cuboid, 0, maxNumCubs)
+	// At first, determine a cuboid that is fully within both of the other cuboids.
+	inside := Cuboid{
+		start: Vec{
+			x: max(onCub.start.x, offCub.start.x),
+			y: max(onCub.start.y, offCub.start.y),
+			z: max(onCub.start.z, offCub.start.z),
+		},
+		end: Vec{
+			x: min(onCub.end.x, offCub.end.x),
+			y: min(onCub.end.y, offCub.end.y),
+			z: min(onCub.end.z, offCub.end.z),
+		},
+	}
+	if inside.Size() == 0 {
+		// In this case, one cuboid is completely outside the other one.
+		return []Cuboid{}, false
+	}
+	if inside == onCub {
+		// In this case, one cuboid is completely outside the other one.
+		return []Cuboid{}, true
+	}
+	for _, dim := range [3]int{0, 1, 2} {
+		// Negative direction.
+		{
+			newCub := Cuboid{start: inside.start, end: inside.end}
+			newCub.start.Set(dim, onCub.start.Get(dim))
+			newCub.end.Set(dim, inside.start.Get(dim))
+			if newCub.Size() &gt; 0 {
+				result = append(result, newCub)
+			}
+		}
+		// Positive direction.
+		{
+			newCub := Cuboid{start: inside.start, end: inside.end}
+			newCub.start.Set(dim, inside.end.Get(dim))
+			newCub.end.Set(dim, onCub.end.Get(dim))
+			if newCub.Size() &gt; 0 {
+				result = append(result, newCub)
+			}
+		}
+	}
+	// count == 6
+	for _, dim := range [3]int{0, 1, 2} {
+		nextDim := (dim + 1) % 3
+		// Negative dim direction
+		{
+			// Negative nextDim direction
+			{
+				newCub := Cuboid{start: inside.start, end: inside.end}
+				newCub.start.Set(dim, onCub.start.Get(dim))
+				newCub.end.Set(dim, inside.start.Get(dim))
+				newCub.start.Set(nextDim, onCub.start.Get(nextDim))
+				newCub.end.Set(nextDim, inside.start.Get(nextDim))
+				if newCub.Size() &gt; 0 {
+					result = append(result, newCub)
+				}
+			}
+			// Positive nextDim direction
+			{
+				newCub := Cuboid{start: inside.start, end: inside.end}
+				newCub.start.Set(dim, onCub.start.Get(dim))
+				newCub.end.Set(dim, inside.start.Get(dim))
+				newCub.start.Set(nextDim, inside.end.Get(nextDim))
+				newCub.end.Set(nextDim, onCub.end.Get(nextDim))
+				if newCub.Size() &gt; 0 {
+					result = append(result, newCub)
+				}
+			}
+		}
+		// Positive dim direction
+		{
+			// Negative nextDim direction
+			{
+				newCub := Cuboid{start: inside.start, end: inside.end}
+				newCub.start.Set(dim, inside.end.Get(dim))
+				newCub.end.Set(dim, onCub.end.Get(dim))
+				newCub.start.Set(nextDim, onCub.start.Get(nextDim))
+				newCub.end.Set(nextDim, inside.start.Get(nextDim))
+				if newCub.Size() &gt; 0 {
+					result = append(result, newCub)
+				}
+			}
+			// Positive nextDim direction
+			{
+				newCub := Cuboid{start: inside.start, end: inside.end}
+				newCub.start.Set(dim, inside.end.Get(dim))
+				newCub.end.Set(dim, onCub.end.Get(dim))
+				newCub.start.Set(nextDim, inside.end.Get(nextDim))
+				newCub.end.Set(nextDim, onCub.end.Get(nextDim))
+				if newCub.Size() &gt; 0 {
+					result = append(result, newCub)
+				}
+			}
+		}
+	}
+	// Eight corners.
+	// x&gt;0 y&gt;0 z&gt;0
+	{
+		newCub := Cuboid{start: inside.end, end: onCub.end}
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&gt;0 y&gt;0 z&lt;0
+	{
+		newCub := Cuboid{start: inside.end, end: onCub.end}
+		newCub.start.z = onCub.start.z
+		newCub.end.z = inside.start.z
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&gt;0 y&lt;0 z&gt;0
+	{
+		newCub := Cuboid{start: inside.end, end: onCub.end}
+		newCub.start.y = onCub.start.y
+		newCub.end.y = inside.start.y
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&gt;0 y&lt;0 z&lt;0
+	{
+		newCub := Cuboid{start: inside.end, end: onCub.end}
+		newCub.start.y = onCub.start.y
+		newCub.end.y = inside.start.y
+		newCub.start.z = onCub.start.z
+		newCub.end.z = inside.start.z
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&lt;0 y&lt;0 z&lt;0
+	{
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&lt;0 y&lt;0 z&gt;0
+	{
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.z = inside.end.z
+		newCub.end.z = onCub.end.z
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&lt;0 y&gt;0 z&lt;0
+	{
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.y = inside.end.y
+		newCub.end.y = onCub.end.y
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	// x&lt;0 y&gt;0 z&gt;0
+	{
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.y = inside.end.y
+		newCub.end.y = onCub.end.y
+		newCub.start.z = inside.end.z
+		newCub.end.z = onCub.end.z
+		if newCub.Size() &gt; 0 {
+			result = append(result, newCub)
+		}
+	}
+	if len(result) == 0 &amp;&amp; inside.Size() &gt; 0 {
+		log.Fatal("something went wrong")
+	}
+	return result, true
+}
+
+func totalSize(cubs []Cuboid) int {
+	sum := 0
+	for _, cub := range cubs {
+		sum += cub.Size()
+	}
+	return sum
+}
+
+//nolint:funlen
+func main() {
+	cubs, switches, err := ReadLinesAsCuboids()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	if len(cubs) != len(switches) {
+		log.Fatal("need as many switches as cuboids")
+	}
+
+	fmt.Println("Part 1")
+
+	grid := Grid{data: map[Vec]bool{}, clamp: clampVal, background: false}
+
+	for idx, cub := range cubs {
+		swit := switches[idx]
+		grid.MarkCuboid(cub, swit)
+	}
+	fmt.Println("Number of cubes marked:", len(grid.data))
+
+	fmt.Println()
+	fmt.Println("Part 2")
+
+	currentCubs := []Cuboid{cubs[0]}
+	if !switches[0] {
+		log.Fatal("expect first one to switch something on")
+	}
+
+	for idx, cub := range cubs[1:] {
+		swit := switches[idx+1]
+		// Switch something on: Let the new chunk eat something out of all existing chunks.
+		// Then, add the new chunk whole.
+		// Switch something off: Let the new chunk eat something out of all existing chunks.
+		// Only add those reduces chunks but don't add the new chunk.
+		newCubs := []Cuboid{}
+		for _, currCub := range currentCubs {
+			chunks, overlap := eatChunk(currCub, cub)
+			if len(chunks) &gt; 0 {
+				// There was definitely some overlap.
+				newCubs = append(newCubs, chunks...)
+			} else if !overlap {
+				// No overlap, keep the old cub.
+				newCubs = append(newCubs, currCub)
+			} /* else {
+				// Otherwise, there was full overlap. Don't add anything back. The current cub will
+				// be fully contained within the new cub. If this is not an addition but a removal,
+				// then the odl cub will be removed entirely.
+			}*/
+		}
+		if swit {
+			newCubs = append(newCubs, cub)
+		}
+		currentCubs = newCubs
+	}
+	fmt.Println("Number of cubes marked:", totalSize(currentCubs))
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>utils.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">// ReadLinesAsCuboids reads lines in as cuboids.
+func ReadLinesAsCuboids() ([]Cuboid, []bool, error) {
+	result := []Cuboid{}
+	switches := []bool{}
+	for {
+		line, err := readLine()
+		if err == io.EOF {
+			// Success case, no more input to read.
+			return result, switches, nil
+		}
+		if err != nil {
+			return []Cuboid{}, []bool{}, err
+		}
+		line = strings.TrimSpace(line)
+		//nolint:nestif
+		var onOff string
+		var x1, x2, y1, y2, z1, z2 int
+		count, err := fmt.Sscanf(line, cuboidFormat, &amp;onOff, &amp;x1, &amp;x2, &amp;y1, &amp;y2, &amp;z1, &amp;z2)
+		if err != nil {
+			return []Cuboid{}, []bool{}, err
+		}
+		if count != parsedVals {
+			return []Cuboid{}, []bool{}, fmt.Errorf("parsed wrong number of values")
+		}
+		if onOff != onStr &amp;&amp; onOff != offStr {
+			return []Cuboid{}, []bool{}, fmt.Errorf("icorrect on-off string")
+		}
+		cub := NewCuboid(x1, x2+1, y1, y2+1, z1, z2+1)
+		result = append(result, cub)
+		switches = append(switches, onOff == onStr)
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>grid.go</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-go" data-lang="go">const (
+	buffer = 100
+)
+
+// Vec is a £D vector. Most of it has been taken from a previous solution.
+type Vec struct {
+	x, y, z int
+}
+
+// Add adds one vector to another one.
+func (v Vec) Add(delta Vec) Vec {
+	result := Vec{
+		x: v.x + delta.x,
+		y: v.y + delta.y,
+		z: v.z + delta.z,
+	}
+	return result
+}
+
+// Get gets the co-ordinate based on the index.
+func (v Vec) Get(idx int) int {
+	if idx == 0 {
+		return v.x
+	}
+	if idx == 1 {
+		return v.y
+	}
+	if idx == 2 { //nolint:gomnd
+		return v.z
+	}
+	panic("incorrect co-ordinate")
+}
+
+// Set sets the co-ordinate based on the index.
+func (v *Vec) Set(idx, val int) {
+	if idx == 0 {
+		v.x = val
+		return
+	}
+	if idx == 1 {
+		v.y = val
+		return
+	}
+	if idx == 2 { //nolint:gomnd
+		v.z = val
+		return
+	}
+	panic("incorrect co-ordinate")
+}
+
+// Mul multiplies each component of a vector with a number.
+func (v Vec) Mul(factor int) Vec {
+	result := Vec{
+		x: v.x * factor,
+		y: v.y * factor,
+		z: v.z * factor,
+	}
+	return result
+}
+
+// Inv inverts a vector.
+func (v Vec) Inv() Vec {
+	return v.Mul(-1)
+}
+
+// Sub subtracts a vector'v data from another one'v.
+func (v Vec) Sub(delta Vec) Vec {
+	return v.Add(delta.Inv())
+}
+
+func abs(val int) int {
+	if val &lt; 0 {
+		return -val
+	}
+	return val
+}
+
+// Size gives the size of space spanned by a vector.
+func (v Vec) Size() int {
+	return abs(v.x * v.y * v.z)
+}
+
+// Cuboid is a cubouid in space.
+type Cuboid struct {
+	start, end Vec
+}
+
+// Size gives the size of space spanned by a cuboid.
+func (c Cuboid) Size() int {
+	diff := c.end.Sub(c.start)
+	if diff.x &lt;= 0 || diff.y &lt;= 0 || diff.z &lt;= 0 {
+		// In this case, this cuboid does not describe a valid one.
+		return 0
+	}
+	return diff.Size()
+}
+
+// Overlaps determines whether two overlap.
+func (c Cuboid) Overlaps(other Cuboid) bool {
+	inside := Cuboid{
+		start: Vec{
+			x: max(c.start.x, other.start.x),
+			y: max(c.start.y, other.start.y),
+			z: max(c.start.z, other.start.z),
+		},
+		end: Vec{
+			x: min(c.end.x, other.end.x),
+			y: min(c.end.y, other.end.y),
+			z: min(c.end.z, other.end.z),
+		},
+	}
+	return inside.Size() != 0
+}
+
+// String provides a string rep.
+func (c Cuboid) String() string {
+	return fmt.Sprintf(
+		"x=%d..%d,y=%d..%d,z=%d..%d",
+		c.start.x, c.end.x, c.start.y, c.end.y, c.start.z, c.end.z,
+	)
+}
+
+// NewCuboid gets a new cuboid, ensuring that the co-ordinates are ordered correctly.
+func NewCuboid(x1, x2, y1, y2, z1, z2 int) Cuboid {
+	if x2 &lt; x1 {
+		x1, x2 = x2, x1
+	}
+	if y2 &lt; y1 {
+		y1, y2 = y2, y1
+	}
+	if z2 &lt; z1 {
+		z1, z2 = z2, z1
+	}
+	cub := Cuboid{
+		start: Vec{
+			x: x1,
+			y: y1,
+			z: z1,
+		},
+		end: Vec{
+			x: x2,
+			y: y2,
+			z: z2,
+		},
+	}
+	return cub
+}
+
+// Contains determines whether a vector lies within a cuboid.
+func (c *Cuboid) Contains(vec Vec) bool {
+	return vec.x-c.start.x &lt; c.end.x &amp;&amp; vec.y-c.start.y &lt; c.end.y &amp;&amp; vec.z-c.start.z &lt; c.end.z
+}
+
+// Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
+// from a previous solution.
+type Grid struct {
+	data       map[Vec]bool
+	background bool
+	clamp      int
+}
+
+// Mark marks a point on the grid as true or false. Any markings equal to the background are
+// ignored.
+func (g *Grid) Mark(entry Vec, val bool) {
+	// We don't have to handle non-existing values here since Go returns the zero value (false for
+	// boolean values) for such entries. Accepting any boolean value here allows us to ignore the
+	// background setting and always call Mark the same way.
+	if val != g.background {
+		g.data[entry] = val
+	} else {
+		delete(g.data, entry)
+	}
+}
+
+//nolint:funlen
+func clamp(cub Cuboid, startVal, endVal int) (Cuboid, bool) {
+	x1 := cub.start.x
+	y1 := cub.start.y
+	z1 := cub.start.z
+
+	if x1 &lt; startVal {
+		x1 = startVal
+	} else if x1 &gt; endVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	if y1 &lt; startVal {
+		y1 = startVal
+	} else if y1 &gt; endVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	if z1 &lt; startVal {
+		z1 = startVal
+	} else if z1 &gt; endVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	x2 := cub.end.x - 1
+	y2 := cub.end.y - 1
+	z2 := cub.end.z - 1
+
+	if x2 &gt; endVal {
+		x2 = endVal
+	} else if x2 &lt; startVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	if y2 &gt; endVal {
+		y2 = endVal
+	} else if y2 &lt; startVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	if z2 &gt; endVal {
+		z2 = endVal
+	} else if z2 &lt; startVal {
+		// In this case, the entire cuboid is outside the area of validity.
+		return Cuboid{}, false
+	}
+
+	result := Cuboid{
+		start: Vec{
+			x: x1,
+			y: y1,
+			z: z1,
+		},
+		end: Vec{
+			x: x2 + 1,
+			y: y2 + 1,
+			z: z2 + 1,
+		},
+	}
+	return result, true
+}
+
+// MarkCuboid marks a point on the grid as true or false within a cuboid.
+func (g *Grid) MarkCuboid(area Cuboid, val bool) {
+	// Permit disabling the clamping by providing a value &lt;=0.
+	if g.clamp &gt; 0 {
+		var valid bool
+		area, valid = clamp(area, -g.clamp, g.clamp)
+		if !valid {
+			// The cuboid is completely outside the area of validity. Don't to anything.
+			return
+		}
+	}
+	// If the to-be-marked value is equal to the background, we can get away with not iterating over
+	// the entirety of the cuboid. This is only then more efficient, if the cuboid contains more
+	// points that the grid. Otherwise, we have to iterate over the entire cuboid, but clamped to
+	// the supported area.
+	if val == g.background &amp;&amp; len(g.data) &lt; area.Size() {
+		for vec := range g.data {
+			if area.Contains(vec) {
+				g.RemoveAll(vec)
+			}
+		}
+	} else {
+		// Iterate over the entire cuboid and mark each point with the given value.
+		for x := area.start.x; x &lt; area.end.x; x++ {
+			for y := area.start.y; y &lt; area.end.y; y++ {
+				for z := area.start.z; z &lt; area.end.z; z++ {
+					vec := Vec{x: x, y: y, z: z}
+					g.Mark(vec, val)
+				}
+			}
+		}
+	}
+
+}
+
+// Marked determines whether a point has been marked.
+func (g *Grid) Marked(entry Vec) bool {
+	if val, found := g.data[entry]; found {
+		return val
+	}
+	return g.background
+}
+
+// Has determines whether a point is on the grid.
+func (g *Grid) Has(entry Vec) bool {
+	_, ok := g.data[entry]
+	return ok
+}
+
+// RemoveAll removes all markings for a specific point.
+func (g *Grid) RemoveAll(entry Vec) {
+	delete(g.data, entry)
+}
+
+// Points returns an iterator over all points on the grid that deviate from the background.
+func (g *Grid) Points() &lt;-chan Vec {
+	channel := make(chan Vec, buffer)
+	go func() {
+		for point := range g.data {
+			if g.Marked(point) != g.background {
+				channel &lt;- point
+			}
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+// String gives you a string.
+func (g Grid) String() string {
+	points := make([]Vec, 0, len(g.data))
+	for p := range g.data {
+		points = append(points, p)
+	}
+
+	lessFn := func(i, j int) bool {
+		if points[i].x &lt; points[j].x {
+			return true
+		}
+		if points[i].y &lt; points[j].y {
+			return true
+		}
+		if points[i].z &lt; points[j].z {
+			return true
+		}
+		return false
+	}
+
+	sort.Slice(points, lessFn)
+	str := ""
+	for _, p := range points {
+		str += fmt.Sprintf("%v\n", p)
+	}
+	return str
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are currently no tests.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_how_to_run_22"><a class="anchor" href="#_how_to_run_22"></a><a class="link" href="#_how_to_run_22">How to run</a></h5>
 <div class="paragraph">
 <p>Assuming the required input is in a file <code>input.dat</code>, you only need to execute
 <code>cat input.dat | go run .</code> to run both solutions.</p>
