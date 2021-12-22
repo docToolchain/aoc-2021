@@ -93,7 +93,7 @@ type Cuboid struct {
 
 // Size gives the size of space spanned by a cuboid.
 func (c Cuboid) Size() int {
-	diff := c.end.Sub(c.start).Add(Vec{1, 1, 1})
+	diff := c.end.Sub(c.start)
 	if diff.x <= 0 || diff.y <= 0 || diff.z <= 0 {
 		// In this case, this cuboid does not describe a valid one.
 		return 0
@@ -137,7 +137,7 @@ func NewCuboid(x1, x2, y1, y2, z1, z2 int) Cuboid {
 
 // Contains determines whether a vector lies within a cuboid.
 func (c *Cuboid) Contains(vec Vec) bool {
-	return vec.x-c.start.x <= c.end.x && vec.y-c.start.y <= c.end.y && vec.z-c.start.z <= c.end.z
+	return vec.x-c.start.x < c.end.x && vec.y-c.start.y < c.end.y && vec.z-c.start.z < c.end.z
 }
 
 // Grid is a lazily evaluated grid that supports marking points on it. Most of it has been taken
@@ -188,9 +188,9 @@ func clamp(cub Cuboid, startVal, endVal int) (Cuboid, bool) {
 		return Cuboid{}, false
 	}
 
-	x2 := cub.end.x
-	y2 := cub.end.y
-	z2 := cub.end.z
+	x2 := cub.end.x - 1
+	y2 := cub.end.y - 1
+	z2 := cub.end.z - 1
 
 	if x2 > endVal {
 		x2 = endVal
@@ -220,9 +220,9 @@ func clamp(cub Cuboid, startVal, endVal int) (Cuboid, bool) {
 			z: z1,
 		},
 		end: Vec{
-			x: x2,
-			y: y2,
-			z: z2,
+			x: x2 + 1,
+			y: y2 + 1,
+			z: z2 + 1,
 		},
 	}
 	return result, true
@@ -251,9 +251,9 @@ func (g *Grid) MarkCuboid(area Cuboid, val bool) {
 		}
 	} else {
 		// Iterate over the entire cuboid and mark each point with the given value.
-		for x := area.start.x; x <= area.end.x; x++ {
-			for y := area.start.y; y <= area.end.y; y++ {
-				for z := area.start.z; z <= area.end.z; z++ {
+		for x := area.start.x; x < area.end.x; x++ {
+			for y := area.start.y; y < area.end.y; y++ {
+				for z := area.start.z; z < area.end.z; z++ {
 					vec := Vec{x: x, y: y, z: z}
 					g.Mark(vec, val)
 				}

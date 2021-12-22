@@ -271,7 +271,7 @@ func main() {
 	for idx, cub := range cubs {
 		swit := switches[idx]
 		grid.MarkCuboid(cub, swit)
-		fmt.Println(idx, len(grid.data), cub.Size())
+		fmt.Println(idx, len(grid.data), cub.Size(), cub)
 	}
 
 	fmt.Println()

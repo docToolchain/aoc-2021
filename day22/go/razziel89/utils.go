@@ -51,7 +51,7 @@ func ReadLinesAsCuboids() ([]Cuboid, []bool, error) {
 		if onOff != onStr && onOff != offStr {
 			return []Cuboid{}, []bool{}, fmt.Errorf("icorrect on-off string")
 		}
-		cub := NewCuboid(x1, x2, y1, y2, z1, z2)
+		cub := NewCuboid(x1, x2+1, y1, y2+1, z1, z2+1)
 		result = append(result, cub)
 		switches = append(switches, onOff == onStr)
 	}
