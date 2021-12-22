@@ -15,15 +15,26 @@ development, e.g., based on the examples given in the puzzles.
 
 === Run Solutions ===
 
-Run solution with `cargo run` (or `cargo run --release` to see the effect of compiler optimization)
+Run solution with `cargo run --release`
 
-Run tests with `cargo test`
+Run tests with `cargo test` or `cargo test --release`
+
+=== Personal Challenges ===
+
+It is December 21st in the meantime. I got that far trying to 
+
+* Keep the overall time for all solutions as small as possible (< 500ms would be great)
+* Do not use anything but out of the box Rust
+
+Let's see whether I can keep up with these constraints until the end.
 
 === Run all Solutions ===
 
-My `day00` solution this year will run all my solutions. At this time, it looks as follows
+My `day00` solution this year will run all my solutions. The code looks as follows:
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=solve]
 ----
+
+To run all solutions, use ``cargo run --release -- from 1 --to 25``. The command line options ``--from <day>`` and ``--to <day>`` specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.
