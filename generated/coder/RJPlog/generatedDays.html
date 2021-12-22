@@ -333,6 +333,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_21_kotlin">Day 21: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_21_dirac_dice">Day 21: Dirac Dice</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_19">First Star</a></li>
+<li><a href="#_second_star_19">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3157,6 +3167,231 @@ solution1 = snailFishNumber[0]</code></pre>
 	println("**************************")
 	println("Solution for part2")
 	println("   $solution2 pixels are lit in the resulting image")
+	println()</code></pre>
+</div>
+</div>
+<a id="day21" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_21_kotlin"><a class="anchor" href="#_day_21_kotlin"></a><a class="link" href="#_day_21_kotlin">Day 21: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_21_dirac_dice"><a class="anchor" href="#_day_21_dirac_dice"></a><a class="link" href="#_day_21_dirac_dice">Day 21: Dirac Dice</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/21" class="bare">https://adventofcode.com/2021/day/21</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2121_1_2.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_19"><a class="anchor" href="#_first_star_19"></a><a class="link" href="#_first_star_19">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>First the puzzle input is read into variables for further proceeding.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var startingSpace = mutableListOf&lt;Int&gt;()
+
+	File("day2121_puzzle_input.txt").forEachLine {
+		startingSpace.add(it.takeLast(1).toString().toInt())
+	}
+
+	var play1 = startingSpace[0]
+	var play2 = startingSpace[1]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All the calculations are placed into a function, which is called from the main part with the puzzle input:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var solution1 = standardDice(play1, play2)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Inside the function the game and the rules are implemented and if one player wins, the result of player&#8217;s score multiplied by number of dices thrown is returned:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun standardDice(in1: Int, in2: Int): Int {
+	var play1 = in1
+	var play2 = in2
+	var play1Score: Int = 0
+	var play2Score: Int = 0
+	var dice: Int = 1
+	var diceCount = 0
+
+	while (play1Score &lt; 1000 &amp;&amp; play2Score &lt; 1000) {
+		// three turns player 1
+		for (i in 0..2) {
+			play1 = ((play1 + dice - 1) % 10) + 1
+			dice = (dice) % 100 + 1
+		}
+		diceCount += 3
+		play1Score = play1Score + play1
+		if (play1Score &gt;= 1000) {
+			return (play2Score * diceCount)
+		}
+		// three turns player 2
+		for (i in 0..2) {
+			play2 = (play2 + dice - 1) % 10 + 1
+			dice = (dice) % 100 + 1
+		}
+		diceCount += 3
+		play2Score = play2Score + play2
+		if (play2Score &gt;= 1000) {
+			return (play1Score * diceCount)
+		}
+	}
+	return 1
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_19"><a class="anchor" href="#_second_star_19"></a><a class="link" href="#_second_star_19">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Here the same puzzle input is used, but for calculation of the result some modifications are necessary. The spedification now asks not for a standardized row of dice
+results, but for a variant tree, starting with (1),(2),(3) and then (1,1),(1,2),(1,3),(2,1)&#8230;&#8203;.  Every round of throwing dices you multiply the input vector by 3 -&#8594;
+3, 9, 27, 81, 243&#8230;&#8203; .  Each player has it&#8217;s turn only after 3 times throwing the dices, so you can combine any combination of (1,2,3) to one throw with value 3-9.
+Each value has a number out of which dice combinations it could be reached, which is stored in a map and used to calculate the number of games following that path.</p>
+</div>
+<div class="paragraph">
+<p>This reduction was not enough, the only idea I had was to split the calculation into separte ones and to add up the result, this is done in the main part, where already
+some of the staring vectors of dices are created, and then it is continued until payer one or two wins, or game ends without win, then new vectors are created with a
+range of 3 to 9 added to the input vector.</p>
+</div>
+<div class="paragraph">
+<p>Tryouts have shown, that for beeing able to reach the end, the starting vector has at least to be filled with the first two values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	var play1Wins: Long = 0
+	var play2Wins: Long = 0
+
+	var diceVarOverall = MutableList(0) { mutableListOf&lt;Int&gt;() }
+	var diceVarOverallNew = MutableList(0) { mutableListOf&lt;Int&gt;() }
+	var diceVariation = mutableListOf&lt;Int&gt;()
+
+	for (ii in 3..9) {
+		for (iii in 3..9) {
+			diceVariation.add(ii)
+			diceVariation.add(iii)
+			diceVarOverall.add(diceVariation.toMutableList())
+			diceVariation.clear()
+
+			println("-----------------")
+			println("-- next turn   --")
+			println("-----------------")
+			print("   diceVarOverall: ")
+			println(diceVarOverall)
+
+			while (diceVarOverall.isNotEmpty()) {
+
+				diceVarOverall.forEach {
+					var result = diracDice(play1, play2, it)
+					if (result.first == 1) {
+						play1Wins = play1Wins + result.second
+					} else if (result.first == 2) {
+						play2Wins = play2Wins + result.second
+					} else if (result.first == 0) {
+						for (i in 3..9) {
+							var diceVariationNew = it.toMutableList()
+							diceVariationNew.add(i)
+							diceVarOverallNew.add(diceVariationNew.toMutableList())
+							//	diceVariationNew.clear()
+						}
+					}
+
+				}
+				diceVarOverall.clear()
+				diceVarOverall.addAll(diceVarOverallNew)
+				diceVarOverallNew.clear()
+
+			} // end While (diceVarOverall.isNotEmpty())
+			println()
+		}
+	}
+
+	var solution2 = maxOf(play1Wins, play2Wins)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With these starting vectors the function <em>diracDice</em> is started, if one player wins, the number of different worlds is calculated and summed up, if now player wins, the main
+algorithm will add nine new input vectors to the list for next run.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">fun diracDice(in1: Int, in2: Int, in3: List&lt;Int&gt;): Pair&lt;Int, Long&gt; {
+	var play1 = in1
+	var play2 = in2
+	var play1Score: Int = 0
+	var play2Score: Int = 0
+	var dice = in3
+	var diceCount = 0
+	var numOfVars: Long = 1
+	var mapTable = mutableMapOf&lt;Int, Int&gt;()
+	mapTable.put(3, 1)
+	mapTable.put(4, 3)
+	mapTable.put(5, 6)
+	mapTable.put(6, 7)
+	mapTable.put(7, 6)
+	mapTable.put(8, 3)
+	mapTable.put(9, 1)
+
+	var i: Int = 0
+	while (true) {
+		play1 = ((play1 + dice[i] - 1) % 10) + 1
+		numOfVars = numOfVars * mapTable.getValue(dice[i])
+		i += 1
+		diceCount += 3
+		play1Score = play1Score + play1
+
+		if (play1Score &gt;= 21) {
+			return Pair(1, numOfVars)
+		} else if (i &gt; dice.size - 1) {
+			return Pair(0, 0)
+		}
+		play2 = (play2 + dice[i] - 1) % 10 + 1
+		numOfVars = numOfVars * mapTable.getValue(dice[i])
+		i += 1
+		diceCount += 3
+		play2Score = play2Score + play2
+		if (play2Score &gt;= 21) {
+			return Pair(2, numOfVars)
+		} else if (i &gt; dice.size - 1) {
+			return Pair(0, 0)
+		}
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At the end, both solutions are printed out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">	// print solution for part 1
+	println("*******************************")
+	println("--- Day 21: Dirac Dice ---")
+	println("*******************************")
+	println("Solution for part1")
+	println("   $solution1 you get if you multiply the score of the losing player by the number of times the die was rolled during the game")
+	println()
+	// print solution for part 2
+	println("*******************************")
+	println("Solution for part2")
+	println("   $solution2 are the most wins in all universes")
 	println()</code></pre>
 </div>
 </div>
