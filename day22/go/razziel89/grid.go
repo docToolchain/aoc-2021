@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // tag::grid[]
 
@@ -99,6 +102,23 @@ func (c Cuboid) Size() int {
 		return 0
 	}
 	return diff.Size()
+}
+
+// Overlaps determines whether two overlap.
+func (c Cuboid) Overlaps(other Cuboid) bool {
+	inside := Cuboid{
+		start: Vec{
+			x: max(c.start.x, other.start.x),
+			y: max(c.start.y, other.start.y),
+			z: max(c.start.z, other.start.z),
+		},
+		end: Vec{
+			x: min(c.end.x, other.end.x),
+			y: min(c.end.y, other.end.y),
+			z: min(c.end.z, other.end.z),
+		},
+	}
+	return inside.Size() != 0
 }
 
 // String provides a string rep.
@@ -294,6 +314,34 @@ func (g *Grid) Points() <-chan Vec {
 		close(channel)
 	}()
 	return channel
+}
+
+// String gives you a string.
+func (g Grid) String() string {
+	points := make([]Vec, 0, len(g.data))
+	for p := range g.data {
+		points = append(points, p)
+	}
+
+	lessFn := func(i, j int) bool {
+		if points[i].x < points[j].x {
+			return true
+		}
+		if points[i].y < points[j].y {
+			return true
+		}
+		if points[i].z < points[j].z {
+			return true
+		}
+		return false
+	}
+
+	sort.Slice(points, lessFn)
+	str := ""
+	for _, p := range points {
+		str += fmt.Sprintf("%v\n", p)
+	}
+	return str
 }
 
 // end::grid[]

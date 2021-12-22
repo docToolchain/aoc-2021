@@ -27,9 +27,8 @@ func min(num1, num2 int) int {
 }
 
 // One cuboid eats a chunk out of another cuboid, splitting the first one into up to 26 new ones.
-//nolint:funlen,gomnd
-func eatChunk(onCub, offCub Cuboid, done map[int]bool) []Cuboid {
-	count := 0
+//nolint:funlen,gomnd,dupl
+func eatChunk(onCub, offCub Cuboid) ([]Cuboid, bool) {
 	result := make([]Cuboid, 0, maxNumCubs)
 	// At first, determine a cuboid that is fully within both of the other cuboids.
 	inside := Cuboid{
@@ -47,32 +46,35 @@ func eatChunk(onCub, offCub Cuboid, done map[int]bool) []Cuboid {
 	if inside.Size() == 0 {
 		// In this case, one cuboid is completely outside the other one.
 		// fmt.Println("no overlap")
-		return []Cuboid{}
+		return []Cuboid{}, false
+	}
+	if inside == onCub {
+		// In this case, one cuboid is completely outside the other one.
+		// fmt.Println("no overlap")
+		return []Cuboid{}, true
 	}
 	// fmt.Println("inside", inside)
+	// fmt.Println("on    ", onCub)
+	// fmt.Println("off   ", offCub)
 	for _, dim := range [3]int{0, 1, 2} {
 		// Negative direction.
 		{
 			newCub := Cuboid{start: inside.start, end: inside.end}
 			newCub.start.Set(dim, onCub.start.Get(dim))
-			newCub.end.Set(dim, inside.start.Get(dim)-1)
+			newCub.end.Set(dim, inside.start.Get(dim))
 			// fmt.Println(newCub)
-			count++
 			if newCub.Size() > 0 {
 				result = append(result, newCub)
-				done[count] = true
 			}
 		}
 		// Positive direction.
 		{
 			newCub := Cuboid{start: inside.start, end: inside.end}
-			newCub.start.Set(dim, inside.end.Get(dim)+1)
+			newCub.start.Set(dim, inside.end.Get(dim))
 			newCub.end.Set(dim, onCub.end.Get(dim))
 			// fmt.Println(newCub)
-			count++
 			if newCub.Size() > 0 {
 				result = append(result, newCub)
-				done[count] = true
 			}
 		}
 	}
@@ -85,28 +87,24 @@ func eatChunk(onCub, offCub Cuboid, done map[int]bool) []Cuboid {
 			{
 				newCub := Cuboid{start: inside.start, end: inside.end}
 				newCub.start.Set(dim, onCub.start.Get(dim))
-				newCub.end.Set(dim, inside.start.Get(dim)-1)
+				newCub.end.Set(dim, inside.start.Get(dim))
 				newCub.start.Set(nextDim, onCub.start.Get(nextDim))
-				newCub.end.Set(nextDim, inside.start.Get(nextDim)-1)
+				newCub.end.Set(nextDim, inside.start.Get(nextDim))
 				// fmt.Println(newCub)
-				count++
 				if newCub.Size() > 0 {
 					result = append(result, newCub)
-					done[count] = true
 				}
 			}
 			// Positive nextDim direction
 			{
 				newCub := Cuboid{start: inside.start, end: inside.end}
 				newCub.start.Set(dim, onCub.start.Get(dim))
-				newCub.end.Set(dim, inside.start.Get(dim)-1)
-				newCub.start.Set(nextDim, inside.end.Get(nextDim)+1)
+				newCub.end.Set(dim, inside.start.Get(dim))
+				newCub.start.Set(nextDim, inside.end.Get(nextDim))
 				newCub.end.Set(nextDim, onCub.end.Get(nextDim))
 				// fmt.Println(newCub)
-				count++
 				if newCub.Size() > 0 {
 					result = append(result, newCub)
-					done[count] = true
 				}
 			}
 		}
@@ -115,29 +113,25 @@ func eatChunk(onCub, offCub Cuboid, done map[int]bool) []Cuboid {
 			// Negative nextDim direction
 			{
 				newCub := Cuboid{start: inside.start, end: inside.end}
-				newCub.start.Set(dim, inside.end.Get(dim)+1)
+				newCub.start.Set(dim, inside.end.Get(dim))
 				newCub.end.Set(dim, onCub.end.Get(dim))
 				newCub.start.Set(nextDim, onCub.start.Get(nextDim))
-				newCub.end.Set(nextDim, inside.start.Get(nextDim)-1)
+				newCub.end.Set(nextDim, inside.start.Get(nextDim))
 				// fmt.Println(newCub)
-				count++
 				if newCub.Size() > 0 {
 					result = append(result, newCub)
-					done[count] = true
 				}
 			}
 			// Positive nextDim direction
 			{
 				newCub := Cuboid{start: inside.start, end: inside.end}
-				newCub.start.Set(dim, inside.end.Get(dim)+1)
+				newCub.start.Set(dim, inside.end.Get(dim))
 				newCub.end.Set(dim, onCub.end.Get(dim))
-				newCub.start.Set(nextDim, inside.end.Get(nextDim)+1)
+				newCub.start.Set(nextDim, inside.end.Get(nextDim))
 				newCub.end.Set(nextDim, onCub.end.Get(nextDim))
 				// fmt.Println(newCub)
-				count++
 				if newCub.Size() > 0 {
 					result = append(result, newCub)
-					done[count] = true
 				}
 			}
 		}
@@ -146,100 +140,87 @@ func eatChunk(onCub, offCub Cuboid, done map[int]bool) []Cuboid {
 	// Eight corners.
 	// x>0 y>0 z>0
 	{
-		newCub := Cuboid{start: inside.end.Add(Vec{1, 1, 1}), end: onCub.end}
+		newCub := Cuboid{start: inside.end, end: onCub.end}
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x>0 y>0 z<0
 	{
-		newCub := Cuboid{start: inside.end.Add(Vec{1, 1, 1}), end: onCub.end}
+		newCub := Cuboid{start: inside.end, end: onCub.end}
 		newCub.start.z = onCub.start.z
-		newCub.end.z = inside.start.z - 1
+		newCub.end.z = inside.start.z
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x>0 y<0 z>0
 	{
-		newCub := Cuboid{start: inside.end.Add(Vec{1, 1, 1}), end: onCub.end}
+		newCub := Cuboid{start: inside.end, end: onCub.end}
 		newCub.start.y = onCub.start.y
-		newCub.end.y = inside.start.y - 1
+		newCub.end.y = inside.start.y
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x>0 y<0 z<0
 	{
-		newCub := Cuboid{start: inside.end.Add(Vec{1, 1, 1}), end: onCub.end}
+		newCub := Cuboid{start: inside.end, end: onCub.end}
 		newCub.start.y = onCub.start.y
-		newCub.end.y = inside.start.y - 1
+		newCub.end.y = inside.start.y
 		newCub.start.z = onCub.start.z
-		newCub.end.z = inside.start.z - 1
+		newCub.end.z = inside.start.z
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x<0 y<0 z<0
 	{
-		newCub := Cuboid{start: onCub.start, end: inside.start.Add(Vec{-1, -1, -1})}
-		count++
+		newCub := Cuboid{start: onCub.start, end: inside.start}
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x<0 y<0 z>0
 	{
-		newCub := Cuboid{start: onCub.start, end: inside.start.Add(Vec{-1, -1, -1})}
-		newCub.start.z = inside.end.z + 1
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.z = inside.end.z
 		newCub.end.z = onCub.end.z
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x<0 y>0 z<0
 	{
-		newCub := Cuboid{start: onCub.start, end: inside.start.Add(Vec{-1, -1, -1})}
-		newCub.start.y = inside.end.y + 1
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.y = inside.end.y
 		newCub.end.y = onCub.end.y
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
 	// x<0 y>0 z>0
 	{
-		newCub := Cuboid{start: onCub.start, end: inside.start.Add(Vec{-1, -1, -1})}
-		newCub.start.y = inside.end.y + 1
+		newCub := Cuboid{start: onCub.start, end: inside.start}
+		newCub.start.y = inside.end.y
 		newCub.end.y = onCub.end.y
-		newCub.start.z = inside.end.z + 1
+		newCub.start.z = inside.end.z
 		newCub.end.z = onCub.end.z
 		// fmt.Println(newCub)
-		count++
 		if newCub.Size() > 0 {
 			result = append(result, newCub)
-			done[count] = true
 		}
 	}
-	return result
+	if len(result) == 0 && inside.Size() > 0 {
+		log.Fatal("something went wrong")
+	}
+	return result, true
 }
 
 func totalSize(cubs []Cuboid) int {
@@ -249,6 +230,14 @@ func totalSize(cubs []Cuboid) int {
 	}
 	return sum
 }
+
+// func cubsToGrid(cubs []Cuboid) Grid {
+// 	grid := Grid{data: map[Vec]bool{}, clamp: clampVal, background: false}
+// 	for _, cub := range cubs {
+// 		grid.MarkCuboid(cub, true)
+// 	}
+// 	return grid
+// }
 
 //nolint:funlen
 func main() {
@@ -266,12 +255,17 @@ func main() {
 	fmt.Println(cubs)
 	fmt.Println(switches)
 
+	stop := 20
+
 	grid := Grid{data: map[Vec]bool{}, clamp: clampVal, background: false}
 
 	for idx, cub := range cubs {
 		swit := switches[idx]
 		grid.MarkCuboid(cub, swit)
 		fmt.Println(idx, len(grid.data), cub.Size(), cub)
+		if idx == stop {
+			break
+		}
 	}
 
 	fmt.Println()
@@ -283,10 +277,7 @@ func main() {
 	}
 	fmt.Println(0, totalSize(currentCubs))
 
-	done := map[int]bool{}
-
 	for idx, cub := range cubs[1:] {
-		hereDone := map[int]bool{}
 		swit := switches[idx+1]
 		// Switch something on: Let the new chunk eat something out of all existing chunks.
 		// Then, add the new chunk whole.
@@ -294,33 +285,55 @@ func main() {
 		// Only add those reduces chunks but don't add the new chunk.
 		newCubs := []Cuboid{}
 		for _, currCub := range currentCubs {
-			// fmt.Println("START")
-			// fmt.Println(cub)
-			// fmt.Println(currCub)
-			// fmt.Println("MID")
-			chunks := eatChunk(currCub, cub, hereDone)
+			chunks, overlap := eatChunk(currCub, cub)
 			if len(chunks) > 0 {
+				// There was definitely some overlap.
 				newCubs = append(newCubs, chunks...)
-			} else {
-				// fmt.Println("no overlap outside")
-				// fmt.Println(chunks)
+			} else if !overlap {
+				// No overlap, keep the old cub.
+				// fmt.Println("NO OVERLAP")
 				newCubs = append(newCubs, currCub)
 			}
-			// fmt.Println("END")
-			// fmt.Println()
+			// Otherwise, there was full overlap. Don't add anything back. The current cub will be
+			// fully contained within the new cub. If this is not an addition but a removal, then
+			// the odl cub will be removed entirely.
 		}
 		if swit {
 			newCubs = append(newCubs, cub)
 		}
 		currentCubs = newCubs
-		newDone := map[int]bool{}
-		for action := range hereDone {
-			if _, found := done[action]; !found {
-				newDone[action] = true
-			}
-			done[action] = true
-		}
-		fmt.Println(idx+1, totalSize(currentCubs), cub, swit, newDone)
+		fmt.Println("GENERAL", idx+1, totalSize(currentCubs), cub, swit)
+
+		// if idx+1 == stop {
+		// 	cubGrid := cubsToGrid(currentCubs)
+		// 	fmt.Println(len(cubGrid.data), len(grid.data))
+		// 	for p := range cubGrid.data {
+		// 		if _, found := grid.data[p]; !found {
+		// 			fmt.Println("too many", p)
+		// 		}
+		// 	}
+		// 	for p := range grid.data {
+		// 		if _, found := cubGrid.data[p]; !found {
+		// 			fmt.Println("missing", p)
+		// 		}
+		// 	}
+		// }
+
+		// // Test for overlaps.
+		// for refIdx, refCub := range currentCubs {
+		// 	for checkIdx, checkCub := range currentCubs {
+		// 		if refIdx == checkIdx {
+		// 			continue
+		// 		}
+		// 		ol1 := refCub.Overlaps(checkCub)
+		// 		ol2 := checkCub.Overlaps(refCub)
+		// 		if ol1 || ol2 {
+		// 			fmt.Println(refCub, refIdx, len(currentCubs))
+		// 			fmt.Println(checkCub, checkIdx, len(currentCubs))
+		// 			log.Fatal("overlapping cubs kept")
+		// 		}
+		// 	}
+		// }
 	}
 
 	// // Disable clamping for part 2.
@@ -331,7 +344,6 @@ func main() {
 	// 	grid.MarkCuboid(cub, swit)
 	// 	fmt.Println(len(grid.data))
 	// }
-	_ = eatChunk
 }
 
 // end::solution[]
