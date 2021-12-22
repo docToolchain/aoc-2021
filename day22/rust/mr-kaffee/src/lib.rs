@@ -316,26 +316,29 @@ mod tests {
     }
 
     #[test]
-    fn test_soluton_1() {
+    fn test_soluton_1_simple() {
         assert_eq!(27, solution_1(&CUBOIDS_PARSE[..1]));
-        assert_eq!(27 + 19, solution_1(&CUBOIDS_PARSE[..2]));
-
-        let cuboids = parse(CONTENT_1);
-        assert_eq!(590_784, solution_1(&cuboids));
-    }
-
-    #[test]
-    fn test_solution_2_simple() {
-        assert_eq!(27, solution_2(&CUBOIDS_PARSE[..1]));
         assert_eq!(27 + 19, solution_1(&CUBOIDS_PARSE[..2]));
         assert_eq!(27 + 19 - 8, solution_1(&CUBOIDS_PARSE[..3]));
         assert_eq!(27 + 19 - 8 + 1, solution_1(&CUBOIDS_PARSE[..4]));
     }
 
     #[test]
+    fn test_solution_1() {
+        assert_eq!(590_784, solution_1(&parse(CONTENT_1)));
+    }
+
+    #[test]
+    fn test_solution_2_simple() {
+        assert_eq!(27, solution_2(&CUBOIDS_PARSE[..1]));
+        assert_eq!(27 + 19, solution_2(&CUBOIDS_PARSE[..2]));
+        assert_eq!(27 + 19 - 8, solution_2(&CUBOIDS_PARSE[..3]));
+        assert_eq!(27 + 19 - 8 + 1, solution_2(&CUBOIDS_PARSE[..4]));
+    }
+
+    #[test]
     fn test_solution_1_2_compare() {
-        let cuboids = parse(CONTENT_1);
-        let cuboids = cuboids
+        let cuboids = parse(CONTENT_1)
             .iter()
             .filter_map(|c| c.clamp(-50, 50))
             .collect::<Vec<_>>();
@@ -353,8 +356,7 @@ mod tests {
 
     #[test]
     fn test_solution_2() {
-        let cuboids = parse(CONTENT_2);
-        assert_eq!(2_758_514_936_282_235, solution_2(&cuboids));
+        assert_eq!(2_758_514_936_282_235, solution_2(&parse(CONTENT_2)));
     }
 }
 // end::tests[]
