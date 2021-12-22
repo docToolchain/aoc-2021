@@ -29,7 +29,20 @@ impl fmt::Debug for Cuboid {
 }
 
 impl Cuboid {
-    pub fn intersect(&self, other: &Self, on: bool) -> Option<Self> {
+    /// a ``Cuboid`` spanning the complete _universe_
+    /// (very unlikely that the universe is larger than 64bit in any dimension)
+    pub const UNIVERSE: Self = Self {
+        on: false,
+        x_mn: isize::MIN,
+        x_mx: isize::MAX,
+        y_mn: isize::MIN,
+        y_mx: isize::MAX,
+        z_mn: isize::MIN,
+        z_mx: isize::MAX,
+    };
+
+    /// get intersection, on flag is copied from self
+    pub fn intersect(&self, other: &Self) -> Option<Self> {
         let x_mn = cmp::max(self.x_mn, other.x_mn);
         let x_mx = cmp::min(self.x_mx, other.x_mx);
         let y_mn = cmp::max(self.y_mn, other.y_mn);
@@ -39,7 +52,7 @@ impl Cuboid {
 
         if x_mx >= x_mn && y_mx >= y_mn && z_mx >= z_mn {
             Some(Self {
-                on,
+                on: self.on,
                 x_mn,
                 x_mx,
                 y_mn,
@@ -52,14 +65,21 @@ impl Cuboid {
         }
     }
 
+    /// count the elements in this cuboid
+    pub fn count(&self) -> isize {
+        (self.x_mx - self.x_mn + 1) * (self.y_mx - self.y_mn + 1) * (self.z_mx - self.z_mn + 1)
+    }
+
     // tag::magic[]
-    /// count(s_n in s) = count(s_n v s) - sum_i=1^n-1 count(s_i in (s_n v s))
-    pub fn get_count_in(&self, others: &[Self]) -> isize {
-        if let Some(other) = others.last() {
-            if let Some(i) = self.intersect(other, other.on) {
+    /// get count restricted to self recursively as follows
+    ///
+    /// ``count(cuboids[k] in self) = count(cuboids[k] v self) - sum_i=1^k-1 count(cuboids[i] in (cuboids[k] v self))``
+    pub fn get_count_in(&self, cuboids: &[Self]) -> isize {
+        if let Some(other) = cuboids.last() {
+            if let Some(i) = other.intersect(self) {
                 let mut count = if i.on { i.count() } else { 0 };
-                for k in 1..others.len() {
-                    count -= i.get_count_in(&others[..k]);
+                for k in 1..cuboids.len() {
+                    count -= i.get_count_in(&cuboids[..k]);
                 }
                 return count;
             }
@@ -69,29 +89,27 @@ impl Cuboid {
     }
     // end::magic[]
 
-    /// count the elements in this cuboid
-    pub fn count(&self) -> isize {
-        cmp::max(0, self.x_mx - self.x_mn + 1)
-            * cmp::max(0, self.y_mx - self.y_mn + 1)
-            * cmp::max(0, self.z_mx - self.z_mn + 1)
-    }
-
     /// restrict all ranges to be contained in ``mn..=mx``
     /// if the resulting cuboid is empty, retun ``None``
     pub fn clamp(&self, mn: isize, mx: isize) -> Option<Self> {
-        let c = Cuboid {
-            on: self.on,
-            x_mn: cmp::max(self.x_mn, mn),
-            x_mx: cmp::min(self.x_mx, mx),
-            y_mn: cmp::max(self.y_mn, mn),
-            y_mx: cmp::min(self.y_mx, mx),
-            z_mn: cmp::max(self.z_mn, mn),
-            z_mx: cmp::min(self.z_mx, mx),
-        };
-        if c.count() > 0 {
-            Some(c)
-        } else {
+        let x_mn = cmp::max(self.x_mn, mn);
+        let x_mx = cmp::min(self.x_mx, mx);
+        let y_mn = cmp::max(self.y_mn, mn);
+        let y_mx = cmp::min(self.y_mx, mx);
+        let z_mn = cmp::max(self.z_mn, mn);
+        let z_mx = cmp::min(self.z_mx, mx);
+        if x_mx < x_mn || y_mx < y_mn || z_mx < z_mn {
             None
+        } else {
+            Some(Cuboid {
+                on: self.on,
+                x_mn,
+                x_mx,
+                y_mn,
+                y_mx,
+                z_mn,
+                z_mx,
+            })
         }
     }
 }
@@ -100,37 +118,25 @@ impl Cuboid {
 // tag::parse[]
 pub fn parse(content: &str) -> Vec<Cuboid> {
     let mut cuboids = Vec::new();
-    for line in content
-        .lines()
-        .map(|line| line.trim())
-        .filter(|line| line.len() > 0)
-    {
-        let mut parts = line.split(' ');
-        let on = parts.next() == Some("on");
+    for line in content.lines().map(|l| l.trim()).filter(|l| l.len() > 0) {
+        let on = line.starts_with("on");
 
-        let mut parts = parts
-            .next()
-            .expect("No ranges")
+        let mut ranges = line
+            .strip_prefix(if on { "on " } else { "off " })
+            .expect("Bad line prefix")
             .split(',')
-            .map(|part| part.split('=').skip(1).next().expect("No range"))
-            .map(|part| {
-                let mut parts = part.split("..");
-                let from = parts
-                    .next()
-                    .expect("No lower bound")
-                    .parse::<isize>()
-                    .unwrap();
-                let to = parts
-                    .next()
-                    .expect("No upper bound")
-                    .parse::<isize>()
-                    .unwrap();
-                (from, to)
+            .zip(["x=", "y=", "z="].into_iter())
+            .map(|(p, pre)| p.strip_prefix(pre).expect("Bad part prefix").split(".."))
+            .map(|mut ranges| {
+                (
+                    ranges.next().expect("No min").parse().unwrap(),
+                    ranges.next().expect("No max").parse().unwrap(),
+                )
             });
 
-        let (x_mn, x_mx) = parts.next().expect("No x range");
-        let (y_mn, y_mx) = parts.next().expect("No y range");
-        let (z_mn, z_mx) = parts.next().expect("No z range");
+        let (x_mn, x_mx) = ranges.next().expect("No x range");
+        let (y_mn, y_mx) = ranges.next().expect("No y range");
+        let (z_mn, z_mx) = ranges.next().expect("No z range");
 
         cuboids.push(Cuboid {
             on,
@@ -149,18 +155,9 @@ pub fn parse(content: &str) -> Vec<Cuboid> {
 
 // tag::solve[]
 pub fn get_on_count(cuboids: &[Cuboid]) -> usize {
-    // println!("{:?}", cuboids);
-    let mut count = 0;
-    for k1 in 0..cuboids.len() {
-        let c1 = cuboids[k1];
-        // println!("{}) {:?}", k1, c1);
-        count += if c1.on { c1.count() } else { 0 };
-        for k in 0..=k1 {
-            count -= c1.get_count_in(&cuboids[..k]);
-        }
-    }
-
-    count as usize
+    (0..cuboids.len())
+        .map(|k| Cuboid::UNIVERSE.get_count_in(&cuboids[..=k]))
+        .sum::<isize>() as usize
 }
 // end::solve[]
 
@@ -319,26 +316,29 @@ mod tests {
     }
 
     #[test]
-    fn test_soluton_1() {
+    fn test_soluton_1_simple() {
         assert_eq!(27, solution_1(&CUBOIDS_PARSE[..1]));
-        assert_eq!(27 + 19, solution_1(&CUBOIDS_PARSE[..2]));
-
-        let cuboids = parse(CONTENT_1);
-        assert_eq!(590_784, solution_1(&cuboids));
-    }
-
-    #[test]
-    fn test_solution_2_simple() {
-        assert_eq!(27, solution_2(&CUBOIDS_PARSE[..1]));
         assert_eq!(27 + 19, solution_1(&CUBOIDS_PARSE[..2]));
         assert_eq!(27 + 19 - 8, solution_1(&CUBOIDS_PARSE[..3]));
         assert_eq!(27 + 19 - 8 + 1, solution_1(&CUBOIDS_PARSE[..4]));
     }
 
     #[test]
+    fn test_solution_1() {
+        assert_eq!(590_784, solution_1(&parse(CONTENT_1)));
+    }
+
+    #[test]
+    fn test_solution_2_simple() {
+        assert_eq!(27, solution_2(&CUBOIDS_PARSE[..1]));
+        assert_eq!(27 + 19, solution_2(&CUBOIDS_PARSE[..2]));
+        assert_eq!(27 + 19 - 8, solution_2(&CUBOIDS_PARSE[..3]));
+        assert_eq!(27 + 19 - 8 + 1, solution_2(&CUBOIDS_PARSE[..4]));
+    }
+
+    #[test]
     fn test_solution_1_2_compare() {
-        let cuboids = parse(CONTENT_1);
-        let cuboids = cuboids
+        let cuboids = parse(CONTENT_1)
             .iter()
             .filter_map(|c| c.clamp(-50, 50))
             .collect::<Vec<_>>();
@@ -356,8 +356,7 @@ mod tests {
 
     #[test]
     fn test_solution_2() {
-        let cuboids = parse(CONTENT_2);
-        assert_eq!(2_758_514_936_282_235, solution_2(&cuboids));
+        assert_eq!(2_758_514_936_282_235, solution_2(&parse(CONTENT_2)));
     }
 }
 // end::tests[]
