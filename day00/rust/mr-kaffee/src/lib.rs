@@ -642,7 +642,7 @@ pub mod day23 {
     // use mr_kaffee_2021_23::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day23/rust/mr-kaffee/input.txt");
+    pub const INPUT: &str = include_str!("../../../../day23/rust/mr-kaffee/input.txt");
     pub const EXP_1: usize = 0;
     pub const EXP_2: usize = 0;
 
