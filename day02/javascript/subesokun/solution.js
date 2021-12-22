@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 // tag::star1[]
-function run_solution_puzzle_one(commandsList) {
+function runSolutionPuzzleOne(commandsList) {
     let horizontal = 0
     let depth = 0
     for (const { command, value }
@@ -19,7 +19,7 @@ function run_solution_puzzle_one(commandsList) {
 // end::star1[]
 
 // tag::star2[]
-function run_solution_puzzle_two(commandsList) {
+function runSolutionPuzzleTwo(commandsList) {
     let horizontal = 0
     let depth = 0
     let aim = 0
@@ -56,5 +56,5 @@ const input = fs.readFileSync('input.txt').toString().split("\n")
 const commandsList = getCommands(input)
     // end::input[]
 
-run_solution_puzzle_one(commandsList)
-run_solution_puzzle_two(commandsList)
+runSolutionPuzzleOne(commandsList)
+runSolutionPuzzleTwo(commandsList)
