@@ -30,9 +30,11 @@ Let's see whether I can keep up with these constraints until the end.
 
 === Run all Solutions ===
 
-My `day00` solution this year will run all my solutions. At this time, it looks as follows
+My `day00` solution this year will run all my solutions. The code looks as follows:
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=solve]
 ----
+
+To run all solutions, use ``cargo run --release -- from 1 --to 25``. The command line options ``--from <day>`` and ``--to <day>`` specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.
