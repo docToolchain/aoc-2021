@@ -8,7 +8,7 @@ The naive implementation is writting down the problem as it is exposed, with a l
 
 This provides the result in 2 minutes for the first step so few years for the second, with an horrible memory complexity (Playing with an array of 360k elements, dynamically pushing to it)
 
-## Slightly optimized
+## Slightly optimized: precompute.rock
 
 The slightly optimized solution is based out of the following two observations:
 - All inputs are in the `[1-5]` range
