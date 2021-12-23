@@ -33,7 +33,7 @@ func getChar(pods [8]pod, pos int) rune {
 			case costB:
 				return b
 			case costC:
-				return b
+				return c
 			case costD:
 				return d
 			default:
@@ -60,7 +60,10 @@ func (g *game) pretty() string {
 		"###%c#%c#%c#%c###\n",
 		roomChars[0], roomChars[2], roomChars[4], roomChars[6],
 	)
-	str += fmt.Sprintf("  #%c#%c#%c#%c#\n", roomChars[1], roomChars[3], roomChars[5], roomChars[7])
+	str += fmt.Sprintf(
+		"  #%c#%c#%c#%c#\n",
+		roomChars[1], roomChars[3], roomChars[5], roomChars[7],
+	)
 
 	str += "  #########"
 	return str
@@ -142,4 +145,8 @@ type space struct {
 	above       int
 	room        bool
 	allowed     map[rune]struct{}
+}
+
+type move struct {
+	start, end, cost int
 }

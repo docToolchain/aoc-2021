@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	g := newGame([8]rune{'B', 'A', 'C', 'D', 'B', 'C', 'D', 'A'})
 	// g := newGame([8]rune{'','','','','','','',''})
 	fmt.Println(g.pretty())
+	fmt.Println(g)
 }
