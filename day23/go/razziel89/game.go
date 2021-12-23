@@ -230,6 +230,28 @@ func (g game) moves() []move {
 			// If we are in the hall, we can only move to a room. We can only move to our room,
 			// though.
 			ourRoom := firstRoomIdx + kindToRoom*p.kind
+			aboveOurRoom := g.spaces[ourRoom].above
+			// If a space on our side of the hall of the above space is occupied, we cannot move to
+			// our room.
+			if p.pos < aboveOurRoom {
+				// We are to the left of the above position.
+				for checkPos := p.pos + 1; checkPos < aboveOurRoom; checkPos++ {
+					if occupied[checkPos] != kindFree {
+						// There is a space occupied to our right, blocking our room. We cannot move
+						// into our room.
+						continue
+					}
+				}
+			} else {
+				// We cannot be in an above position. Hence, we are to the right of the above spot.
+				for checkPos := p.pos - 1; checkPos > aboveOurRoom; checkPos-- {
+					if occupied[checkPos] != kindFree {
+						// There is a space occupied to our left, blocking our room. We cannot move
+						// into our room.
+						continue
+					}
+				}
+			}
 			if occupied[ourRoom] != kindFree {
 				// In this case, the first spot in the room is occupied. We are not allowed
 				// in at all.
