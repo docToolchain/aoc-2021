@@ -292,6 +292,24 @@ func (g *game) getPod(pos int) *pod {
 	return nil
 }
 
+func (g *game) isFinal(int) bool {
+	occupied := [19]int{}
+	for idx := range occupied {
+		occupied[idx] = kindFree
+	}
+	for _, p := range g.pods {
+		occupied[p.pos] = p.kind
+	}
+	return occupied[11] == kindA &&
+		occupied[12] == kindA &&
+		occupied[13] == kindB &&
+		occupied[14] == kindB &&
+		occupied[15] == kindC &&
+		occupied[16] == kindC &&
+		occupied[17] == kindD &&
+		occupied[18] == kindD
+}
+
 func (p pod) String() string {
 	var name rune
 	switch p.kind {
