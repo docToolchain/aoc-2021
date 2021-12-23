@@ -1,47 +1,15 @@
 Say "Hashtable for 16 iterations"
-(After 16 iterations hashtable)
-Eight is "618"
-Seven is "507"
-Six is "4668"
-Five is "3557"
-Four is "2446"
-Three is "1335"
-Two is "0224"
-One is "61138"
-Zero is "50027"
+Rock Hashy with "50027", "61138", "0224", "1335", "2446", "3557", "4668", "507", "618"
 
 (Do 16 iterations at once)
 QuickChange wants the array
 Rock Quickiter One
 While the array ain't nothing
 Roll the array into Val
-If Val is 0
-Rock Quickiter One with Zero
+If Hashy at Val is mysterious
+Cast Val
 
-If Val is 1
-Rock Quickiter One with One
-
-If Val is 2
-Rock Quickiter One with Two
-
-If Val is 3
-Rock Quickiter One with Three
-
-If Val is 4
-Rock Quickiter One with Four
-
-If Val is 5
-Rock Quickiter One with Five
-
-If Val is 6
-Rock Quickiter One with Six
-
-If Val is 7
-Rock Quickiter One with Seven
-
-If Val is 8
-Rock Quickiter One with Eight
-
+Rock Quickiter One with Hashy at Val
 
 Join Quickiter One
 Shatter Quickiter One
