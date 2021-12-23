@@ -207,7 +207,7 @@ PODLOOP:
 			if diffToRoomStart/kindToRoom == p.kind {
 				// If we already are in our room, we don't want to move anymore, but only if the
 				// other ones in our room are also of our kind.
-				// If we are at the bottom, we are good to know.
+				// If we are at the bottom, we are good to go.
 				if diffToRoomStart%4 == 3 {
 					continue PODLOOP
 				}
@@ -233,13 +233,10 @@ PODLOOP:
 			if diffToRoomStart%kindToRoom > 0 {
 				// These are the bottom spaces of a room. If there is someone above us, we cannot
 				// move.
-				topSpace := kindToRoom*((p.pos-firstRoomIdx)/kindToRoom) + 1
-				for ; topSpace%kindToRoom > 0; topSpace++ {
-					if firstRoomIdx+topSpace >= p.pos {
-						// Only check spaces above us.
-						break
-					}
-					if occupied[firstRoomIdx+topSpace] != kindFree {
+				topSpace := kindToRoom * ((p.pos - firstRoomIdx) / kindToRoom)
+				// Only check spaces above us.
+				for checkSpace := firstRoomIdx + topSpace; checkSpace < p.pos; checkSpace++ {
+					if occupied[checkSpace] != kindFree {
 						// If any of the spaces above us are occupied, we don't have any moves.
 						continue PODLOOP
 					}
@@ -316,9 +313,9 @@ PODLOOP:
 			bottomSpace := ourRoom + kindToRoom - 1
 			// This block uses the implicit knowledge that, if we find a free space, all spaces
 			// above it must be free, too, since all rooms start out full.
-			for space := bottomSpace; space > ourRoom; space-- {
-				spacesMoved := abs(p.pos-aboveOurRoom) + diffToTop //nolint:gomnd
+			for space := bottomSpace; space >= ourRoom; space-- {
 				if occupied[space] == kindFree {
+					spacesMoved := abs(p.pos-aboveOurRoom) + diffToTop //nolint:gomnd
 					m := move{
 						start: p.pos,
 						end:   space,

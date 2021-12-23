@@ -11,13 +11,13 @@ const (
 //nolint:nestif,funlen
 func main() {
 	// // Actual riddle part 1.
-	// g := newGame(
-	// 	[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
-	// )
-	// Example part 1.
 	g := newGame(
-		[16]rune{'B', 'A', 'A', 'A', 'C', 'D', 'B', 'B', 'B', 'C', 'C', 'C', 'D', 'A', 'D', 'D'},
+		[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
 	)
+	// // Example part 1.
+	// g := newGame(
+	// 	[16]rune{'B', 'A', 'A', 'A', 'C', 'D', 'B', 'B', 'B', 'C', 'C', 'C', 'D', 'A', 'D', 'D'},
+	// )
 	// // Actual riddle part 2.
 	// g := newGame(
 	// 	[16]rune{'D', 'D', 'D', 'C', 'D', 'C', 'B', 'A', 'B', 'B', 'A', 'B', 'A', 'A', 'C', 'C'},
@@ -42,7 +42,6 @@ func main() {
 
 	for done := false; !done; {
 		count++
-		fmt.Println(g.pretty())
 
 		if !popped {
 			moves = g.moves()
@@ -51,6 +50,7 @@ func main() {
 		if path < len(moves) {
 			// There are still moves available. Save the game state.
 			move := moves[path]
+			// fmt.Println(move)
 			path++
 			stack.Push(g, trackedCost, path, moves)
 			// fmt.Printf("PUSH %d\n\n", count)
@@ -66,6 +66,13 @@ func main() {
 					found = true
 					cheapest = trackedCost
 					fmt.Println(cheapest)
+					// fmt.Println(cheapest, "==============================")
+					// for _, gam := range stack {
+					// 	fmt.Println(gam.game.pretty())
+					// 	fmt.Println(gam.cost)
+					// 	fmt.Println(gam.moves[gam.path-1])
+					// }
+					// fmt.Println(g.pretty())
 				}
 			}
 			if len(stack) == 0 {
