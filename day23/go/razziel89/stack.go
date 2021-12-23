@@ -24,15 +24,15 @@ func (s *Stack) Push(g game, cost, path int) {
 }
 
 // Pop removes the topmost value and returns it. Also returns whether the stack was non-empty.
-func (s *Stack) Pop() (game, int, int, bool) {
+func (s *Stack) Pop() (game, int, int) {
 	l := len(*s)
 	if l == 0 {
-		return game{}, 0, false
+		return game{}, 0, 0
 	}
 	val := (*s)[l-1]
 	// Don't cut the capacity. A game can be copied, so we pemit overwriting it.
 	*s = (*s)[0 : len(*s)-1]
-	return val.game, val.cost, val.path, true
+	return val.game, val.cost, val.path
 }
 
 // Peek returns the top-most entry.

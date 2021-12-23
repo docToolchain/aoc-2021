@@ -89,7 +89,7 @@ func newGame(inPods [8]rune) game {
 
 	// allowed := []rune{a, b, c, d}
 	// These are the spaces we can move to in the hall.
-	hallIndces := []int{0, 1, 3, 5, 7, 9, 10}
+	// hallIndces := []int{0, 1, 3, 5, 7, 9, 10}
 	// These are the spaces we cannot move to in the hall, but they are still in the hall. We use
 	// them to identify which positions are to the top left or right of a room.
 	aboveSpaces := []int{2, 4, 6, 8}
@@ -118,12 +118,12 @@ func newGame(inPods [8]rune) game {
 			// roomSpace.allowed = roomAllowed
 			roomSpace.above = aboveRoom
 			roomSpace.room = true
-			// Build the connections to the hall.
-			for _, hallIdx := range hallIndces {
-				roomSpace.moveIndices = append(roomSpace.moveIndices, hallIdx)
-				hallSpace := &spaces[hallIdx]
-				hallSpace.moveIndices = append(hallSpace.moveIndices, spaceIdx)
-			}
+			// // Build the connections to the hall.
+			// for _, hallIdx := range hallIndces {
+			// 	// roomSpace.moveIndices = append(roomSpace.moveIndices, hallIdx)
+			// 	hallSpace := &spaces[hallIdx]
+			// 	// hallSpace.moveIndices = append(hallSpace.moveIndices, spaceIdx)
+			// }
 		}
 	}
 
@@ -155,9 +155,9 @@ type pod struct {
 }
 
 type space struct {
-	moveIndices []int
-	above       int
-	room        bool
+	// moveIndices []int
+	above int
+	room  bool
 	// allowed     map[rune]struct{}
 }
 
@@ -283,16 +283,35 @@ PODLOOP:
 	return moves
 }
 
-func (g *game) getPod(pos int) *pod {
-	for posIdx := range g.pods {
-		if g.pods[posIdx].pos == pos {
-			return &g.pods[posIdx]
+// func (g *game) getPod(pos int) *pod {
+// 	for posIdx := range g.pods {
+// 		if g.pods[posIdx].pos == pos {
+// 			return &g.pods[posIdx]
+// 		}
+// 	}
+// 	return nil
+// }
+
+func (g game) update(m move) game {
+	var mover int
+	for moverIdx, p := range g.pods {
+		if p.pos == m.start {
+			mover = moverIdx
+			break
+		}
+		log.Fatal("invalid move")
+	}
+	// Sanity check, try to find something at the target position.
+	for _, p := range g.pods {
+		if p.pos == m.end {
+			log.Fatal("invalid move")
 		}
 	}
-	return nil
+	g.pods[mover].pos = m.end
+	return g
 }
 
-func (g *game) isFinal(int) bool {
+func (g *game) isFinal() bool {
 	occupied := [19]int{}
 	for idx := range occupied {
 		occupied[idx] = kindFree
