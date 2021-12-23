@@ -6,21 +6,48 @@ use std::{
 };
 
 #[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
-pub struct Burrow2 {
-    //  0 .. =10 : hallway
-    // 11 .. =12 : room A
-    // 13 .. =14 : room B
-    // 15 .. =16 : room C
-    // 17 .. =19 : room D
-    data: [Option<u8>; 27],
+pub struct BurrowLarge {
+    data: [Option<u8>; 11 + 4 * 4],
 }
 
-impl fmt::Debug for Burrow2 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+pub struct BurrowSmall {
+    data: [Option<u8>; 11 + 4 * 2],
+}
+
+pub trait Burrow {
+    const ROOM_LEN: usize;
+    const LEN: usize;
+    const MAP: &'static [&'static [usize]];
+
+    fn get(&self, idx: usize) -> Option<u8>;
+    fn set(&mut self, idx: usize, val: Option<u8>);
+}
+
+pub trait BurrowCommon {
+    const HALLWAY_LEN: usize;
+    const ENERGIES: [usize; 4];
+    fn format(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+    fn is_door(idx: usize) -> bool;
+    fn get_room(idx: usize) -> Option<u8>;
+    fn get_room_mn(room: u8) -> usize;
+    fn get_room_mx(room: u8) -> usize;
+    fn move_pod(&mut self, idx_from: usize, idx_to: usize);
+    fn is_deadlock(&self) -> bool;
+}
+
+impl<B> BurrowCommon for B
+where
+    B: Burrow,
+{
+    const HALLWAY_LEN: usize = 11;
+    const ENERGIES: [usize; 4] = [1, 10, 100, 1000];
+
+    fn format(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "#############\n")?;
         write!(f, "#")?;
-        for k in 0..11 {
-            match self.data[k] {
+        for k in 0..Self::HALLWAY_LEN {
+            match self.get(k) {
                 Some(0) => write!(f, "A")?,
                 Some(1) => write!(f, "B")?,
                 Some(2) => write!(f, "C")?,
@@ -30,156 +57,104 @@ impl fmt::Debug for Burrow2 {
         }
         write!(f, "#\n")?;
 
-        write!(f, "###")?;
-        match self.data[11] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[15] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[19] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[23] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "###\n")?;
+        for row in 0..Self::ROOM_LEN {
+            if row == 0 {
+                write!(f, "###")?;
+            } else {
+                write!(f, "  #")?;
+            }
 
-        write!(f, "  #")?;
-        match self.data[12] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[16] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[20] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[24] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#\n")?;
+            for room in 0..4 {
+                match self.get(Self::HALLWAY_LEN + Self::ROOM_LEN * room + row) {
+                    Some(0) => write!(f, "A#")?,
+                    Some(1) => write!(f, "B#")?,
+                    Some(2) => write!(f, "C#")?,
+                    Some(3) => write!(f, "D#")?,
+                    _ => write!(f, ".#")?,
+                };
+            }
 
-        write!(f, "  #")?;
-        match self.data[13] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[17] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[21] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[25] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#\n")?;
+            if row == 0 {
+                write!(f, "##\n")?;
+            } else {
+                write!(f, "\n")?;
+            }
+        }
+        write!(f, "  #########")
+    }
 
-        write!(f, "  #")?;
-        match self.data[14] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[18] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[22] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[26] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#\n")?;
+    fn is_door(idx: usize) -> bool {
+        idx == 2 || idx == 4 || idx == 6 || idx == 8
+    }
 
-        write!(f, "  #########\n")
+    fn get_room(idx: usize) -> Option<u8> {
+        if idx >= Self::HALLWAY_LEN {
+            Some(((idx - Self::HALLWAY_LEN) / Self::ROOM_LEN) as u8)
+        } else {
+            None
+        }
+    }
+
+    fn get_room_mn(room: u8) -> usize {
+        Self::HALLWAY_LEN + room as usize * Self::ROOM_LEN
+    }
+
+    fn get_room_mx(room: u8) -> usize {
+        Self::HALLWAY_LEN + (room as usize + 1) * Self::ROOM_LEN
+    }
+
+    fn move_pod(&mut self, idx_from: usize, idx_to: usize) {
+        assert_eq!(None, self.get(idx_to));
+        self.set(idx_to, self.get(idx_from));
+        self.set(idx_from, None);
+    }
+
+    fn is_deadlock(&self) -> bool {
+        if self.get(3) == Some(3) && self.get(7) == Some(0)
+            || self.get(5) == Some(3) && self.get(7) == Some(0)
+            || self.get(3) == Some(3) && self.get(5) == Some(0)
+            || self.get(3) == Some(2) && self.get(5) == Some(0)
+            || self.get(5) == Some(3) && self.get(7) == Some(1)
+        {
+            return true;
+        }
+
+        if self.get(0).is_some() && self.get(1).is_some() {
+            if let Some(p_mx) = (Self::get_room_mn(0)..Self::get_room_mx(0))
+                .filter_map(|k| self.get(k))
+                .max()
+            {
+                if self.get(3) == Some(0) && p_mx > 0
+                    || self.get(5) == Some(0) && p_mx > 1
+                    || self.get(7) == Some(0) && p_mx > 2
+                {
+                    return true;
+                }
+            }
+        }
+
+        if self.get(10).is_some() && self.get(9).is_some() {
+            if let Some(p_mn) = (Self::get_room_mn(3)..Self::get_room_mx(3))
+                .filter_map(|k| self.get(k))
+                .min()
+            {
+                if self.get(7) == Some(3) && p_mn < 3
+                    || self.get(5) == Some(3) && p_mn < 2
+                    || self.get(3) == Some(3) && p_mn < 1
+                {
+                    return true;
+                }
+            }
+        }
+
+        false
     }
 }
 
-impl Burrow2 {
-    pub const LEN: usize = 27;
-    pub const HALLWAY_LEN: usize = 11;
-    pub const ENERGIES: [usize; 4] = [1, 10, 100, 1000];
-    pub const DOORS: [usize; 4] = [2, 4, 6, 8];
-    pub const ROOMS_1: [usize; 4] = [11, 15, 19, 23];
-    pub const ROOMS_2: [usize; 4] = [12, 16, 20, 24];
-    pub const ROOMS_3: [usize; 4] = [13, 17, 21, 25];
-    pub const ROOMS_4: [usize; 4] = [14, 18, 22, 26];
-    pub const ADJ: &'static [&'static [usize]] = &[
+impl Burrow for BurrowLarge {
+    const ROOM_LEN: usize = 4;
+    const LEN: usize = 11 + 4 * 4;
+    const MAP: &'static [&'static [usize]] = &[
         &[1],
         &[0, 2],
         &[1, 3, 11],
@@ -213,136 +188,19 @@ impl Burrow2 {
         &[25],
     ];
 
-    pub fn from(burrow: Burrow) -> Self {
-        let mut data = [None; Burrow2::LEN];
+    fn get(&self, idx: usize) -> Option<u8> {
+        self.data[idx]
+    }
 
-        for k in 0..Burrow::HALLWAY_LEN {
-            data[k] = burrow.data[k];
-        }
-
-        for k in 0..4 {
-            data[Self::ROOMS_1[k]] = burrow.data[Burrow::ROOMS_1[k]];
-            data[Self::ROOMS_4[k]] = burrow.data[Burrow::ROOMS_2[k]];
-        }
-
-        data[12] = Some(3);
-        data[13] = Some(3);
-        data[16] = Some(2);
-        data[17] = Some(1);
-        data[20] = Some(1);
-        data[21] = Some(0);
-        data[24] = Some(0);
-        data[25] = Some(2);
-
-        Burrow2 { data }
+    fn set(&mut self, idx: usize, val: Option<u8>) {
+        self.data[idx] = val;
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
-pub struct Burrow {
-    //  0 .. =10 : hallway
-    // 11 .. =12 : room A
-    // 13 .. =14 : room B
-    // 15 .. =16 : room C
-    // 17 .. =19 : room D
-    data: [Option<u8>; 19],
-}
-
-impl fmt::Debug for Burrow {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "#############\n")?;
-        write!(f, "#")?;
-        for k in 0..11 {
-            match self.data[k] {
-                Some(0) => write!(f, "A")?,
-                Some(1) => write!(f, "B")?,
-                Some(2) => write!(f, "C")?,
-                Some(3) => write!(f, "D")?,
-                _ => write!(f, ".")?,
-            };
-        }
-        write!(f, "#\n")?;
-
-        write!(f, "###")?;
-        match self.data[11] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[13] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[15] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[17] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "###\n")?;
-
-        write!(f, "  #")?;
-        match self.data[12] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[14] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[16] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#")?;
-        match self.data[18] {
-            Some(0) => write!(f, "A")?,
-            Some(1) => write!(f, "B")?,
-            Some(2) => write!(f, "C")?,
-            Some(3) => write!(f, "D")?,
-            _ => write!(f, ".")?,
-        };
-        write!(f, "#\n")?;
-
-        write!(f, "  #########\n")
-    }
-}
-
-impl Burrow {
-    pub const LEN: usize = 19;
-    pub const HALLWAY_LEN: usize = 11;
-    pub const ENERGIES: [usize; 4] = [1, 10, 100, 1000];
-    pub const DOORS: [usize; 4] = [2, 4, 6, 8];
-    pub const ROOMS_1: [usize; 4] = [11, 13, 15, 17];
-    pub const ROOMS_2: [usize; 4] = [12, 14, 16, 18];
-    pub const ADJ: &'static [&'static [usize]] = &[
+impl Burrow for BurrowSmall {
+    const ROOM_LEN: usize = 2;
+    const LEN: usize = 11 + 4 * 2;
+    const MAP: &'static [&'static [usize]] = &[
         &[1],
         &[0, 2],
         &[1, 3, 11],
@@ -354,20 +212,82 @@ impl Burrow {
         &[7, 9, 17],
         &[8, 10],
         &[9],
+        // room 1
         &[2, 12],
         &[11],
+        // room 2
         &[4, 14],
         &[13],
+        // room 3
         &[6, 16],
         &[15],
+        // room 4
         &[8, 18],
         &[17],
     ];
 
+    fn get(&self, idx: usize) -> Option<u8> {
+        self.data[idx]
+    }
+
+    fn set(&mut self, idx: usize, val: Option<u8>) {
+        self.data[idx] = val;
+    }
+}
+
+impl fmt::Debug for BurrowSmall {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.format(f)
+    }
+}
+
+impl fmt::Display for BurrowSmall {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.format(f)
+    }
+}
+
+impl fmt::Debug for BurrowLarge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.format(f)
+    }
+}
+
+impl fmt::Display for BurrowLarge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.format(f)
+    }
+}
+
+impl BurrowSmall {
+    pub const TARGET: Self = Self {
+        data: [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(0),
+            Some(0),
+            Some(1),
+            Some(1),
+            Some(2),
+            Some(2),
+            Some(3),
+            Some(3),
+        ],
+    };
+
     pub fn parse(content: &str) -> Self {
         let mut lines = content.lines().skip(1);
 
-        let mut data = [None; 19];
+        let mut data = [None; Self::LEN];
 
         for (k, c) in lines
             .next()
@@ -387,7 +307,7 @@ impl Burrow {
             }
         }
 
-        for row in 0..2 {
+        for row in 0..Self::ROOM_LEN {
             let mut i = 0;
             for (_, c) in lines
                 .next()
@@ -395,7 +315,7 @@ impl Burrow {
                 .chars()
                 .skip(1)
                 .enumerate()
-                .filter(|(k, _)| Self::DOORS.contains(&k))
+                .filter(|(k, _)| Self::is_door(*k))
             {
                 let pod = match c {
                     'A' => Some(0),
@@ -405,10 +325,70 @@ impl Burrow {
                     '.' => None,
                     _ => panic!("Unexpected character: {}", c),
                 };
-                data[11 + 2 * i + row] = pod;
+                data[Self::HALLWAY_LEN + i * Self::ROOM_LEN + row] = pod;
                 i += 1;
             }
         }
+
+        Self { data }
+    }
+}
+
+impl BurrowLarge {
+    pub const TARGET: Self = Self {
+        data: [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(0),
+            Some(0),
+            Some(0),
+            Some(0),
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(3),
+            Some(3),
+            Some(3),
+            Some(3),
+        ],
+    };
+
+    pub fn from(burrow: BurrowSmall) -> Self {
+        let mut data = [None; Self::LEN];
+
+        for k in 0..Self::HALLWAY_LEN {
+            data[k] = burrow.data[k];
+        }
+
+        for k in 0..4 {
+            data[Self::HALLWAY_LEN + k * Self::ROOM_LEN + 0] =
+                burrow.data[BurrowSmall::HALLWAY_LEN + k * BurrowSmall::ROOM_LEN + 0];
+            data[Self::HALLWAY_LEN + k * Self::ROOM_LEN + 3] =
+                burrow.data[BurrowSmall::HALLWAY_LEN + k * BurrowSmall::ROOM_LEN + 1];
+        }
+
+        data[Self::HALLWAY_LEN + 0 * Self::ROOM_LEN + 1] = Some(3);
+        data[Self::HALLWAY_LEN + 0 * Self::ROOM_LEN + 2] = Some(3);
+        data[Self::HALLWAY_LEN + 1 * Self::ROOM_LEN + 1] = Some(2);
+        data[Self::HALLWAY_LEN + 1 * Self::ROOM_LEN + 2] = Some(1);
+        data[Self::HALLWAY_LEN + 2 * Self::ROOM_LEN + 1] = Some(1);
+        data[Self::HALLWAY_LEN + 2 * Self::ROOM_LEN + 2] = Some(0);
+        data[Self::HALLWAY_LEN + 3 * Self::ROOM_LEN + 1] = Some(0);
+        data[Self::HALLWAY_LEN + 3 * Self::ROOM_LEN + 2] = Some(2);
 
         Self { data }
     }
@@ -419,21 +399,25 @@ pub struct Search<T> {
     heap: BTreeSet<(usize, T)>,
     settled: HashSet<T>,
     costs: HashMap<T, usize>,
+    parents: HashMap<T, (usize, Option<T>)>,
+    trace_path: bool,
 }
 
 impl<T> Search<T>
 where
     T: Eq + Ord + Hash + Copy,
 {
-    pub fn init(cost: usize, burrow: T) -> Self {
+    pub fn init(start: T) -> Self {
         let mut search = Self {
             heap: BTreeSet::new(),
             settled: HashSet::new(),
             costs: HashMap::new(),
+            parents: HashMap::new(),
+            trace_path: false,
         };
-        search.heap.insert((cost, burrow));
-        search.settled.insert(burrow);
-        search.costs.insert(burrow, cost);
+        search.heap.insert((0, start));
+        search.settled.insert(start);
+        search.costs.insert(start, 0);
         search
     }
 
@@ -446,352 +430,102 @@ where
         }
     }
 
-    pub fn push(&mut self, cost: usize, adjacent: T) -> bool {
+    pub fn push(&mut self, cost: usize, parent: T, weight: usize, adjacent: T) -> bool {
         if self.settled.contains(&adjacent) {
             return false;
         }
 
         if let Some(cur_cost) = self.costs.get(&adjacent) {
-            if cost < *cur_cost {
+            if cost + weight < *cur_cost {
                 self.heap.remove(&(*cur_cost, adjacent));
             } else {
                 return false;
             }
         }
 
-        self.heap.insert((cost, adjacent));
-        self.costs.insert(adjacent, cost);
+        self.heap.insert((cost + weight, adjacent));
+        self.costs.insert(adjacent, cost + weight);
+        if self.trace_path {
+            self.parents.insert(adjacent, (weight, Some(parent)));
+        }
 
         true
     }
-}
 
-// tag::parse[]
-pub fn parse(content: &str) -> Burrow {
-    Burrow::parse(content)
-}
-// end::parse[]
+    pub fn get_path_to(&self, target: T) -> VecDeque<(usize, T)> {
+        let mut path = VecDeque::new();
 
-pub fn solution_1(burrow: Burrow) -> usize {
-    solve1(
-        burrow,
-        Burrow {
-            data: [
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                Some(0),
-                Some(0),
-                Some(1),
-                Some(1),
-                Some(2),
-                Some(2),
-                Some(3),
-                Some(3),
-            ],
-        },
-    )
-}
-
-pub fn settle1(burrow: Burrow) -> Option<(Burrow, usize)> {
-    let mut update = burrow;
-    let mut weight = 0;
-
-    for k in 0..Burrow::LEN {
-        if let Some(p) = burrow.data[k] {
-            let cur_room = if k >= Burrow::HALLWAY_LEN {
-                ((k - Burrow::HALLWAY_LEN) / 2) as u8
+        let mut current = target;
+        while let Some((cost, parent)) = self.parents.get(&current) {
+            path.push_front((*cost, current));
+            if let Some(parent) = parent {
+                current = *parent;
             } else {
-                u8::MAX
-            };
-
-            if cur_room == p {
-                // already in own room -> cannot settle
-                continue;
-            }
-
-            if burrow.data[Burrow::ROOMS_1[p as usize]].is_some() {
-                // no free space in room
-                continue;
-            }
-
-            if let Some(p2) = burrow.data[Burrow::ROOMS_2[p as usize]] {
-                if p2 != p {
-                    // room is occupied by foreigner
-                    continue;
-                }
-            }
-
-            let mut done = [false; Burrow::LEN];
-            let mut stack = Vec::new();
-
-            done[k] = true;
-            for k_adj in Burrow::ADJ[k] {
-                done[*k_adj] = true;
-                stack.push((1, *k_adj));
-            }
-
-            while let Some((steps, k_adj)) = stack.pop() {
-                if burrow.data[k_adj].is_some() {
-                    // cannot move on top of other
-                    continue;
-                }
-
-                let adj_room = if k_adj >= Burrow::HALLWAY_LEN {
-                    ((k_adj - Burrow::HALLWAY_LEN) / 2) as u8
-                } else {
-                    u8::MAX
-                };
-
-                if adj_room == p
-                    && (k_adj + 1..=Burrow::ROOMS_2[p as usize])
-                        .all(|k_r| burrow.data[k_r] == Some(p))
-                {
-                    // all below are settled
-                    update.data[k] = None;
-                    update.data[k_adj] = Some(p);
-                    weight += steps * Burrow::ENERGIES[p as usize];
-                }
-
-                for k_adj_2 in Burrow::ADJ[k_adj] {
-                    if !done[*k_adj_2] {
-                        done[*k_adj_2] = true;
-                        stack.push((steps + 1, *k_adj_2));
-                    }
-                }
+                break;
             }
         }
-    }
 
-    if weight > 0 {
-        Some((update, weight))
-    } else {
-        None
+        path
     }
 }
 
-pub fn solve1(burrow: Burrow, target: Burrow) -> usize {
+pub fn settle<B>(burrow: B) -> Option<(usize, B)>
+where
+    B: Burrow + Copy,
+{
     let mut burrow = burrow;
-    let mut cost = 0;
-    while let Some((update, weight)) = settle1(burrow) {
-        burrow = update;
-        cost += weight;
-    }
-    let mut search = Search::init(cost, burrow);
-
-    while let Some((cost, burrow)) = search.pop() {
-        if burrow == target {
-            return cost; // target reached
-        }
-
-        for k in 0..Burrow::LEN {
-            if let Some(p) = burrow.data[k] {
-                let cur_room = if k >= Burrow::HALLWAY_LEN {
-                    ((k - Burrow::HALLWAY_LEN) / 2) as u8
-                } else {
-                    u8::MAX
-                };
-
-                if cur_room == p
-                    && (k + 1..=Burrow::ROOMS_2[p as usize]).all(|k_r| burrow.data[k_r] == Some(p))
-                {
-                    // position is settled in room and below are only the right ones
-                    continue;
-                }
-
-                let mut done = [false; Burrow::LEN];
-                let mut stack = Vec::new();
-
-                done[k] = true;
-                for k_adj in Burrow::ADJ[k] {
-                    done[*k_adj] = true;
-                    stack.push((1, *k_adj));
-                }
-
-                while let Some((steps, k_adj)) = stack.pop() {
-                    if burrow.data[k_adj].is_some() {
-                        // cannot move on top of other
-                        continue;
-                    }
-
-                    let adj_room = if k_adj >= Burrow::HALLWAY_LEN {
-                        ((k_adj - Burrow::HALLWAY_LEN) / 2) as u8
-                    } else {
-                        u8::MAX
-                    };
-
-                    let own_room = adj_room == p;
-                    if own_room && cur_room != p {
-                        // move in own room
-
-                        if (k_adj + 1..=Burrow::ROOMS_2[p as usize])
-                            .any(|k_r| burrow.data[k_r].map(|p_2| p_2 != p).unwrap_or(false))
-                        {
-                            // foreign pods are in room
-                            continue;
-                        }
-
-                        if (k_adj + 1..=Burrow::ROOMS_2[p as usize])
-                            .all(|k_r| burrow.data[k_r] == Some(p))
-                        {
-                            unreachable!("Cannot reach here because no move possible that settle");
-                        }
-                        // otherwise do not create an adjacent but continue to look ahaed
-                    } else if adj_room != u8::MAX {
-                        // move out of room
-                        if cur_room != adj_room || done[k_adj - 1] {
-                            // moving in
-                            continue;
-                        }
-                        // don't create adjacent in foreign room but continue to look ahead
-                    } else if !Burrow::DOORS.contains(&k_adj) {
-                        // if I am not in front of a door, this is a valid adjacent
-                        let mut adjacent = burrow.clone();
-                        adjacent.data[k] = None;
-                        adjacent.data[k_adj] = Some(p);
-                        let mut cost = cost + steps * Burrow::ENERGIES[p as usize];
-                        while let Some((update, weight)) = settle1(adjacent) {
-                            cost += weight;
-                            adjacent = update;
-                        }
-                        search.push(cost, adjacent);
-                    }
-
-                    for k_adj_2 in Burrow::ADJ[k_adj] {
-                        if !done[*k_adj_2] {
-                            done[*k_adj_2] = true;
-                            stack.push((steps + 1, *k_adj_2));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    panic!("No path found");
-}
-
-// tag::part2[]
-pub fn solution_2(burrow: Burrow) -> usize {
-    solve2(
-        Burrow2::from(burrow),
-        Burrow2 {
-            data: [
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                Some(0),
-                Some(0),
-                Some(0),
-                Some(0),
-                Some(1),
-                Some(1),
-                Some(1),
-                Some(1),
-                Some(2),
-                Some(2),
-                Some(2),
-                Some(2),
-                Some(3),
-                Some(3),
-                Some(3),
-                Some(3),
-            ],
-        },
-    )
-}
-
-pub fn settle2(burrow: Burrow2) -> Option<(Burrow2, usize)> {
-    let mut update = burrow;
     let mut weight = 0;
 
-    for k in 0..Burrow2::LEN {
-        if let Some(p) = burrow.data[k] {
-            let cur_room = if k >= Burrow2::HALLWAY_LEN {
-                ((k - Burrow2::HALLWAY_LEN) / 4) as u8
-            } else {
-                u8::MAX
-            };
+    for k in 0..B::LEN {
+        if let Some(p) = burrow.get(k) {
+            let cur_room = B::get_room(k);
 
-            if cur_room == p {
+            if cur_room == Some(p) {
                 // already in own room -> cannot settle
                 continue;
             }
 
-            if burrow.data[Burrow2::ROOMS_1[p as usize]].is_some() {
+            if burrow
+                .get(B::HALLWAY_LEN + (p as usize) * B::ROOM_LEN)
+                .is_some()
+            {
                 // no free space in room
                 continue;
             }
 
-            if let Some(p2) = burrow.data[Burrow2::ROOMS_2[p as usize]] {
-                if p2 != p {
-                    // room is occupied by foreigner
-                    continue;
-                }
+            if (B::get_room_mn(p)..B::get_room_mx(p))
+                .any(|k| burrow.get(k).map(|p2| p != p2).unwrap_or(false))
+            {
+                // room is occupied by foreigner
+                continue;
             }
 
-            if let Some(p2) = burrow.data[Burrow2::ROOMS_3[p as usize]] {
-                if p2 != p {
-                    // room is occupied by foreigner
-                    continue;
-                }
-            }
-
-            if let Some(p2) = burrow.data[Burrow2::ROOMS_4[p as usize]] {
-                if p2 != p {
-                    // room is occupied by foreigner
-                    continue;
-                }
-            }
-
-            let mut done = [false; Burrow2::LEN];
+            let mut done = vec![false; B::LEN];
             let mut stack = Vec::new();
 
             done[k] = true;
-            for k_adj in Burrow2::ADJ[k] {
+            for k_adj in B::MAP[k] {
                 done[*k_adj] = true;
                 stack.push((1, *k_adj));
             }
 
             while let Some((steps, k_adj)) = stack.pop() {
-                if burrow.data[k_adj].is_some() {
+                if burrow.get(k_adj).is_some() {
                     // cannot move on top of other
                     continue;
                 }
 
-                let adj_room = if k_adj >= Burrow2::HALLWAY_LEN {
-                    ((k_adj - Burrow2::HALLWAY_LEN) / 4) as u8
-                } else {
-                    u8::MAX
-                };
+                let adj_room = B::get_room(k_adj);
 
-                if adj_room == p
-                    && (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
-                        .all(|k_r| burrow.data[k_r] == Some(p))
+                if adj_room == Some(p)
+                    && (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
                 {
                     // all below are settled
-                    update.data[k] = None;
-                    update.data[k_adj] = Some(p);
-                    weight += steps * Burrow2::ENERGIES[p as usize];
+                    burrow.move_pod(k, k_adj);
+                    weight += steps * B::ENERGIES[p as usize];
                 }
 
-                for k_adj_2 in Burrow2::ADJ[k_adj] {
+                for k_adj_2 in B::MAP[k_adj] {
                     if !done[*k_adj_2] {
                         done[*k_adj_2] = true;
                         stack.push((steps + 1, *k_adj_2));
@@ -802,129 +536,83 @@ pub fn settle2(burrow: Burrow2) -> Option<(Burrow2, usize)> {
     }
 
     if weight > 0 {
-        Some((update, weight))
+        Some((weight, burrow))
     } else {
         None
     }
 }
 
-pub fn solve2(burrow: Burrow2, target: Burrow2) -> usize {
-    let mut parents = HashMap::new();
-
+pub fn solve<B>(start: B, target: B) -> usize
+where
+    B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
+{
     // start normalized with everything settled
-    let mut burrow = burrow;
-    let mut cost = 0;
-    while let Some((update, weight)) = settle2(burrow) {
-        burrow = update;
-        cost += weight;
-    }
-    let mut search = Search::init(cost, burrow);
-    parents.insert(burrow, (cost, None as Option<Burrow2>));
+    let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
         if burrow == target {
-            let mut path = VecDeque::new();
-            let mut current = target;
-            while let Some((cost, parent)) = parents.get(&current) {
-                path.push_front((*cost, current));
-                if let Some(parent) = parent {
-                    current = *parent;
-                } else {
-                    break;
-                }
-            }
-            let mut total = 0;
-            for (cost, b) in path {
-                total += cost;
-                println!("Cost: {}, Total: {}\n{:?}", cost, total, b);
-            }
-
-            return cost; // target reached
+            // target reached
+            return cost;
         }
 
-        for k in 0..Burrow2::LEN {
-            if let Some(p) = burrow.data[k] {
-                let cur_room = if k >= Burrow2::HALLWAY_LEN {
-                    ((k - Burrow2::HALLWAY_LEN) / 4) as u8
-                } else {
-                    u8::MAX
-                };
+        let mut adjacent = burrow;
+        let mut weight = 0;
+        while let Some((weight_upd, update)) = settle(adjacent) {
+            weight += weight_upd;
+            adjacent = update;
+        }
+        if weight > 0 {
+            search.push(cost, burrow, weight, adjacent);
+            continue;
+        }
 
-                if cur_room == p
-                    && (k + 1..=Burrow2::ROOMS_4[p as usize]).all(|k_r| burrow.data[k_r] == Some(p))
+        for k in 0..B::LEN {
+            if let Some(p) = burrow.get(k) {
+                let cur_room = B::get_room(k);
+                if cur_room == Some(p)
+                    && (k + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
                 {
                     // position is settled in room and below are only the right ones
                     continue;
                 }
 
-                let mut done = [false; Burrow2::LEN];
+                let mut done = vec![false; B::LEN];
                 let mut stack = Vec::new();
-
                 done[k] = true;
-                for k_adj in Burrow2::ADJ[k] {
+                for k_adj in B::MAP[k] {
                     done[*k_adj] = true;
                     stack.push((1, *k_adj));
                 }
 
                 while let Some((steps, k_adj)) = stack.pop() {
-                    if burrow.data[k_adj].is_some() {
+                    if burrow.get(k_adj).is_some() {
                         // cannot move on top of other
                         continue;
                     }
 
-                    let adj_room = if k_adj >= Burrow2::HALLWAY_LEN {
-                        ((k_adj - Burrow2::HALLWAY_LEN) / 4) as u8
-                    } else {
-                        u8::MAX
-                    };
-
-                    let own_room = adj_room == p;
-                    if own_room && cur_room != p {
+                    let adj_room = B::get_room(k_adj);
+                    if adj_room == Some(p)
+                        && (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
+                    {
                         // move in own room
+                        let weight = steps * B::ENERGIES[p as usize];
+                        let mut adjacent = burrow;
+                        adjacent.move_pod(k, k_adj);
+                        search.push(cost, burrow, weight, adjacent);
+                        continue;
+                    }
 
-                        if (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
-                            .any(|k_r| burrow.data[k_r].map(|p_2| p_2 != p).unwrap_or(false))
-                        {
-                            // foreign pods are in room
-                            continue;
-                        }
-
-                        if (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
-                            .all(|k_r| burrow.data[k_r] == Some(p))
-                        {
-                            unreachable!("Cannot reach here because no move possible that settle");
-                        }
-                        // otherwise do not create an adjacent but continue to look ahaed
-                    } else if adj_room != u8::MAX {
-                        // move out of room
-                        if cur_room != adj_room || done[k_adj - 1] {
-                            // moving in
-                            continue;
-                        }
-                        // don't create adjacent in foreign room but continue to look ahead
-                    } else if !Burrow2::DOORS.contains(&k_adj) {
-                        // if I am not in front of a door, this is a valid adjacent
-                        let mut adjacent = burrow.clone();
-                        adjacent.data[k] = None;
-                        adjacent.data[k_adj] = Some(p);
-                        let adjacent_0 = adjacent;
-                        let cost_upd_0 = cost + steps * Burrow2::ENERGIES[p as usize];
-                        let mut cost_upd = cost_upd_0;
-                        while let Some((update, weight)) = settle2(adjacent) {
-                            cost_upd += weight;
-                            adjacent = update;
-                        }
-                        if search.push(cost_upd, adjacent) {
-                            if cost_upd != cost_upd_0 {
-                                parents.insert(adjacent_0, (cost_upd_0 - cost, Some(burrow)));
-                                parents.insert(adjacent, (cost_upd - cost_upd_0, Some(adjacent_0)));
-                            } else {
-                                parents.insert(adjacent, (cost_upd - cost, Some(burrow)));
-                            }
+                    if !B::is_door(k_adj) && cur_room.is_some() {
+                        // move from room to hallway
+                        let weight = steps * B::ENERGIES[p as usize];
+                        let mut adjacent = burrow;
+                        adjacent.move_pod(k, k_adj);
+                        if !adjacent.is_deadlock() {
+                            search.push(cost, burrow, weight, adjacent);
                         }
                     }
 
-                    for k_adj_2 in Burrow2::ADJ[k_adj] {
+                    for k_adj_2 in B::MAP[k_adj] {
                         if !done[*k_adj_2] {
                             done[*k_adj_2] = true;
                             stack.push((steps + 1, *k_adj_2));
@@ -936,6 +624,18 @@ pub fn solve2(burrow: Burrow2, target: Burrow2) -> usize {
     }
 
     panic!("No path found");
+}
+
+pub fn parse(content: &str) -> BurrowSmall {
+    BurrowSmall::parse(content)
+}
+
+pub fn solution_1(burrow: BurrowSmall) -> usize {
+    solve(burrow, BurrowSmall::TARGET)
+}
+
+pub fn solution_2(burrow: BurrowSmall) -> usize {
+    solve(BurrowLarge::from(burrow), BurrowLarge::TARGET)
 }
 
 // tag::tests[]
@@ -948,7 +648,7 @@ mod tests {
 ###B#C#B#D###
   #A#D#C#A#
   #########";
-    const BURROW_1: Burrow = Burrow {
+    const BURROW_1: BurrowSmall = BurrowSmall {
         data: [
             None,
             None,
@@ -972,7 +672,7 @@ mod tests {
         ],
     };
 
-    const BURROW_2: Burrow2 = Burrow2 {
+    const BURROW_2: BurrowLarge = BurrowLarge {
         data: [
             None,
             None,
@@ -1048,51 +748,6 @@ mod tests {
   #########";
 
     #[test]
-    fn test_solve1() {
-        let burrows = [
-            parse(CONTENT_1),
-            parse(CONTENT_2),
-            parse(CONTENT_3),
-            parse(CONTENT_4),
-            parse(CONTENT_5),
-            parse(CONTENT_6),
-            parse(CONTENT_7),
-            parse(CONTENT_8),
-        ];
-
-        let exp_costs = [40, 400, 3030, 40, 2003, 7000, 8, 0];
-
-        for k1 in 0..burrows.len() - 1 {
-            let start = burrows[k1];
-            let mut target = burrows[k1 + 1].clone();
-            let mut exp_cost = exp_costs[k1];
-            while let Some((update, weight)) = settle1(target) {
-                exp_cost += weight;
-                target = update;
-            }
-            let act_cost = solve1(start, target);
-            assert_eq!(exp_cost, act_cost);
-        }
-
-        let mut start = burrows[0];
-        let mut act_cost = 0;
-        for k in 1..burrows.len() {
-            let mut target = burrows[k];
-            let mut exp_adder = 0;
-            while let Some((update, weight)) = settle1(target) {
-                exp_adder += weight;
-                target = update;
-            }
-            let weight = solve1(start, target);
-            act_cost += weight;
-            start = target;
-            let exp_cost = exp_costs.iter().take(k).sum::<usize>();
-            assert_eq!(exp_cost + exp_adder, act_cost);
-        }
-        assert_eq!(exp_costs.iter().sum::<usize>(), act_cost);
-    }
-
-    #[test]
     fn test_solution_1() {
         let exp_costs = [
             40 + 400 + 3030 + 40 + 2003 + 7000 + 8,
@@ -1128,8 +783,8 @@ mod tests {
     }
 
     #[test]
-    fn test_burrow2_from() {
-        assert_eq!(BURROW_2, Burrow2::from(BURROW_1));
+    fn test_burrow_large_from() {
+        assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
     }
 
     #[test]
@@ -1148,8 +803,8 @@ mod tests {
   #A#B#C#D#
   #########",
         );
-        let cost = solve1(start, target);
-        println!("{}", cost);
+        let cost = solve(start, target);
+        assert_eq!(4008, cost);
     }
 
     #[test]
@@ -1168,7 +823,7 @@ mod tests {
   #A#B#C#D#
   #########",
         );
-        let cost = solve1(start, target);
+        let cost = solve(start, target);
         assert_eq!(9011, cost);
     }
 }
