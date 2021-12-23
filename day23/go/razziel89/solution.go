@@ -13,12 +13,15 @@ func main() {
 	// Actual riddle.
 	g := newGame([8]rune{'D', 'C', 'D', 'A', 'B', 'B', 'A', 'C'})
 	// Example.
-	//g := newGame([8]rune{'B', 'A', 'C', 'D', 'B', 'C', 'D', 'A'})
+	// g := newGame([8]rune{'B', 'A', 'C', 'D', 'B', 'C', 'D', 'A'})
 	// Initialise.
 	stack := make(Stack, 0, numGames)
 
 	cheapest := 0
 	found := false
+	popped := false
+
+	var moves []move
 
 	trackedCost := 0
 	path := 0
@@ -29,17 +32,20 @@ func main() {
 		count++
 		// fmt.Print(g.pretty())
 
-		moves := g.moves()
+		if !popped {
+			moves = g.moves()
+		}
 		// fmt.Println(moves)
 		if path < len(moves) {
 			// There are still moves available. Save the game state.
 			move := moves[path]
 			path++
-			stack.Push(g, trackedCost, path)
+			stack.Push(g, trackedCost, path, moves)
 			// fmt.Printf("PUSH %d\n\n", count)
 			path = 0
 			trackedCost += move.cost
 			g = g.update(move)
+			popped = false
 		} else {
 			// There are no more moves available. Check whether this is final and pop the last
 			// element and continue from there.
@@ -54,7 +60,8 @@ func main() {
 				// We have reached the end. No more moves and the stack is empty.
 				break
 			}
-			g, trackedCost, path = stack.Pop()
+			g, trackedCost, path, moves = stack.Pop()
+			popped = true
 			// fmt.Printf("POP %d\n\n", count)
 		}
 	}
