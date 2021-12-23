@@ -8,8 +8,13 @@ const (
 	numGames = 1000000
 )
 
+// This solution really isn't that efficient, but it can find the solution for each example in under
+// 10min and for each actual puzzle in way under an hour. That's fine by me.
+
 //nolint:nestif,funlen
 func main() {
+	// Part 1 stuff has been augmented to fit into the part 2 board by adding pieces that will never
+	// leave their rooms to the very bottom of their destination rooms. Uncomment each array to run.
 	// // Actual riddle part 1.
 	// g := newGame(
 	// 	[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
@@ -27,7 +32,8 @@ func main() {
 	// g := newGame(
 	// 	[16]rune{'B', 'D', 'D', 'A', 'C', 'C', 'B', 'D', 'B', 'B', 'A', 'C', 'D', 'A', 'C', 'A'},
 	// )
-	// Initialise.
+	// Initialise. Allocate much since we don't know how deep we need to iterate. This uses about
+	// 1.5GB of RAM.
 	stack := make(Stack, 0, numGames)
 	fmt.Println(g.pretty())
 
@@ -52,10 +58,8 @@ func main() {
 		if path < len(moves) {
 			// There are still moves available. Save the game state.
 			move := moves[path]
-			// fmt.Println(move)
 			path++
 			stack.Push(g, trackedCost, path, moves)
-			// fmt.Printf("PUSH %d\n\n", count)
 			path = 0
 			trackedCost += move.cost
 			g = g.update(move)
@@ -67,7 +71,7 @@ func main() {
 				if !found || trackedCost < cheapest {
 					found = true
 					cheapest = trackedCost
-					// fmt.Println(cheapest)
+					// Print out the entire solution.
 					fmt.Println(cheapest, "==============================")
 					for _, gam := range stack {
 						fmt.Println(gam.game.pretty())
@@ -75,6 +79,7 @@ func main() {
 						fmt.Println(gam.moves[gam.path-1])
 					}
 					fmt.Println(g.pretty())
+					fmt.Println(cheapest)
 				}
 			}
 			if len(stack) == 0 {
@@ -83,7 +88,6 @@ func main() {
 			}
 			g, trackedCost, path, moves = stack.Pop()
 			popped = true
-			// fmt.Printf("POP %d\n\n", count)
 		}
 	}
 	fmt.Println(cheapest)

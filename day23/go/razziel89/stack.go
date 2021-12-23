@@ -3,7 +3,9 @@ package main
 // tag::stack[]
 
 // StackedGame tracks a game on the stack. It also contains the total cost for all moves until that
-// point.
+// point. It also tracks the available moves for that game as well as a counter called `path` that
+// indicates which move index next to try. Thus, if path>=len(moves), we have exhausted all possible
+// moves.
 type StackedGame struct {
 	game  game
 	cost  int

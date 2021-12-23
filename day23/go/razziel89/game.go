@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// Go doesn't have enums, sadly. Use constants with name prefixes instead.
 const (
 	a            = 'A'
 	b            = 'B'
@@ -29,13 +30,14 @@ const (
 )
 
 // I'll try to keep this structure as copyable as possible. That way, I can simply put it on a stack
-// to remember the old state, instead of reverting to an old state.
+// to remember the old state, instead of reverting to an old state. Hence, I need to use
+// fixed-length arrays here instead of variable-length slices.
 type game struct {
 	pods   [16]pod
 	spaces [27]space
 }
 
-func getChar(pods [16]pod, pos int) rune {
+func getCharForPos(pods [16]pod, pos int) rune {
 	for _, p := range pods {
 		if p.pos == pos {
 			switch p.cost {
@@ -59,12 +61,12 @@ func (g game) pretty() string {
 	str := "#############\n"
 	str += "#"
 	for pos := 0; pos < 11; pos++ {
-		str += string(getChar(g.pods, pos))
+		str += string(getCharForPos(g.pods, pos))
 	}
 	str += "#\n"
 	roomChars := [16]rune{}
 	for pos := 11; pos < 27; pos++ {
-		char := getChar(g.pods, pos)
+		char := getCharForPos(g.pods, pos)
 		roomChars[pos-firstRoomIdx] = char
 	}
 	str += fmt.Sprintf(
@@ -96,47 +98,23 @@ func newGame(inPods [16]rune) game {
 	// The game board consists of all rooms and the hall, 27 spaces in total.
 	spaces := [27]space{}
 
-	// allowed := []rune{a, b, c, d}
-	// These are the spaces we can move to in the hall.
-	// hallIndces := []int{0, 1, 3, 5, 7, 9, 10}
 	// These are the spaces we cannot move to in the hall, but they are still in the hall. We use
 	// them to identify which positions are to the top left or right of a room.
 	aboveSpaces := []int{2, 4, 6, 8}
 
-	// // Everyone is allowed in the hall.
-	// allAllowed := map[rune]struct{}{
-	// 	a: struct{}{},
-	// 	b: struct{}{},
-	// 	c: struct{}{},
-	// 	d: struct{}{},
-	// }
-	// We implicitly know that anyone may move to the hall. Don't track that here.
-	// for _, hallIdx := range hallIndces {
-	// 	spaces[hallIdx].allowed = allAllowed
-	// }
-
-	// Connect everything together. All rooms are connected to the hall and vice versa.
-	// Iterate over those spaces that are at the beginning of a room.
+	// Determine which spaces are rooms and which are the spaces directly above them. We use this
+	// for easy distance computation later.
 	for roomIdx, roomStart := range []int{11, 15, 19, 23} {
-		// roomAllowed := map[rune]struct{}{allowed[roomIdx]: struct{}{}}
 		aboveRoom := aboveSpaces[roomIdx]
-		// Build the room. Make sure to connect to the entire hall.
 		for _, count := range []int{0, 1, 2, 3} {
 			spaceIdx := roomStart + count
 			roomSpace := &spaces[spaceIdx]
-			// roomSpace.allowed = roomAllowed
 			roomSpace.above = aboveRoom
 			roomSpace.room = true
-			// // Build the connections to the hall.
-			// for _, hallIdx := range hallIndces {
-			// 	// roomSpace.moveIndices = append(roomSpace.moveIndices, hallIdx)
-			// 	hallSpace := &spaces[hallIdx]
-			// 	// hallSpace.moveIndices = append(hallSpace.moveIndices, spaceIdx)
-			// }
 		}
 	}
 
-	// Build the pods.
+	// Build the pods based on user input.
 	pods := [16]pod{}
 	costs := map[rune]int{a: costA, b: costB, c: costC, d: costD}
 	kinds := map[rune]int{a: kindA, b: kindB, c: kindC, d: kindD}
@@ -164,10 +142,8 @@ type pod struct {
 }
 
 type space struct {
-	// moveIndices []int
 	above int
 	room  bool
-	// allowed     map[rune]struct{}
 }
 
 type move struct {
@@ -265,8 +241,8 @@ PODLOOP:
 			// at most right.
 			for _, pos := range []int{0, 1, 3, 5, 7, 9, 10} {
 				if pos > left && pos < right {
-					// The number of spacs moved is the distance between the target position and the
-					// above space, plus distanceToAbove, which is hte distance to the space
+					// The number of spaces moved is the distance between the target position and
+					// the above space, plus distanceToAbove, which is hte distance to the space
 					// directly above our room.
 					distanceToAbove := diffToRoomStart%kindToRoom + 1
 					spacesMoved := abs(pos-mySpace.above) + distanceToAbove
@@ -311,7 +287,8 @@ PODLOOP:
 			diffToTop := kindToRoom
 			bottomSpace := ourRoom + kindToRoom - 1
 			// This block uses the implicit knowledge that, if we find a free space, all spaces
-			// above it must be free, too, since all rooms start out full.
+			// above it must be free, too, since all rooms start out full. And we only ever want to
+			// move to the lowest unoccupied space.
 			for space := bottomSpace; space >= ourRoom; space-- {
 				if occupied[space] == kindFree {
 					spacesMoved := abs(p.pos-aboveOurRoom) + diffToTop //nolint:gomnd
@@ -324,8 +301,9 @@ PODLOOP:
 					continue PODLOOP
 				}
 				if occupied[space] != p.kind {
-					// If we find anyone else here, we must not enter the room. Since we've already
-					// taken care of the empty case, this one means we cannot move into the room.
+					// If we find anyone of a different kind here, we must not enter the room. Since
+					// we've already taken care of the empty case, this one means we cannot move
+					// into the room.
 					continue PODLOOP
 				}
 				diffToTop--
@@ -335,15 +313,6 @@ PODLOOP:
 
 	return moves
 }
-
-// func (g *game) getPod(pos int) *pod {
-// 	for posIdx := range g.pods {
-// 		if g.pods[posIdx].pos == pos {
-// 			return &g.pods[posIdx]
-// 		}
-// 	}
-// 	return nil
-// }
 
 func (g game) update(m move) game {
 	mover := -1
