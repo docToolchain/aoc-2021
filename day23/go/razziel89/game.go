@@ -165,6 +165,17 @@ type move struct {
 	start, end, cost int
 }
 
+func (m move) String() string {
+	return fmt.Sprintf("[s: %d, e: %d, c: %d]", m.start, m.end, m.cost)
+}
+
+func abs(i int) int {
+	if i < 0 {
+		return -i
+	}
+	return i
+}
+
 // Determine possible moves. This is the crux of the entire thing.
 //nolint:nestif,funlen
 func (g game) moves() []move {
@@ -183,8 +194,17 @@ PODLOOP:
 		if mySpace.room {
 			// If we are in a room, we can only move to the hall, but not in some cases.
 			if (p.pos-firstRoomIdx)/kindToRoom == p.kind {
-				// If we already are in our room, we don't want to move anymore.
-				continue PODLOOP
+				// If we already are in our room, we don't want to move anymore, but only if the
+				// other one in our room is also of our kind.
+				// If we are at the bottom, we are good to know.
+				if p.pos%2 == 0 {
+					continue PODLOOP
+				}
+				// If we are at the top, we still have to move if the one below us is of a different
+				// kind. But of the one below us is of the same kind, we don't want to move anymore.
+				if occupied[p.pos+1] == p.kind {
+					continue PODLOOP
+				}
 			}
 			if p.pos%2 == 0 {
 				// This is the bottom space of a room. If there is someone above us, we cannot move.
@@ -217,10 +237,16 @@ PODLOOP:
 			// at most right.
 			for _, pos := range []int{0, 1, 3, 5, 7, 9, 10} {
 				if pos > left && pos < right {
+					// The number of spacs moved is the distanc between the target position and the
+					// above space, plus "2 - (pos%2)". If pos%2==0, we are at a bottom space of a
+					// room, in which case it takes 2 spaces to reach the above space. If pos%2==1,
+					// we are at a top space of a room, in which case it takes 1 step to reach the
+					// above space.
+					spacesMoved := abs(pos-mySpace.above) + (2 - (p.pos % 2)) //nolint:gomnd
 					m := move{
 						start: p.pos,
 						end:   pos,
-						cost:  p.cost,
+						cost:  p.cost * spacesMoved,
 					}
 					// Anyone is allowed in the hall. Don't check if we are allowed.
 					moves = append(moves, m)
@@ -260,20 +286,22 @@ PODLOOP:
 			// The first space is free, we are allowed in, but only if the last space is
 			// free or occupied by one of the same kind.
 			if occupied[ourRoom+1] == kindFree {
+				spacesMoved := abs(p.pos-aboveOurRoom) + 2 //nolint:gomnd
 				// If the second space is free, we are only allowed in there since we don't want to
 				// block the room for our comrade by standing on the first spot.
 				m := move{
 					start: p.pos,
 					end:   ourRoom + 1,
-					cost:  p.cost,
+					cost:  p.cost * spacesMoved,
 				}
 				moves = append(moves, m)
 			} else if occupied[ourRoom+1] == p.kind {
+				spacesMoved := abs(p.pos-aboveOurRoom) + 1
 				// If the last space is occupied by one of our kind, we are allowed in.
 				m := move{
 					start: p.pos,
 					end:   ourRoom,
-					cost:  p.cost,
+					cost:  p.cost * spacesMoved,
 				}
 				moves = append(moves, m)
 			}
@@ -293,18 +321,23 @@ PODLOOP:
 // }
 
 func (g game) update(m move) game {
-	var mover int
+	mover := -1
 	for moverIdx, p := range g.pods {
 		if p.pos == m.start {
 			mover = moverIdx
 			break
 		}
-		log.Fatal("invalid move")
+	}
+	if mover < 0 {
+		fmt.Println(g.pretty())
+		fmt.Println(m)
+		fmt.Println(g.pods)
+		log.Fatal("invalid move, no mover")
 	}
 	// Sanity check, try to find something at the target position.
 	for _, p := range g.pods {
 		if p.pos == m.end {
-			log.Fatal("invalid move")
+			log.Fatal("invalid move, target occupied")
 		}
 	}
 	g.pods[mover].pos = m.end
