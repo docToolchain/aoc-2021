@@ -1,6 +1,6 @@
 #![feature(map_first_last)]
 use std::{
-    collections::{BTreeSet, HashMap, HashSet},
+    collections::{BTreeSet, HashMap, HashSet, VecDeque},
     fmt,
     hash::Hash,
 };
@@ -628,30 +628,21 @@ pub fn solve1(burrow: Burrow, target: Burrow) -> usize {
                         u8::MAX
                     };
 
-                    let own_room = adj_room < u8::MAX && adj_room == p;
+                    let own_room = adj_room == p;
                     if own_room && cur_room != p {
                         // move in own room
 
-                        if (k_adj + 1..Burrow::ROOMS_2[p as usize])
+                        if (k_adj + 1..=Burrow::ROOMS_2[p as usize])
                             .any(|k_r| burrow.data[k_r].map(|p_2| p_2 != p).unwrap_or(false))
                         {
                             // foreign pods are in room
                             continue;
                         }
 
-                        if (k_adj + 1..Burrow::ROOMS_2[p as usize])
+                        if (k_adj + 1..=Burrow::ROOMS_2[p as usize])
                             .all(|k_r| burrow.data[k_r] == Some(p))
                         {
-                            // all below are settled
-                            let mut adjacent = burrow.clone();
-                            adjacent.data[k] = None;
-                            adjacent.data[k_adj] = Some(p);
-                            let mut cost = cost + steps * Burrow::ENERGIES[p as usize];
-                            while let Some((update, weight)) = settle1(adjacent) {
-                                cost += weight;
-                                adjacent = update;
-                            }
-                            search.push(cost, adjacent);
+                            unreachable!("Cannot reach here because no move possible that settle");
                         }
                         // otherwise do not create an adjacent but continue to look ahaed
                     } else if adj_room != u8::MAX {
@@ -689,20 +680,183 @@ pub fn solve1(burrow: Burrow, target: Burrow) -> usize {
 }
 
 // tag::part2[]
-pub fn solution_2(_burrow: Burrow) -> usize {
-    todo!()
+pub fn solution_2(burrow: Burrow) -> usize {
+    solve2(
+        Burrow2::from(burrow),
+        Burrow2 {
+            data: [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some(0),
+                Some(0),
+                Some(0),
+                Some(0),
+                Some(1),
+                Some(1),
+                Some(1),
+                Some(1),
+                Some(2),
+                Some(2),
+                Some(2),
+                Some(2),
+                Some(3),
+                Some(3),
+                Some(3),
+                Some(3),
+            ],
+        },
+    )
+}
+
+pub fn settle2(burrow: Burrow2) -> Option<(Burrow2, usize)> {
+    let mut update = burrow;
+    let mut weight = 0;
+
+    for k in 0..Burrow2::LEN {
+        if let Some(p) = burrow.data[k] {
+            let cur_room = if k >= Burrow2::HALLWAY_LEN {
+                ((k - Burrow2::HALLWAY_LEN) / 4) as u8
+            } else {
+                u8::MAX
+            };
+
+            if cur_room == p {
+                // already in own room -> cannot settle
+                continue;
+            }
+
+            if burrow.data[Burrow2::ROOMS_1[p as usize]].is_some() {
+                // no free space in room
+                continue;
+            }
+
+            if let Some(p2) = burrow.data[Burrow2::ROOMS_2[p as usize]] {
+                if p2 != p {
+                    // room is occupied by foreigner
+                    continue;
+                }
+            }
+
+            if let Some(p2) = burrow.data[Burrow2::ROOMS_3[p as usize]] {
+                if p2 != p {
+                    // room is occupied by foreigner
+                    continue;
+                }
+            }
+
+            if let Some(p2) = burrow.data[Burrow2::ROOMS_4[p as usize]] {
+                if p2 != p {
+                    // room is occupied by foreigner
+                    continue;
+                }
+            }
+
+            let mut done = [false; Burrow2::LEN];
+            let mut stack = Vec::new();
+
+            done[k] = true;
+            for k_adj in Burrow2::ADJ[k] {
+                done[*k_adj] = true;
+                stack.push((1, *k_adj));
+            }
+
+            while let Some((steps, k_adj)) = stack.pop() {
+                if burrow.data[k_adj].is_some() {
+                    // cannot move on top of other
+                    continue;
+                }
+
+                let adj_room = if k_adj >= Burrow2::HALLWAY_LEN {
+                    ((k_adj - Burrow2::HALLWAY_LEN) / 4) as u8
+                } else {
+                    u8::MAX
+                };
+
+                if adj_room == p
+                    && (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
+                        .all(|k_r| burrow.data[k_r] == Some(p))
+                {
+                    // all below are settled
+                    update.data[k] = None;
+                    update.data[k_adj] = Some(p);
+                    weight += steps * Burrow2::ENERGIES[p as usize];
+                }
+
+                for k_adj_2 in Burrow2::ADJ[k_adj] {
+                    if !done[*k_adj_2] {
+                        done[*k_adj_2] = true;
+                        stack.push((steps + 1, *k_adj_2));
+                    }
+                }
+            }
+        }
+    }
+
+    if weight > 0 {
+        Some((update, weight))
+    } else {
+        None
+    }
 }
 
 pub fn solve2(burrow: Burrow2, target: Burrow2) -> usize {
-    let mut search = Search::init(0, burrow);
+    let mut parents = HashMap::new();
+
+    // start normalized with everything settled
+    let mut burrow = burrow;
+    let mut cost = 0;
+    while let Some((update, weight)) = settle2(burrow) {
+        burrow = update;
+        cost += weight;
+    }
+    let mut search = Search::init(cost, burrow);
+    parents.insert(burrow, (cost, None as Option<Burrow2>));
 
     while let Some((cost, burrow)) = search.pop() {
         if burrow == target {
+            let mut path = VecDeque::new();
+            let mut current = target;
+            while let Some((cost, parent)) = parents.get(&current) {
+                path.push_front((*cost, current));
+                if let Some(parent) = parent {
+                    current = *parent;
+                } else {
+                    break;
+                }
+            }
+            let mut total = 0;
+            for (cost, b) in path {
+                total += cost;
+                println!("Cost: {}, Total: {}\n{:?}", cost, total, b);
+            }
+
             return cost; // target reached
         }
 
         for k in 0..Burrow2::LEN {
             if let Some(p) = burrow.data[k] {
+                let cur_room = if k >= Burrow2::HALLWAY_LEN {
+                    ((k - Burrow2::HALLWAY_LEN) / 4) as u8
+                } else {
+                    u8::MAX
+                };
+
+                if cur_room == p
+                    && (k + 1..=Burrow2::ROOMS_4[p as usize]).all(|k_r| burrow.data[k_r] == Some(p))
+                {
+                    // position is settled in room and below are only the right ones
+                    continue;
+                }
+
                 let mut done = [false; Burrow2::LEN];
                 let mut stack = Vec::new();
 
@@ -718,16 +872,56 @@ pub fn solve2(burrow: Burrow2, target: Burrow2) -> usize {
                         continue;
                     }
 
-                    // don't create adjacent in foreign room but continue to look around. I might be moving out
-                    let foreign_room = k_adj >= Burrow2::HALLWAY_LEN
-                        && (k_adj - Burrow2::HALLWAY_LEN) / 4 != p as usize;
+                    let adj_room = if k_adj >= Burrow2::HALLWAY_LEN {
+                        ((k_adj - Burrow2::HALLWAY_LEN) / 4) as u8
+                    } else {
+                        u8::MAX
+                    };
 
-                    if !Burrow2::DOORS.contains(&k_adj) && !foreign_room {
+                    let own_room = adj_room == p;
+                    if own_room && cur_room != p {
+                        // move in own room
+
+                        if (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
+                            .any(|k_r| burrow.data[k_r].map(|p_2| p_2 != p).unwrap_or(false))
+                        {
+                            // foreign pods are in room
+                            continue;
+                        }
+
+                        if (k_adj + 1..=Burrow2::ROOMS_4[p as usize])
+                            .all(|k_r| burrow.data[k_r] == Some(p))
+                        {
+                            unreachable!("Cannot reach here because no move possible that settle");
+                        }
+                        // otherwise do not create an adjacent but continue to look ahaed
+                    } else if adj_room != u8::MAX {
+                        // move out of room
+                        if cur_room != adj_room || done[k_adj - 1] {
+                            // moving in
+                            continue;
+                        }
+                        // don't create adjacent in foreign room but continue to look ahead
+                    } else if !Burrow2::DOORS.contains(&k_adj) {
                         // if I am not in front of a door, this is a valid adjacent
                         let mut adjacent = burrow.clone();
                         adjacent.data[k] = None;
                         adjacent.data[k_adj] = Some(p);
-                        search.push(cost + steps * Burrow2::ENERGIES[p as usize], adjacent);
+                        let adjacent_0 = adjacent;
+                        let cost_upd_0 = cost + steps * Burrow2::ENERGIES[p as usize];
+                        let mut cost_upd = cost_upd_0;
+                        while let Some((update, weight)) = settle2(adjacent) {
+                            cost_upd += weight;
+                            adjacent = update;
+                        }
+                        if search.push(cost_upd, adjacent) {
+                            if cost_upd != cost_upd_0 {
+                                parents.insert(adjacent_0, (cost_upd_0 - cost, Some(burrow)));
+                                parents.insert(adjacent, (cost_upd - cost_upd_0, Some(adjacent_0)));
+                            } else {
+                                parents.insert(adjacent, (cost_upd - cost, Some(burrow)));
+                            }
+                        }
                     }
 
                     for k_adj_2 in Burrow2::ADJ[k_adj] {
@@ -900,7 +1094,7 @@ mod tests {
 
     #[test]
     fn test_solution_1() {
-        let costs = [
+        let exp_costs = [
             40 + 400 + 3030 + 40 + 2003 + 7000 + 8,
             400 + 3030 + 40 + 2003 + 7000 + 8,
             3030 + 40 + 2003 + 7000 + 8,
@@ -923,19 +1117,14 @@ mod tests {
         ];
 
         for k in (0..1).rev() {
-            println!("{}", k);
-            let cost = solution_1(burrows[k]);
-
-            // println!("\n=============\n=============\n");
-            // let mut target = Burrow::parse(CONTENT_8);
-            // println!("{:?}", target);
-            // while let Some((burrow, cost)) = parents.get(&target) {
-            //     println!("{:?} reaches parent at {}", burrow, cost);
-            //     target = *burrow;
-            // }
-
-            assert_eq!(costs[k], cost);
+            let act_cost = solution_1(burrows[k]);
+            assert_eq!(exp_costs[k], act_cost);
         }
+    }
+
+    #[test]
+    fn test_solution_2() {
+        assert_eq!(44169, solution_2(BURROW_1));
     }
 
     #[test]
