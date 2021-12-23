@@ -76,7 +76,7 @@ func (g game) pretty() string {
 		roomChars[1], roomChars[5], roomChars[9], roomChars[13],
 	)
 	str += fmt.Sprintf(
-		"###%c#%c#%c#%c###\n",
+		"  #%c#%c#%c#%c#\n",
 		roomChars[2], roomChars[6], roomChars[10], roomChars[14],
 	)
 	str += fmt.Sprintf(
@@ -235,6 +235,10 @@ PODLOOP:
 				// move.
 				topSpace := kindToRoom*((p.pos-firstRoomIdx)/kindToRoom) + 1
 				for ; topSpace%kindToRoom > 0; topSpace++ {
+					if firstRoomIdx+topSpace >= p.pos {
+						// Only check spaces above us.
+						break
+					}
 					if occupied[firstRoomIdx+topSpace] != kindFree {
 						// If any of the spaces above us are occupied, we don't have any moves.
 						continue PODLOOP

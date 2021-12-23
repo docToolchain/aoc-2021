@@ -42,7 +42,7 @@ func main() {
 
 	for done := false; !done; {
 		count++
-		fmt.Print(g.pretty())
+		fmt.Println(g.pretty())
 
 		if !popped {
 			moves = g.moves()
