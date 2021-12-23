@@ -182,7 +182,7 @@ func (g game) moves() []move {
 		mySpace := g.spaces[p.pos]
 		if mySpace.room {
 			// If we are in a room, we can only move to the hall, but not in some cases.
-			if p.pos-firstRoomIdx == kindToRoom*p.kind {
+			if (p.pos-firstRoomIdx)/kindToRoom == p.kind {
 				// If we already are in our room, we don't want to move anymore.
 				continue
 			}
@@ -268,4 +268,8 @@ func (g *game) getPod(pos int) *pod {
 		}
 	}
 	return nil
+}
+
+func (p pod) String() string {
+	return fmt.Sprintf("{k: %d, p: %d, c: %d}", p.kind, p.pos, p.cost)
 }
