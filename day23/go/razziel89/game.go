@@ -265,12 +265,11 @@ PODLOOP:
 			// at most right.
 			for _, pos := range []int{0, 1, 3, 5, 7, 9, 10} {
 				if pos > left && pos < right {
-					// The number of spacs moved is the distanc between the target position and the
-					// above space, plus "2 - (pos%2)". If pos%2==0, we are at a bottom space of a
-					// room, in which case it takes 2 spaces to reach the above space. If pos%2==1,
-					// we are at a top space of a room, in which case it takes 1 step to reach the
-					// above space.
-					spacesMoved := abs(pos-mySpace.above) + (2 - (p.pos % 2)) //nolint:gomnd
+					// The number of spacs moved is the distance between the target position and the
+					// above space, plus distanceToAbove, which is hte distance to the space
+					// directly above our room.
+					distanceToAbove := diffToRoomStart%kindToRoom + 1
+					spacesMoved := abs(pos-mySpace.above) + distanceToAbove
 					m := move{
 						start: p.pos,
 						end:   pos,

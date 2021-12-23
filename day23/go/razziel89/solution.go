@@ -11,23 +11,25 @@ const (
 //nolint:nestif,funlen
 func main() {
 	// // Actual riddle part 1.
-	g := newGame(
-		[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
-	)
+	// g := newGame(
+	// 	[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
+	// )
 	// // Example part 1.
 	// g := newGame(
 	// 	[16]rune{'B', 'A', 'A', 'A', 'C', 'D', 'B', 'B', 'B', 'C', 'C', 'C', 'D', 'A', 'D', 'D'},
 	// )
-	// // Actual riddle part 2.
-	// g := newGame(
-	// 	[16]rune{'D', 'D', 'D', 'C', 'D', 'C', 'B', 'A', 'B', 'B', 'A', 'B', 'A', 'A', 'C', 'C'},
-	// )
-	// // Example part 2.
+	// Actual riddle part 2.
+	g := newGame(
+		[16]rune{'D', 'D', 'D', 'C', 'D', 'C', 'B', 'A', 'B', 'B', 'A', 'B', 'A', 'A', 'C', 'C'},
+	)
+	// Example part 2.
+	// fmt.Println("Example 2")
 	// g := newGame(
 	// 	[16]rune{'B', 'D', 'D', 'A', 'C', 'C', 'B', 'D', 'B', 'B', 'A', 'C', 'D', 'A', 'C', 'A'},
 	// )
 	// Initialise.
 	stack := make(Stack, 0, numGames)
+	fmt.Println(g.pretty())
 
 	cheapest := 0
 	found := false
@@ -65,14 +67,14 @@ func main() {
 				if !found || trackedCost < cheapest {
 					found = true
 					cheapest = trackedCost
-					fmt.Println(cheapest)
-					// fmt.Println(cheapest, "==============================")
-					// for _, gam := range stack {
-					// 	fmt.Println(gam.game.pretty())
-					// 	fmt.Println(gam.cost)
-					// 	fmt.Println(gam.moves[gam.path-1])
-					// }
-					// fmt.Println(g.pretty())
+					// fmt.Println(cheapest)
+					fmt.Println(cheapest, "==============================")
+					for _, gam := range stack {
+						fmt.Println(gam.game.pretty())
+						fmt.Println(gam.cost)
+						fmt.Println(gam.moves[gam.path-1])
+					}
+					fmt.Println(g.pretty())
 				}
 			}
 			if len(stack) == 0 {
