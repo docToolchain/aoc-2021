@@ -103,15 +103,15 @@ const RANGE: RangeInclusive<isize> = -1000..=1000;
 /// each scanner is a hash set of coordinates in the scanner's local
 /// coordinate system and a hashmap of pairwise distances as keys and number of
 /// occurance of this distance as value
-pub fn parse(content: &str) -> Vec<(HashSet<Coord>, HashMap<usize, usize>)> {
-    let mut scanners: Vec<(HashSet<Coord>, HashMap<usize, usize>)> = Vec::new();
+pub fn parse(content: &str) -> Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>)> {
+    let mut scanners: Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>)> = Vec::new();
 
     let mut beacons = HashSet::new();
     let mut distances = HashMap::new();
     for line in content.lines().map(|l| l.trim()).filter(|l| l.len() > 0) {
         if line.starts_with("---") {
             if !beacons.is_empty() {
-                scanners.push((beacons, distances));
+                scanners.push((beacons, (0, 0, 0), distances));
                 beacons = HashSet::new();
                 distances = HashMap::new();
             }
@@ -130,7 +130,7 @@ pub fn parse(content: &str) -> Vec<(HashSet<Coord>, HashMap<usize, usize>)> {
         }
     }
     if !beacons.is_empty() {
-        scanners.push((beacons, distances));
+        scanners.push((beacons, (0, 0, 0), distances));
     }
 
     scanners
@@ -147,8 +147,8 @@ pub fn parse(content: &str) -> Vec<(HashSet<Coord>, HashMap<usize, usize>)> {
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    (beacons_settled, distances_settled): &(HashSet<Coord>, HashMap<usize, usize>),
-    (beacons_check, distances_check): &(HashSet<Coord>, HashMap<usize, usize>),
+    (beacons_settled, _center_settled, distances_settled): &(HashSet<Coord>, Coord, HashMap<usize, usize>),
+    (beacons_check, _center_check, distances_check): &(HashSet<Coord>, Coord, HashMap<usize, usize>),
     threshold: usize,
 ) -> Option<(fn(Coord) -> Coord, Coord)> {
     // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
@@ -167,9 +167,10 @@ pub fn check_overlap(
         // find all beacons with the same distance as b1[k1] to b2[k2]
         for b1 in beacons_settled {
             for b2 in beacons_check {
-                // center = t(b2) - b1
-                // => b1 = t(b2) - center
-                let center = TRAFOS[t_idx](*b2).sub(b1);
+                // d = b1 - t(b2)
+                // => b1 = t(b2) + center
+                // => b2 = t^-1(b1 - d)
+                let d = b1.sub(&TRAFOS[t_idx](*b2));
 
                 // filter for scanner range prior to lookup
                 // settled beacons are in transformed coordinate (scanner is not necessarily at origin)
@@ -178,14 +179,14 @@ pub fn check_overlap(
                 let mut count = 0;
                 for _ in beacons_settled
                     .iter()
-                    .map(|b1| INV_TRAFOS[t_idx](b1.add(&center)))
+                    .map(|b1| INV_TRAFOS[t_idx](b1.sub(&d)))
                     .filter(|(x, y, z)| RANGE.contains(x) && RANGE.contains(y) && RANGE.contains(z))
                     .filter(|b1| beacons_check.contains(b1))
                 {
                     // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count >= threshold {
-                        return Some((TRAFOS[t_idx], center));
+                        return Some((TRAFOS[t_idx], d));
                     }
                 }
             }
@@ -199,7 +200,7 @@ pub fn check_overlap(
 // tag::solution[]
 /// determine number of unique beacons and max Manhatten distance between
 /// any two scanners
-pub fn solution_1_2(scanners: &[(HashSet<Coord>, HashMap<usize, usize>)]) -> (usize, usize) {
+pub fn solution_1_2(scanners: &[(HashSet<Coord>, Coord, HashMap<usize, usize>)]) -> (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
@@ -225,9 +226,10 @@ pub fn solution_1_2(scanners: &[(HashSet<Coord>, HashMap<usize, usize>)]) -> (us
                 continue; // already settled
             }
 
-            if let Some((t, c)) = check_overlap(&scanners[k1], &scanners[k2], 12) {
+            if let Some((t, d)) = check_overlap(&scanners[k1], &scanners[k2], 12) {
                 // update scanner to settled coordinates
-                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).sub(&c)).collect();
+                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).add(&d)).collect();
+                scanners[k2].1 = t(scanners[k2].1).add(&d);
 
                 // add beacons to unique set
                 beacons.extend(&scanners[k2].0);
@@ -237,14 +239,14 @@ pub fn solution_1_2(scanners: &[(HashSet<Coord>, HashMap<usize, usize>)]) -> (us
 
                 // update max distance
                 for c_settled in &centers {
-                    let dist = c.sub(&c_settled).abs();
+                    let dist = scanners[k2].1.sub(&c_settled).abs();
                     if dist > max_dist {
                         max_dist = dist;
                     }
                 }
 
                 // add center
-                centers.push(c);
+                centers.push(d);
             }
         }
 
@@ -279,8 +281,8 @@ mod tests {
         assert!(r.is_some(), "No transformation found");
         let (t, d) = r.unwrap();
 
-        assert_eq!((-68, 1246, 43), d);
-        assert_eq!((-618, -824, -621), t((686, 422, 578)).sub(&d));
+        assert_eq!((68, -1246, -43), d);
+        assert_eq!((-618, -824, -621), t((686, 422, 578)).add(&d));
     }
 
     #[test]
