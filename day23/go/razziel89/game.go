@@ -22,19 +22,20 @@ const (
 	firstHallIdx = -1
 	lastHallIdx  = 11
 	firstRoomIdx = 11
-	kindToRoom   = 2
-	// Assume there are at least 2 possible moves per pod. This number influences performance a bit.
+	kindToRoom   = 4
+	// Assume there are at least 2 possible moves per situation. This number influences performance
+	// a bit.
 	buffer = 16
 )
 
 // I'll try to keep this structure as copyable as possible. That way, I can simply put it on a stack
 // to remember the old state, instead of reverting to an old state.
 type game struct {
-	pods   [8]pod
-	spaces [19]space
+	pods   [16]pod
+	spaces [27]space
 }
 
-func getChar(pods [8]pod, pos int) rune {
+func getChar(pods [16]pod, pos int) rune {
 	for _, p := range pods {
 		if p.pos == pos {
 			switch p.cost {
@@ -61,18 +62,26 @@ func (g game) pretty() string {
 		str += string(getChar(g.pods, pos))
 	}
 	str += "#\n"
-	roomChars := [8]rune{}
-	for pos := 11; pos < 19; pos++ {
+	roomChars := [16]rune{}
+	for pos := 11; pos < 27; pos++ {
 		char := getChar(g.pods, pos)
-		roomChars[pos-11] = char
+		roomChars[pos-firstRoomIdx] = char
 	}
 	str += fmt.Sprintf(
 		"###%c#%c#%c#%c###\n",
-		roomChars[0], roomChars[2], roomChars[4], roomChars[6],
+		roomChars[0], roomChars[4], roomChars[8], roomChars[12],
 	)
 	str += fmt.Sprintf(
 		"  #%c#%c#%c#%c#\n",
-		roomChars[1], roomChars[3], roomChars[5], roomChars[7],
+		roomChars[1], roomChars[5], roomChars[9], roomChars[13],
+	)
+	str += fmt.Sprintf(
+		"###%c#%c#%c#%c###\n",
+		roomChars[2], roomChars[6], roomChars[10], roomChars[14],
+	)
+	str += fmt.Sprintf(
+		"  #%c#%c#%c#%c#\n",
+		roomChars[3], roomChars[7], roomChars[11], roomChars[15],
 	)
 
 	str += "  #########\n"
@@ -80,12 +89,12 @@ func (g game) pretty() string {
 }
 
 //nolint:funlen
-func newGame(inPods [8]rune) game {
+func newGame(inPods [16]rune) game {
 
 	// Build the game board first.
 
-	// The game board consists of all rooms and the hall, 19 spaces in total.
-	spaces := [19]space{}
+	// The game board consists of all rooms and the hall, 27 spaces in total.
+	spaces := [27]space{}
 
 	// allowed := []rune{a, b, c, d}
 	// These are the spaces we can move to in the hall.
@@ -108,11 +117,11 @@ func newGame(inPods [8]rune) game {
 
 	// Connect everything together. All rooms are connected to the hall and vice versa.
 	// Iterate over those spaces that are at the beginning of a room.
-	for roomIdx, roomStart := range []int{11, 13, 15, 17} {
+	for roomIdx, roomStart := range []int{11, 15, 19, 23} {
 		// roomAllowed := map[rune]struct{}{allowed[roomIdx]: struct{}{}}
 		aboveRoom := aboveSpaces[roomIdx]
 		// Build the room. Make sure to connect to the entire hall.
-		for _, count := range []int{0, 1} {
+		for _, count := range []int{0, 1, 2, 3} {
 			spaceIdx := roomStart + count
 			roomSpace := &spaces[spaceIdx]
 			// roomSpace.allowed = roomAllowed
@@ -128,12 +137,12 @@ func newGame(inPods [8]rune) game {
 	}
 
 	// Build the pods.
-	pods := [8]pod{}
+	pods := [16]pod{}
 	costs := map[rune]int{a: costA, b: costB, c: costC, d: costD}
 	kinds := map[rune]int{a: kindA, b: kindB, c: kindC, d: kindD}
 	podIdx := 0
-	for _, roomStart := range []int{11, 13, 15, 17} {
-		for _, count := range []int{0, 1} {
+	for _, roomStart := range []int{11, 15, 19, 23} {
+		for _, count := range []int{0, 1, 2, 3} {
 			spaceIdx := roomStart + count
 			pods[podIdx].pos = spaceIdx
 			pods[podIdx].cost = costs[inPods[podIdx]]
@@ -181,7 +190,7 @@ func abs(i int) int {
 func (g game) moves() []move {
 	moves := make([]move, 0, buffer)
 
-	occupied := [19]int{}
+	occupied := [27]int{}
 	for idx := range occupied {
 		occupied[idx] = kindFree
 	}
@@ -193,25 +202,43 @@ PODLOOP:
 		mySpace := g.spaces[p.pos]
 		if mySpace.room {
 			// If we are in a room, we can only move to the hall, but not in some cases.
-			if (p.pos-firstRoomIdx)/kindToRoom == p.kind {
+			diffToRoomStart := p.pos - firstRoomIdx
+			//nolint:gomnd
+			if diffToRoomStart/kindToRoom == p.kind {
 				// If we already are in our room, we don't want to move anymore, but only if the
-				// other one in our room is also of our kind.
+				// other ones in our room are also of our kind.
 				// If we are at the bottom, we are good to know.
-				if p.pos%2 == 0 {
+				if diffToRoomStart%4 == 3 {
 					continue PODLOOP
 				}
-				// If we are at the top, we still have to move if the one below us is of a different
-				// kind. But of the one below us is of the same kind, we don't want to move anymore.
-				if occupied[p.pos+1] == p.kind {
-					continue PODLOOP
+				// If we are somewhere at the top, we still have to move if the ones below us are of
+				// a different kind. But if the ones below us is of the same kind, we don't want to
+				// move anymore.
+				if diffToRoomStart%4 == 2 {
+					if occupied[p.pos+1] == p.kind {
+						continue PODLOOP
+					}
+				}
+				if diffToRoomStart%4 == 1 {
+					if occupied[p.pos+1] == p.kind && occupied[p.pos+2] == p.kind {
+						continue PODLOOP
+					}
+				}
+				if diffToRoomStart%4 == 0 {
+					if occupied[p.pos+1] == p.kind && occupied[p.pos+2] == p.kind && occupied[p.pos+3] == p.kind {
+						continue PODLOOP
+					}
 				}
 			}
-			if p.pos%2 == 0 {
-				// This is the bottom space of a room. If there is someone above us, we cannot move.
-				topSpace := p.pos - 1
-				if occupied[topSpace] != kindFree {
-					// If the top space is occupied, we don't have any moves.
-					continue PODLOOP
+			if diffToRoomStart%kindToRoom > 0 {
+				// These are the bottom spaces of a room. If there is someone above us, we cannot
+				// move.
+				topSpace := kindToRoom*((p.pos-firstRoomIdx)/kindToRoom) + 1
+				for ; topSpace%kindToRoom > 0; topSpace++ {
+					if occupied[firstRoomIdx+topSpace] != kindFree {
+						// If any of the spaces above us are occupied, we don't have any moves.
+						continue PODLOOP
+					}
 				}
 			}
 			// Find the largest occupied space in the hall smaller than our "above" space. We cannot
@@ -278,32 +305,30 @@ PODLOOP:
 					}
 				}
 			}
-			if occupied[ourRoom] != kindFree {
-				// In this case, the first spot in the room is occupied. We are not allowed
-				// in at all.
-				continue PODLOOP
-			}
-			// The first space is free, we are allowed in, but only if the last space is
-			// free or occupied by one of the same kind.
-			if occupied[ourRoom+1] == kindFree {
-				spacesMoved := abs(p.pos-aboveOurRoom) + 2 //nolint:gomnd
-				// If the second space is free, we are only allowed in there since we don't want to
-				// block the room for our comrade by standing on the first spot.
-				m := move{
-					start: p.pos,
-					end:   ourRoom + 1,
-					cost:  p.cost * spacesMoved,
+			// Check whether any space already in the room is occupied. We may only move to the
+			// lowest unoccupied space. But only if there are only the same kind of pods there like
+			// us.
+			diffToTop := kindToRoom
+			bottomSpace := ourRoom + kindToRoom - 1
+			// This block uses the implicit knowledge that, if we find a free space, all spaces
+			// above it must be free, too, since all rooms start out full.
+			for space := bottomSpace; space > ourRoom; space-- {
+				spacesMoved := abs(p.pos-aboveOurRoom) + diffToTop //nolint:gomnd
+				if occupied[space] == kindFree {
+					m := move{
+						start: p.pos,
+						end:   space,
+						cost:  p.cost * spacesMoved,
+					}
+					moves = append(moves, m)
+					continue PODLOOP
 				}
-				moves = append(moves, m)
-			} else if occupied[ourRoom+1] == p.kind {
-				spacesMoved := abs(p.pos-aboveOurRoom) + 1
-				// If the last space is occupied by one of our kind, we are allowed in.
-				m := move{
-					start: p.pos,
-					end:   ourRoom,
-					cost:  p.cost * spacesMoved,
+				if occupied[space] != p.kind {
+					// If we find anyone else here, we must not enter the room. Since we've already
+					// taken care of the empty case, this one means we cannot move into the room.
+					continue PODLOOP
 				}
-				moves = append(moves, m)
+				diffToTop--
 			}
 		}
 	}
@@ -345,21 +370,30 @@ func (g game) update(m move) game {
 }
 
 func (g *game) isFinal() bool {
-	occupied := [19]int{}
+	occupied := [27]int{}
 	for idx := range occupied {
 		occupied[idx] = kindFree
 	}
 	for _, p := range g.pods {
 		occupied[p.pos] = p.kind
 	}
-	return occupied[11] == kindA &&
+	occ := occupied[11] == kindA &&
 		occupied[12] == kindA &&
-		occupied[13] == kindB &&
-		occupied[14] == kindB &&
-		occupied[15] == kindC &&
-		occupied[16] == kindC &&
-		occupied[17] == kindD &&
-		occupied[18] == kindD
+		occupied[13] == kindA &&
+		occupied[14] == kindA &&
+		occupied[15] == kindB &&
+		occupied[16] == kindB &&
+		occupied[17] == kindB &&
+		occupied[18] == kindB &&
+		occupied[19] == kindC &&
+		occupied[20] == kindC &&
+		occupied[21] == kindC &&
+		occupied[22] == kindC &&
+		occupied[23] == kindD &&
+		occupied[24] == kindD &&
+		occupied[25] == kindD &&
+		occupied[26] == kindD
+	return occ
 }
 
 func (p pod) String() string {
