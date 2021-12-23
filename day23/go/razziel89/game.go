@@ -177,21 +177,21 @@ func (g game) moves() []move {
 	for _, p := range g.pods {
 		occupied[p.pos] = p.kind
 	}
-
+PODLOOP:
 	for _, p := range g.pods {
 		mySpace := g.spaces[p.pos]
 		if mySpace.room {
 			// If we are in a room, we can only move to the hall, but not in some cases.
 			if (p.pos-firstRoomIdx)/kindToRoom == p.kind {
 				// If we already are in our room, we don't want to move anymore.
-				continue
+				continue PODLOOP
 			}
 			if p.pos%2 == 0 {
 				// This is the bottom space of a room. If there is someone above us, we cannot move.
 				topSpace := p.pos - 1
 				if occupied[topSpace] != kindFree {
 					// If the top space is occupied, we don't have any moves.
-					continue
+					continue PODLOOP
 				}
 			}
 			// Find the largest occupied space in the hall smaller than our "above" space. We cannot
@@ -239,7 +239,7 @@ func (g game) moves() []move {
 					if occupied[checkPos] != kindFree {
 						// There is a space occupied to our right, blocking our room. We cannot move
 						// into our room.
-						continue
+						continue PODLOOP
 					}
 				}
 			} else {
@@ -248,14 +248,14 @@ func (g game) moves() []move {
 					if occupied[checkPos] != kindFree {
 						// There is a space occupied to our left, blocking our room. We cannot move
 						// into our room.
-						continue
+						continue PODLOOP
 					}
 				}
 			}
 			if occupied[ourRoom] != kindFree {
 				// In this case, the first spot in the room is occupied. We are not allowed
 				// in at all.
-				continue
+				continue PODLOOP
 			}
 			// The first space is free, we are allowed in, but only if the last space is
 			// free or occupied by one of the same kind.
@@ -293,5 +293,18 @@ func (g *game) getPod(pos int) *pod {
 }
 
 func (p pod) String() string {
-	return fmt.Sprintf("{k: %d, p: %d, c: %d}", p.kind, p.pos, p.cost)
+	var name rune
+	switch p.kind {
+	case kindA:
+		name = a
+	case kindB:
+		name = b
+	case kindC:
+		name = c
+	case kindD:
+		name = d
+	default:
+		log.Fatal("internal error")
+	}
+	return fmt.Sprintf("{k: %c, p: %d, c: %d}", name, p.pos, p.cost)
 }
