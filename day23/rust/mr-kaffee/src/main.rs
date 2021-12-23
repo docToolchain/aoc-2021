@@ -2,7 +2,7 @@ use mr_kaffee_2021_23::*;
 use std::time::Instant;
 
 pub const INPUT: &str = include_str!("../input.txt");
-pub const EXP_1: usize = 0;
+pub const EXP_1: usize = 15_365;
 pub const EXP_2: usize = 1;
 
 fn main() {     
