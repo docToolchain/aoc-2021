@@ -13,7 +13,7 @@ I use a structure ``Cuboid`` with one key function for the solution:
 include::src/lib.rs[tags=magic]
 ----
 
-This function recursively calculates the contribution of a previous reboot step restricted to the current rebbot step. By subtracting all the contributions from previous steps, it essentially undoes the previous steps restricted to the area affected by the current step before applying the current step.
+This function recursively calculates the contribution of a previous reboot step restricted to the current reboot step. By subtracting all the contributions from previous steps, it essentially undoes the previous steps restricted to the area affected by the current step before applying the current step.
 
 The recursion is necessary, because previous steps will in general overlap. So without the recursion, these overlapping areas would be undone several times.
 
