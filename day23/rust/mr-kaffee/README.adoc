@@ -1,0 +1,59 @@
+== Day 23: Amphipod ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/23[AoC|2021|23].
+
+=== Part 1 ===
+
+My initial idea was to use Dijkstra. The first challenge was to come up with a way to model the data. After some tries, I decided to model the burrows as a list of ``Option<u8>``s. The first 11 model the hallway. The remaining elements model the rooms one after the other. A ``None`` value represents open space, a ``Some(p)`` value represents a space occupied by amphipd ``A`` for ``p = 0`` to ``D`` for ``p = 3``.
+
+The next challenge is to find all adjacent states from a given state. To solve this, I use a constant ``MAP`` listing all adjacent positions for every position. To find the adjacents, I do a breadth first search using this map starting from every position that contains an amphipod. There is a lot of potential for bugs in implementing the rules from the puzzle description that describe whether a position is valid for a given amphipod.
+
+After all bugs fixed, I had a solution which solved part 1 in ~15 seconds and did never finish for part 2.
+
+=== Part 2 ===
+
+The key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I simply add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I realized that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.
+
+Adding the A* heuristic reduced the solution time to <1s for both parts together.
+
+=== Implementation ===
+
+==== A* search ====
+
+The actual search is performed in a solve method, which mostly implements the logic to find adjacents
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve]
+----
+
+==== Burrow ====
+
+I wanted to have a solution that works for both, part 1 and part 2.
+
+Therefore, I implemented a trait ``Burrow`` and a trait ``BurrowCommon`` to be able to create blanket implementations for common behavior or properties. The two structs implementing the trait ``Burrow`` are ``BurrowSmall`` for part 1 and ``BurrowLarge`` for part 2.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=burrow]
+----
+
+==== Search State ====
+
+The search state is modeled as a separate struct:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=search]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
+
+A* can be very helpful compared to plain Dijkstra!
