@@ -5,6 +5,7 @@ use std::{
     hash::Hash,
 };
 
+// tag::burrow[]
 #[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
 pub struct BurrowLarge {
     data: [Option<u8>; 11 + 4 * 4],
@@ -19,6 +20,8 @@ pub trait Burrow {
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &'static [&'static [usize]];
+    const MIN_COST: &'static [[usize; 4]];
+    const TARGET: Self;
 
     fn get(&self, idx: usize) -> Option<u8>;
     fn set(&mut self, idx: usize, val: Option<u8>);
@@ -33,7 +36,7 @@ pub trait BurrowCommon {
     fn get_room_mn(room: u8) -> usize;
     fn get_room_mx(room: u8) -> usize;
     fn move_pod(&mut self, idx_from: usize, idx_to: usize);
-    fn is_deadlock(&self) -> bool;
+    fn get_min_cost(&self) -> usize;
 }
 
 impl<B> BurrowCommon for B
@@ -109,49 +112,70 @@ where
         self.set(idx_from, None);
     }
 
-    fn is_deadlock(&self) -> bool {
-        if self.get(3) == Some(3) && self.get(7) == Some(0)
-            || self.get(5) == Some(3) && self.get(7) == Some(0)
-            || self.get(3) == Some(3) && self.get(5) == Some(0)
-            || self.get(3) == Some(2) && self.get(5) == Some(0)
-            || self.get(5) == Some(3) && self.get(7) == Some(1)
-        {
-            return true;
-        }
-
-        if self.get(0).is_some() && self.get(1).is_some() {
-            if let Some(p_mx) = (Self::get_room_mn(0)..Self::get_room_mx(0))
-                .filter_map(|k| self.get(k))
-                .max()
-            {
-                if self.get(3) == Some(0) && p_mx > 0
-                    || self.get(5) == Some(0) && p_mx > 1
-                    || self.get(7) == Some(0) && p_mx > 2
-                {
-                    return true;
+    fn get_min_cost(&self) -> usize {
+        let mut cost = 0;
+        for k in 0..Self::LEN {
+            if let Some(p) = self.get(k) {
+                // lookup minimum cost from table
+                cost += Self::MIN_COST[k][p as usize];
+                if let Some(r) = Self::get_room(k) {
+                    if p == r
+                        && (k + 1..Self::get_room_mx(r))
+                            .any(|k| self.get(k).map(|p2| p2 != p).unwrap_or(false))
+                    {
+                        // foreigners below, need to
+                        // - move out (+1) and
+                        // - move one to the side (+1)
+                        // - and back again (*2)
+                        let adder = 2
+                            * (k - Self::get_room_mn(r) as usize + 2)
+                            * Self::ENERGIES[p as usize];
+                        cost += adder;
+                    }
                 }
             }
         }
 
-        if self.get(10).is_some() && self.get(9).is_some() {
-            if let Some(p_mn) = (Self::get_room_mn(3)..Self::get_room_mx(3))
-                .filter_map(|k| self.get(k))
-                .min()
-            {
-                if self.get(7) == Some(3) && p_mn < 3
-                    || self.get(5) == Some(3) && p_mn < 2
-                    || self.get(3) == Some(3) && p_mn < 1
-                {
-                    return true;
-                }
-            }
+        for e in Self::ENERGIES {
+            cost -= Self::ROOM_LEN * (Self::ROOM_LEN - 1) / 2 * e;
         }
 
-        false
+        cost
     }
 }
 
 impl Burrow for BurrowLarge {
+    const TARGET: Self = Self {
+        data: [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(0),
+            Some(0),
+            Some(0),
+            Some(0),
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(3),
+            Some(3),
+            Some(3),
+            Some(3),
+        ],
+    };
     const ROOM_LEN: usize = 4;
     const LEN: usize = 11 + 4 * 4;
     const MAP: &'static [&'static [usize]] = &[
@@ -187,6 +211,40 @@ impl Burrow for BurrowLarge {
         &[24, 26],
         &[25],
     ];
+    const MIN_COST: &'static [[usize; 4]] = &[
+        // hallway
+        [6, 80, 1000, 12000],
+        [5, 70, 900, 11000],
+        [4, 60, 800, 10000],
+        [5, 50, 700, 9000],
+        [6, 40, 600, 8000],
+        [7, 50, 500, 7000],
+        [8, 60, 400, 6000],
+        [9, 70, 500, 5000],
+        [10, 80, 600, 4000],
+        [11, 90, 700, 5000],
+        [12, 100, 800, 6000],
+        // room 1
+        [3, 70, 900, 11000],
+        [2, 80, 1000, 12000],
+        [1, 90, 1100, 13000],
+        [0, 100, 1200, 14000],
+        // room 2
+        [7, 30, 700, 9000],
+        [8, 20, 800, 10000],
+        [9, 10, 900, 11000],
+        [10, 0, 1000, 12000],
+        // room 3
+        [9, 70, 300, 7000],
+        [10, 80, 200, 8000],
+        [11, 90, 100, 9000],
+        [12, 100, 0, 10000],
+        // room 4
+        [11, 90, 700, 3000],
+        [12, 100, 800, 2000],
+        [13, 110, 900, 1000],
+        [14, 120, 1000, 0],
+    ];
 
     fn get(&self, idx: usize) -> Option<u8> {
         self.data[idx]
@@ -198,6 +256,29 @@ impl Burrow for BurrowLarge {
 }
 
 impl Burrow for BurrowSmall {
+    const TARGET: Self = Self {
+        data: [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(0),
+            Some(0),
+            Some(1),
+            Some(1),
+            Some(2),
+            Some(2),
+            Some(3),
+            Some(3),
+        ],
+    };
     const ROOM_LEN: usize = 2;
     const LEN: usize = 11 + 4 * 2;
     const MAP: &'static [&'static [usize]] = &[
@@ -224,6 +305,32 @@ impl Burrow for BurrowSmall {
         // room 4
         &[8, 18],
         &[17],
+    ];
+    const MIN_COST: &'static [[usize; 4]] = &[
+        // hallway
+        [4, 60, 800, 10000],
+        [3, 50, 700, 9000],
+        [2, 40, 600, 8000],
+        [3, 30, 500, 7000],
+        [4, 20, 400, 6000],
+        [5, 30, 300, 5000],
+        [6, 40, 200, 4000],
+        [7, 50, 300, 3000],
+        [8, 60, 400, 2000],
+        [9, 70, 500, 3000],
+        [10, 80, 600, 4000],
+        // room 1
+        [1, 50, 700, 9000],
+        [0, 60, 800, 10000],
+        // room 2
+        [5, 10, 500, 7000],
+        [6, 0, 600, 8000],
+        // room 3
+        [7, 50, 100, 5000],
+        [8, 60, 0, 6000],
+        // room 4
+        [9, 70, 500, 1000],
+        [10, 80, 600, 0],
     ];
 
     fn get(&self, idx: usize) -> Option<u8> {
@@ -260,30 +367,6 @@ impl fmt::Display for BurrowLarge {
 }
 
 impl BurrowSmall {
-    pub const TARGET: Self = Self {
-        data: [
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            Some(0),
-            Some(0),
-            Some(1),
-            Some(1),
-            Some(2),
-            Some(2),
-            Some(3),
-            Some(3),
-        ],
-    };
-
     pub fn parse(content: &str) -> Self {
         let mut lines = content.lines().skip(1);
 
@@ -335,38 +418,6 @@ impl BurrowSmall {
 }
 
 impl BurrowLarge {
-    pub const TARGET: Self = Self {
-        data: [
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            Some(0),
-            Some(0),
-            Some(0),
-            Some(0),
-            Some(1),
-            Some(1),
-            Some(1),
-            Some(1),
-            Some(2),
-            Some(2),
-            Some(2),
-            Some(2),
-            Some(3),
-            Some(3),
-            Some(3),
-            Some(3),
-        ],
-    };
-
     pub fn from(burrow: BurrowSmall) -> Self {
         let mut data = [None; Self::LEN];
 
@@ -393,19 +444,21 @@ impl BurrowLarge {
         Self { data }
     }
 }
+// end::burrow[]
 
+// tag::search[]
 #[derive(Debug)]
 pub struct Search<T> {
-    heap: BTreeSet<(usize, T)>,
+    heap: BTreeSet<(usize, usize, T)>,
     settled: HashSet<T>,
-    costs: HashMap<T, usize>,
+    costs: HashMap<T, (usize, usize)>,
     parents: HashMap<T, (usize, Option<T>)>,
     trace_path: bool,
 }
 
 impl<T> Search<T>
 where
-    T: Eq + Ord + Hash + Copy,
+    T: Eq + Ord + Hash + Copy + fmt::Debug,
 {
     pub fn init(start: T) -> Self {
         let mut search = Self {
@@ -415,36 +468,45 @@ where
             parents: HashMap::new(),
             trace_path: false,
         };
-        search.heap.insert((0, start));
+        search.heap.insert((0, 0, start));
         search.settled.insert(start);
-        search.costs.insert(start, 0);
+        search.costs.insert(start, (0, 0));
         search
     }
 
     pub fn pop(&mut self) -> Option<(usize, T)> {
-        if let Some((weight, burrow)) = self.heap.pop_first() {
+        if let Some((_, cost, burrow)) = self.heap.pop_first() {
             self.settled.insert(burrow);
-            Some((weight, burrow))
+            Some((cost, burrow))
         } else {
             None
         }
     }
 
-    pub fn push(&mut self, cost: usize, parent: T, weight: usize, adjacent: T) -> bool {
+    pub fn push(
+        &mut self,
+        cost: usize,
+        parent: T,
+        weight: usize,
+        bound_rem: usize,
+        adjacent: T,
+    ) -> bool {
         if self.settled.contains(&adjacent) {
             return false;
         }
 
-        if let Some(cur_cost) = self.costs.get(&adjacent) {
-            if cost + weight < *cur_cost {
-                self.heap.remove(&(*cur_cost, adjacent));
+        if let Some((cur_bound, cur_cost)) = self.costs.get(&adjacent) {
+            if cost + weight + bound_rem < *cur_bound {
+                self.heap.remove(&(*cur_bound, *cur_cost, adjacent));
             } else {
                 return false;
             }
         }
 
-        self.heap.insert((cost + weight, adjacent));
-        self.costs.insert(adjacent, cost + weight);
+        self.heap
+            .insert((cost + weight + bound_rem, cost + weight, adjacent));
+        self.costs
+            .insert(adjacent, (cost + weight + bound_rem, cost + weight));
         if self.trace_path {
             self.parents.insert(adjacent, (weight, Some(parent)));
         }
@@ -467,82 +529,17 @@ where
 
         path
     }
-}
 
-pub fn settle<B>(burrow: B) -> Option<(usize, B)>
-where
-    B: Burrow + Copy,
-{
-    let mut burrow = burrow;
-    let mut weight = 0;
-
-    for k in 0..B::LEN {
-        if let Some(p) = burrow.get(k) {
-            let cur_room = B::get_room(k);
-
-            if cur_room == Some(p) {
-                // already in own room -> cannot settle
-                continue;
-            }
-
-            if burrow
-                .get(B::HALLWAY_LEN + (p as usize) * B::ROOM_LEN)
-                .is_some()
-            {
-                // no free space in room
-                continue;
-            }
-
-            if (B::get_room_mn(p)..B::get_room_mx(p))
-                .any(|k| burrow.get(k).map(|p2| p != p2).unwrap_or(false))
-            {
-                // room is occupied by foreigner
-                continue;
-            }
-
-            let mut done = vec![false; B::LEN];
-            let mut stack = Vec::new();
-
-            done[k] = true;
-            for k_adj in B::MAP[k] {
-                done[*k_adj] = true;
-                stack.push((1, *k_adj));
-            }
-
-            while let Some((steps, k_adj)) = stack.pop() {
-                if burrow.get(k_adj).is_some() {
-                    // cannot move on top of other
-                    continue;
-                }
-
-                let adj_room = B::get_room(k_adj);
-
-                if adj_room == Some(p)
-                    && (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
-                {
-                    // all below are settled
-                    burrow.move_pod(k, k_adj);
-                    weight += steps * B::ENERGIES[p as usize];
-                }
-
-                for k_adj_2 in B::MAP[k_adj] {
-                    if !done[*k_adj_2] {
-                        done[*k_adj_2] = true;
-                        stack.push((steps + 1, *k_adj_2));
-                    }
-                }
-            }
+    pub fn print_path_to(&self, target: T) {
+        for (weight, burrow) in self.get_path_to(target) {
+            println!("==({})==>\n{:?}", weight, burrow);
         }
     }
-
-    if weight > 0 {
-        Some((weight, burrow))
-    } else {
-        None
-    }
 }
+// end::search[]
 
-pub fn solve<B>(start: B, target: B) -> usize
+// tag::solve[]
+pub fn solve<B>(start: B) -> usize
 where
     B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
 {
@@ -550,20 +547,9 @@ where
     let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
-        if burrow == target {
+        if burrow == B::TARGET {
             // target reached
             return cost;
-        }
-
-        let mut adjacent = burrow;
-        let mut weight = 0;
-        while let Some((weight_upd, update)) = settle(adjacent) {
-            weight += weight_upd;
-            adjacent = update;
-        }
-        if weight > 0 {
-            search.push(cost, burrow, weight, adjacent);
-            continue;
         }
 
         for k in 0..B::LEN {
@@ -598,18 +584,16 @@ where
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent);
+                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
                         continue;
                     }
 
-                    if !B::is_door(k_adj) && cur_room.is_some() {
+                    if k_adj < B::HALLWAY_LEN && !B::is_door(k_adj) && cur_room.is_some() {
                         // move from room to hallway
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
-                        if !adjacent.is_deadlock() {
-                            search.push(cost, burrow, weight, adjacent);
-                        }
+                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
@@ -625,17 +609,18 @@ where
 
     panic!("No path found");
 }
+// end::solve[]
 
 pub fn parse(content: &str) -> BurrowSmall {
     BurrowSmall::parse(content)
 }
 
 pub fn solution_1(burrow: BurrowSmall) -> usize {
-    solve(burrow, BurrowSmall::TARGET)
+    solve(burrow)
 }
 
 pub fn solution_2(burrow: BurrowSmall) -> usize {
-    solve(BurrowLarge::from(burrow), BurrowLarge::TARGET)
+    solve(BurrowLarge::from(burrow))
 }
 
 // tag::tests[]
@@ -787,44 +772,19 @@ mod tests {
         assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
     }
 
-    #[test]
-    fn test_step_1() {
-        let start = parse(
-            "#############
-#.....D...A.#
-###.#B#C#.###
-  #A#B#C#D#
-  #########",
-        );
-        let target = parse(
-            "#############
-#...........#
-###A#B#C#D###
-  #A#B#C#D#
-  #########",
-        );
-        let cost = solve(start, target);
-        assert_eq!(4008, cost);
-    }
 
     #[test]
-    fn test_step_2() {
-        let start = parse(
-            "#############
-#.....D.....#
-###.#B#C#D###
-  #A#B#C#A#
+    fn test_get_min_cost() {
+        let burrow = BurrowLarge::from(parse(
+            "#############    
+#...........#    
+###A#D#C#A###    
+  #C#D#B#B#
   #########",
-        );
-        let target = parse(
-            "#############
-#...........#
-###A#B#C#D###
-  #A#B#C#D#
-  #########",
-        );
-        let cost = solve(start, target);
-        assert_eq!(9011, cost);
+        ));
+        println!("{:?}", burrow);
+        assert_eq!(43365, burrow.get_min_cost());
+        assert_eq!(0, BurrowLarge::TARGET.get_min_cost());
     }
 }
 // end::tests[]
