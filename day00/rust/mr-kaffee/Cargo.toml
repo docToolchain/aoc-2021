@@ -29,6 +29,15 @@ mr-kaffee-2021-19 = { path = "../../../day19/rust/mr-kaffee" }
 mr-kaffee-2021-20 = { path = "../../../day20/rust/mr-kaffee" }
 mr-kaffee-2021-21 = { path = "../../../day21/rust/mr-kaffee" }
 mr-kaffee-2021-22 = { path = "../../../day22/rust/mr-kaffee" }
-mr-kaffee-2021-23 = { path = "../../../day23/rust/mr-kaffee" }
 mr-kaffee-2021-24 = { path = "../../../day24/rust/mr-kaffee" }
-# mr-kaffee-2021-25 = { path = "../../../day25/rust/mr-kaffee" }
+mr-kaffee-2021-25 = { path = "../../../day25/rust/mr-kaffee" }
+
+[features]
+
+default = ["with-unstable"]
+with-unstable = ["mr-kaffee-2021-23"]
+
+[dependencies.mr-kaffee-2021-23]
+
+optional = true
+path = "../../../day23/rust/mr-kaffee"

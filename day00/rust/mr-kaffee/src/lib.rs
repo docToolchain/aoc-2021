@@ -638,6 +638,14 @@ pub mod day22 {
     }
 }
 
+#[cfg(not(feature = "with-unstable"))]
+pub mod day23 {
+    pub fn solve() {
+        println!("Use feature 'with-unstable' to run day23 solution\n")
+    }
+}
+
+#[cfg(feature = "with-unstable")]
 pub mod day23 {
     use mr_kaffee_2021_23::*;
     use std::time::Instant;
@@ -691,17 +699,20 @@ pub mod day24 {
 }
 
 pub mod day25 {
-    // use mr_kaffee_2021_25::*;
+    use mr_kaffee_2021_25::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day25/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
+    pub const INPUT: &str = include_str!("../../../../day25/rust/mr-kaffee/input.txt");
+    pub const EXP_1: usize = 534;
 
     pub fn solve() {
         let timer = Instant::now();
+        let (grid, w) = parse(INPUT);
 
-        assert!(false, "Day 25 not yet implemented");
+        let timer_1 = Instant::now();
+        let sol_1 = solution_1(&grid, w);
+        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
+        assert_eq!(EXP_1, sol_1);
 
         println!("-> Solved day 25 in {:?}\n", timer.elapsed());
     }

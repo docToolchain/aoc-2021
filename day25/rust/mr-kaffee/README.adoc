@@ -1,10 +1,14 @@
-== Day 25: ____ ==
+== Day 25: Sea Cucumber ==
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/25[AoC|2021|25].
 
-=== Part 1 ===
+A simple one to conclude this year's edition...
 
-Parse
+=== Solution ===
+
+Not much to say here. By looking in both, the initial and the updated grid for updating the south facing cucumbers, I avoid creating two copies of the grid in each step. Still ~100ms computation time...
+
+Here is my solution:
 
 [source,rust,numbered]
 ----
@@ -13,7 +17,7 @@ include::src/lib.rs[tags=parse]
 
 [source,rust,numbered]
 ----
-include::src/lib.rs[tags=part1]
+include::src/lib.rs[tags=solution]
 ----
 
 === Tests ===
@@ -22,5 +26,3 @@ include::src/lib.rs[tags=part1]
 ----
 include::src/lib.rs[tags=tests]
 ----
-
-=== Today I learned ===
