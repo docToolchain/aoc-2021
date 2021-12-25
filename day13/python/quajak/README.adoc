@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+The code is based on transforming the folding operations into coordinate transformations and then iterativly executing them. 
+
+[source, python]
+....
+include::thirteen.py[]
+....

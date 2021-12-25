@@ -1,0 +1,5 @@
+Advent of Code 2021
+
+== No code
+
+I solved this one using pen and paper after understanding what the computations are doing. The input is a series of 14 very similar operations, which each take one digit of the input. The operations use Left Shifts/Right Shifts (* 24 or / 24) to keep the individual values from operations seperate and build a stack. To find the final solutions one has to match which push/pop operations belong together, so that at the end the stack (and z) is 0.  This is done by comparing the constants at the push and comparison location to determine the relationship betwen the pair of inputs.

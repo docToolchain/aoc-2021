@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+A very inefficient and slow solution but I couldnt think of anything quicker. The algorithm works recursively, first checking if anyone can move to their final position, since there is no reason to wait if they can. Otherwise recursively try all possible moves to a waiting position to determine the cheapest one. For the second star the implementation details had to be changed but the idea is the same. No idea why there is an off by 2000 error in the second star.
+
+[source, python]
+....
+include::twentythree.py[]
+....

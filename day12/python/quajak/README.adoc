@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+
+Parse the data into a list of nodes and edges to construct a graph. For the first star, use a recursive function to generate all paths starting at a certain node until the end. When being called on a small node, the node is removed from the graph to ensure that the node is only visisted once.
+
+The approach from the first star can not be easily extended to the second star, since the function assumed that it did not matter how a certain node was reached. So for the second star a new function was written which extends a path by one more node while ensuring that only one small node has already been visited.
+
+[source, python]
+....
+include::twelve.py[]
+....

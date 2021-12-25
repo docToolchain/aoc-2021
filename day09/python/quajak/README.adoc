@@ -1,0 +1,13 @@
+Advent of Code 2021
+
+== Python
+
+Construct a 2D array of all the values. For the first star, find all low points and sum their risks.
+
+For the second star, store all the found low points positions in a list and "flood fill" outwards to find the size of the entire basin. 
+
+
+[source, python]
+....
+include::nine.py[]
+....

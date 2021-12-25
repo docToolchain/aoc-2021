@@ -1,0 +1,11 @@
+Advent of Code 2021
+
+== Python
+
+Use a stack and then for the first star track where the parsing fails and sum up the errors. For the second star, "clear" the stack while keeping score for each element removed.
+
+
+[source, python]
+....
+include::ten.py[]
+....
