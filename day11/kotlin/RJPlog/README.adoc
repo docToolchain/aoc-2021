@@ -1,0 +1,42 @@
+==  Day 11: Dumbo Octopus  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/11
+
+For execution enter _kotlin day2111_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+The puzzle input will be read into a array as integers. Then the rules are applied. 
+
+- First: Increase each octopus by one. To show that a octopus is ready to flash (>9), I choosed to just set it to 100, at this time I already started counting. 
+- Second: Iterative go through all of the tiles and if it is an octopus readiy to flash, increase all adjacent tiles 
+- Third: Set all flashed tiles to zero.
+
+After 100 rounds the flash counter will be reported.
+
+[source, kotlin, numbered]
+....
+include::day2111_1_2.kts[tags=solution]
+....
+
+=== Second Star
+
+How does it work: +
+
+This is integrated in the solution for part one, when applying the third rule, setting all flashed tiles to zero, also a counter is implemented. If the counter is 100, then the solution for part 2 is reached.
+
+
+At the end, both solutions are printed out. 
+
+[source, kotlin, numbered]
+....
+include::day2111_1_2.kts[tags=output]
+....
+
+=== Add On
+
+After some discussion with Peter about using lists or arrays I created a verson based on a list and one on an array. Both are running 1000 times and the execution time is measured. I run it several times, but there was not realy a valuable result reachable, one time the array version was faster, one time the list. My expectation would have been, that the array version is faster.

@@ -1,0 +1,43 @@
+==  Day 20: Trench Map  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/20
+
+For execution enter _kotlin day2120_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+First of all puzzle input is read into _enhAlg_ string for the ruleset and _inputImage_ map for the first image
+
+[source, kotlin, numbered]
+....
+include::day2120_1_2.kts[tags=readInput]
+....
+
+After reading puzzle input, the enhancement algorithm is applied n times. After each time the lights which are on are conunted and at n == 2 solution for part 1 is available.
+
+[source, kotlin, numbered]
+....
+include::day2120_1_2.kts[tags=applyEnhAlg]
+....
+
+=== Second Star
+
+How does it work: +
+
+Just continue after n == 2 of part 1 until n reachd 50, then the counted lights are solution for part 2 
+
+[source, kotlin, numbered]
+....
+include::day2120_1_2.kts[tags=applyEnhAlg]
+....
+
+At the end, both solutions are printed out. 
+
+[source, kotlin, numbered]
+....
+include::day2120_1_2.kts[tags=output]
+....

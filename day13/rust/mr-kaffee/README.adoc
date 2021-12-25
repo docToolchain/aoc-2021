@@ -1,0 +1,44 @@
+== Day 13: Transparent Origami ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/13[AoC|2021|13].
+
+=== Part 1 ===
+
+I parse the points in a set (that does the duplicates handling for me) and the fold instructions in a list of tuples with a boolean flag and a fold coordinate. The boolean flag is set to true for horizontal folds and false for vertical folds
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+The fold function iterates over all points, checks whether they are below / to the right of the fold coordinate and maps them above / to the left. Then everything is collected to a set again (removing duplicates)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=fold]
+----
+
+This is used for part 1 as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+Part 2 adds calculating a bounding box of the result and putting everything together in a string:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+Solving part 2 took much longer than it should for me, because I messed up with the bounding box. Tried to find my mistake in the calculations to figure out that I just took ``y_min`` for ``x_max`` and vice versa resulting in empty strings all the time :(. 
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----

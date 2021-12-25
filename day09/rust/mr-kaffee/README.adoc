@@ -1,0 +1,45 @@
+== Day 09: Smoke Basin ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/9[AoC|2021|09].
+
+=== Part 1 ===
+
+I parse the input into a flat list and return the width of the grid in addition
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Part one is about finding the low points. This is quite straightforward.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+Finally a puzzle where a breadth-first-traversal could be used (there might be easier approaches...). 
+
+[.line-through]#I did not read the instructions well and thought that adjacent coordinates only belong to a basin if their value was heigher than the neighbor's value. My tests helped me to sort that out and understand that I only have to look for coordinates with value ``9`` that delimit the basins.#
+
+Actually, the problem was that in my test case I did not start from the low point ``(1, 0)`` but a neighbor ``(0, 0)``. Looking only for numbers with higher values would work when starting from the low point, but it is not necessary. Only looking for nines is fine and allows to start from anywhere in the basin.
+
+The depth first traversal is put in its own function ``get_basin_size`` for readability ;)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I learned ===
+
+Read the puzzle description carefully (ha, not really a new learning) and continue to test (I think we had that before).

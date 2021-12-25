@@ -1,0 +1,65 @@
+== Day 15: Chiton ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/15[AoC|2021|15].
+
+=== Solution ===
+
+https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm[Dijkstra!?]
+
+When looking at the puzzle, I thought: "Obviously Dijkstra". Then I implemented a solution which I thought was Dijskstra while it actually was not. It still worked.
+
+I realized my implementation was not Dijkstra when I tried to extend to https://en.wikipedia.org/wiki/A*_search_algorithm[A*] to figure out whether this improves performance. 
+
+Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target ``width - 1 - x + height - 1 - y`` as heuristic) does not perform any better.
+
+The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by using feature ``dijkstra_panic_decrease`` which results the program to panic on an attempt to decrease a key. Run puzzle with ``cargo run --release --features dijkstra_panic_release``.
+
+==== Simple Algorithm ====
+
+The simple solution (my first solution) is as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve_simple]
+----
+
+In the simple solution, I "invert" the risk (``usize::MAX - risk``) because ``BinaryHeap`` returns the biggest element first.
+
+==== Dijkstra ====
+
+The Dijkstra implementatino looks as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve_dijkstra]
+----
+
+I use a ``BTreeSet`` as heap. Decrease key is implemented as remove old node and insert new node (but actually never used, see above).
+
+The solution only compiles using the rust nightly channel because ``BTreeSet::pop_first`` is unstable. The simple version runs on rust stable.
+
+Run the Dijkstra version with ``cargo run --release --features dijkstra``.
+
+==== Parse ====
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+
+=== Today I Learned ===
+
+A possible way to implement Dijkstra on a simple graph with Rust.
+
+Remember how Dijkstra and A* really work and understand that Dijkstra is not always needed depending on the structure of the problem to solve.
+
+Use features for conditional compilation and use unstable Rust features.
+
+Unfortunately, I also learned that the Rust collections in ``std::collections`` offer a quite poor interface. The function ``BTreeMap::pop_min`` being unstable is sad.

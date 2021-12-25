@@ -1,38 +1,43 @@
 == Day 00: Hello World ==
 
-I am still undecided what language to use this year.
-I'll start with https://www.rust-lang.org/[Rust].
+It'll be another day of https://www.rust-lang.org/[Rust] solutions for the 2021 edition of 
+https://adventofcode.com/2021[Advent of Code]
 
 === General structure ===
 
-Generally, my solutions will contain a `src/main.rs` file which reads inputs, calls the solution functions and measures time
+Generally, my solutions will contain a `src/main.rs` file which reads the input from `input.txt`, 
+calls the solution functions and measures time.
 
-[source,rust,numbered]
-----
-include::src/main.rs[tags=read_input]
-----
+The actual solution will be implemented in `src/lib.rs` file.
 
-[source,rust,numbered]
-----
-include::src/main.rs[tags=main]
-----
-
-The actual solution will be implemented in a `lib.rs` file
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=function]
-----
-
-The `lib.rs` file also contains the tests in a separate submodule.
-I will use this for test-driven development, e.g., based on the examples given in the puzzles.
-
-----
-include::src/lib.rs[tags=tests]
-----
+The `lib.rs` file also contains the tests in a separate submodule. I will use this for test-driven 
+development, e.g., based on the examples given in the puzzles.
 
 === Run Solutions ===
 
-Run solution with `cargo run` (or `cargo run --release` to see the effect of compiler optimization)
+Run solution with `cargo run --release`
 
-Run tests with `cargo test`
+Run tests with `cargo test` or `cargo test --release`
+
+=== Personal Challenges ===
+
+I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. I finally came down to slightly above ~600ms and there certainly is potential for more. For now, my overall solution time is just around 1 second on my machine:author:
+
+----
+Total time for 25 days: 969.5999ms (38.783996ms per day)
+----
+
+My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box nightly Rust for this one to be able to use the method ``BTreeSet::pop_first``
+
+=== Run all Solutions ===
+
+My `day00` solution this year will run all my solutions. The code looks as follows:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve]
+----
+
+To run all solutions, use ``cargo run --release \-- --from 1 --to 25``. The command line options ``--from <day>`` and ``--to <day>`` specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.
+
+Because day23 uses the unstable function ``BTreeSet::pop_first``, this will only compile on the rust nightly channel. If you want to run all the other solutions, use ``cargo run --release --no-default-features \-- --from 1 --to 25``.

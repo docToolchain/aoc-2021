@@ -1,0 +1,57 @@
+== Day 08: Seven Segment Search ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/8[AoC|2021|08].
+
+=== Part 1 ===
+
+For part 1, the most difficult part for me was to parse the input. In the current version, I parse the unique patterns and outputs to integers, where bits `0` to `6` correspond to wires `a` to `g`
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+Counting the unique outputs is simple
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+For part 2 I did not really have a good idea and tried around for a while. What I came up with is a map of wires to candidate segments. I iterate over all unique patterns and exclude candidate segments for each wire.
+
+For patterns with 2, 3, or 4 wires, the 2, 3, or 4 corresponding segments are known.
+
+For patterns with 5 or 6 wires, the unused wires correspond to one of 4 or 3 segments, respectively.
+
+Once all patterns processed, the map is further reduced by removing segments which are the only candidate left for one wire from the candidates of all other wires.
+
+That was enough in my case to end up with a unique mapping.
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2]
+----
+
+==== Alternative Solution ====
+
+I looked at the solution by https://github.com/RJPlog[RJPlog] later, which is actually much simpler than mine. Here is a Rust version of his decode idea. 
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=decode_alt]
+----
+
+Run the alternative solution with ``cargo run --release --features rjplog_solution``
+
+Not only is this solution simpler but it also runs faster. With compiler optimizations turned on, my original part 2 solves in about 1ms, the alternative solution takes about 0.1ms.
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----
+

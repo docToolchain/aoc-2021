@@ -1,0 +1,12 @@
+== Day 08: Seven Segment Search ==
+
+This is my solution for part 1.
+There is a solution for both parts in go in the respective location.
+
+`solution_part1.sh`
+[source,bash,numbered]
+----
+include::solution_part1.sh[tags=solution]
+----
+
+Simply run the script to solve.

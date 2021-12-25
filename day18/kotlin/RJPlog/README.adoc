@@ -1,0 +1,38 @@
+==  Day 18: Snailfish  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/18
+
+For execution enter _kotlin day2118_1.kts_ in the command line or _kotlin day218_2.kts
+
+=== First Star
+
+How does it work: +
+
+General idea is to create to lists for each snailfish number, one contains all values, the second one contains the level. The level is created by counting the input string's brackets, an opening bracket will increase the level, an closing bracket will decrease. As soon as a digit is regcognised in the string, the value and the level are stored in the corresponding lists. When adding a second snailfish number, it is added to the lists and afterwards the level of all entries is increased.
+
+After that within a while loop the reduction is started following the rules, manipulating entries of both lists. After all values are added, the magnitude is calculated
+
+[source, kotlin, numbered]
+....
+include::day2118_1.kts[tags=snailFishMath]
+....
+
+=== Second Star
+
+How does it work: +
+
+Here only some modifications are necessary to run through all possible combinations of values to add, meanwhile the largest value is keept.
+
+[source, kotlin, numbered]
+....
+include::day2118_1.kts[tags=snailFishMath]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2118_2.kts[tags=output]
+....

@@ -16,7 +16,7 @@ impl Board {
     /// dimension of the boad
     pub const N: usize = 5;
 
-    /// crate new board from data vector
+    /// create new board from data vector
     pub fn new(data: Vec<usize>) -> Self {
         if data.len() != Self::N * Self::N {
             panic!("Illegal data length: {}", data.len());

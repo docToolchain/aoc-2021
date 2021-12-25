@@ -7,7 +7,6 @@
 pub fn parse(content: &str) -> Vec<usize> {
     content
         .lines()
-        .into_iter()
         .map(|line| line.parse().expect("Could not parse line"))
         .collect()
 }
@@ -84,7 +83,7 @@ mod tests {
     #[test]
     fn test_parse() {
         let data: Vec<usize> = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
-        assert_eq!(parse(CONTENT), data, "Parse failed");
+        assert_eq!(data, parse(CONTENT));
     }
 }
 //end::tests[]

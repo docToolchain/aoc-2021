@@ -1,0 +1,45 @@
+==  Day 17: Tick Shot  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/17
+
+For execution enter _kotlin day2117_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+First of all, read the puzzle input and determine target area.
+
+The trajectory can be separated in x part and y part. So first all possible x velocites, which are able to reach target area, are calculated and stored into a list _validXvel_. The range can be reduced to 1 (0 and negative will never reach) to xmax (> xmax will overshoot already in first step). 
+
+[source, kotlin, numbered]
+....
+include::day2117_1_2.kts[tags=findAllXvel]
+....
+
+
+The minimum x velocity will need the most steps, so that is also the velocity which will enable to reach highest y position. In the first version therefore all possible y velocities for only the smalles x velocity where calculated and the highest position reached is kept as result for part one.
+
+As a modification for part 2 all possible y velocities are not only calculated for the smallest x velocity, but for all possible x velocities. The sum of all possible x and y velocities is added up as a result for part2.
+Similar to narrowing the range of x velocities, y velocities can be narrowed from ymin (lower will already undershot in first step) to -ymin (asssuming a target area lower then 0 level and that a probe crossing zero will always have reached absolute value of starting velocity and therefore also definitly undershoot)
+
+[source, kotlin, numbered]
+....
+include::day2117_1_2.kts[tags=findAllYvel]
+....
+
+=== Second Star
+
+How does it work: +
+
+See description above.
+
+
+At the end, both solutions are printed out. 
+
+[source, kotlin, numbered]
+....
+include::day2117_1_2.kts[tags=output]
+....

@@ -1,0 +1,10 @@
+== Advent of Code
+
+TIP: Find the full puzzles at https://adventofcode.com/2021/
+
+[quote]
+....
+Unfortunately, no more time to write documentation. Solving the riddles takes more time than available. 
+Since nobody reads this documentation, including me, it is a wasted effort. Besides, I develop test driven.
+A hint. If you look into the source code, don't be surprised about the names of variables and functions. I recycle since the second day the code from the day before ;-)
+....

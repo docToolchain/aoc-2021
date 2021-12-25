@@ -1,0 +1,41 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-18: Snailfish
+https://adventofcode.com/2021/day/18
+
+=== Info
+
+Do the math addition homework ... in snailfish maths with nested pair numbers, exploding pairs if nesting gets too deep and splitting if numbers get higher than 9...
+
+* Star1: Evaluate (explode / split) addition of snailfish number series. Calculate "magnitude" of resulting expression.
+
+* Star2: Evaluate all homework snailfish number pairs and find highest magnitude
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and preprocessed.
+
+* Star1: Write parser for expression by eval() of string. Ugly extensive nested ifs/isinstances. Long bug hunt for rare case of double splits 🙄. 
+
+* Star2: Struggled with shallow copy effects, spoiling the main list. Eval string expression just prior to usage --> another ugly hack...
+
+=== Learned today
+
+* Do not forget to return directly after recursive function call, else active part might get called twice...
+
+* Got reminded of the f* by reference handling of those deeply-nested lists
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

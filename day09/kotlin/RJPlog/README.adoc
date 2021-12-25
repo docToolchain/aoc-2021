@@ -1,0 +1,34 @@
+==  Day 9: Smoke Basin  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/9
+
+For execution enter _kotlin day2109_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+For the first part I read in the puzzle input and added a frame outside, one line with '9' on each side. For evalation of risk level, I went through the map and checked, if the adjacent tiles are higher or lower. If all are lower, you found a sink and added it to the result (+1)
+[source, kotlin, numbered]
+....
+include::day2109_1_2.kts[tags=solution]
+....
+
+=== Second Star
+
+How does it work: +
+
+The second part is nested into part one, whenever a sink is identified, a function is called, which evaluates the size of the basin arround. All basins are stored into a list, the result is calculated by multiplication of the three largest.
+[source, kotlin, numbered]
+....
+include::day2109_1_2.kts[tags=smokeBasin]
+....
+
+
+At the end, both solutions are printed out. 
+[source, kotlin, numbered]
+....
+include::day2109_1_2.kts[tags=output]
+....
