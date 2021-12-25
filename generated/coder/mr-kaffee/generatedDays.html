@@ -385,6 +385,7 @@
 <li><a href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a>
 <ul class="sectlevel4">
 <li><a href="#_parts_1_2_2">Parts 1 &amp; 2</a></li>
+<li><a href="#_sanity_check">Sanity Check</a></li>
 <li><a href="#_tests_18">Tests</a></li>
 </ul>
 </li>
@@ -5147,15 +5148,15 @@ impl CoordMath for Coord {
 /// each scanner is a hash set of coordinates in the scanner's local
 /// coordinate system and a hashmap of pairwise distances as keys and number of
 /// occurance of this distance as value
-pub fn parse(content: &amp;str) -&gt; Vec&lt;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)&gt; {
-    let mut scanners: Vec&lt;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)&gt; = Vec::new();
+pub fn parse(content: &amp;str) -&gt; Vec&lt;(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)&gt; {
+    let mut scanners: Vec&lt;(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)&gt; = Vec::new();
 
     let mut beacons = HashSet::new();
     let mut distances = HashMap::new();
     for line in content.lines().map(|l| l.trim()).filter(|l| l.len() &gt; 0) {
         if line.starts_with("---") {
             if !beacons.is_empty() {
-                scanners.push((beacons, distances));
+                scanners.push((beacons, (0, 0, 0), distances));
                 beacons = HashSet::new();
                 distances = HashMap::new();
             }
@@ -5174,7 +5175,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;(HashSet&lt;Coord&gt;, HashMap&lt;u
         }
     }
     if !beacons.is_empty() {
-        scanners.push((beacons, distances));
+        scanners.push((beacons, (0, 0, 0), distances));
     }
 
     scanners
@@ -5257,8 +5258,16 @@ pub const INV_TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    (beacons_settled, distances_settled): &amp;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;),
-    (beacons_check, distances_check): &amp;(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;),
+    (beacons_settled, _center_settled, distances_settled): &amp;(
+        HashSet&lt;Coord&gt;,
+        Coord,
+        HashMap&lt;usize, usize&gt;,
+    ),
+    (beacons_check, _center_check, distances_check): &amp;(
+        HashSet&lt;Coord&gt;,
+        Coord,
+        HashMap&lt;usize, usize&gt;,
+    ),
     threshold: usize,
 ) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
     // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
@@ -5277,9 +5286,10 @@ pub fn check_overlap(
         // find all beacons with the same distance as b1[k1] to b2[k2]
         for b1 in beacons_settled {
             for b2 in beacons_check {
-                // center = t(b2) - b1
-                // =&gt; b1 = t(b2) - center
-                let center = TRAFOS[t_idx](*b2).sub(b1);
+                // d = b1 - t(b2)
+                // =&gt; b1 = t(b2) + d
+                // =&gt; b2 = t^-1(b1 - d)
+                let d = b1.sub(&amp;TRAFOS[t_idx](*b2));
 
                 // filter for scanner range prior to lookup
                 // settled beacons are in transformed coordinate (scanner is not necessarily at origin)
@@ -5288,14 +5298,24 @@ pub fn check_overlap(
                 let mut count = 0;
                 for _ in beacons_settled
                     .iter()
-                    .map(|b1| INV_TRAFOS[t_idx](b1.add(&amp;center)))
+                    .map(|b1| INV_TRAFOS[t_idx](b1.sub(&amp;d)))
                     .filter(|(x, y, z)| RANGE.contains(x) &amp;&amp; RANGE.contains(y) &amp;&amp; RANGE.contains(z))
                     .filter(|b1| beacons_check.contains(b1))
                 {
                     // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count &gt;= threshold {
-                        return Some((TRAFOS[t_idx], center));
+                        if cfg!(feature = "sanity-check") {
+                            sanity_check(
+                                beacons_settled,
+                                _center_settled,
+                                beacons_check,
+                                _center_check,
+                                t_idx,
+                                d,
+                            );
+                        }
+                        return Some((TRAFOS[t_idx], d));
                     }
                 }
             }
@@ -5313,7 +5333,7 @@ pub fn check_overlap(
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// determine number of unique beacons and max Manhatten distance between
 /// any two scanners
-pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, HashMap&lt;usize, usize&gt;)]) -&gt; (usize, usize) {
+pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)]) -&gt; (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
@@ -5339,9 +5359,10 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, HashMap&lt;usize, usi
                 continue; // already settled
             }
 
-            if let Some((t, c)) = check_overlap(&amp;scanners[k1], &amp;scanners[k2], 12) {
+            if let Some((t, d)) = check_overlap(&amp;scanners[k1], &amp;scanners[k2], 12) {
                 // update scanner to settled coordinates
-                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).sub(&amp;c)).collect();
+                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).add(&amp;d)).collect();
+                scanners[k2].1 = t(scanners[k2].1).add(&amp;d);
 
                 // add beacons to unique set
                 beacons.extend(&amp;scanners[k2].0);
@@ -5351,14 +5372,14 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, HashMap&lt;usize, usi
 
                 // update max distance
                 for c_settled in &amp;centers {
-                    let dist = c.sub(&amp;c_settled).abs();
+                    let dist = scanners[k2].1.sub(&amp;c_settled).abs();
                     if dist &gt; max_dist {
                         max_dist = dist;
                     }
                 }
 
                 // add center
-                centers.push(c);
+                centers.push(d);
             }
         }
 
@@ -5370,6 +5391,70 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, HashMap&lt;usize, usi
     (beacons.len(), max_dist)
 }</code></pre>
 </div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_sanity_check"><a class="anchor" href="#_sanity_check"></a><a class="link" href="#_sanity_check">Sanity Check</a></h5>
+<div class="paragraph">
+<p>I implemented a sanity check for overlapping scanner regions as follows (see comment for details):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// sanity check for overlapping scanner regions
+///
+/// for all beacons seen by scanner 1 / 2, check whether they are also seen by scanner 2 / 1
+/// if and only if they are in range of scanner 2 / 1
+///
+/// # Panics
+/// if sanity check fails
+pub fn sanity_check(
+    beacons1: &amp;HashSet&lt;Coord&gt;,
+    center1: &amp;Coord,
+    beacons2: &amp;HashSet&lt;Coord&gt;,
+    center2: &amp;Coord,
+    t_idx: usize,
+    d: Coord,
+) {
+    // =&gt; b1 = t(b2) + d
+    // =&gt; b2 = t^-1(b1 - d)
+
+    // transform center2 in 1's coordinates
+    let center2 = TRAFOS[t_idx](*center2).add(&amp;d);
+
+    for b1 in beacons1 {
+        // distance vec
+        let (dx, dy, dz) = center2.sub(b1);
+
+        let in_range = RANGE.contains(&amp;dx) &amp;&amp; RANGE.contains(&amp;dy) &amp;&amp; RANGE.contains(&amp;dz);
+        // transform in 2's coordinates for check
+        let contained = beacons2.contains(&amp;INV_TRAFOS[t_idx](b1.sub(&amp;d)));
+        if in_range != contained {
+            panic!(
+                "{:?} is in range of 2nd scanner at {:?}, but not contained in set",
+                b1, center2
+            );
+        }
+    }
+
+    // loop over beacons seen by scanner 2 in 1's coordinates
+    for b2 in beacons2.iter().map(|b2| TRAFOS[t_idx](*b2).add(&amp;d)) {
+        // distance vec
+        let (dx, dy, dz) = center1.sub(&amp;b2);
+
+        let in_range = RANGE.contains(&amp;dx) &amp;&amp; RANGE.contains(&amp;dy) &amp;&amp; RANGE.contains(&amp;dz);
+        let contained = beacons1.contains(&amp;b2);
+        if in_range != contained {
+            panic!(
+                "{:?} is in range of 1st scanner at {:?}, but not contained in set",
+                b2, center1
+            );
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, the sanity check is switched off. It is enabled with the feature <code>sanity-check</code>, i.e., if the puzzle is run with <code>cargo run --release --features sanity-check</code>. For my puzzle input &amp; the examples, the sanity check passes.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5397,8 +5482,8 @@ mod tests {
         assert!(r.is_some(), "No transformation found");
         let (t, d) = r.unwrap();
 
-        assert_eq!((-68, 1246, 43), d);
-        assert_eq!((-618, -824, -621), t((686, 422, 578)).sub(&amp;d));
+        assert_eq!((68, -1246, -43), d);
+        assert_eq!((-618, -824, -621), t((686, 422, 578)).add(&amp;d));
     }
 
     #[test]
@@ -7175,55 +7260,114 @@ mod tests {
 <p>I reverse engineered the MONAD (puzzle input) to figure out that an offset is added to each digit and the digits are then processed in a kind of 26 based system (using <code>mul a 26</code>, <code>div a 26</code> and <code>mod a 26</code> repeatedly) in 14 blocks of instructions (one for every input digit).</p>
 </div>
 <div class="paragraph">
-<p>In every block, there is a condition (<code>eql a b</code> instructions), controlling whether a 26-based digit is added to <code>z</code>. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to <code>z</code> if <code>dX != dY B + c</code>". In order for the final result to be zero, digits shall not be added, which is the case if <code>dX = dY + c</code> (<code>dX</code> and <code>dY</code> are digits of the serial number to check, <code>c</code> is an offset).</p>
+<p>In every block, there is a condition (<code>eql a b</code> instructions), controlling whether a 26-based digit is added to <code>z</code>. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to <code>z</code> if <code>dX != dY + c</code>". In order for the final result to be zero, digits shall not be added, which is the case if the constraint <code>dX = dY + c</code> is satisfied (<code>dX</code> and <code>dY</code> are digits of the serial number to check, <code>c</code> is an offset). This results in seven bounds <code>dX &#8656; 9 - c</code> for a serial number to be valid.</p>
 </div>
 <div class="sect4">
 <h5 id="_solution_6"><a class="anchor" href="#_solution_6"></a><a class="link" href="#_solution_6">Solution</a></h5>
+<div class="paragraph">
+<p>After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only):</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const BOUNDS: [Option&lt;isize&gt;; 14] = [
-    Some(5),
-    None,
-    None,
-    None,
-    Some(6),
-    None,
-    Some(1),
-    Some(2),
-    None,
-    Some(8),
-    Some(1),
-    None,
-    Some(3),
-    None,
-];
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_constraints(instructions: &amp;[Instruction]) -&gt; Vec&lt;(usize, usize, isize)&gt; {
+    let block_starts = instructions
+        .iter()
+        .enumerate()
+        .filter(|(_, i)| i == &amp;&amp;Instruction::Inp(0))
+        .map(|(k, _)| k)
+        .collect::&lt;Vec&lt;_&gt;&gt;();
 
-pub const CONSTRAINTS: [Option&lt;fn(&amp;[isize]) -&gt; isize&gt;; 14] = [
-    None,
-    Some(|digits| digits[12] + 6),
-    Some(|digits| digits[9] + 1),
-    Some(|digits| digits[4] + 3),
-    None,
-    Some(|digits| digits[6] + 8),
-    None,
-    None,
-    Some(|digits| digits[7] + 7),
-    None,
-    None,
-    Some(|digits| digits[10] + 8),
-    None,
-    Some(|digits| digits[0] + 4),
-];
+    assert_eq!(14, block_starts.len());
+
+    // z holds elements (n, o) where n is an input number and o as an offset
+    // the actual value of the z variable will be
+    // z.iter().fold(0, |z, (n, o)| z * 26 + input[n] + o);
+    let mut z: Vec&lt;(usize, isize)&gt; = Vec::with_capacity(14);
+    // constraints holds elements (n1, n2, o) and represents a constraint
+    // input[n1] == input[n2] + o, which needs to be satisfied for a valid serial number
+    let mut constraints = Vec::with_capacity(7);
+    for (n, k) in block_starts.iter().enumerate() {
+        // take last digit of z
+        // a single 'div z a' instruction is expected per block where a is either
+        // 26 or 1. In case of a == 26, the last element from z is removed
+        let d = if instructions[*k..]
+            .iter()
+            .filter_map(|i| {
+                if let Instruction::Div(3, Value::Val(div)) = i {
+                    Some(*div)
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("No div")
+            == 26
+        {
+            // z is divided by 26, pop element
+            z.pop()
+        } else {
+            // z is divided by 1, peek element
+            z.last().map(|d| *d)
+        };
+
+        // a single instruction 'add x a' where a is a literal value is expected in a block
+        // the value a is used to build the condition
+        let check_off = instructions[*k..]
+            .iter()
+            .filter_map(|i| {
+                if let Instruction::Add(1, Value::Val(off)) = i {
+                    Some(*off)
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("No check offset");
+        // the actual condition offset is the offset from the last element from z + the condition offset
+        let off = d.map(|(_, off)| off + check_off).unwrap_or(check_off);
+
+        if off &gt; -9 &amp;&amp; off &lt; 9 {
+            // if the offset is greater than -9 and less than 9, this results in a constraint comparing
+            // two inputs input[n] = input[n1] + off. This is only valid, if there was a last element in z
+            let (n1, _) = d.expect("Condition but no digit to compare");
+            // normalize constraint to positive offsets
+            constraints.push(if off &gt; 0 { (n, n1, off) } else { (n1, n, -off) });
+
+            // if constraint is satisfied, no additional element will be added to z
+        } else {
+            // the condition check outcome is independent of the input values, add next element to z
+            // there will be one instruction 'add y w' followed by an instruction 'add y a' where
+            // a is a literal value representing an offset
+            let k_add = instructions[*k..]
+                .iter()
+                .position(|i| i == &amp;Instruction::Add(2, Value::Var(0)))
+                .expect("input is not copied to y");
+            if let Instruction::Add(2, Value::Val(off)) = instructions[*k + k_add + 1] {
+                z.push((n, off));
+            } else {
+                panic!("No offset added to digit {}", n);
+            }
+        }
+    }
+
+    // expect 7 constraints and z empty (equal to 0)
+    assert_eq!(7, constraints.len());
+    assert!(z.is_empty());
+
+    // sort for easier comparison
+    constraints.sort_unstable();
+
+    constraints
+}
 
 pub fn solution_1(instructions: &amp;[Instruction]) -&gt; isize {
-    let mut inputs = BOUNDS
-        .iter()
-        .map(|b| if let Some(p) = b { *p } else { 0 })
-        .collect::&lt;Vec&lt;_&gt;&gt;();
-    for (k, c) in CONSTRAINTS.iter().enumerate() {
-        if let Some(c) = c {
-            inputs[k] = c(&amp;inputs);
-        }
+    let constraints = get_constraints(instructions);
+    let mut inputs = vec![0; 14];
+    for (_, n2, o) in &amp;constraints {
+        inputs[*n2] = 9 - o;
+    }
+    for (n1, n2, o) in &amp;constraints {
+        inputs[*n1] = inputs[*n2] + o;
     }
 
     assert_eq!(Some(0), eval(instructions, &amp;inputs));
@@ -7232,14 +7376,13 @@ pub fn solution_1(instructions: &amp;[Instruction]) -&gt; isize {
 }
 
 pub fn solution_2(instructions: &amp;[Instruction]) -&gt; isize {
-    let mut inputs = BOUNDS
-        .iter()
-        .map(|b| if b.is_some() { 1 } else { 0 })
-        .collect::&lt;Vec&lt;_&gt;&gt;();
-    for (k, c) in CONSTRAINTS.iter().enumerate() {
-        if let Some(c) = c {
-            inputs[k] = c(&amp;inputs);
-        }
+    let constraints = get_constraints(instructions);
+    let mut inputs = vec![0; 14];
+    for (_, n2, _) in &amp;constraints {
+        inputs[*n2] = 1;
+    }
+    for (n1, n2, o) in &amp;constraints {
+        inputs[*n1] = inputs[*n2] + o;
     }
 
     assert_eq!(Some(0), eval(instructions, &amp;inputs));
