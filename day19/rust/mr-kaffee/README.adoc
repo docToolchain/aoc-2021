@@ -48,6 +48,17 @@ With these elements, the solution to both parts is calculated as follows:
 include::src/lib.rs[tags=solution]
 ----
 
+=== Sanity Check ===
+
+I implemented a sanity check for overlapping scanner regions as follows (see comment for details):
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=sanity]
+----
+
+By default, the sanity check is switched off. It is enabled with the feature ``sanity-check``, i.e., if the puzzle is run with ``cargo run --release --features sanity-check``. For my puzzle input & the examples, the sanity check passes.
+
 === Tests ===
 
 [source,rust,numbered]

@@ -137,6 +137,60 @@ pub fn parse(content: &str) -> Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>
 }
 // end::parse[]
 
+// tag::sanity[]
+/// sanity check for overlapping scanner regions
+///
+/// for all beacons seen by scanner 1 / 2, check whether they are also seen by scanner 2 / 1
+/// if and only if they are in range of scanner 2 / 1
+/// 
+/// # Panics
+/// if sanity check fails
+pub fn sanity_check(
+    beacons1: &HashSet<Coord>,
+    center1: &Coord,
+    beacons2: &HashSet<Coord>,
+    center2: &Coord,
+    t_idx: usize,
+    d: Coord,
+) {
+    // => b1 = t(b2) + d
+    // => b2 = t^-1(b1 - d)
+
+    // transform center2 in 1's coordinates
+    let center2 = TRAFOS[t_idx](*center2).add(&d);
+
+    for b1 in beacons1 {
+        // distance vec
+        let (dx, dy, dz) = center2.sub(b1);
+
+        let in_range = RANGE.contains(&dx) && RANGE.contains(&dy) && RANGE.contains(&dz);
+        // transform in 2's coordinates for check
+        let contained = beacons2.contains(&INV_TRAFOS[t_idx](b1.sub(&d)));
+        if in_range != contained {
+            panic!(
+                "{:?} is in range of 2nd scanner at {:?}, but not contained in set",
+                b1, center2
+            );
+        }
+    }
+
+    // loop over beacons seen by scanner 2 in 1's coordinates
+    for b2 in beacons2.iter().map(|b2| TRAFOS[t_idx](*b2).add(&d)) {
+        // distance vec
+        let (dx, dy, dz) = center1.sub(&b2);
+
+        let in_range = RANGE.contains(&dx) && RANGE.contains(&dy) && RANGE.contains(&dz);
+        let contained = beacons1.contains(&b2);
+        if in_range != contained {
+            panic!(
+                "{:?} is in range of 1st scanner at {:?}, but not contained in set",
+                b2, center1
+            );
+        }
+    }
+}
+// end::sanity[]
+
 // tag::check_overlap[]
 /// check whether two sets of beacons overlap
 ///
@@ -147,8 +201,16 @@ pub fn parse(content: &str) -> Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    (beacons_settled, _center_settled, distances_settled): &(HashSet<Coord>, Coord, HashMap<usize, usize>),
-    (beacons_check, _center_check, distances_check): &(HashSet<Coord>, Coord, HashMap<usize, usize>),
+    (beacons_settled, _center_settled, distances_settled): &(
+        HashSet<Coord>,
+        Coord,
+        HashMap<usize, usize>,
+    ),
+    (beacons_check, _center_check, distances_check): &(
+        HashSet<Coord>,
+        Coord,
+        HashMap<usize, usize>,
+    ),
     threshold: usize,
 ) -> Option<(fn(Coord) -> Coord, Coord)> {
     // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
@@ -168,7 +230,7 @@ pub fn check_overlap(
         for b1 in beacons_settled {
             for b2 in beacons_check {
                 // d = b1 - t(b2)
-                // => b1 = t(b2) + center
+                // => b1 = t(b2) + d
                 // => b2 = t^-1(b1 - d)
                 let d = b1.sub(&TRAFOS[t_idx](*b2));
 
@@ -186,6 +248,16 @@ pub fn check_overlap(
                     // don't use iter.count() to avoid checking more elements once threshold is reached
                     count += 1;
                     if count >= threshold {
+                        if cfg!(feature = "sanity-check") {
+                            sanity_check(
+                                beacons_settled,
+                                _center_settled,
+                                beacons_check,
+                                _center_check,
+                                t_idx,
+                                d,
+                            );
+                        }
                         return Some((TRAFOS[t_idx], d));
                     }
                 }
