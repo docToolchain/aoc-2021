@@ -619,7 +619,7 @@ pub mod day22 {
     pub const INPUT: &str = include_str!("../../../../day22/rust/mr-kaffee/input.txt");
     pub const EXP_1: usize = 581_108;
     pub const EXP_2: usize = 1_325_473_814_582_641;
-    
+
     pub fn solve() {
         let timer = Instant::now();
         let cuboids = parse(INPUT);
@@ -645,7 +645,7 @@ pub mod day23 {
     pub const INPUT: &str = include_str!("../../../../day23/rust/mr-kaffee/input.txt");
     pub const EXP_1: usize = 15_365;
     pub const EXP_2: usize = 52_055;
-    
+
     pub fn solve() {
         let timer = Instant::now();
         let burrow = parse(INPUT);
@@ -654,28 +654,37 @@ pub mod day23 {
         let sol_1 = solution_1(burrow);
         println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
         assert_eq!(EXP_1, sol_1);
-    
+
         let timer_2 = Instant::now();
         let sol_2 = solution_2(burrow);
         println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
         assert_eq!(EXP_2, sol_2); // 54171 is too high, // 43775 is too low
-    
+
         println!("-> Solved day 23 in {:?}\n", timer.elapsed());
     }
 }
 
 pub mod day24 {
-    // use mr_kaffee_2021_24::*;
+    use mr_kaffee_2021_24::*;
     use std::time::Instant;
 
-    // pub const INPUT: &str = include_str!("../../../../day24/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 0;
-    pub const EXP_2: usize = 0;
+    pub const INPUT: &str = include_str!("../../../../day24/rust/mr-kaffee/input.txt");
+    pub const EXP_1: isize = 59_996_912_981_939;
+    pub const EXP_2: isize = 17_241_911_811_915;
 
     pub fn solve() {
         let timer = Instant::now();
+        let instructions = parse(INPUT);
 
-        assert!(false, "Day 24 not yet implemented");
+        let timer_1 = Instant::now();
+        let sol_1 = solution_1(&instructions);
+        println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
+        assert_eq!(EXP_1, sol_1);
+
+        let timer_2 = Instant::now();
+        let sol_2 = solution_2(&instructions);
+        println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
+        assert_eq!(EXP_2, sol_2);
 
         println!("-> Solved day 24 in {:?}\n", timer.elapsed());
     }
