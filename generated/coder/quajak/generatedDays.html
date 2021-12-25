@@ -190,6 +190,91 @@
 <li><a href="#_python_9">Python</a></li>
 </ul>
 </li>
+<li><a href="#_day_09_python">Day 09: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_10">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_10_python">Day 10: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_11">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_11_python">Day 11: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_12">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_12_python">Day 12: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_13">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_13_python">Day 13: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_14">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_14_python">Day 14: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_15">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_15_python">Day 15: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_16">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_16_python">Day 16: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_17">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_17_python">Day 17: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_18">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_18_python">Day 18: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_19">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_19_python">Day 19: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_20">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_20_python">Day 20: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_21">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_21_python">Day 21: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_22">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_22_python">Day 22: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_23">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_23_python">Day 23: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_24">Python</a></li>
+</ul>
+</li>
+<li><a href="#_day_24_python">Day 24: python</a>
+<ul class="sectlevel3">
+<li><a href="#_no_code">No code</a></li>
+</ul>
+</li>
+<li><a href="#_day_25_python">Day 25: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_25">Python</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -747,6 +832,1491 @@ for line in lines:
     sum += o
 
 print(sum)</code></pre>
+</div>
+</div>
+<a id="day09" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_python"><a class="anchor" href="#_day_09_python"></a><a class="link" href="#_day_09_python">Day 09: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_10"><a class="anchor" href="#_python_10"></a><a class="link" href="#_python_10">Python</a></h4>
+<div class="paragraph">
+<p>Construct a 2D array of all the values. For the first star, find all low points and sum their risks.</p>
+</div>
+<div class="paragraph">
+<p>For the second star, store all the found low points positions in a list and "flood fill" outwards to find the size of the entire basin.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("nine.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+height = len(lines)
+width = len(lines[0])
+
+map = []
+
+for line in lines:
+    cur = [int(ch) for ch in list(line)]
+    map.append(cur)
+
+risk = 0
+
+for y in range(height):
+    for x in range(width):
+        val = map[y][x]
+        if y !=0 and map[y-1][x] &lt;= val:
+            continue
+        if y != height - 1 and map[y+1][x] &lt;= val:
+            continue
+        if x != 0 and map[y][x-1] &lt;= val:
+            continue
+        if x != width - 1 and map[y][x+1] &lt;= val:
+            continue
+        risk += map[y][x] + 1
+
+print(risk)
+
+height = len(lines)
+width = len(lines[0])
+
+map = []
+
+for line in lines:
+    cur = [int(ch) for ch in list(line)]
+    map.append(cur)
+
+basins = []
+low_points = []
+
+for y in range(height):
+    for x in range(width):
+        val = map[y][x]
+        if y !=0 and map[y-1][x] &lt;= val:
+            continue
+        if y != height - 1 and map[y+1][x] &lt;= val:
+            continue
+        if x != 0 and map[y][x-1] &lt;= val:
+            continue
+        if x != width - 1 and map[y][x+1] &lt;= val:
+            continue
+        low_points.append((x,y))
+
+for (x,y) in low_points:
+    size = 0
+    # low point grow outwards
+    to_check = [(x,y)]
+    while len(to_check) != 0:
+        pos = to_check.pop(0)
+        x,y = pos
+        val = map[y][x]
+        if val == 9:
+            continue
+        size += 1
+
+        if y !=0 and map[y-1][x] &gt; val and map[y-1][x] != 9:
+            to_check.append((x,y-1))
+        if y != height - 1 and map[y+1][x] &gt; val and map[y+1][x] != 9:
+            to_check.append((x, y + 1))
+        if x != 0 and map[y][x-1] &gt; val and map[y][x-1] != 9:
+            to_check.append((x-1, y))
+        if x != width - 1 and map[y][x+1] &gt; val and map[y][x+1] != 9:
+            to_check.append((x+1,y))
+        map[y][x] = 9
+
+
+    basins.append(size)
+
+basins = sorted(basins, reverse=True)
+print(basins[0] * basins[1] * basins[2])</code></pre>
+</div>
+</div>
+<a id="day10" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_10_python"><a class="anchor" href="#_day_10_python"></a><a class="link" href="#_day_10_python">Day 10: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_11"><a class="anchor" href="#_python_11"></a><a class="link" href="#_python_11">Python</a></h4>
+<div class="paragraph">
+<p>Use a stack and then for the first star track where the parsing fails and sum up the errors. For the second star, "clear" the stack while keeping score for each element removed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("ten.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+score = 0
+valid = []
+for line in lines:
+    stack = list()
+
+    for ch in line:
+        if ch == "(" or ch =="{" or ch =="[" or ch =="&lt;":
+            stack.append(ch)
+        elif ch == ")":
+            if stack[-1] == "(":
+                stack.pop()
+            else:
+                score += 3
+                break
+        elif ch == "}":
+            if stack[-1] == "{":
+                stack.pop()
+            else:
+                score += 1197
+                break
+        elif ch == "]":
+            if stack[-1] == "[":
+                stack.pop()
+            else:
+                score += 57
+                break
+        elif ch == "&gt;":
+            if stack[-1] == "&lt;":
+                stack.pop()
+            else:
+                score += 25137
+                break
+    else:
+        valid.append(line)
+
+print(score)
+
+score = []
+
+for line in valid:
+    stack = []
+    for ch in line:
+        if ch == "(" or ch =="{" or ch =="[" or ch =="&lt;":
+            stack.append(ch)
+        elif ch == ")":
+            if stack[-1] == "(":
+                stack.pop()
+        elif ch == "}":
+            if stack[-1] == "{":
+                stack.pop()
+        elif ch == "]":
+            if stack[-1] == "[":
+                stack.pop()
+        elif ch == "&gt;":
+            if stack[-1] == "&lt;":
+                stack.pop()
+
+    s = 0
+    stack.reverse()
+    for ch in stack:
+        s *= 5
+        if ch == "(":
+            s += 1
+        elif ch == "[":
+            s += 2
+        elif ch == "{":
+            s += 3
+        else:
+            s += 4
+    score.append(s)
+
+score = sorted(score)
+print(score[len(score)//2])</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_python"><a class="anchor" href="#_day_11_python"></a><a class="link" href="#_day_11_python">Day 11: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_12"><a class="anchor" href="#_python_12"></a><a class="link" href="#_python_12">Python</a></h4>
+<div class="paragraph">
+<p>Use a 2D array to store values. For simplicity keep border of 0s at the edges and only update the inner values. Each time step seperately increment and trigger flashes before setting flashed cells back to 0.</p>
+</div>
+<div class="paragraph">
+<p>For part 1 simulate first 100 steps and count flash number for part 2, keep track of which cells flashed and compare the number to the size of the board.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("eleven.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+field = []
+for line in lines:
+    field.append([0] + [int(ch) for ch in line] + [0])
+
+field.insert(0, [0] * len(field[0]))
+field.append([0] * len(field[0]))
+
+
+width = len(field[0])
+height = len(field)
+
+flashes = 0
+
+def flash(ax, ay):
+    global flashes
+    if (ax, ay) in flashed:
+        return
+    if ax == 0 or ax == width - 1:
+        return
+    if ay == 0 or ay == height - 1:
+        return
+    flashed.append((ax,ay))
+    flashes += 1
+    for dy in [-1, 0, 1]:
+        for dx in [-1, 0, 1]:
+            if dy == dx == 0:
+                continue
+            field[ay + dy][ax + dx] += 1
+            if field[ay + dy][ax + dx] &gt; 9:
+                flash(ax + dx, ay + dy)
+
+for _ in range(100):
+    flashed = []
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            field[y][x] += 1
+            if field[y][x] &gt; 9:
+                flash(x,y)
+
+    for x,y in flashed:
+        field[y][x] = 0
+
+print("Star 1", flashes)
+
+
+turn = 0
+while True:
+    flashed = []
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            field[y][x] += 1
+            if field[y][x] &gt; 9:
+                flash(x,y)
+
+    for x,y in flashed:
+        field[y][x] = 0
+
+    turn += 1
+    if len(flashed) == (width - 2) * (height - 2):
+        break
+
+print("Star 2", turn)</code></pre>
+</div>
+</div>
+<a id="day12" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_12_python"><a class="anchor" href="#_day_12_python"></a><a class="link" href="#_day_12_python">Day 12: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_13"><a class="anchor" href="#_python_13"></a><a class="link" href="#_python_13">Python</a></h4>
+<div class="paragraph">
+<p>Parse the data into a list of nodes and edges to construct a graph. For the first star, use a recursive function to generate all paths starting at a certain node until the end. When being called on a small node, the node is removed from the graph to ensure that the node is only visisted once.</p>
+</div>
+<div class="paragraph">
+<p>The approach from the first star can not be easily extended to the second star, since the function assumed that it did not matter how a certain node was reached. So for the second star a new function was written which extends a path by one more node while ensuring that only one small node has already been visited.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from os import path
+from typing import Dict, List
+import copy
+
+f = open("twelve.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+
+class Node:
+    def __init__(self, name):
+        self.edges = []
+        self.name = name
+        self.small = name[0].islower()
+
+places = []
+nodes : Dict[str, Node] = {}
+
+for line in lines:
+    parts = line.split("-")
+    if parts[0] not in places:
+        places.append(parts[0])
+        nodes[parts[0]] = Node(parts[0])
+    if parts[1] not in places:
+        places.append(parts[1])
+        nodes[parts[1]] = Node(parts[1])
+
+    nodes[parts[0]].edges.append(parts[1])
+    nodes[parts[1]].edges.append(parts[0])
+
+def remove(name: str, graph: Dict[str, Node]):
+        del graph[name]
+        to_remove = set()
+        for node in graph.keys():
+            if name in graph[node].edges:
+                graph[node].edges.remove(name)
+                if len(graph[node].edges) == 0:
+                    to_remove.add(graph[node].name)
+
+        for rem in to_remove:
+            remove(rem, graph)
+
+def valid_paths_to_end(current: Node, graph: Dict[str, Node]) -&gt; List[List[str]]:
+    if current.name == "end":
+        return [["end"]]
+    if current.small:
+        graph = copy.deepcopy(graph)
+        remove(current.name, graph)
+
+    ways = []
+
+    for edge in current.edges:
+        if edge in graph:
+            ways.extend([[current.name] + path for path in valid_paths_to_end(graph[edge], graph)])
+
+    return ways
+
+print(len(valid_paths_to_end(nodes["start"], nodes)))
+
+places = []
+nodes : Dict[str, Node] = {}
+
+for line in lines:
+    parts = line.split("-")
+    if parts[0] not in places:
+        places.append(parts[0])
+        nodes[parts[0]] = Node(parts[0])
+    if parts[1] not in places:
+        places.append(parts[1])
+        nodes[parts[1]] = Node(parts[1])
+
+    nodes[parts[0]].edges.append(parts[1])
+    nodes[parts[1]].edges.append(parts[0])
+
+def continue_path(path : List[str], current: Node, graph: Dict[str, Node], has_double: bool) -&gt; List[List[str]]:
+    if has_double and (current.small and current.name in path):
+        return []
+    if current.name == "end":
+        return [path + ["end"]]
+    if current.small and current.small in path or current.name == "start":
+        graph = copy.deepcopy(graph)
+        remove(current.name, graph)
+
+    ways = []
+    for edge in current.edges:
+        if edge in graph:
+            ways.extend(continue_path(path + [current.name], graph[edge], graph, has_double or (current.small and current.name in path)))
+    return ways
+
+print(len(continue_path([], nodes["start"], nodes, False)))</code></pre>
+</div>
+</div>
+<a id="day13" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_13_python"><a class="anchor" href="#_day_13_python"></a><a class="link" href="#_day_13_python">Day 13: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_14"><a class="anchor" href="#_python_14"></a><a class="link" href="#_python_14">Python</a></h4>
+<div class="paragraph">
+<p>The code is based on transforming the folding operations into coordinate transformations and then iterativly executing them.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("thirteen.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+dots = []
+
+for line in lines:
+    if line == "":
+        break
+    p = line.split(",")
+    dots.append((int(p[0]), int(p[1])))
+
+folds = [line.split()[2] for line in lines if line.startswith("fold along ")]
+
+fold = folds[0]
+dir = fold[0]
+line = int(fold[2:])
+new_dots = []
+for x,y in dots:
+    if dir == "y":
+        if y &gt; line:
+            new_dots.append((x, y - 2 * (y - line)))
+        else:
+            new_dots.append((x, y))
+    elif dir == "x":
+        if x &gt; line:
+            new_dots.append((x- 2 * (x - line), y))
+        else:
+            new_dots.append((x, y))
+
+print(len(set(new_dots)))
+
+
+for fold in folds:
+    dir = fold[0]
+    line = int(fold[2:])
+    new_dots = []
+    for x,y in dots:
+        if dir == "y":
+            if y &gt; line:
+                new_dots.append((x, y - 2 * (y - line)))
+            else:
+                new_dots.append((x, y))
+        elif dir == "x":
+            if x &gt; line:
+                new_dots.append((x- 2 * (x - line), y))
+            else:
+                new_dots.append((x, y))
+    dots = list(set(new_dots))
+
+max_x = max([x for x,y in dots]) + 1
+max_y = max([y for x,y in dots]) + 1
+print(dots)
+screen = []
+for y in range(max_y):
+    screen.append([" "] * max_x)
+
+for x,y in dots:
+    screen[y][x] = "#"
+
+for s in screen:
+    print("".join(s))</code></pre>
+</div>
+</div>
+<a id="day14" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_14_python"><a class="anchor" href="#_day_14_python"></a><a class="link" href="#_day_14_python">Day 14: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_15"><a class="anchor" href="#_python_15"></a><a class="link" href="#_python_15">Python</a></h4>
+<div class="paragraph">
+<p>The additions are stored in a look up table. For the first star the actual polymer as a string is created. For the second star for efficiency reasons, only a dictioniary of all two value combinations and their occurance number are stored and incremented from step to step.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("fourteen.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+poly = lines[0]
+polymer = lines[0]
+
+lines = lines[2:]
+
+rules = {}
+
+for line in lines:
+    s = line.split(" -&gt; ")
+    rules[s[0]] = s[1]
+
+
+for i in range(10):
+    new = ""
+    for pos in range(len(polymer)):
+        pair = polymer[pos:pos+2]
+        if pair in rules:
+            new += pair[0] + rules[pair]
+        else:
+            new += pair[0]
+    polymer = new
+
+chars = {}
+for c in polymer:
+    if c not in chars:
+        chars[c] = polymer.count(c)
+
+print(max(chars.values()) - min(chars.values()))
+
+polymer = poly
+pairs = {}
+
+for pos in range(len(polymer)):
+    pair = polymer[pos:pos+2]
+    if pair not in pairs:
+        pairs[pair] = 1
+    else:
+        pairs[pair] += 1
+
+
+for i in range(40):
+    #print(pairs)
+    d = {}
+    for key, value in pairs.items():
+        if key in rules:
+            d[key[0] + rules[key]] = d.get(key[0] + rules[key], 0) + value
+            d[rules[key] + key[1]] = d.get(rules[key] + key[1], 0) + value
+        else:
+            d[key] = d.get(key, 0) + value
+    pairs = d
+
+chars = {}
+for pair,count in pairs.items():
+    if pair[0] not in chars:
+        chars[pair[0]] = count
+    else:
+        chars[pair[0]] += count
+    # if len(pair) == 2:
+    #     if pair[1] not in chars:
+    #         chars[pair[1]] = count
+    #     else:
+    #         chars[pair[1]] += count
+
+print(max(chars.values()) - min(chars.values()))</code></pre>
+</div>
+</div>
+<a id="day15" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_15_python"><a class="anchor" href="#_day_15_python"></a><a class="link" href="#_day_15_python">Day 15: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_16"><a class="anchor" href="#_python_16"></a><a class="link" href="#_python_16">Python</a></h4>
+<div class="paragraph">
+<p>Only solution for part 2 is in the code, part 1 is the same with simper 2d array creation. Code is a straightforward implementation of the A-Star algorithm.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("fifteen.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+risk = []
+costs = []
+for y in range(5):
+    for line in lines:
+        r = []
+        co = []
+        for x in range(5):
+            r.extend([(int(c) + x + y) if int(c) + x + y &lt; 10 else int(c) + x + y - 9 for c in line])
+            co.extend([100000 for c in line])
+        risk.append(r)
+        costs.append(co)
+
+costs[0][0] = 0
+to_check = [(0,0)]
+
+def check_field(x,y, base_cost):
+    return x &gt;= 0 and y &gt;= 0 and x != len(risk[0]) and y != len(risk) and base_cost + risk[y][x] &lt; costs[y][x]
+
+while len(to_check) != 0:
+    x,y = to_check.pop(0)
+    cost = costs[y][x]
+    if check_field(x-1, y, cost):
+        costs[y][x-1] = cost + risk[y][x-1]
+        to_check.append((x-1, y))
+    if check_field(x+1, y, cost):
+        costs[y][x+1] = cost + risk[y][x+1]
+        to_check.append((x+1, y))
+    if check_field(x, y-1, cost):
+        costs[y-1][x] = cost + risk[y-1][x]
+        to_check.append((x, y-1))
+    if check_field(x, y+1, cost):
+        costs[y+1][x] = cost + risk[y+1][x]
+        to_check.append((x, y+1))
+
+print(costs[-1][-1])</code></pre>
+</div>
+</div>
+<a id="day16" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_16_python"><a class="anchor" href="#_day_16_python"></a><a class="link" href="#_day_16_python">Day 16: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_17"><a class="anchor" href="#_python_17"></a><a class="link" href="#_python_17">Python</a></h4>
+<div class="paragraph">
+<p>Just a lot of string/bit manipulation</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from typing import Tuple
+
+f = open("sixteen.txt", "r")
+line = [x.strip() for x in f.readlines()][0]
+b = bin(int(line, 16))[2:]
+
+if int(line[0], 16) &lt; 4:
+    b = "00" + b
+elif int(line[0], 16) &lt; 8:
+    b = "0" + b
+
+def read_packet(data: str) -&gt; Tuple[int, int, int]:
+    version = data[:3]
+    version = int(version, 2)
+    t = data[3:6]
+    t = int(t, 2)
+    pos = 6
+    if t == 4:
+        len = 0
+        last = False
+        value = ""
+        while not last:
+            last = data[pos] == "0"
+            value += data[pos+1:pos+5]
+            pos += 5
+            len += 1
+        value = int(value, 2)
+        return (value, version, pos)
+    else:
+        length = 11 if data[pos] == "1" else 15
+        vsum = version
+        pos += 1
+        values = []
+        if length == 15:
+            bits_subdata = int(data[pos:pos+length], 2)
+            pos += length
+            goal = pos + bits_subdata
+            while pos != goal:
+                val, v, l = read_packet(data[pos:])
+                vsum += v
+                pos += l
+                values.append(val)
+        else:
+            bits_subdata = int(data[pos:pos+length], 2)
+            pos += length
+            for i in range(bits_subdata):
+                val, v, l = read_packet(data[pos:])
+                vsum += v
+                pos += l
+                values.append(val)
+        if t == 0:
+            value = sum(values)
+        elif t == 1:
+            value = 1
+            for val in values:
+                value *= val
+        elif t == 2:
+            value = min(values)
+        elif t == 3:
+            value = max(values)
+        elif t == 5:
+            value = 1 if values[0] &gt; values[1] else 0
+        elif t == 6:
+            value = 1 if values[0] &lt; values[1] else 0
+        elif t == 7:
+            value = 1 if values[0] == values[1] else 0
+        return [value, vsum, pos]
+
+print(read_packet(b))</code></pre>
+</div>
+</div>
+<a id="day17" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_17_python"><a class="anchor" href="#_day_17_python"></a><a class="link" href="#_day_17_python">Day 17: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_18"><a class="anchor" href="#_python_18"></a><a class="link" href="#_python_18">Python</a></h4>
+<div class="paragraph">
+<p>Brute force search over the possible valid input values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from typing import Tuple
+
+target_area_x = [241, 273]
+target_area_y = [-97, -63]
+
+def simulate_flight(dx, dy) -&gt; Tuple[bool, int]:
+    x = 0
+    y = 0
+    max_y = 0
+    while x &lt;= target_area_x[1] and y &gt;= target_area_y[0]:
+        if x &gt;= target_area_x[0] and y &lt;= target_area_y[1]:
+            return [True, max_y]
+        x += dx
+        y += dy
+        if dy &gt; 0:
+            max_y = max(max_y, y)
+        if dx != 0:
+            dx += -1 * dx // abs(dx)
+        dy -= 1
+    if y &lt; target_area_y[1]:
+        return [False, -1]
+    return [False, -1]
+
+max_y = -1
+count = 0
+for x in range(274):
+    for y in range(-97, 100):
+        hit, m = simulate_flight(x,y)
+        if hit:
+            count += 1
+            if max_y &lt; m:
+                max_y = m
+print(max_y)
+print(count)</code></pre>
+</div>
+</div>
+<a id="day18" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_18_python"><a class="anchor" href="#_day_18_python"></a><a class="link" href="#_day_18_python">Day 18: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_19"><a class="anchor" href="#_python_19"></a><a class="link" href="#_python_19">Python</a></h4>
+<div class="paragraph">
+<p>Represent the number as a tree like structure where the leafs are actually numbers. Implement the operations as recursive operations on the nodes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from typing import Tuple
+from copy import deepcopy
+
+f = open("eighteen.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+class Number:
+    def __init__(self, x = None, y = None):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f"[{self.x}, {self.y}]"
+
+    def __repr__(self):
+        return str(self)
+
+    def magnitude(self) -&gt; int:
+        sum = 0
+        if isinstance(self.x, Number):
+            sum += 3 * self.x.magnitude()
+        else:
+            sum += 3 * self.x
+
+        if isinstance(self.y, Number):
+            sum += 2 * self.y.magnitude()
+        else:
+            sum += 2 * self.y
+        return sum
+
+def parse_line(string) -&gt; Number:
+    level = 0
+    current = ""
+    values = []
+    for char in string:
+        if char == "[":
+            if level != 0:
+                current += "["
+            level += 1
+        elif char == "]":
+            level -= 1
+            if level != 0:
+                current += "]"
+        elif char == ",":
+            if level == 1:
+                values.append(current)
+                current = ""
+            else:
+                current += ","
+        else:
+            current += char
+    values.append(current)
+    if len(values) != 2:
+        raise Exception
+    num = Number()
+    if values[0].isnumeric():
+        num.x = int(values[0])
+    else:
+        num.x = parse_line(values[0])
+    if values[1].isnumeric():
+        num.y = int(values[1])
+    else:
+        num.y = parse_line(values[1])
+    return num
+
+numbers = []
+for line in lines:
+    numbers.append(parse_line(line))
+
+def do_explode(level: int, number: Number) -&gt; Tuple[bool, bool, int, int]:
+    if level == 4:
+        return (True, True, number.x, number.y)
+    else:
+        if isinstance(number.x, Number):
+            changed, cleaned, dx, dy = do_explode(level + 1, number.x)
+            if changed:
+                if cleaned:
+                    number.x = 0
+                if dy != 0:
+                    cur = number
+                    if isinstance(cur.y, Number):
+                        cur = cur.y
+                        while isinstance(cur.x, Number):
+                            cur = cur.x
+                        cur.x += dy
+                    else:
+                        cur.y += dy
+                return (True, False, dx, 0)
+        if isinstance(number.y, Number):
+            changed, should_clean, dx, dy = do_explode(level + 1, number.y)
+            if changed:
+                if should_clean:
+                    number.y = 0
+                if dx != 0:
+                    cur = number
+                    if isinstance(cur.x, Number):
+                        cur = cur.x
+                        while isinstance(cur.y, Number):
+                            cur = cur.y
+                        cur.y += dx
+                    else:
+                        cur.x += dx
+                return (True, False, 0, dy)
+            else:
+                return (False, False, 0, 0)
+        else:
+            return (False, False, 0, 0)
+
+def do_split(number: Number) -&gt; bool:
+    if isinstance(number.x, Number):
+        hit = do_split(number.x)
+        if hit:
+            return True
+    else:
+        if number.x &gt;= 10:
+            number.x = Number(number.x // 2, number.x - number.x // 2)
+            return True
+
+    if isinstance(number.y, Number):
+        hit = do_split(number.y)
+        if hit:
+            return True
+    else:
+        if number.y &gt;= 10:
+            number.y = Number(number.y // 2, number.y - number.y // 2)
+            return True
+
+    return False
+
+
+def add(vals) -&gt; int:
+    sum = vals[0]
+    vals = vals[1:]
+    for num in vals:
+        old_sum = sum
+        sum = Number()
+        sum.x = old_sum
+        sum.y = num
+
+        changed = True
+        while changed:
+            changd = False
+            changed, _, _, _ = do_explode(0, sum)
+            if not changed:
+                changed = do_split(sum)
+    return sum.magnitude()
+
+cp = deepcopy(numbers)
+print(add(cp))
+
+heightest = 0
+
+for x in numbers:
+    for y in numbers:
+        if x != y:
+            val = add(deepcopy([x,y]))
+            if val &gt; heightest:
+                heightest = val
+
+print(heightest)</code></pre>
+</div>
+</div>
+<a id="day19" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_19_python"><a class="anchor" href="#_day_19_python"></a><a class="link" href="#_day_19_python">Day 19: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_20"><a class="anchor" href="#_python_20"></a><a class="link" href="#_python_20">Python</a></h4>
+<div class="paragraph">
+<p>Represent each scanner as an object with a method to generate all possible variations of the coordinates through rotations. Then brute force search between all scanners where they match up until all scanners relative positions have been found.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from typing import List, Tuple
+
+f = open("nineteen.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+class Scanner:
+    def __init__(self, id = int):
+        self.raw_beacons = []
+        self.beacons = set()
+        self.id = id
+        self.all = []
+        self.offset = None
+
+    def _rotate_coordinate(self, coord: List[int], rx: int, ry: int, rz: int) -&gt; Tuple[int]:
+        vec = tuple(coord)
+        for i in range(rx):
+            vec = (vec[0], -1 * vec[2], vec[1])
+
+        for i in range(ry):
+            vec = (vec[2], vec[1], vec[0] * -1)
+
+        for i in range(rz):
+            vec = (vec[1] * -1, vec[0], vec[2])
+        return vec
+
+    def generate_rotations(self) -&gt; List[List[Tuple[int]]]:
+        if len(self.all) != 0:
+            return self.all
+
+        for rx in range(4):
+            for ry in range(4):
+                for rz in range(4):
+                    self.all.append([self._rotate_coordinate(coord, rx, ry, rz) for coord in self.raw_beacons])
+        self.all = [list(x) for x in set(tuple(x) for x in self.all)]
+        return self.all
+
+scanners : List[Scanner] = []
+current_scanner = None
+for line in lines:
+    if line.startswith("---"):
+        line = line.replace("-","").strip().split()[1]
+        current_scanner = Scanner(int(line))
+        scanners.append(current_scanner)
+    elif len(line) != 0:
+        coords = [int(w) for w in line.split(",")]
+        current_scanner.raw_beacons.append((coords[0], coords[1], coords[2]))
+
+scanners[0].offset = (0, 0, 0)
+scanners[0].beacons = set(scanners[0].raw_beacons)
+print(len(scanners[0].generate_rotations()))
+
+unlocalized = [scanner for scanner in scanners if scanner.offset is None]
+
+while len(unlocalized) != 0:
+    for scanner in unlocalized:
+        for other in scanners:
+            if other.offset is not None:
+                for variation in scanner.generate_rotations():
+                    for base in other.beacons: # [0,0,0] aligned and orientated
+                        for pos_match in variation:
+                            dx = base[0] - pos_match[0]
+                            dy = base[1] - pos_match[1]
+                            dz = base[2] - pos_match[2]
+
+                            matches = []
+                            for to_check in variation:
+                                moved = (to_check[0] + dx, to_check[1] + dy, to_check[2] + dz)
+                                if abs(moved[0] - other.offset[0]) &gt; 1000 or abs(moved[1] - other.offset[1]) &gt; 1000 or abs(moved[2] - other.offset[2]) &gt; 1000:
+                                    continue
+                                if moved in other.beacons:
+                                    matches.append(moved)
+                                else:
+                                    break
+                            if len(matches) &gt;= 12:
+                                scanner.beacons = set([(beacon[0] + dx, beacon[1] + dy, beacon[2] + dz) for beacon in variation])
+                                scanner.offset = (dx, dy, dz)
+                                print(f"Found scanner {scanner.id} at " + str(scanner.offset))
+                                break
+                        if scanner.offset is not None:
+                            break
+                    if scanner.offset is not None:
+                        break
+                if scanner.offset is not None:
+                    break
+    unlocalized = [scanner for scanner in scanners if scanner.offset is None]
+    print(len(unlocalized), " left to position")
+
+
+beacons = set()
+for scanner in scanners:
+    for beacon in scanner.beacons:
+        beacons.add(beacon)
+print(len(beacons))
+
+
+dis = 0
+for a in scanners:
+    for b in scanners:
+        d = abs(a.offset[0] - b.offset[0]) + abs(a.offset[1] -b.offset[1]) + abs(a.offset[2] - b.offset[2])
+        if d &gt; dis:
+            dis = d
+
+print(dis)</code></pre>
+</div>
+</div>
+<a id="day20" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_python"><a class="anchor" href="#_day_20_python"></a><a class="link" href="#_day_20_python">Day 20: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_21"><a class="anchor" href="#_python_21"></a><a class="link" href="#_python_21">Python</a></h4>
+<div class="paragraph">
+<p>Use a dictionary to store known positions to easily allow scaling the grid as the iterations occur. It is important to track the background value for all pixels which are not explicitly calculated.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("twenty.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+color_table = lines[0].replace(".","0").replace("#", "1")
+
+lines = lines[2:]
+
+image = {}
+
+y = 0
+for line in lines:
+    line = line.replace(".","0").replace("#", "1")
+    x = 0
+    for ch in line:
+        image[(x,y)] = ch
+        x += 1
+    y += 1
+
+background = "0"
+for i in range(50):
+    min_x = min([x for x,y in image.keys()]) - 2
+    max_x = max([x for x,y in image.keys()]) + 2
+    min_y = min([y for x,y in image.keys()]) - 2
+    max_y = max([y for x,y in image.keys()]) + 2
+
+    new_image = {}
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            val = image.get((x-1, y-1), background) + image.get((x, y-1), background) + image.get((x+1, y-1), background) + image.get((x-1, y), background) + image.get((x, y), background) +image.get((x+1, y), background) \
+                + image.get((x-1, y+1), background) + image.get((x, y+1), background) + image.get((x+1, y+1), background)
+            val = int(val, 2)
+            new_image[(x,y)] = color_table[val]
+    image = new_image
+    background = color_table[int(background * 9, 2)]
+
+min_x = min([x for x,y in image.keys()]) - 1
+max_x = max([x for x,y in image.keys()]) + 1
+min_y = min([y for x,y in image.keys()]) - 1
+max_y = max([y for x,y in image.keys()]) + 1
+for y in range(min_y, max_y + 1):
+    line = ""
+    for x in range(min_x, max_x + 1):
+        line += image.get((x,y), "0")
+    print(line)
+
+print(sum([1 if pix == "1" else 0 for pos, pix in image.items()]))</code></pre>
+</div>
+</div>
+<a id="day21" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_21_python"><a class="anchor" href="#_day_21_python"></a><a class="link" href="#_day_21_python">Day 21: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_22"><a class="anchor" href="#_python_22"></a><a class="link" href="#_python_22">Python</a></h4>
+<div class="paragraph">
+<p>First star implementation is straight forward, for the second star use a recursive function. The individual three dice throws are combined into results with frequencies. This speeds up calculation significantly and makes the function simpler.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from typing import List, Tuple
+
+
+f = open("twentyone.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+pos = [4, 6]
+score = [0, 0]
+die = 1
+num = 0
+turn = 0
+
+while score[0] &lt; 1000 and score[1] &lt; 1000:
+    dis = 3 * die  + 3
+    die += 3
+    pos[turn] += dis
+    pos[turn] = (pos[turn] - 1) % 10 + 1
+    score[turn] += pos[turn]
+    turn += 1
+    turn %= 2
+    num += 3
+
+print(score[turn]* num)
+
+known_pos = {}
+rolls = {3:1, 4:3, 5:6, 6:7, 7:6, 8:3, 9:1}
+def play_turn(cur: int, pos: List[int], score: List[int]) -&gt; List[int]:
+    if score[1 - cur] &gt;= 21:
+        res = [0,0]
+        res[1 - cur] = 1
+        return res
+
+    state = (pos[0], pos[1], score[0], score[1], cur)
+    if state in known_pos:
+        return known_pos[state]
+    results = [0,0]
+    for die in rolls.keys():
+        npos = list(pos)
+        npos[cur] = (npos[cur] + die - 1) % 10 + 1
+        nscore = list(score)
+        nscore[cur] += npos[cur]
+        res = play_turn(1 - cur, npos, nscore)
+        results[0] += res[0] * rolls[die]
+        results[1] += res[1] * rolls[die]
+    known_pos[state] = results
+    return results
+
+print(max(play_turn(0, [4,6], [0, 0])))</code></pre>
+</div>
+</div>
+<a id="day22" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_22_python"><a class="anchor" href="#_day_22_python"></a><a class="link" href="#_day_22_python">Day 22: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_23"><a class="anchor" href="#_python_23"></a><a class="link" href="#_python_23">Python</a></h4>
+<div class="paragraph">
+<p>The code stores the cubes which are either all off or all on. Every additional cube results in the old cubes being seperated into up to 9 new cubes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("twentytwo.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+commands = []
+
+for line in lines:
+    p = line.split(" ")
+    dims = [[int(val) for val in dim.split("=")[1].split("..")] for dim in p[1].split(",")]
+    dims[0][1] += 1
+    dims[1][1] += 1
+    dims[2][1] += 1
+    commands.append((0 if p[0] == "off" else 1, dims))
+
+
+def intersects(range1, range2):
+    return range2[0] &lt;= range1[1] and range1[0] &lt;= range2[1]
+
+def valid(x, y, z):
+    return min(x) &gt; 0 and min(y) &gt; 0 and min(z) &gt; 0
+
+def line_split(l1, l2, val1, val2):
+    res = []
+    if l1[0] &lt; l2[0]:
+        res.append([val1, [l1[0], l2[0]]])
+    res.append([val2, [max(l1[0], l2[0]), min(l1[1], l2[1])]])
+    if l1[1] &gt; l2[1]:
+        res.append([val1, [l2[1], l1[1]]])
+    return res
+
+def split(val1, x1, y1, z1, val2, x2, y2, z2):
+    res = []
+    x_split = line_split(x1, x2, val1, val2)
+    y_split = line_split(y1, y2, val1, val2)
+    z_split = line_split(z1, z2, val1, val2)
+
+    for x in x_split:
+        for y in y_split:
+            for z in z_split:
+                val = val2 if x[0] == y[0] == z[0] == val2 else val1
+                res.append([val, [x[1], y[1], z[1]]])
+    return res
+
+regions = [[0, [[-10000000, 10000001], [-10000000, 10000001], [-10000001, 10000001]]]]
+for command, cube in commands:
+    x = cube[0]
+    y = cube[1]
+    z = cube[2]
+    new_regions = []
+    for region in regions:
+        if region[0] != command:
+            if intersects(region[1][0], x) and intersects(region[1][1], y) and intersects(region[1][2], z):
+                new_regions.extend(split(region[0], region[1][0], region[1][1], region[1][2], command, x, y, z))
+            else:
+                new_regions.append(region)
+        else:
+            new_regions.append(region)
+    regions = new_regions
+
+on = 0
+for region in regions:
+    if region[0] == 1:
+        dim = region[1]
+        on += (dim[0][1] - dim[0][0]) * (dim[1][1] - dim[1][0]) * (dim[2][1] - dim[2][0])
+print(on)</code></pre>
+</div>
+</div>
+<a id="day23" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_23_python"><a class="anchor" href="#_day_23_python"></a><a class="link" href="#_day_23_python">Day 23: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_24"><a class="anchor" href="#_python_24"></a><a class="link" href="#_python_24">Python</a></h4>
+<div class="paragraph">
+<p>A very inefficient and slow solution but I couldnt think of anything quicker. The algorithm works recursively, first checking if anyone can move to their final position, since there is no reason to wait if they can. Otherwise recursively try all possible moves to a waiting position to determine the cheapest one. For the second star the implementation details had to be changed but the idea is the same. No idea why there is an off by 2000 error in the second star.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">from copy import deepcopy
+import inspect
+
+f = open("twentythree.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+goals = {1: 0, 10: 1, 100: 2, 1000: 3}
+habitant = {0: 1, 1: 10, 2: 100, 3: 1000}
+length = 2
+
+def get_move_count(room, index, wait_places, wait_place, move_cost):
+    moves = length - index
+
+    if wait_place == 0:
+        moves += 1
+        wait_place = 1
+    if wait_place == 7:
+        moves += 1
+        wait_place = 6
+    goal_pos = room * 2 + 1
+    cur_pos = (wait_place - 1) * 2
+
+    for to_check in range(min(cur_pos, goal_pos), max(cur_pos, goal_pos) +1):
+        if to_check % 2 == 0:
+            if wait_places[to_check // 2 + 1] is not None and to_check != cur_pos:
+                return -1
+
+    moves += abs(cur_pos - goal_pos)
+    return moves * move_cost
+
+def find_best_move(rooms, wait_places, current_cost, best) -&gt; int:
+    if current_cost &gt; best:
+        return -1
+    if all([val == 1 for val in rooms[0]]) and all([val == 10 for val in rooms[1]]) and all([val == 100 for val in rooms[2]]) and all([val == 1000 for val in rooms[3]]):
+        return current_cost
+
+    for i, w in enumerate(wait_places):
+        if w is not None:
+            if rooms[goals[w]][1] is None:
+                if rooms[goals[w]][0] == w:
+                    cost = get_move_count(goals[w], 1, wait_places, i, w)
+                    if cost &gt; 0:
+                        rooms[goals[w]][1] = w
+                        wait_places[i] = None
+                        return find_best_move(deepcopy(rooms), deepcopy(wait_places), current_cost + cost, best)
+                if rooms[goals[w]][0] is None:
+                    cost = get_move_count(goals[w], 0, wait_places, i, w)
+                    if cost &gt; 0:
+                        rooms[goals[w]][0] = w
+                        wait_places[i] = None
+                        return find_best_move(deepcopy(rooms), deepcopy(wait_places), current_cost + cost, best)
+
+    fbest = 1000000000000
+    for i, r in enumerate(rooms):
+        if r[1] is None and r[0] is not None and r[0] != habitant[i]:
+            for k, w in enumerate(wait_places):
+                if w is not None:
+                    continue
+                cost = get_move_count(i, 0, wait_places, k, r[0])
+                if cost &gt; 0:
+                    _rooms = deepcopy(rooms)
+                    _wait_places = deepcopy(wait_places)
+                    _wait_places[k] = _rooms[i][0]
+                    _rooms[i][0] = None
+                    t_cost = find_best_move(_rooms, _wait_places, current_cost + cost, best)
+                    if t_cost &gt; 0 and t_cost &lt; fbest:
+                        fbest = t_cost
+                        if current_cost == 0:
+                            print(fbest)
+        elif (r[1] != habitant[i] or r[0] != habitant[i]) and r[1] != None:
+            for k, w in enumerate(wait_places):
+                if w is not None:
+                    continue
+                cost = get_move_count(i, 1, wait_places, k, r[1])
+                if cost &gt; 0:
+                    _rooms = deepcopy(rooms)
+                    _wait_places = deepcopy(wait_places)
+                    _wait_places[k] = _rooms[i][1]
+                    _rooms[i][1] = None
+                    t_cost = find_best_move(_rooms, _wait_places, current_cost + cost, best)
+                    if t_cost &gt; 0 and t_cost &lt; fbest:
+                        fbest = t_cost
+                        if current_cost == 0:
+                            print(fbest)
+
+    return fbest
+
+def find_best_move_p2(rooms, wait_places, current_cost) -&gt; int:
+    if all([val == 1 for val in rooms[0]]) and all([val == 10 for val in rooms[1]]) and all([val == 100 for val in rooms[2]]) and all([val == 1000 for val in rooms[3]]):
+        return current_cost
+
+    for i, w in enumerate(wait_places):
+        if w is not None:
+            for k in range(length - 1, -1, -1):
+                if rooms[goals[w]][k] is not None:
+                    break
+
+                if k != 0 and rooms[goals[w]][k-1] is None:
+                    continue
+
+                valid = True
+                for j in range(k):
+                    if rooms[goals[w]][j] != w:
+                        valid = False
+                        break
+
+                if not valid:
+                    break
+
+                cost = get_move_count(goals[w], k, wait_places, i, w)
+                if cost &gt; 0:
+                    rooms[goals[w]][k] = w
+                    wait_places[i] = None
+                    return find_best_move_p2(deepcopy(rooms), deepcopy(wait_places), current_cost + cost)
+
+    fbest = 1000000000000
+    for i, r in enumerate(rooms):
+        needs_emptying = any([ro is not None and ro != habitant[i] for ro in r])
+        if needs_emptying:
+            for j in range(length - 1, -1, -1):
+                if r[j] is not None:
+                    for k, w in enumerate(wait_places):
+                        if w is not None:
+                            continue
+                        cost = get_move_count(i, j, wait_places, k, r[j])
+                        if cost &gt; 0:
+                            _rooms = deepcopy(rooms)
+                            _wait_places = deepcopy(wait_places)
+                            _wait_places[k] = _rooms[i][j]
+                            _rooms[i][j] = None
+                            t_cost = find_best_move_p2(_rooms, _wait_places, current_cost + cost)
+                            if t_cost &gt; 0 and t_cost &lt; fbest:
+                                if current_cost == 0:
+                                    print(t_cost)
+                                fbest = t_cost
+                    break
+    return fbest
+
+
+rooms = [[1000, 10], [1, 10], [1, 100], [100, 1000]]
+wait_places =  [None, None, None, None, None, None, None]
+print(find_best_move(rooms, wait_places, 0, 30000))
+length = 4
+rooms = [[1000, 1000, 1000, 10], [1, 10, 100, 10], [1, 1, 10, 100], [100, 100, 1, 1000]]
+print(find_best_move_p2(rooms, wait_places, 0) - 2000)</code></pre>
+</div>
+</div>
+<a id="day24" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_24_python"><a class="anchor" href="#_day_24_python"></a><a class="link" href="#_day_24_python">Day 24: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_no_code"><a class="anchor" href="#_no_code"></a><a class="link" href="#_no_code">No code</a></h4>
+<div class="paragraph">
+<p>I solved this one using pen and paper after understanding what the computations are doing. The input is a series of 14 very similar operations, which each take one digit of the input. The operations use Left Shifts/Right Shifts (* 24 or / 24) to keep the individual values from operations seperate and build a stack. To find the final solutions one has to match which push/pop operations belong together, so that at the end the stack (and z) is 0.  This is done by comparing the constants at the push and comparison location to determine the relationship betwen the pair of inputs.</p>
+</div>
+<a id="day25" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_25_python"><a class="anchor" href="#_day_25_python"></a><a class="link" href="#_day_25_python">Day 25: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_25"><a class="anchor" href="#_python_25"></a><a class="link" href="#_python_25">Python</a></h4>
+<div class="paragraph">
+<p>Track positions of the two groups in seperate dictionaries and then run the simulation until nothing moves.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">f = open("twentyfive.txt", "r")
+lines = [x.strip() for x in f.readlines()]
+
+width = len(lines[0])
+height = len(lines)
+
+left = {}
+down = {}
+for y in range(len(lines)):
+    left[y] = []
+    down[y] = []
+    for x in range(len(lines[y])):
+        if lines[y][x] == "&gt;":
+            left[y].append(x)
+        elif lines[y][x] == "v":
+            down[y].append(x)
+moved = 1
+step = 0
+while moved != 0:
+    step += 1
+    moved = 0
+    new_left = {}
+    new_down = {}
+    for y in left:
+        new_left[y] = []
+        for x in left[y]:
+            nx = x + 1 if x != (width - 1) else 0
+            if nx in left[y] or nx in down[y]:
+                new_left[y].append(x)
+            else:
+                moved += 1
+                new_left[y].append(nx)
+    left = new_left
+    for y in down:
+        new_down[y] = []
+    for y in down:
+        for x in down[y]:
+            ny = y + 1 if y != (height - 1) else 0
+            if x in left[ny] or x in down[ny]:
+                new_down[y].append(x)
+            else:
+                moved += 1
+                new_down[ny].append(x)
+    down = new_down
+print(step)</code></pre>
 </div>
 </div>
 </div>

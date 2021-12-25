@@ -27,17 +27,17 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/subesokun/generatedDays.html</loc>
-    	<lastmod>2021-12-25</lastmod>
-    </url>
-
-    <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/uniqueck/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
     <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/t-pi/generatedDays.html</loc>
+    	<lastmod>2021-12-25</lastmod>
+    </url>
+
+    <url>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/subesokun/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
@@ -57,12 +57,12 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/ojuaf/generatedDays.html</loc>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/quajak/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/quajak/generatedDays.html</loc>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/ojuaf/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
@@ -72,22 +72,12 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/mogron/generatedDays.html</loc>
-    	<lastmod>2021-12-25</lastmod>
-    </url>
-
-    <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/docToolchain/generatedDays.html</loc>
-    	<lastmod>2021-12-25</lastmod>
-    </url>
-
-    <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/jamhocken/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/fallshare/generatedDays.html</loc>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/mogron/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
@@ -97,7 +87,7 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/aspik79/generatedDays.html</loc>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/docToolchain/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
@@ -107,12 +97,22 @@
     </url>
 
     <url>
-    	<loc>https://aoc-2021.netlify.com/generated/coder/anoff/generatedDays.html</loc>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/fallshare/generatedDays.html</loc>
+    	<lastmod>2021-12-25</lastmod>
+    </url>
+
+    <url>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/aspik79/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 
     <url>
     	<loc>https://aoc-2021.netlify.com/generated/coder/AlexisTM/generatedDays.html</loc>
+    	<lastmod>2021-12-25</lastmod>
+    </url>
+
+    <url>
+    	<loc>https://aoc-2021.netlify.com/generated/coder/anoff/generatedDays.html</loc>
     	<lastmod>2021-12-25</lastmod>
     </url>
 

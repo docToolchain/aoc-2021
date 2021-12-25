@@ -343,6 +343,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_25_kotlin">Day 25: kotlin</a>
+<ul class="sectlevel3">
+<li><a href="#_day_25_sea_cucumber">Day 25: Sea Cucumber</a>
+<ul class="sectlevel4">
+<li><a href="#_first_star_20">First Star</a></li>
+<li><a href="#_second_star_20">Second Star</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -3394,6 +3404,152 @@ algorithm will add nine new input vectors to the list for next run.</p>
 	println("   $solution2 are the most wins in all universes")
 	println()</code></pre>
 </div>
+</div>
+<a id="day25" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_25_kotlin"><a class="anchor" href="#_day_25_kotlin"></a><a class="link" href="#_day_25_kotlin">Day 25: kotlin</a></h3>
+<div class="sect3">
+<h4 id="_day_25_sea_cucumber"><a class="anchor" href="#_day_25_sea_cucumber"></a><a class="link" href="#_day_25_sea_cucumber">Day 25: Sea Cucumber</a></h4>
+<div class="paragraph">
+<p>This solution is written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The original puzzle can be found at <a href="https://adventofcode.com/2021/day/25" class="bare">https://adventofcode.com/2021/day/25</a></p>
+</div>
+<div class="paragraph">
+<p>For execution enter <em>kotlin day2125_1.kts</em> in the command line.</p>
+</div>
+<div class="sect4">
+<h5 id="_first_star_20"><a class="anchor" href="#_first_star_20"></a><a class="link" href="#_first_star_20">First Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Puzzle input is read into a map with coordinates as key and cucumbers or free spaces as value. Within a while loop first the cucumbers facing east are considered moving, than the cucumbers facing south. As long as any cucumber has moved, the loop continues.</p>
+</div>
+<div class="paragraph">
+<p>After no cucumber moves any more, the number of steps is printed out as solution.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-kotlin" data-lang="kotlin">import java.io.File
+
+//fun main(args: Array&lt;String&gt;) {
+	var solution1: Int
+	var width: Int = 0
+	var depth: Int = 0
+	var ground = mutableMapOf&lt;Pair&lt;Int, Int&gt;, String&gt;()
+
+	File("day2125_puzzle_input.txt").forEachLine {
+
+		width = 0
+		it.forEach {
+			ground.put(Pair(width, depth), it.toString())
+			width += 1
+		}
+		depth += 1
+	}
+
+	// initial state
+/*	println("Inital state:")
+	for (y in 0..depth - 1) {
+		for (x in 0..width - 1) {
+			print(ground.getValue(Pair(x, y)))
+		}
+		println()
+	}
+	println() */
+
+	// start moves
+	var n: Int = 0
+	var groundNew = mutableMapOf&lt;Pair&lt;Int, Int&gt;, String&gt;()
+	var moveEnd: Boolean = false
+
+	while (!moveEnd) {  // move loop
+		n += 1
+		moveEnd = true
+
+		// move east
+		// prepare groundNew
+		for (y in 0..depth - 1) {
+			for (x in 0..width - 1) {
+				groundNew.put(Pair(x, y), ground.getValue(Pair(x, y)))
+			}
+		}
+		// move where possible
+		for (y in 0..depth - 1) {
+			for (x in 0..width - 1) {
+				if (ground.getValue(Pair(x % width, y)).contains("&gt;")) {
+					if (ground.getValue(Pair((x + 1) % width, y)).contains(".")) {
+						groundNew.put(Pair((x + 1) % width, y), "&gt;")
+						groundNew.put(Pair((x) % width, y), ".")
+						moveEnd = false
+					}
+				}
+			}
+		}
+		ground.clear()
+		ground.putAll(groundNew)
+		groundNew.clear()
+
+		// move west
+		// prepare groundNew
+		for (y in 0..depth - 1) {
+			for (x in 0..width - 1) {
+				groundNew.put(Pair(x, y), ground.getValue(Pair(x, y)))
+			}
+		}
+		// move where possible
+		for (y in 0..depth - 1) {
+			for (x in 0..width - 1) {
+				if (ground.getValue(Pair(x, y % depth)).contains("v")) {
+					if (ground.getValue(Pair(x, (y + 1) % depth)).contains(".")) {
+						groundNew.put(Pair(x, (y + 1) % depth), "v")
+						groundNew.put(Pair(x, y % depth), ".")
+						moveEnd = false
+					}
+				}
+			}
+		}
+		ground.clear()
+		ground.putAll(groundNew)
+		groundNew.clear()
+
+		// n-th state
+/*		println("After $n step:")
+		for (y in 0..depth - 1) {
+			for (x in 0..width - 1) {
+				print(ground.getValue(Pair(x, y)))
+			}
+			println()
+		}
+		println() */
+
+	} // move loop
+
+	solution1 = n
+
+
+	// print solution for part 1
+	println("****************************")
+	println("--- Day 25: Sea Cucumber ---")
+	println("****************************")
+	println("Solution for part1")
+	println("   $solution1 is the first step on which no sea cucumbers move")
+//}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_second_star_20"><a class="anchor" href="#_second_star_20"></a><a class="link" href="#_second_star_20">Second Star</a></h5>
+<div class="paragraph">
+<p>How does it work:<br></p>
+</div>
+<div class="paragraph">
+<p>Collect all stars, up to now (25.12.2021, 10:44 CET) I am still missing some of the puzzles :-(</p>
 </div>
 </div>
 </div>
