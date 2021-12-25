@@ -119,31 +119,57 @@ pub fn eval(instructions: &[Instruction], inputs: &[isize]) -> Option<isize> {
 // end::instructions[]
 
 // tag::solution[]
+const DIGIT_MIN: isize = 1;
+const DIGIT_MAX: isize = 9;
+
+const INPUT_VAR: usize = 0;
+const CONDITION_VAR: usize = 1;
+const ELEMENT_VAR: usize = 2;
+const STACK_VAR: usize = 3;
+
+const INPUT_LEN: usize = 14;
+
 pub fn get_constraints(instructions: &[Instruction]) -> Vec<(usize, usize, isize)> {
     let block_starts = instructions
         .iter()
         .enumerate()
-        .filter(|(_, i)| i == &&Instruction::Inp(0))
+        .filter(|(_, i)| i == &&Instruction::Inp(INPUT_VAR))
         .map(|(k, _)| k)
         .collect::<Vec<_>>();
 
-    assert_eq!(14, block_starts.len());
+    assert_eq!(INPUT_LEN, block_starts.len());
 
-    // z holds elements (n, o) where n is an input number and o as an offset
+    // determine module used to build stack
+    let module = instructions
+        .iter()
+        .filter_map(|i| {
+            if let Instruction::Mod(CONDITION_VAR, Value::Val(module)) = i {
+                Some(*module)
+            } else {
+                None
+            }
+        })
+        .next()
+        .expect("No module");
+
+    // stack of elements (n, o) where n is an input number and o an offset
     // the actual value of the z variable will be
-    // z.iter().fold(0, |z, (n, o)| z * 26 + input[n] + o);
-    let mut z: Vec<(usize, isize)> = Vec::with_capacity(14);
+    // stack.iter().fold(0, |z, (n, o)| z * module + input[n] + o);
+    let mut stack: Vec<(usize, isize)> = Vec::with_capacity(INPUT_LEN);
+
     // constraints holds elements (n1, n2, o) and represents a constraint
     // input[n1] == input[n2] + o, which needs to be satisfied for a valid serial number
-    let mut constraints = Vec::with_capacity(7);
-    for (n, k) in block_starts.iter().enumerate() {
-        // take last digit of z
+    let mut constraints = Vec::with_capacity(INPUT_LEN / 2);
+
+    // iterate over blocks
+    for (n1, k) in block_starts.iter().enumerate() {
+        // take last element of stack
         // a single 'div z a' instruction is expected per block where a is either
-        // 26 or 1. In case of a == 26, the last element from z is removed
-        let d = if instructions[*k..]
+        // the module or 1. In case of a == module, the last element from z is removed
+        let element = if instructions[*k..]
             .iter()
             .filter_map(|i| {
-                if let Instruction::Div(3, Value::Val(div)) = i {
+                if let Instruction::Div(STACK_VAR, Value::Val(div)) = i {
                     Some(*div)
                 } else {
                     None
@@ -151,21 +177,21 @@ pub fn get_constraints(instructions: &[Instruction]) -> Vec<(usize, usize, isize
             })
             .next()
             .expect("No div")
-            == 26
+            == module
         {
             // z is divided by 26, pop element
-            z.pop()
+            stack.pop()
         } else {
             // z is divided by 1, peek element
-            z.last().map(|d| *d)
+            stack.last().map(|e| *e)
         };
 
         // a single instruction 'add x a' where a is a literal value is expected in a block
         // the value a is used to build the condition
-        let check_off = instructions[*k..]
+        let off = instructions[*k..]
             .iter()
             .filter_map(|i| {
-                if let Instruction::Add(1, Value::Val(off)) = i {
+                if let Instruction::Add(CONDITION_VAR, Value::Val(off)) = i {
                     Some(*off)
                 } else {
                     None
@@ -173,69 +199,68 @@ pub fn get_constraints(instructions: &[Instruction]) -> Vec<(usize, usize, isize
             })
             .next()
             .expect("No check offset");
-        // the actual condition offset is the offset from the last element from z + the condition offset
-        let off = d.map(|(_, off)| off + check_off).unwrap_or(check_off);
 
-        if off > -9 && off < 9 {
+        // the actual condition offset is the offset from the last element from stack + the 
+        // condition offset
+        let off = element.map(|(_, o)| off + o).unwrap_or(off);
+
+        if off > -DIGIT_MAX && off < DIGIT_MAX {
             // if the offset is greater than -9 and less than 9, this results in a constraint comparing
-            // two inputs input[n] = input[n1] + off. This is only valid, if there was a last element in z
-            let (n1, _) = d.expect("Condition but no digit to compare");
-            // normalize constraint to positive offsets
-            constraints.push(if off > 0 { (n, n1, off) } else { (n1, n, -off) });
+            // two inputs input[n] = input[n1] + off. This is only valid, if there was a last element on
+            // stack
+            let (n2, _) = element.expect("Condition but no input digit to compare");
 
-            // if constraint is satisfied, no additional element will be added to z
+            // normalize constraint to positive offsets
+            constraints.push(if off > 0 { (n1, n2, off) } else { (n2, n1, -off) });
+
+            // if constraint is satisfied, no additional element will be added to stack
         } else {
-            // the condition check outcome is independent of the input values, add next element to z
+            // the condition check outcome is independent of the input values, add next element to stack
             // there will be one instruction 'add y w' followed by an instruction 'add y a' where
             // a is a literal value representing an offset
             let k_add = instructions[*k..]
                 .iter()
-                .position(|i| i == &Instruction::Add(2, Value::Var(0)))
+                .position(|i| i == &Instruction::Add(ELEMENT_VAR, Value::Var(INPUT_VAR)))
                 .expect("input is not copied to y");
-            if let Instruction::Add(2, Value::Val(off)) = instructions[*k + k_add + 1] {
-                z.push((n, off));
+
+            if let Instruction::Add(ELEMENT_VAR, Value::Val(off)) = instructions[*k + k_add + 1] {
+                assert!(off >= 0 && off < module - DIGIT_MAX, "Input does not fit");
+                stack.push((n1, off));
             } else {
-                panic!("No offset added to digit {}", n);
+                panic!("No offset added to digit {}", n1);
             }
         }
     }
 
-    // expect 7 constraints and z empty (equal to 0)
-    assert_eq!(7, constraints.len());
-    assert!(z.is_empty());
-
-    // sort for easier comparison
-    constraints.sort_unstable();
+    // expect 7 constraints and stack empty (z equal to 0)
+    assert_eq!(INPUT_LEN / 2, constraints.len());
+    assert!(stack.is_empty());
 
     constraints
 }
 
 pub fn solution_1(instructions: &[Instruction]) -> isize {
     let constraints = get_constraints(instructions);
-    let mut inputs = vec![0; 14];
-    for (_, n2, o) in &constraints {
-        inputs[*n2] = 9 - o;
-    }
+    let inputs = &mut [0; INPUT_LEN];
     for (n1, n2, o) in &constraints {
-        inputs[*n1] = inputs[*n2] + o;
+        inputs[*n1] = DIGIT_MAX;
+        inputs[*n2] = DIGIT_MAX - o;
     }
 
-    assert_eq!(Some(0), eval(instructions, &inputs));
+    assert_eq!(Some(0), eval(instructions, inputs));
 
     inputs.iter().fold(0, |v, d| 10 * v + *d)
 }
 
 pub fn solution_2(instructions: &[Instruction]) -> isize {
     let constraints = get_constraints(instructions);
-    let mut inputs = vec![0; 14];
-    for (_, n2, _) in &constraints {
-        inputs[*n2] = 1;
-    }
+    let inputs = &mut [0; INPUT_LEN];
     for (n1, n2, o) in &constraints {
-        inputs[*n1] = inputs[*n2] + o;
+        inputs[*n1] = DIGIT_MIN + o;
+        inputs[*n2] = DIGIT_MIN;
     }
 
-    assert_eq!(Some(0), eval(instructions, &inputs));
+    assert_eq!(Some(0), eval(instructions, inputs));
 
     inputs.iter().fold(0, |v, d| 10 * v + *d)
 }
