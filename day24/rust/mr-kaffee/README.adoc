@@ -10,6 +10,8 @@ In every block, there is a condition (``eql a b`` instructions), controlling whe
 
 === Solution ===
 
+After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only):
+
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=solution]
