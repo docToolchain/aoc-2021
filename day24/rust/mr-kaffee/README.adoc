@@ -6,7 +6,7 @@ I don't get the idea of today's puzzle. I essentially solved it manually.
 
 I reverse engineered the MONAD (puzzle input) to figure out that an offset is added to each digit and the digits are then processed in a kind of 26 based system (using ``mul a 26``, ``div a 26`` and ``mod a 26`` repeatedly) in 14 blocks of instructions (one for every input digit). 
 
-In every block, there is a condition (``eql a b`` instructions), controlling whether a 26-based digit is added to ``z``. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to ``z`` if ``dX != dY B + c``". In order for the final result to be zero, digits shall not be added, which is the case if ``dX = dY + c`` (``dX`` and ``dY`` are digits of the serial number to check, ``c`` is an offset).
+In every block, there is a condition (``eql a b`` instructions), controlling whether a 26-based digit is added to ``z``. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to ``z`` if ``dX != dY + c``". In order for the final result to be zero, digits shall not be added, which is the case if the constraint ``dX = dY + c`` is satisfied (``dX`` and ``dY`` are digits of the serial number to check, ``c`` is an offset). This results in seven bounds ``dX <= 9 - c`` for a serial number to be valid.
 
 === Solution ===
 
