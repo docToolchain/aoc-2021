@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+First star implementation is straight forward, for the second star use a recursive function. The individual three dice throws are combined into results with frequencies. This speeds up calculation significantly and makes the function simpler.
+
+[source, python]
+....
+include::twentyone.py[]
+....

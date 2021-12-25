@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Brute force search over the possible valid input values.
+
+[source, python]
+....
+include::seventeen.py[]
+....

@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+The code stores the cubes which are either all off or all on. Every additional cube results in the old cubes being seperated into up to 9 new cubes. 
+
+[source, python]
+....
+include::twentytwo.py[]
+....

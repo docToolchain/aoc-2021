@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Track positions of the two groups in seperate dictionaries and then run the simulation until nothing moves.
+
+[source, python]
+....
+include::twentyfive.py[]
+....

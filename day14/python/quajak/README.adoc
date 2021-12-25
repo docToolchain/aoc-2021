@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+The additions are stored in a look up table. For the first star the actual polymer as a string is created. For the second star for efficiency reasons, only a dictioniary of all two value combinations and their occurance number are stored and incremented from step to step.  
+
+[source, python]
+....
+include::fourteen.py[]
+....

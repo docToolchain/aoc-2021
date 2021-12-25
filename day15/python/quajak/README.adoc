@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Only solution for part 2 is in the code, part 1 is the same with simper 2d array creation. Code is a straightforward implementation of the A-Star algorithm.
+
+[source, python]
+....
+include::fifteen.py[]
+....

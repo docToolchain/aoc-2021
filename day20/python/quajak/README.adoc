@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Use a dictionary to store known positions to easily allow scaling the grid as the iterations occur. It is important to track the background value for all pixels which are not explicitly calculated. 
+
+[source, python]
+....
+include::twenty.py[]
+....
