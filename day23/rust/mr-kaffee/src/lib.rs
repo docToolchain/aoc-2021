@@ -543,7 +543,6 @@ pub fn solve<B>(start: B) -> usize
 where
     B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
 {
-    // start normalized with everything settled
     let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
@@ -558,7 +557,7 @@ where
                 if cur_room == Some(p)
                     && (k + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
                 {
-                    // position is settled in room and below are only the right ones
+                    // position is settled in room (below are only the pods of the same type)
                     continue;
                 }
 
@@ -585,6 +584,7 @@ where
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
                         search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        // no need to continue to look for other adjacents
                         continue;
                     }
 
@@ -594,6 +594,7 @@ where
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
                         search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        // continue search, other positions in the hallway may also be valid adjacents
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
