@@ -543,7 +543,6 @@ pub fn solve<B>(start: B) -> usize
 where
     B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
 {
-    // start normalized with everything settled
     let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
