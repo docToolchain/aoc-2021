@@ -436,6 +436,25 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_24_rust">Day 24: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_24_arithmetic_logic_unit">Day 24: Arithmetic Logic Unit</a>
+<ul class="sectlevel4">
+<li><a href="#_solution_6">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_25_rust">Day 25: rust</a>
+<ul class="sectlevel3">
+<li><a href="#_day_25_sea_cucumber">Day 25: Sea Cucumber</a>
+<ul class="sectlevel4">
+<li><a href="#_solution_7">Solution</a></li>
+<li><a href="#_tests_23">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -504,20 +523,15 @@ development, e.g., based on the examples given in the puzzles.</p>
 <div class="sect4">
 <h5 id="_personal_challenges"><a class="anchor" href="#_personal_challenges"></a><a class="link" href="#_personal_challenges">Personal Challenges</a></h5>
 <div class="paragraph">
-<p>It is December 21st in the meantime. I got that far trying to</p>
+<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. I finally came down to slightly above ~600ms and there certainly is potential for more. For now, my overall solution time is just around 1 second on my machine:author:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>Keep the overall time for all solutions as small as possible (&lt; 500ms would be great)</p>
-</li>
-<li>
-<p>Do not use anything but out of the box Rust</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre>Total time for 25 days: 969.5999ms (38.783996ms per day)</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see whether I can keep up with these constraints until the end.</p>
+<p>My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box nightly Rust for this one to be able to use the method <code>BTreeSet::pop_first</code></p>
 </div>
 </div>
 <div class="sect4">
@@ -576,7 +590,10 @@ pub fn solve(indices: impl Iterator&lt;Item = usize&gt;) {
 </div>
 </div>
 <div class="paragraph">
-<p>To run all solutions, use <code>cargo run --release&#8201;&#8212;&#8201;from 1 --to 25</code>. The command line options <code>--from &lt;day&gt;</code> and <code>--to &lt;day&gt;</code> specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.</p>
+<p>To run all solutions, use <code>cargo run --release -- --from 1 --to 25</code>. The command line options <code>--from &lt;day&gt;</code> and <code>--to &lt;day&gt;</code> specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.</p>
+</div>
+<div class="paragraph">
+<p>Because day23 uses the unstable function <code>BTreeSet::pop_first</code>, this will only compile on the rust nightly channel. If you want to run all the other solutions, use <code>cargo run --release --no-default-features -- --from 1 --to 25</code>.</p>
 </div>
 <a id="day00" />
 </div>
@@ -6300,13 +6317,20 @@ mod tests {
 <div class="paragraph">
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/23">AoC|2021|23</a>.</p>
 </div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This solution uses nightly Rust features (specifically the function <code>BTreeSet::pop_first</code>). It will not compile on the Rust stable toolchain.</p>
+</div>
+</div>
+</div>
 <div class="sect4">
 <h5 id="_part_1_15"><a class="anchor" href="#_part_1_15"></a><a class="link" href="#_part_1_15">Part 1</a></h5>
 <div class="paragraph">
-<p>My initial idea was to use Dijkstra. The first challenge was to come up with a way to model the data. After some tries, I decided to model the burrows as a list of <code>Option&lt;u8&gt;</code>s. The first 11 model the hallway. The remaining elements model the rooms one after the other. A <code>None</code> value represents open space, a <code>Some(p)</code> value represents a space occupied by amphipd <code>A</code> for <code>p = 0</code> to <code>D</code> for <code>p = 3</code>.</p>
+<p>My initial idea was to use Dijkstra. The first challenge was to come up with a way to model the data. After some tries, I decided to model the burrows as a list of <code>Option&lt;u8&gt;</code>s. The first 11 entries model the hallway. The remaining elements model the rooms one after the other. A <code>None</code> value represents open space, a <code>Some(p)</code> value represents a space occupied by amphipod, <code>A</code> for <code>p = 0</code> to <code>D</code> for <code>p = 3</code>.</p>
 </div>
 <div class="paragraph">
-<p>The next challenge is to find all adjacent states from a given state. To solve this, I use a constant <code>MAP</code> listing all adjacent positions for every position. To find the adjacents, I do a breadth first search using this map starting from every position that contains an amphipod. There is a lot of potential for bugs in implementing the rules from the puzzle description that describe whether a position is valid for a given amphipod.</p>
+<p>The next challenge is to find all adjacent states from a given state. To solve this, I use a constant <code>MAP</code> listing all adjacent positions for every position. To find the adjacents, I do a depth first search using this map starting from every position that contains an amphipod. There is a lot of potential for bugs in implementing the rules from the puzzle description that describe whether a position is valid for a given amphipod.</p>
 </div>
 <div class="paragraph">
 <p>After all bugs fixed, I had a solution which solved part 1 in ~15 seconds and did never finish for part 2.</p>
@@ -6315,7 +6339,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_part_2_15"><a class="anchor" href="#_part_2_15"></a><a class="link" href="#_part_2_15">Part 2</a></h5>
 <div class="paragraph">
-<p>The key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I simply add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I realized that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.</p>
+<p>The key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I figured out that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.</p>
 </div>
 <div class="paragraph">
 <p>Adding the A* heuristic reduced the solution time to &lt;1s for both parts together.</p>
@@ -6334,7 +6358,6 @@ mod tests {
 where
     B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
 {
-    // start normalized with everything settled
     let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
@@ -6349,7 +6372,7 @@ where
                 if cur_room == Some(p)
                     &amp;&amp; (k + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
                 {
-                    // position is settled in room and below are only the right ones
+                    // position is settled in room (below are only the pods of the same type)
                     continue;
                 }
 
@@ -6376,6 +6399,7 @@ where
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
                         search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        // no need to continue to look for other adjacents
                         continue;
                     }
 
@@ -6385,6 +6409,7 @@ where
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
                         search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        // continue search, other positions in the hallway may also be valid adjacents
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
@@ -7128,6 +7153,407 @@ mod tests {
 <h5 id="_today_i_learned_10"><a class="anchor" href="#_today_i_learned_10"></a><a class="link" href="#_today_i_learned_10">Today I learned</a></h5>
 <div class="paragraph">
 <p>A* can be very helpful compared to plain Dijkstra!</p>
+</div>
+<div class="paragraph">
+<p>I think this was the first time I created what Rust calls "blanket implementations".</p>
+</div>
+<a id="day24" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_24_rust"><a class="anchor" href="#_day_24_rust"></a><a class="link" href="#_day_24_rust">Day 24: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_24_arithmetic_logic_unit"><a class="anchor" href="#_day_24_arithmetic_logic_unit"></a><a class="link" href="#_day_24_arithmetic_logic_unit">Day 24: Arithmetic Logic Unit</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/24">AoC|2021|24</a>.</p>
+</div>
+<div class="paragraph">
+<p>I don&#8217;t get the idea of today&#8217;s puzzle. I essentially solved it manually.</p>
+</div>
+<div class="paragraph">
+<p>I reverse engineered the MONAD (puzzle input) to figure out that an offset is added to each digit and the digits are then processed in a kind of 26 based system (using <code>mul a 26</code>, <code>div a 26</code> and <code>mod a 26</code> repeatedly) in 14 blocks of instructions (one for every input digit).</p>
+</div>
+<div class="paragraph">
+<p>In every block, there is a condition (<code>eql a b</code> instructions), controlling whether a 26-based digit is added to <code>z</code>. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to <code>z</code> if <code>dX != dY B + c</code>". In order for the final result to be zero, digits shall not be added, which is the case if <code>dX = dY + c</code> (<code>dX</code> and <code>dY</code> are digits of the serial number to check, <code>c</code> is an offset).</p>
+</div>
+<div class="sect4">
+<h5 id="_solution_6"><a class="anchor" href="#_solution_6"></a><a class="link" href="#_solution_6">Solution</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const BOUNDS: [Option&lt;isize&gt;; 14] = [
+    Some(5),
+    None,
+    None,
+    None,
+    Some(6),
+    None,
+    Some(1),
+    Some(2),
+    None,
+    Some(8),
+    Some(1),
+    None,
+    Some(3),
+    None,
+];
+
+pub const CONSTRAINTS: [Option&lt;fn(&amp;[isize]) -&gt; isize&gt;; 14] = [
+    None,
+    Some(|digits| digits[12] + 6),
+    Some(|digits| digits[9] + 1),
+    Some(|digits| digits[4] + 3),
+    None,
+    Some(|digits| digits[6] + 8),
+    None,
+    None,
+    Some(|digits| digits[7] + 7),
+    None,
+    None,
+    Some(|digits| digits[10] + 8),
+    None,
+    Some(|digits| digits[0] + 4),
+];
+
+pub fn solution_1(instructions: &amp;[Instruction]) -&gt; isize {
+    let mut inputs = BOUNDS
+        .iter()
+        .map(|b| if let Some(p) = b { *p } else { 0 })
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+    for (k, c) in CONSTRAINTS.iter().enumerate() {
+        if let Some(c) = c {
+            inputs[k] = c(&amp;inputs);
+        }
+    }
+
+    assert_eq!(Some(0), eval(instructions, &amp;inputs));
+
+    inputs.iter().fold(0, |v, d| 10 * v + *d)
+}
+
+pub fn solution_2(instructions: &amp;[Instruction]) -&gt; isize {
+    let mut inputs = BOUNDS
+        .iter()
+        .map(|b| if b.is_some() { 1 } else { 0 })
+        .collect::&lt;Vec&lt;_&gt;&gt;();
+    for (k, c) in CONSTRAINTS.iter().enumerate() {
+        if let Some(c) = c {
+            inputs[k] = c(&amp;inputs);
+        }
+    }
+
+    assert_eq!(Some(0), eval(instructions, &amp;inputs));
+
+    inputs.iter().fold(0, |v, d| 10 * v + *d)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I still implemented instruction evaluation and use this to verify my solution</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug, PartialEq, Eq)]
+pub enum Instruction {
+    Inp(usize),
+    Add(usize, Value),
+    Mul(usize, Value),
+    Div(usize, Value),
+    Mod(usize, Value),
+    Eql(usize, Value),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Value {
+    Var(usize),
+    Val(isize),
+}
+
+impl Value {
+    pub fn eval(&amp;self, vars: &amp;[isize; 4]) -&gt; isize {
+        match self {
+            Value::Var(v) =&gt; vars[*v],
+            Value::Val(v) =&gt; *v,
+        }
+    }
+}
+
+impl Instruction {
+    pub fn parse(line: &amp;str) -&gt; Self {
+        let mut parts = line.trim().split(" ");
+        let name = parts.next().expect("No name in instruction");
+        let first = match parts.next().expect("No first part") {
+            "w" =&gt; 0,
+            "x" =&gt; 1,
+            "y" =&gt; 2,
+            "z" =&gt; 3,
+            _ =&gt; panic!("Illegal first part in '{}'", line),
+        };
+        let second = parts.next().map(|second| match second {
+            "w" =&gt; Value::Var(0),
+            "x" =&gt; Value::Var(1),
+            "y" =&gt; Value::Var(2),
+            "z" =&gt; Value::Var(3),
+            _ =&gt; Value::Val(second.parse().expect("Could not parse value")),
+        });
+
+        match name {
+            "inp" =&gt; Self::Inp(first),
+            "add" =&gt; Self::Add(first, second.expect("No second part")),
+            "mul" =&gt; Self::Mul(first, second.expect("No second part")),
+            "div" =&gt; Self::Div(first, second.expect("No second part")),
+            "mod" =&gt; Self::Mod(first, second.expect("No second part")),
+            "eql" =&gt; Self::Eql(first, second.expect("No second part")),
+            _ =&gt; panic!("Illegal name in '{}'", line),
+        }
+    }
+
+    pub fn eval(&amp;self, vars: &amp;mut [isize; 4], inputs: &amp;mut impl Iterator&lt;Item = isize&gt;) -&gt; bool {
+        match self {
+            Instruction::Inp(v1) =&gt; {
+                if let Some(v) = inputs.next() {
+                    vars[*v1] = v;
+                    true
+                } else {
+                    false
+                }
+            }
+            Instruction::Add(v1, v2) =&gt; {
+                vars[*v1] += v2.eval(&amp;vars);
+                true
+            }
+            Instruction::Mul(v1, v2) =&gt; {
+                vars[*v1] *= v2.eval(&amp;vars);
+                true
+            }
+            Instruction::Div(v1, v2) =&gt; {
+                let v = v2.eval(&amp;vars);
+                if v != 0 {
+                    vars[*v1] /= v;
+                    true
+                } else {
+                    false
+                }
+            }
+            Instruction::Mod(v1, v2) =&gt; {
+                let val1 = vars[*v1];
+                let val2 = v2.eval(&amp;vars);
+                if val1 &gt;= 0 &amp;&amp; val2 &gt; 0 {
+                    vars[*v1] = val1 % val2;
+                    true
+                } else {
+                    false
+                }
+            }
+            Instruction::Eql(v1, v2) =&gt; {
+                vars[*v1] = (vars[*v1] == v2.eval(&amp;vars)) as isize;
+                true
+            }
+        }
+    }
+}
+
+pub fn parse(content: &amp;str) -&gt; Vec&lt;Instruction&gt; {
+    content
+        .lines()
+        .map(|line| Instruction::parse(line))
+        .collect()
+}
+
+pub fn eval(instructions: &amp;[Instruction], inputs: &amp;[isize]) -&gt; Option&lt;isize&gt; {
+    let mut vars = [0; 4];
+    let mut inputs = inputs.iter().map(|v| *v);
+    for instruction in instructions {
+        if !instruction.eval(&amp;mut vars, &amp;mut inputs) {
+            return None;
+        }
+    }
+    Some(vars[3])
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and I also have a test for the <code>parse</code> function</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT: &amp;str = "inp z
+        inp x
+        mul z 3
+        eql z x";
+    const INSTRUCTIONS: &amp;[Instruction] = &amp;[
+        Instruction::Inp(3),
+        Instruction::Inp(1),
+        Instruction::Mul(3, Value::Val(3)),
+        Instruction::Eql(3, Value::Var(1)),
+    ];
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(INSTRUCTIONS, parse(CONTENT));
+    }
+}</code></pre>
+</div>
+</div>
+<a id="day25" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_25_rust"><a class="anchor" href="#_day_25_rust"></a><a class="link" href="#_day_25_rust">Day 25: rust</a></h3>
+<div class="sect3">
+<h4 id="_day_25_sea_cucumber"><a class="anchor" href="#_day_25_sea_cucumber"></a><a class="link" href="#_day_25_sea_cucumber">Day 25: Sea Cucumber</a></h4>
+<div class="paragraph">
+<p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/25">AoC|2021|25</a>.</p>
+</div>
+<div class="paragraph">
+<p>A simple one to conclude this year&#8217;s edition&#8230;&#8203;</p>
+</div>
+<div class="sect4">
+<h5 id="_solution_7"><a class="anchor" href="#_solution_7"></a><a class="link" href="#_solution_7">Solution</a></h5>
+<div class="paragraph">
+<p>Not much to say here. By looking in both, the initial and the updated grid for updating the south facing cucumbers, I avoid creating two copies of the grid in each step. Still ~100ms computation time&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Here is my solution:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; (Vec&lt;char&gt;, usize) {
+    let w = content.lines().next().expect("No content").trim().len();
+    let grid = content.chars().filter(|c| !c.is_whitespace()).collect();
+    (grid, w)
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const E: char = '&gt;';
+pub const S: char = 'v';
+pub const X: char = '.';
+
+pub fn step(grid: &amp;[char], w: usize) -&gt; Option&lt;Vec&lt;char&gt;&gt; {
+    let mut grid_upd = vec![X; grid.len()];
+    let mut moved = false;
+
+    for k in 0..grid.len() {
+        if grid[k] == E {
+            let k_upd = (k + 1) % w + w * (k / w);
+            if grid[k_upd] == X {
+                grid_upd[k_upd] = E;
+                moved = true;
+            } else {
+                grid_upd[k] = E;
+            }
+        }
+    }
+
+    for k in 0..grid.len() {
+        if grid[k] == S {
+            let k_upd = (k + w) % grid.len();
+            if grid[k_upd] != S &amp;&amp; grid_upd[k_upd] == X {
+                grid_upd[k_upd] = S;
+                moved = true;
+            } else {
+                grid_upd[k] = S;
+            }
+        }
+    }
+
+    if moved {
+        Some(grid_upd)
+    } else {
+        None
+    }
+}
+
+pub fn solution_1(grid: &amp;[char], w: usize) -&gt; usize {
+    let mut grid = grid.to_owned();
+    let mut count = 0;
+    while let Some(upd) = step(&amp;grid, w) {
+        grid = upd;
+        count += 1;
+    }
+    count + 1
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_tests_23"><a class="anchor" href="#_tests_23"></a><a class="link" href="#_tests_23">Tests</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONTENT_00: &amp;str = "v...&gt;&gt;.vv&gt;
+        .vv&gt;&gt;.vv..
+        &gt;&gt;.&gt;v&gt;...v
+        &gt;&gt;v&gt;&gt;.&gt;.v.
+        v&gt;v.vv.v..
+        &gt;.&gt;&gt;..v...
+        .vv..&gt;.&gt;v.
+        v.v..&gt;&gt;v.v
+        ....v..v.&gt;";
+    const CONTENT_01: &amp;str = "....&gt;.&gt;v.&gt;
+        v.v&gt;.&gt;v.v.
+        &gt;v&gt;&gt;..&gt;v..
+        &gt;&gt;v&gt;v&gt;.&gt;.v
+        .&gt;v.v...v.
+        v&gt;&gt;.&gt;vvv..
+        ..v...&gt;&gt;..
+        vv...&gt;&gt;vv.
+        &gt;.v.v..v.v";
+    const CONTENT_10: &amp;str = "..&gt;..&gt;&gt;vv.
+        v.....&gt;&gt;.v
+        ..v.v&gt;&gt;&gt;v&gt;
+        v&gt;.&gt;v.&gt;&gt;&gt;.
+        ..v&gt;v.vv.v
+        .v.&gt;&gt;&gt;.v..
+        v.v..&gt;v&gt;..
+        ..v...&gt;v.&gt;
+        .vv..v&gt;vv.";
+
+    const GRID_00: &amp;[char] = &amp;[
+        S, X, X, X, E, E, X, S, S, E, X, S, S, E, E, X, S, S, X, X, E, E, X, E, S, E, X, X, X, S,
+        E, E, S, E, E, X, E, X, S, X, S, E, S, X, S, S, X, S, X, X, E, X, E, E, X, X, S, X, X, X,
+        X, S, S, X, X, E, X, E, S, X, S, X, S, X, X, E, E, S, X, S, X, X, X, X, S, X, X, S, X, E,
+    ];
+    const W: usize = 10;
+
+    #[test]
+    fn test_parse() {
+        let (grid, w) = parse(CONTENT_00);
+        assert_eq!(W, w);
+        assert_eq!(GRID_00, grid);
+    }
+
+    #[test]
+    fn test_step() {
+        let grid_00 = GRID_00.to_owned();
+        let (grid_01, _) = parse(CONTENT_01);
+        let (grid_10, _) = parse(CONTENT_10);
+
+        assert_eq!(Some(grid_01), step(&amp;grid_00, W));
+
+        let mut grid = grid_00;
+        for _ in 0..10 {
+            grid = step(&amp;grid, W).unwrap();
+        }
+        assert_eq!(grid_10, grid)
+    }
+
+    #[test]
+    fn test_solution_1() {
+        assert_eq!(58, solution_1(GRID_00, W));
+    }
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
