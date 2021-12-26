@@ -677,8 +677,8 @@ pub mod day24 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day24/rust/mr-kaffee/input.txt");
-    pub const EXP_1: isize = 59_996_912_981_939;
-    pub const EXP_2: isize = 17_241_911_811_915;
+    pub const EXP_1: usize = 59_996_912_981_939;
+    pub const EXP_2: usize = 17_241_911_811_915;
 
     pub fn solve() {
         let timer = Instant::now();
