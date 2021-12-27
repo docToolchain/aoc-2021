@@ -20,6 +20,8 @@ The key to also solve part 2 in reasonable time and with reasonable memory requi
 
 Adding the A* heuristic reduced the solution time to <1s for both parts together.
 
+As an additional optimization, I perform some simple deadlock checks (amphipods that cannot exchange position in the hallway and amphipods that cannot reach their room from the left-most or right-most rooms) prior to adding adjacents to the queue. This saves ~40% runtime.
+
 === Implementation ===
 
 ==== A* search ====

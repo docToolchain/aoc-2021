@@ -30,6 +30,7 @@ pub trait BurrowCommon {
     fn get_room_mx(room: u8) -> usize;
     fn move_pod(&mut self, idx_from: usize, idx_to: usize);
     fn get_min_cost(&self) -> usize;
+    fn is_deadlock(&self) -> bool;
 }
 
 impl<B> BurrowCommon for B
@@ -134,6 +135,42 @@ where
         }
 
         cost
+    }
+
+    fn is_deadlock(&self) -> bool {
+        // pods in hallway which cannot exchange positions
+        if self[3] == Some(3) && self[5] == Some(0)
+            || self[3] == Some(3) && self[7] == Some(0)
+            || self[5] == Some(3) && self[7] == Some(0)
+            || self[5] == Some(3) && self[7] == Some(1)
+            || self[3] == Some(2) && self[5] == Some(0)
+        {
+            return true;
+        }
+
+        // pods in left most room which cannot reach any other room
+        if self[1].is_some()
+            && self[3] == Some(0)
+            && (Self::get_room_mn(0)..Self::get_room_mx(0))
+                .filter_map(|k| self[k])
+                .max()
+                .map_or(false, |mx| mx > 0)
+        {
+            return true;
+        }
+
+        // pods in rightmost room which cannto reach any other room
+        if self[9].is_some()
+            && self[7] == Some(3)
+            && (Self::get_room_mn(3)..Self::get_room_mx(3))
+                .filter_map(|k| self[k])
+                .min()
+                .map_or(false, |mn| mn < 3)
+        {
+            return true;
+        }
+
+        false
     }
 }
 
@@ -598,8 +635,10 @@ where
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
-                        // continue search, other positions in the hallway may also be valid adjacents
+                        if !adjacent.is_deadlock() {
+                            search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        }
+                        // continue search, other positions in the hallway may be valid adjacents
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
