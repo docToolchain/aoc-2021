@@ -1,17 +1,27 @@
+type C = u8;
+
 // tag::parse[]
-pub fn parse(content: &str) -> (Vec<char>, usize) {
+pub fn parse(content: &str) -> (Vec<C>, usize) {
     let w = content.lines().next().expect("No content").trim().len();
-    let grid = content.chars().filter(|c| !c.is_whitespace()).collect();
+    let grid = content
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .map(|c| match c {
+            '>' => 1,
+            'v' => 2,
+            _ => 0,
+        })
+        .collect();
     (grid, w)
 }
 // end::parse[]
 
 // tag::solution[]
-pub const E: char = '>';
-pub const S: char = 'v';
-pub const X: char = '.';
+pub const E: C = 1;
+pub const S: C = 2;
+pub const X: C = 0;
 
-pub fn step(grid: &[char], w: usize) -> Option<Vec<char>> {
+pub fn step(grid: &[C], w: usize) -> Option<Vec<C>> {
     let mut grid_upd = vec![X; grid.len()];
     let mut moved = false;
 
@@ -46,14 +56,13 @@ pub fn step(grid: &[char], w: usize) -> Option<Vec<char>> {
     }
 }
 
-pub fn solution_1(grid: &[char], w: usize) -> usize {
-    let mut grid = grid.to_owned();
-    let mut count = 0;
+pub fn solution_1(mut grid: Vec<C>, w: usize) -> usize {
+    let mut count = 1;
     while let Some(upd) = step(&grid, w) {
         grid = upd;
         count += 1;
     }
-    count + 1
+    count
 }
 // end::solution[]
 
@@ -90,7 +99,7 @@ mod tests {
         ..v...>v.>
         .vv..v>vv.";
 
-    const GRID_00: &[char] = &[
+    const GRID_00: &[C] = &[
         S, X, X, X, E, E, X, S, S, E, X, S, S, E, E, X, S, S, X, X, E, E, X, E, S, E, X, X, X, S,
         E, E, S, E, E, X, E, X, S, X, S, E, S, X, S, S, X, S, X, X, E, X, E, E, X, X, S, X, X, X,
         X, S, S, X, X, E, X, E, S, X, S, X, S, X, X, E, E, S, X, S, X, X, X, X, S, X, X, S, X, E,
@@ -121,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_solution_1() {
-        assert_eq!(58, solution_1(GRID_00, W));
+        assert_eq!(58, solution_1(GRID_00.to_owned(), W));
     }
 }
 // end::tests[]
