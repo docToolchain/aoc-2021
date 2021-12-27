@@ -283,10 +283,10 @@ pub fn solution_1_2(scanners: &[(HashSet<Coord>, Coord, HashMap<usize, usize>)])
     let mut settled = vec![0; scanners.len()];
     settled[0] = 1u8; // start with first scanner settled
 
-    // holds scanner coordinates in the coordinate system of the settled scanners.
+    let mut transformed = Vec::with_capacity(scanners.len());
+    transformed.push(0usize);
+
     // Used to calculate largest distance between any two scanners.
-    let mut centers = Vec::with_capacity(scanners.len());
-    centers.push((0, 0, 0)); // first scanner's position (= reference)
     let mut max_dist = 0;
 
     // holds all settled beacons. Start with beacons in range of scanner 1
@@ -310,15 +310,14 @@ pub fn solution_1_2(scanners: &[(HashSet<Coord>, Coord, HashMap<usize, usize>)])
                 settled[k2] = 1;
 
                 // update max distance
-                for c_settled in &centers {
-                    let dist = scanners[k2].1.sub(&c_settled).abs();
+                for k_t in &transformed {
+                    let dist = scanners[k2].1.sub(&scanners[*k_t].1).abs();
                     if dist > max_dist {
                         max_dist = dist;
                     }
                 }
 
-                // add center
-                centers.push(d);
+                transformed.push(k2);
             }
         }
 
