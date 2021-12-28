@@ -442,6 +442,8 @@
 <li><a href="#_day_24_arithmetic_logic_unit">Day 24: Arithmetic Logic Unit</a>
 <ul class="sectlevel4">
 <li><a href="#_solution_6">Solution</a></li>
+<li><a href="#_traits_index_and_implementation">Traits, Index and implementation</a></li>
+<li><a href="#_tests_23">Tests</a></li>
 </ul>
 </li>
 </ul>
@@ -451,7 +453,7 @@
 <li><a href="#_day_25_sea_cucumber">Day 25: Sea Cucumber</a>
 <ul class="sectlevel4">
 <li><a href="#_solution_7">Solution</a></li>
-<li><a href="#_tests_23">Tests</a></li>
+<li><a href="#_tests_24">Tests</a></li>
 </ul>
 </li>
 </ul>
@@ -524,11 +526,11 @@ development, e.g., based on the examples given in the puzzles.</p>
 <div class="sect4">
 <h5 id="_personal_challenges"><a class="anchor" href="#_personal_challenges"></a><a class="link" href="#_personal_challenges">Personal Challenges</a></h5>
 <div class="paragraph">
-<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. I finally came down to slightly above ~600ms and there certainly is potential for more. For now, my overall solution time is just around 1 second on my machine:author:</p>
+<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this and some build optimizations, my overall solution time is below 700ms on my machine:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Total time for 25 days: 969.5999ms (38.783996ms per day)</pre>
+<pre>Total time for 25 days: 666.6676ms (26.666704ms per day)</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5344,10 +5346,10 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usi
     let mut settled = vec![0; scanners.len()];
     settled[0] = 1u8; // start with first scanner settled
 
-    // holds scanner coordinates in the coordinate system of the settled scanners.
+    let mut transformed = Vec::with_capacity(scanners.len());
+    transformed.push(0usize);
+
     // Used to calculate largest distance between any two scanners.
-    let mut centers = Vec::with_capacity(scanners.len());
-    centers.push((0, 0, 0)); // first scanner's position (= reference)
     let mut max_dist = 0;
 
     // holds all settled beacons. Start with beacons in range of scanner 1
@@ -5371,15 +5373,14 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usi
                 settled[k2] = 1;
 
                 // update max distance
-                for c_settled in &amp;centers {
-                    let dist = scanners[k2].1.sub(&amp;c_settled).abs();
+                for k_t in &amp;transformed {
+                    let dist = scanners[k2].1.sub(&amp;scanners[*k_t].1).abs();
                     if dist &gt; max_dist {
                         max_dist = dist;
                     }
                 }
 
-                // add center
-                centers.push(d);
+                transformed.push(k2);
             }
         }
 
@@ -6424,10 +6425,19 @@ mod tests {
 <div class="sect4">
 <h5 id="_part_2_15"><a class="anchor" href="#_part_2_15"></a><a class="link" href="#_part_2_15">Part 2</a></h5>
 <div class="paragraph">
-<p>The key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I figured out that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.</p>
+<p>I thought that the key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I figured out that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.</p>
 </div>
 <div class="paragraph">
 <p>Adding the A* heuristic reduced the solution time to &lt;1s for both parts together.</p>
+</div>
+<div class="paragraph">
+<p>After my A* solution worked, I switched it off again and it turned out that the solution still runs in slightly above 1s for part 2. I cannot figure out, what my mistake really was. Implementing A* obviously helped to fix it&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>As an additional optimization, I perform some simple deadlock checks (amphipods that cannot exchange position in the hallway and amphipods that cannot reach their room from the left-most or right-most rooms) prior to adding adjacents to the queue. This saves ~40% runtime, mainly for part 2.</p>
+</div>
+<div class="paragraph">
+<p>I made the use of the A* heuristic and the deadlock check configurable via features <code>a-star</code> and <code>deadlock-check</code> which are both active as default. It turns out that A* does not reduce runtime a lot for part 2 but helps a lot for part 1 while it is the other way around for deadlock checks.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6441,7 +6451,7 @@ mod tests {
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve&lt;B&gt;(start: B) -&gt; usize
 where
-    B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
+    B: Burrow + Ord + Eq + std::hash::Hash + Copy + std::fmt::Debug,
 {
     let mut search = Search::init(start);
 
@@ -6452,10 +6462,10 @@ where
         }
 
         for k in 0..B::LEN {
-            if let Some(p) = burrow.get(k) {
+            if let Some(p) = burrow[k] {
                 let cur_room = B::get_room(k);
                 if cur_room == Some(p)
-                    &amp;&amp; (k + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
+                    &amp;&amp; (k + 1..B::get_room_mx(p)).all(|k_r| burrow[k_r] == Some(p))
                 {
                     // position is settled in room (below are only the pods of the same type)
                     continue;
@@ -6470,14 +6480,14 @@ where
                 }
 
                 while let Some((steps, k_adj)) = stack.pop() {
-                    if burrow.get(k_adj).is_some() {
+                    if burrow[k_adj].is_some() {
                         // cannot move on top of other
                         continue;
                     }
 
                     let adj_room = B::get_room(k_adj);
                     if adj_room == Some(p)
-                        &amp;&amp; (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
+                        &amp;&amp; (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow[k_r] == Some(p))
                     {
                         // move in own room
                         let weight = steps * B::ENERGIES[p as usize];
@@ -6493,8 +6503,10 @@ where
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
-                        // continue search, other positions in the hallway may also be valid adjacents
+                        if !adjacent.is_deadlock() {
+                            search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        }
+                        // continue search, other positions in the hallway may be valid adjacents
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
@@ -6533,27 +6545,25 @@ pub struct BurrowSmall {
     data: [Option&lt;u8&gt;; 11 + 4 * 2],
 }
 
-pub trait Burrow {
+pub trait Burrow: std::ops::Index&lt;usize, Output = Option&lt;u8&gt;&gt; + std::ops::IndexMut&lt;usize&gt; {
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &amp;'static [&amp;'static [usize]];
     const MIN_COST: &amp;'static [[usize; 4]];
     const TARGET: Self;
-
-    fn get(&amp;self, idx: usize) -&gt; Option&lt;u8&gt;;
-    fn set(&amp;mut self, idx: usize, val: Option&lt;u8&gt;);
 }
 
 pub trait BurrowCommon {
     const HALLWAY_LEN: usize;
     const ENERGIES: [usize; 4];
-    fn format(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result;
+    fn format(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result;
     fn is_door(idx: usize) -&gt; bool;
     fn get_room(idx: usize) -&gt; Option&lt;u8&gt;;
     fn get_room_mn(room: u8) -&gt; usize;
     fn get_room_mx(room: u8) -&gt; usize;
     fn move_pod(&amp;mut self, idx_from: usize, idx_to: usize);
     fn get_min_cost(&amp;self) -&gt; usize;
+    fn is_deadlock(&amp;self) -&gt; bool;
 }
 
 impl&lt;B&gt; BurrowCommon for B
@@ -6563,11 +6573,11 @@ where
     const HALLWAY_LEN: usize = 11;
     const ENERGIES: [usize; 4] = [1, 10, 100, 1000];
 
-    fn format(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+    fn format(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
         write!(f, "#############\n")?;
         write!(f, "#")?;
         for k in 0..Self::HALLWAY_LEN {
-            match self.get(k) {
+            match self[k] {
                 Some(0) =&gt; write!(f, "A")?,
                 Some(1) =&gt; write!(f, "B")?,
                 Some(2) =&gt; write!(f, "C")?,
@@ -6585,7 +6595,7 @@ where
             }
 
             for room in 0..4 {
-                match self.get(Self::HALLWAY_LEN + Self::ROOM_LEN * room + row) {
+                match self[Self::HALLWAY_LEN + Self::ROOM_LEN * room + row] {
                     Some(0) =&gt; write!(f, "A#")?,
                     Some(1) =&gt; write!(f, "B#")?,
                     Some(2) =&gt; write!(f, "C#")?,
@@ -6624,21 +6634,22 @@ where
     }
 
     fn move_pod(&amp;mut self, idx_from: usize, idx_to: usize) {
-        assert_eq!(None, self.get(idx_to));
-        self.set(idx_to, self.get(idx_from));
-        self.set(idx_from, None);
+        assert_eq!(None, self[idx_to]);
+        self[idx_to] = self[idx_from];
+        self[idx_from] = None;
     }
 
+    #[cfg(feature = "a-star")]
     fn get_min_cost(&amp;self) -&gt; usize {
         let mut cost = 0;
         for k in 0..Self::LEN {
-            if let Some(p) = self.get(k) {
+            if let Some(p) = self[k] {
                 // lookup minimum cost from table
                 cost += Self::MIN_COST[k][p as usize];
                 if let Some(r) = Self::get_room(k) {
                     if p == r
                         &amp;&amp; (k + 1..Self::get_room_mx(r))
-                            .any(|k| self.get(k).map(|p2| p2 != p).unwrap_or(false))
+                            .any(|k| self[k].map(|p2| p2 != p).unwrap_or(false))
                     {
                         // foreigners below, need to
                         // - move out (+1) and
@@ -6658,6 +6669,53 @@ where
         }
 
         cost
+    }
+
+    #[cfg(not(feature = "a-star"))]
+    fn get_min_cost(&amp;self) -&gt; usize {
+        0
+    }
+
+    #[cfg(feature = "deadlock-check")]
+    fn is_deadlock(&amp;self) -&gt; bool {
+        // pods in hallway which cannot exchange positions
+        if self[3] == Some(3) &amp;&amp; self[5] == Some(0)
+            || self[3] == Some(3) &amp;&amp; self[7] == Some(0)
+            || self[5] == Some(3) &amp;&amp; self[7] == Some(0)
+            || self[5] == Some(3) &amp;&amp; self[7] == Some(1)
+            || self[3] == Some(2) &amp;&amp; self[5] == Some(0)
+        {
+            return true;
+        }
+
+        // pods in left most room which cannot reach any other room
+        if self[1].is_some()
+            &amp;&amp; self[3] == Some(0)
+            &amp;&amp; (Self::get_room_mn(0)..Self::get_room_mx(0))
+                .filter_map(|k| self[k])
+                .max()
+                .map_or(false, |mx| mx &gt; 0)
+        {
+            return true;
+        }
+
+        // pods in rightmost room which cannto reach any other room
+        if self[9].is_some()
+            &amp;&amp; self[7] == Some(3)
+            &amp;&amp; (Self::get_room_mn(3)..Self::get_room_mx(3))
+                .filter_map(|k| self[k])
+                .min()
+                .map_or(false, |mn| mn &lt; 3)
+        {
+            return true;
+        }
+
+        false
+    }
+
+    #[cfg(not(feature = "deadlock-check"))]
+    fn is_deadlock(&amp;self) -&gt; bool {
+        false
     }
 }
 
@@ -6762,14 +6820,6 @@ impl Burrow for BurrowLarge {
         [13, 110, 900, 1000],
         [14, 120, 1000, 0],
     ];
-
-    fn get(&amp;self, idx: usize) -&gt; Option&lt;u8&gt; {
-        self.data[idx]
-    }
-
-    fn set(&amp;mut self, idx: usize, val: Option&lt;u8&gt;) {
-        self.data[idx] = val;
-    }
 }
 
 impl Burrow for BurrowSmall {
@@ -6849,37 +6899,57 @@ impl Burrow for BurrowSmall {
         [9, 70, 500, 1000],
         [10, 80, 600, 0],
     ];
-
-    fn get(&amp;self, idx: usize) -&gt; Option&lt;u8&gt; {
-        self.data[idx]
-    }
-
-    fn set(&amp;mut self, idx: usize, val: Option&lt;u8&gt;) {
-        self.data[idx] = val;
-    }
 }
 
-impl fmt::Debug for BurrowSmall {
-    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+impl std::fmt::Debug for BurrowSmall {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Display for BurrowSmall {
-    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+impl std::fmt::Display for BurrowSmall {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Debug for BurrowLarge {
-    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+impl std::ops::Index&lt;usize&gt; for BurrowSmall {
+    type Output = Option&lt;u8&gt;;
+
+    fn index(&amp;self, index: usize) -&gt; &amp;Self::Output {
+        &amp;self.data[index]
+    }
+}
+
+impl std::ops::IndexMut&lt;usize&gt; for BurrowSmall {
+    fn index_mut(&amp;mut self, index: usize) -&gt; &amp;mut Self::Output {
+        &amp;mut self.data[index]
+    }
+}
+
+impl std::fmt::Debug for BurrowLarge {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Display for BurrowLarge {
-    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+impl std::fmt::Display for BurrowLarge {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
         self.format(f)
+    }
+}
+
+impl std::ops::Index&lt;usize&gt; for BurrowLarge {
+    type Output = Option&lt;u8&gt;;
+
+    fn index(&amp;self, index: usize) -&gt; &amp;Self::Output {
+        &amp;self.data[index]
+    }
+}
+
+impl std::ops::IndexMut&lt;usize&gt; for BurrowLarge {
+    fn index_mut(&amp;mut self, index: usize) -&gt; &amp;mut Self::Output {
+        &amp;mut self.data[index]
     }
 }
 
@@ -6982,7 +7052,7 @@ pub struct Search&lt;T&gt; {
 
 impl&lt;T&gt; Search&lt;T&gt;
 where
-    T: Eq + Ord + Hash + Copy + fmt::Debug,
+    T: Eq + Ord + std::hash::Hash + Copy + std::fmt::Debug,
 {
     pub fn init(start: T) -&gt; Self {
         let mut search = Self {
@@ -7216,7 +7286,6 @@ mod tests {
         assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
     }
 
-
     #[test]
     fn test_get_min_cost() {
         let burrow = BurrowLarge::from(parse(
@@ -7237,7 +7306,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_today_i_learned_10"><a class="anchor" href="#_today_i_learned_10"></a><a class="link" href="#_today_i_learned_10">Today I learned</a></h5>
 <div class="paragraph">
-<p>A* can be very helpful compared to plain Dijkstra!</p>
+<p>A* can be very helpful compared to plain Dijkstra! But it is even more helpful to implemenent the basic Dijkstra correctly.</p>
 </div>
 <div class="paragraph">
 <p>I think this was the first time I created what Rust calls "blanket implementations".</p>
@@ -7254,46 +7323,73 @@ mod tests {
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/24">AoC|2021|24</a>.</p>
 </div>
 <div class="paragraph">
-<p>I don&#8217;t get the idea of today&#8217;s puzzle. I essentially solved it manually.</p>
+<p>I don&#8217;t get the idea of today&#8217;s puzzle. I essentially solved it manually. From my point of view, a well posed problem allows to implement a solution without looking at the puzzle input data and than compute a solution based on the puzzle input. For today&#8217;s problem, I don&#8217;t think there is a way to find a solution without analyzing the puzzle input.</p>
 </div>
 <div class="paragraph">
-<p>I reverse engineered the MONAD (puzzle input) to figure out that an offset is added to each digit and the digits are then processed in a kind of 26 based system (using <code>mul a 26</code>, <code>div a 26</code> and <code>mod a 26</code> repeatedly) in 14 blocks of instructions (one for every input digit).</p>
+<p>I reverse engineered the MONAD (puzzle input) to figure out what actually happens. The content in variable z can essentially be interpreted as a stack od input digits with offsets. To add stack elements, the current content is multiplied with 26 (in case of my puzzle input) and than the next element is added. This constrains an element to be in the range 0 to 25 (inclusive). Since input digits are in the range 0 to 9 (inclusive), offsets shall be in the range 0 to 16 (inclusive).</p>
 </div>
 <div class="paragraph">
-<p>In every block, there is a condition (<code>eql a b</code> instructions), controlling whether a 26-based digit is added to <code>z</code>. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to <code>z</code> if <code>dX != dY + c</code>". In order for the final result to be zero, digits shall not be added, which is the case if the constraint <code>dX = dY + c</code> is satisfied (<code>dX</code> and <code>dY</code> are digits of the serial number to check, <code>c</code> is an offset). This results in seven bounds <code>dX &#8656; 9 - c</code> for a serial number to be valid.</p>
+<p>The MONAD contains of 14 blocks (one for every input digit), which evaluate a condition and based on the outcome push a new element to the stack (the z variable).</p>
+</div>
+<div class="paragraph">
+<p>In seven of the blocks, the condition evaluates to true independently of the input digit. In the remaining seven blocks, a new element is pushed to the stack if <code>dX != dY + o</code>. For stack to be empty at the end and thus the variable <code>z</code> to equal zero, elements shall not be pushed to the stack, i.e., <code>dX = dY + o</code>, where <code>dX</code> and <code>dY</code> are digits of the serial number to be checked and <code>o &gt;= 0</code> is an offset.</p>
+</div>
+<div class="paragraph">
+<p>For the equalities to be satisfied, <code>dY &gt;= 1</code> and <code>dY &#8656; 9 - o</code> need to be satisfied.</p>
 </div>
 <div class="sect4">
 <h5 id="_solution_6"><a class="anchor" href="#_solution_6"></a><a class="link" href="#_solution_6">Solution</a></h5>
 <div class="paragraph">
-<p>After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only):</p>
+<p>After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only).</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_constraints(instructions: &amp;[Instruction]) -&gt; Vec&lt;(usize, usize, isize)&gt; {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const DIGIT_MIN: Val = 1;
+pub const DIGIT_MAX: Val = 9;
+
+pub const INPUT_LEN: usize = 14;
+
+pub fn get_constraints(instructions: &amp;[Inst]) -&gt; Vec&lt;(usize, usize, Val)&gt; {
     let block_starts = instructions
         .iter()
         .enumerate()
-        .filter(|(_, i)| i == &amp;&amp;Instruction::Inp(0))
+        .filter(|(_, i)| i == &amp;&amp;Inst::Inp(Var::W))
         .map(|(k, _)| k)
         .collect::&lt;Vec&lt;_&gt;&gt;();
 
-    assert_eq!(14, block_starts.len());
+    assert_eq!(INPUT_LEN, block_starts.len());
 
-    // z holds elements (n, o) where n is an input number and o as an offset
+    // determine module used to build stack
+    let module = instructions
+        .iter()
+        .filter_map(|i| {
+            if let Inst::Mod(Var::X, Op::Val(m)) = i {
+                Some(*m)
+            } else {
+                None
+            }
+        })
+        .next()
+        .expect("No module");
+
+    // stack of elements (n, o) where n is an input number and o an offset
     // the actual value of the z variable will be
-    // z.iter().fold(0, |z, (n, o)| z * 26 + input[n] + o);
-    let mut z: Vec&lt;(usize, isize)&gt; = Vec::with_capacity(14);
+    // stack.iter().fold(0, |z, (n, o)| z * module + input[n] + o);
+    let mut stack: Vec&lt;(usize, Val)&gt; = Vec::with_capacity(INPUT_LEN);
+
     // constraints holds elements (n1, n2, o) and represents a constraint
     // input[n1] == input[n2] + o, which needs to be satisfied for a valid serial number
-    let mut constraints = Vec::with_capacity(7);
-    for (n, k) in block_starts.iter().enumerate() {
-        // take last digit of z
+    let mut constraints = Vec::with_capacity(INPUT_LEN / 2);
+
+    // iterate over blocks
+    for (n1, k) in block_starts.iter().enumerate() {
+        // take last element of stack
         // a single 'div z a' instruction is expected per block where a is either
-        // 26 or 1. In case of a == 26, the last element from z is removed
-        let d = if instructions[*k..]
+        // the module or 1. In case of a == module, the last element from z is removed
+        let element = if instructions[*k..]
             .iter()
             .filter_map(|i| {
-                if let Instruction::Div(3, Value::Val(div)) = i {
+                if let Inst::Div(Var::Z, Op::Val(div)) = i {
                     Some(*div)
                 } else {
                     None
@@ -7301,223 +7397,259 @@ mod tests {
             })
             .next()
             .expect("No div")
-            == 26
+            == module
         {
             // z is divided by 26, pop element
-            z.pop()
+            stack.pop()
         } else {
             // z is divided by 1, peek element
-            z.last().map(|d| *d)
+            stack.last().map(|e| *e)
         };
 
         // a single instruction 'add x a' where a is a literal value is expected in a block
         // the value a is used to build the condition
-        let check_off = instructions[*k..]
+        let off = instructions[*k..]
             .iter()
             .filter_map(|i| {
-                if let Instruction::Add(1, Value::Val(off)) = i {
-                    Some(*off)
+                if let Inst::Add(Var::X, Op::Val(o)) = i {
+                    Some(*o)
                 } else {
                     None
                 }
             })
             .next()
             .expect("No check offset");
-        // the actual condition offset is the offset from the last element from z + the condition offset
-        let off = d.map(|(_, off)| off + check_off).unwrap_or(check_off);
 
-        if off &gt; -9 &amp;&amp; off &lt; 9 {
+        // the actual condition offset is the offset from the last element from stack + the
+        // condition offset
+        let off = element.map(|(_, o)| off + o).unwrap_or(off);
+
+        if off &gt; -DIGIT_MAX &amp;&amp; off &lt; DIGIT_MAX {
             // if the offset is greater than -9 and less than 9, this results in a constraint comparing
-            // two inputs input[n] = input[n1] + off. This is only valid, if there was a last element in z
-            let (n1, _) = d.expect("Condition but no digit to compare");
-            // normalize constraint to positive offsets
-            constraints.push(if off &gt; 0 { (n, n1, off) } else { (n1, n, -off) });
+            // two inputs input[n] = input[n1] + off. This is only valid, if there was a last element on
+            // stack
+            let (n2, _) = element.expect("Condition but no input digit to compare");
 
-            // if constraint is satisfied, no additional element will be added to z
+            // normalize constraint to positive offsets
+            constraints.push(if off &gt; 0 {
+                (n1, n2, off)
+            } else {
+                (n2, n1, -off)
+            });
+
+            // if constraint is satisfied, no additional element will be added to stack
         } else {
-            // the condition check outcome is independent of the input values, add next element to z
+            // the condition check outcome is independent of the input values, add next element to stack
             // there will be one instruction 'add y w' followed by an instruction 'add y a' where
             // a is a literal value representing an offset
             let k_add = instructions[*k..]
                 .iter()
-                .position(|i| i == &amp;Instruction::Add(2, Value::Var(0)))
+                .position(|i| i == &amp;Inst::Add(Var::Y, Op::Var(Var::W)))
                 .expect("input is not copied to y");
-            if let Instruction::Add(2, Value::Val(off)) = instructions[*k + k_add + 1] {
-                z.push((n, off));
+
+            if let Inst::Add(Var::Y, Op::Val(off)) = instructions[*k + k_add + 1] {
+                assert!(off &gt;= 0 &amp;&amp; off &lt; module - DIGIT_MAX, "Input does not fit");
+                stack.push((n1, off));
             } else {
-                panic!("No offset added to digit {}", n);
+                panic!("No offset added to digit {}", n1);
             }
         }
     }
 
-    // expect 7 constraints and z empty (equal to 0)
-    assert_eq!(7, constraints.len());
-    assert!(z.is_empty());
-
-    // sort for easier comparison
-    constraints.sort_unstable();
+    // expect 7 constraints and stack empty (z equal to 0)
+    assert_eq!(INPUT_LEN / 2, constraints.len());
+    assert!(stack.is_empty());
 
     constraints
 }
 
-pub fn solution_1(instructions: &amp;[Instruction]) -&gt; isize {
-    let constraints = get_constraints(instructions);
-    let mut inputs = vec![0; 14];
-    for (_, n2, o) in &amp;constraints {
-        inputs[*n2] = 9 - o;
-    }
-    for (n1, n2, o) in &amp;constraints {
-        inputs[*n1] = inputs[*n2] + o;
+pub fn solution_1(instructions: &amp;[Inst]) -&gt; usize {
+    let inputs = &amp;mut [0; INPUT_LEN];
+    for (n1, n2, o) in get_constraints(instructions) {
+        inputs[n1] = DIGIT_MAX;
+        inputs[n2] = DIGIT_MAX - o;
     }
 
-    assert_eq!(Some(0), eval(instructions, &amp;inputs));
+    assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
 }
 
-pub fn solution_2(instructions: &amp;[Instruction]) -&gt; isize {
-    let constraints = get_constraints(instructions);
-    let mut inputs = vec![0; 14];
-    for (_, n2, _) in &amp;constraints {
-        inputs[*n2] = 1;
-    }
-    for (n1, n2, o) in &amp;constraints {
-        inputs[*n1] = inputs[*n2] + o;
+pub fn solution_2(instructions: &amp;[Inst]) -&gt; usize {
+    let inputs = &amp;mut [0; INPUT_LEN];
+    for (n1, n2, o) in get_constraints(instructions) {
+        inputs[n1] = DIGIT_MIN + o;
+        inputs[n2] = DIGIT_MIN;
     }
 
-    assert_eq!(Some(0), eval(instructions, &amp;inputs));
+    assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
 }</code></pre>
 </div>
 </div>
+</div>
+<div class="sect4">
+<h5 id="_traits_index_and_implementation"><a class="anchor" href="#_traits_index_and_implementation"></a><a class="link" href="#_traits_index_and_implementation">Traits, Index and implementation</a></h5>
 <div class="paragraph">
-<p>I still implemented instruction evaluation and use this to verify my solution</p>
+<p>I wanted to learn something today, so I implemented Instructions using structs, traits and enums. This allows to have all range checks done at compile time.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug, PartialEq, Eq)]
-pub enum Instruction {
-    Inp(usize),
-    Add(usize, Value),
-    Mul(usize, Value),
-    Div(usize, Value),
-    Mod(usize, Value),
-    Eql(usize, Value),
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// Value type
+pub type Val = i32;
+/// Memory of variables
+pub type Memory = [Val; 4];
+
+/// Variable
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Var {
+    W,
+    X,
+    Y,
+    Z,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub enum Value {
-    Var(usize),
-    Val(isize),
-}
+impl std::ops::Index&lt;Var&gt; for Memory {
+    type Output = Val;
 
-impl Value {
-    pub fn eval(&amp;self, vars: &amp;[isize; 4]) -&gt; isize {
-        match self {
-            Value::Var(v) =&gt; vars[*v],
-            Value::Val(v) =&gt; *v,
+    fn index(&amp;self, index: Var) -&gt; &amp;Self::Output {
+        match index {
+            Var::W =&gt; &amp;self[0],
+            Var::X =&gt; &amp;self[1],
+            Var::Y =&gt; &amp;self[2],
+            Var::Z =&gt; &amp;self[3],
         }
     }
 }
 
-impl Instruction {
-    pub fn parse(line: &amp;str) -&gt; Self {
-        let mut parts = line.trim().split(" ");
-        let name = parts.next().expect("No name in instruction");
-        let first = match parts.next().expect("No first part") {
-            "w" =&gt; 0,
-            "x" =&gt; 1,
-            "y" =&gt; 2,
-            "z" =&gt; 3,
-            _ =&gt; panic!("Illegal first part in '{}'", line),
-        };
-        let second = parts.next().map(|second| match second {
-            "w" =&gt; Value::Var(0),
-            "x" =&gt; Value::Var(1),
-            "y" =&gt; Value::Var(2),
-            "z" =&gt; Value::Var(3),
-            _ =&gt; Value::Val(second.parse().expect("Could not parse value")),
-        });
+impl std::ops::IndexMut&lt;Var&gt; for Memory {
+    fn index_mut(&amp;mut self, index: Var) -&gt; &amp;mut Self::Output {
+        match index {
+            Var::W =&gt; &amp;mut self[0],
+            Var::X =&gt; &amp;mut self[1],
+            Var::Y =&gt; &amp;mut self[2],
+            Var::Z =&gt; &amp;mut self[3],
+        }
+    }
+}
+
+impl std::str::FromStr for Var {
+    type Err = ();
+
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        match s {
+            "w" =&gt; Ok(Var::W),
+            "x" =&gt; Ok(Var::X),
+            "y" =&gt; Ok(Var::Y),
+            "z" =&gt; Ok(Var::Z),
+            _ =&gt; Err(()),
+        }
+    }
+}
+
+/// Second operand (Variable or Literal)
+#[derive(Debug, PartialEq, Eq)]
+pub enum Op {
+    Var(Var),
+    Val(Val),
+}
+
+impl Op {
+    /// evaluate operand
+    pub fn eval(&amp;self, vars: &amp;Memory) -&gt; Val {
+        match self {
+            Op::Var(v) =&gt; vars[*v],
+            Op::Val(v) =&gt; *v,
+        }
+    }
+}
+
+impl std::str::FromStr for Op {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        if let Ok(v) = s.parse() {
+            Ok(Op::Var(v))
+        } else {
+            s.parse().map(|v| Op::Val(v))
+        }
+    }
+}
+
+/// instruction
+#[derive(Debug, PartialEq, Eq)]
+pub enum Inst {
+    Inp(Var),
+    Add(Var, Op),
+    Mul(Var, Op),
+    Div(Var, Op),
+    Mod(Var, Op),
+    Eql(Var, Op),
+}
+
+impl Inst {
+    /// execute instruction
+    pub fn execute(&amp;self, vars: &amp;mut Memory, inputs: &amp;mut impl Iterator&lt;Item = Val&gt;) {
+        match self {
+            Inst::Inp(v1) =&gt; vars[*v1] = inputs.next().expect("No input"),
+            Inst::Add(v1, v2) =&gt; vars[*v1] += v2.eval(vars),
+            Inst::Mul(v1, v2) =&gt; vars[*v1] *= v2.eval(vars),
+            Inst::Div(v1, v2) =&gt; vars[*v1] /= v2.eval(vars),
+            Inst::Mod(v1, v2) =&gt; vars[*v1] = vars[*v1] % v2.eval(vars),
+            Inst::Eql(v1, v2) =&gt; vars[*v1] = (vars[*v1] == v2.eval(vars)) as Val,
+        }
+    }
+}
+
+impl std::str::FromStr for Inst {
+    type Err = Box&lt;dyn std::error::Error&gt;;
+
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        let mut parts = s.trim().split(" ");
+
+        let name = parts
+            .next()
+            .ok_or_else(|| format!("'{}' contains no name part", s))?;
+        let first = parts
+            .next()
+            .ok_or_else(|| format!("'{}' contains no first operand", s))?
+            .parse()
+            .map_err(|()| format!("First part of '{}' is not a variable", s))?;
+        let second = parts.next().map_or(Ok(None), |s| s.parse().map(Some))?;
+        let second = || second.ok_or_else(|| format!("'{}' contains no second operand", s));
 
         match name {
-            "inp" =&gt; Self::Inp(first),
-            "add" =&gt; Self::Add(first, second.expect("No second part")),
-            "mul" =&gt; Self::Mul(first, second.expect("No second part")),
-            "div" =&gt; Self::Div(first, second.expect("No second part")),
-            "mod" =&gt; Self::Mod(first, second.expect("No second part")),
-            "eql" =&gt; Self::Eql(first, second.expect("No second part")),
-            _ =&gt; panic!("Illegal name in '{}'", line),
-        }
-    }
-
-    pub fn eval(&amp;self, vars: &amp;mut [isize; 4], inputs: &amp;mut impl Iterator&lt;Item = isize&gt;) -&gt; bool {
-        match self {
-            Instruction::Inp(v1) =&gt; {
-                if let Some(v) = inputs.next() {
-                    vars[*v1] = v;
-                    true
-                } else {
-                    false
-                }
-            }
-            Instruction::Add(v1, v2) =&gt; {
-                vars[*v1] += v2.eval(&amp;vars);
-                true
-            }
-            Instruction::Mul(v1, v2) =&gt; {
-                vars[*v1] *= v2.eval(&amp;vars);
-                true
-            }
-            Instruction::Div(v1, v2) =&gt; {
-                let v = v2.eval(&amp;vars);
-                if v != 0 {
-                    vars[*v1] /= v;
-                    true
-                } else {
-                    false
-                }
-            }
-            Instruction::Mod(v1, v2) =&gt; {
-                let val1 = vars[*v1];
-                let val2 = v2.eval(&amp;vars);
-                if val1 &gt;= 0 &amp;&amp; val2 &gt; 0 {
-                    vars[*v1] = val1 % val2;
-                    true
-                } else {
-                    false
-                }
-            }
-            Instruction::Eql(v1, v2) =&gt; {
-                vars[*v1] = (vars[*v1] == v2.eval(&amp;vars)) as isize;
-                true
-            }
+            "inp" =&gt; Ok(Self::Inp(first)),
+            "add" =&gt; Ok(Self::Add(first, second()?)),
+            "mul" =&gt; Ok(Self::Mul(first, second()?)),
+            "div" =&gt; Ok(Self::Div(first, second()?)),
+            "mod" =&gt; Ok(Self::Mod(first, second()?)),
+            "eql" =&gt; Ok(Self::Eql(first, second()?)),
+            _ =&gt; Err(format!("'{}' is not a valid instruction name", name))?,
         }
     }
 }
 
-pub fn parse(content: &amp;str) -&gt; Vec&lt;Instruction&gt; {
-    content
-        .lines()
-        .map(|line| Instruction::parse(line))
-        .collect()
+/// parse lines to instructions
+pub fn parse(content: &amp;str) -&gt; Vec&lt;Inst&gt; {
+    content.lines().map(|line| line.parse().unwrap()).collect()
 }
 
-pub fn eval(instructions: &amp;[Instruction], inputs: &amp;[isize]) -&gt; Option&lt;isize&gt; {
-    let mut vars = [0; 4];
-    let mut inputs = inputs.iter().map(|v| *v);
+/// execute instructions
+pub fn execute(instructions: &amp;[Inst], inputs: &amp;[Val]) -&gt; Val {
+    let mut vars = Memory::default();
+    let mut inputs = inputs.iter().copied();
     for instruction in instructions {
-        if !instruction.eval(&amp;mut vars, &amp;mut inputs) {
-            return None;
-        }
+        instruction.execute(&amp;mut vars, &amp;mut inputs)
     }
-    Some(vars[3])
+    vars[Var::Z]
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>and I also have a test for the <code>parse</code> function</p>
 </div>
+<div class="sect4">
+<h5 id="_tests_23"><a class="anchor" href="#_tests_23"></a><a class="link" href="#_tests_23">Tests</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
@@ -7528,11 +7660,11 @@ mod tests {
         inp x
         mul z 3
         eql z x";
-    const INSTRUCTIONS: &amp;[Instruction] = &amp;[
-        Instruction::Inp(3),
-        Instruction::Inp(1),
-        Instruction::Mul(3, Value::Val(3)),
-        Instruction::Eql(3, Value::Var(1)),
+    const INSTRUCTIONS: &amp;[Inst] = &amp;[
+        Inst::Inp(Var::Z),
+        Inst::Inp(Var::X),
+        Inst::Mul(Var::Z, Op::Val(3)),
+        Inst::Eql(Var::Z, Op::Var(Var::X)),
     ];
 
     #[test]
@@ -7566,20 +7698,28 @@ mod tests {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; (Vec&lt;char&gt;, usize) {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn parse(content: &amp;str) -&gt; (Vec&lt;C&gt;, usize) {
     let w = content.lines().next().expect("No content").trim().len();
-    let grid = content.chars().filter(|c| !c.is_whitespace()).collect();
+    let grid = content
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .map(|c| match c {
+            '&gt;' =&gt; 1,
+            'v' =&gt; 2,
+            _ =&gt; 0,
+        })
+        .collect();
     (grid, w)
 }</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const E: char = '&gt;';
-pub const S: char = 'v';
-pub const X: char = '.';
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub const E: C = 1;
+pub const S: C = 2;
+pub const X: C = 0;
 
-pub fn step(grid: &amp;[char], w: usize) -&gt; Option&lt;Vec&lt;char&gt;&gt; {
+pub fn step(grid: &amp;[C], w: usize) -&gt; Option&lt;Vec&lt;C&gt;&gt; {
     let mut grid_upd = vec![X; grid.len()];
     let mut moved = false;
 
@@ -7614,20 +7754,19 @@ pub fn step(grid: &amp;[char], w: usize) -&gt; Option&lt;Vec&lt;char&gt;&gt; {
     }
 }
 
-pub fn solution_1(grid: &amp;[char], w: usize) -&gt; usize {
-    let mut grid = grid.to_owned();
-    let mut count = 0;
+pub fn solution_1(mut grid: Vec&lt;C&gt;, w: usize) -&gt; usize {
+    let mut count = 1;
     while let Some(upd) = step(&amp;grid, w) {
         grid = upd;
         count += 1;
     }
-    count + 1
+    count
 }</code></pre>
 </div>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_tests_23"><a class="anchor" href="#_tests_23"></a><a class="link" href="#_tests_23">Tests</a></h5>
+<h5 id="_tests_24"><a class="anchor" href="#_tests_24"></a><a class="link" href="#_tests_24">Tests</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
@@ -7662,7 +7801,7 @@ mod tests {
         ..v...&gt;v.&gt;
         .vv..v&gt;vv.";
 
-    const GRID_00: &amp;[char] = &amp;[
+    const GRID_00: &amp;[C] = &amp;[
         S, X, X, X, E, E, X, S, S, E, X, S, S, E, E, X, S, S, X, X, E, E, X, E, S, E, X, X, X, S,
         E, E, S, E, E, X, E, X, S, X, S, E, S, X, S, S, X, S, X, X, E, X, E, E, X, X, S, X, X, X,
         X, S, S, X, X, E, X, E, S, X, S, X, S, X, X, E, E, S, X, S, X, X, X, X, S, X, X, S, X, E,
@@ -7693,7 +7832,7 @@ mod tests {
 
     #[test]
     fn test_solution_1() {
-        assert_eq!(58, solution_1(GRID_00, W));
+        assert_eq!(58, solution_1(GRID_00.to_owned(), W));
     }
 }</code></pre>
 </div>
