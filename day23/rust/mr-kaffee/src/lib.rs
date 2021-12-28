@@ -106,6 +106,7 @@ where
         self[idx_from] = None;
     }
 
+    #[cfg(feature = "a-star")]
     fn get_min_cost(&self) -> usize {
         let mut cost = 0;
         for k in 0..Self::LEN {
@@ -137,6 +138,12 @@ where
         cost
     }
 
+    #[cfg(not(feature = "a-star"))]
+    fn get_min_cost(&self) -> usize {
+        0
+    }
+
+    #[cfg(feature = "deadlock-check")]
     fn is_deadlock(&self) -> bool {
         // pods in hallway which cannot exchange positions
         if self[3] == Some(3) && self[5] == Some(0)
@@ -170,6 +177,11 @@ where
             return true;
         }
 
+        false
+    }
+
+    #[cfg(not(feature = "deadlock-check"))]
+    fn is_deadlock(&self) -> bool {
         false
     }
 }
