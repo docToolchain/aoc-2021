@@ -9,7 +9,7 @@ fn main() {
     let (grid, w) = parse(INPUT);
 
     let timer_1 = Instant::now();
-    let sol_1 = solution_1(&grid, w);
+    let sol_1 = solution_1(grid, w);
     println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
     assert_eq!(EXP_1, sol_1);
 

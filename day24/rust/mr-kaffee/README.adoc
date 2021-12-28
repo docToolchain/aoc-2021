@@ -2,29 +2,35 @@
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/24[AoC|2021|24].
 
-I don't get the idea of today's puzzle. I essentially solved it manually.
+I don't get the idea of today's puzzle. I essentially solved it manually. From my point of view, a well posed problem allows to implement a solution without looking at the puzzle input data and than compute a solution based on the puzzle input. For today's problem, I don't think there is a way to find a solution without analyzing the puzzle input.
 
-I reverse engineered the MONAD (puzzle input) to figure out that an offset is added to each digit and the digits are then processed in a kind of 26 based system (using ``mul a 26``, ``div a 26`` and ``mod a 26`` repeatedly) in 14 blocks of instructions (one for every input digit). 
+I reverse engineered the MONAD (puzzle input) to figure out what actually happens. The content in variable z can essentially be interpreted as a stack od input digits with offsets. To add stack elements, the current content is multiplied with 26 (in case of my puzzle input) and than the next element is added. This constrains an element to be in the range 0 to 25 (inclusive). Since input digits are in the range 0 to 9 (inclusive), offsets shall be in the range 0 to 16 (inclusive).
 
-In every block, there is a condition (``eql a b`` instructions), controlling whether a 26-based digit is added to ``z``. In seven of the blocks, the condition is always true for valid inputs (1 to 9). In the other seven blocks, the condition results in something of the form "26 based digit is added to ``z`` if ``dX != dY + c``". In order for the final result to be zero, digits shall not be added, which is the case if the constraint ``dX = dY + c`` is satisfied (``dX`` and ``dY`` are digits of the serial number to check, ``c`` is an offset). This results in seven bounds ``dX <= 9 - c`` for a serial number to be valid.
+The MONAD contains of 14 blocks (one for every input digit), which evaluate a condition and based on the outcome push a new element to the stack (the z variable).
+
+In seven of the blocks, the condition evaluates to true independently of the input digit. In the remaining seven blocks, a new element is pushed to the stack if ``dX != dY + o``. For stack to be empty at the end and thus the variable ``z`` to equal zero, elements shall not be pushed to the stack, i.e., ``dX = dY + o``, where ``dX`` and ``dY`` are digits of the serial number to be checked and ``o >= 0`` is an offset.
+
+For the equalities to be satisfied, ``dY >= 1`` and ``dY <= 9 - o`` need to be satisfied.
 
 === Solution ===
 
-After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only):
+After I had the solution, I put into code what I did manually (so it might work for other inputs assuming they differ in the offsets only).
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=solution]
 ----
 
-I still implemented instruction evaluation and use this to verify my solution
+=== Traits, Index and implementation ===
+
+I wanted to learn something today, so I implemented Instructions using structs, traits and enums. This allows to have all range checks done at compile time.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=instructions]
 ----
 
-and I also have a test for the ``parse`` function
+=== Tests ===
 
 [source,rust,numbered]
 ----

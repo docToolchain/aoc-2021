@@ -16,9 +16,15 @@ After all bugs fixed, I had a solution which solved part 1 in ~15 seconds and di
 
 === Part 2 ===
 
-The key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I figured out that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.
+I thought that the key to also solve part 2 in reasonable time and with reasonable memory requirements was to switch from Dijkstra to A*. As an heuristic for the remaining cost, I add all the energies required to move to the target position neglecting all amphipods in the way. For amphipods that already sit in their target room but have amphipods of other types below them, I add the cost for moving out of the room and in again. I figured out that A* might help a lot when manually solving part 1 and realizing that the actual cost was only very little above that lower bound.
 
 Adding the A* heuristic reduced the solution time to <1s for both parts together.
+
+After my A* solution worked, I switched it off again and it turned out that the solution still runs in slightly above 1s for part 2. I cannot figure out, what my mistake really was. Implementing A* obviously helped to fix it...
+
+As an additional optimization, I perform some simple deadlock checks (amphipods that cannot exchange position in the hallway and amphipods that cannot reach their room from the left-most or right-most rooms) prior to adding adjacents to the queue. This saves ~40% runtime, mainly for part 2.
+
+I made the use of the A* heuristic and the deadlock check configurable via features ``a-star`` and ``deadlock-check`` which are both active as default. It turns out that A* does not reduce runtime a lot for part 2 but helps a lot for part 1 while it is the other way around for deadlock checks.
 
 === Implementation ===
 
@@ -60,6 +66,6 @@ include::src/lib.rs[tags=tests]
 
 === Today I learned ===
 
-A* can be very helpful compared to plain Dijkstra!
+A* can be very helpful compared to plain Dijkstra! But it is even more helpful to implemenent the basic Dijkstra correctly.
 
 I think this was the first time I created what Rust calls "blanket implementations".

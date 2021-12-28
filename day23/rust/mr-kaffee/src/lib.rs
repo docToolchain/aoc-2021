@@ -1,9 +1,5 @@
 #![feature(map_first_last)]
-use std::{
-    collections::{BTreeSet, HashMap, HashSet, VecDeque},
-    fmt,
-    hash::Hash,
-};
+use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 
 // tag::burrow[]
 #[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
@@ -16,27 +12,25 @@ pub struct BurrowSmall {
     data: [Option<u8>; 11 + 4 * 2],
 }
 
-pub trait Burrow {
+pub trait Burrow: std::ops::Index<usize, Output = Option<u8>> + std::ops::IndexMut<usize> {
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &'static [&'static [usize]];
     const MIN_COST: &'static [[usize; 4]];
     const TARGET: Self;
-
-    fn get(&self, idx: usize) -> Option<u8>;
-    fn set(&mut self, idx: usize, val: Option<u8>);
 }
 
 pub trait BurrowCommon {
     const HALLWAY_LEN: usize;
     const ENERGIES: [usize; 4];
-    fn format(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+    fn format(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn is_door(idx: usize) -> bool;
     fn get_room(idx: usize) -> Option<u8>;
     fn get_room_mn(room: u8) -> usize;
     fn get_room_mx(room: u8) -> usize;
     fn move_pod(&mut self, idx_from: usize, idx_to: usize);
     fn get_min_cost(&self) -> usize;
+    fn is_deadlock(&self) -> bool;
 }
 
 impl<B> BurrowCommon for B
@@ -46,11 +40,11 @@ where
     const HALLWAY_LEN: usize = 11;
     const ENERGIES: [usize; 4] = [1, 10, 100, 1000];
 
-    fn format(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn format(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "#############\n")?;
         write!(f, "#")?;
         for k in 0..Self::HALLWAY_LEN {
-            match self.get(k) {
+            match self[k] {
                 Some(0) => write!(f, "A")?,
                 Some(1) => write!(f, "B")?,
                 Some(2) => write!(f, "C")?,
@@ -68,7 +62,7 @@ where
             }
 
             for room in 0..4 {
-                match self.get(Self::HALLWAY_LEN + Self::ROOM_LEN * room + row) {
+                match self[Self::HALLWAY_LEN + Self::ROOM_LEN * room + row] {
                     Some(0) => write!(f, "A#")?,
                     Some(1) => write!(f, "B#")?,
                     Some(2) => write!(f, "C#")?,
@@ -107,21 +101,22 @@ where
     }
 
     fn move_pod(&mut self, idx_from: usize, idx_to: usize) {
-        assert_eq!(None, self.get(idx_to));
-        self.set(idx_to, self.get(idx_from));
-        self.set(idx_from, None);
+        assert_eq!(None, self[idx_to]);
+        self[idx_to] = self[idx_from];
+        self[idx_from] = None;
     }
 
+    #[cfg(feature = "a-star")]
     fn get_min_cost(&self) -> usize {
         let mut cost = 0;
         for k in 0..Self::LEN {
-            if let Some(p) = self.get(k) {
+            if let Some(p) = self[k] {
                 // lookup minimum cost from table
                 cost += Self::MIN_COST[k][p as usize];
                 if let Some(r) = Self::get_room(k) {
                     if p == r
                         && (k + 1..Self::get_room_mx(r))
-                            .any(|k| self.get(k).map(|p2| p2 != p).unwrap_or(false))
+                            .any(|k| self[k].map(|p2| p2 != p).unwrap_or(false))
                     {
                         // foreigners below, need to
                         // - move out (+1) and
@@ -141,6 +136,53 @@ where
         }
 
         cost
+    }
+
+    #[cfg(not(feature = "a-star"))]
+    fn get_min_cost(&self) -> usize {
+        0
+    }
+
+    #[cfg(feature = "deadlock-check")]
+    fn is_deadlock(&self) -> bool {
+        // pods in hallway which cannot exchange positions
+        if self[3] == Some(3) && self[5] == Some(0)
+            || self[3] == Some(3) && self[7] == Some(0)
+            || self[5] == Some(3) && self[7] == Some(0)
+            || self[5] == Some(3) && self[7] == Some(1)
+            || self[3] == Some(2) && self[5] == Some(0)
+        {
+            return true;
+        }
+
+        // pods in left most room which cannot reach any other room
+        if self[1].is_some()
+            && self[3] == Some(0)
+            && (Self::get_room_mn(0)..Self::get_room_mx(0))
+                .filter_map(|k| self[k])
+                .max()
+                .map_or(false, |mx| mx > 0)
+        {
+            return true;
+        }
+
+        // pods in rightmost room which cannto reach any other room
+        if self[9].is_some()
+            && self[7] == Some(3)
+            && (Self::get_room_mn(3)..Self::get_room_mx(3))
+                .filter_map(|k| self[k])
+                .min()
+                .map_or(false, |mn| mn < 3)
+        {
+            return true;
+        }
+
+        false
+    }
+
+    #[cfg(not(feature = "deadlock-check"))]
+    fn is_deadlock(&self) -> bool {
+        false
     }
 }
 
@@ -245,14 +287,6 @@ impl Burrow for BurrowLarge {
         [13, 110, 900, 1000],
         [14, 120, 1000, 0],
     ];
-
-    fn get(&self, idx: usize) -> Option<u8> {
-        self.data[idx]
-    }
-
-    fn set(&mut self, idx: usize, val: Option<u8>) {
-        self.data[idx] = val;
-    }
 }
 
 impl Burrow for BurrowSmall {
@@ -332,37 +366,57 @@ impl Burrow for BurrowSmall {
         [9, 70, 500, 1000],
         [10, 80, 600, 0],
     ];
-
-    fn get(&self, idx: usize) -> Option<u8> {
-        self.data[idx]
-    }
-
-    fn set(&mut self, idx: usize, val: Option<u8>) {
-        self.data[idx] = val;
-    }
 }
 
-impl fmt::Debug for BurrowSmall {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Debug for BurrowSmall {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Display for BurrowSmall {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for BurrowSmall {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Debug for BurrowLarge {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::ops::Index<usize> for BurrowSmall {
+    type Output = Option<u8>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl std::ops::IndexMut<usize> for BurrowSmall {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
+
+impl std::fmt::Debug for BurrowLarge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.format(f)
     }
 }
 
-impl fmt::Display for BurrowLarge {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for BurrowLarge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.format(f)
+    }
+}
+
+impl std::ops::Index<usize> for BurrowLarge {
+    type Output = Option<u8>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl std::ops::IndexMut<usize> for BurrowLarge {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
     }
 }
 
@@ -458,7 +512,7 @@ pub struct Search<T> {
 
 impl<T> Search<T>
 where
-    T: Eq + Ord + Hash + Copy + fmt::Debug,
+    T: Eq + Ord + std::hash::Hash + Copy + std::fmt::Debug,
 {
     pub fn init(start: T) -> Self {
         let mut search = Self {
@@ -541,7 +595,7 @@ where
 // tag::solve[]
 pub fn solve<B>(start: B) -> usize
 where
-    B: Burrow + Ord + Eq + Hash + Copy + fmt::Debug,
+    B: Burrow + Ord + Eq + std::hash::Hash + Copy + std::fmt::Debug,
 {
     let mut search = Search::init(start);
 
@@ -552,10 +606,10 @@ where
         }
 
         for k in 0..B::LEN {
-            if let Some(p) = burrow.get(k) {
+            if let Some(p) = burrow[k] {
                 let cur_room = B::get_room(k);
                 if cur_room == Some(p)
-                    && (k + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
+                    && (k + 1..B::get_room_mx(p)).all(|k_r| burrow[k_r] == Some(p))
                 {
                     // position is settled in room (below are only the pods of the same type)
                     continue;
@@ -570,14 +624,14 @@ where
                 }
 
                 while let Some((steps, k_adj)) = stack.pop() {
-                    if burrow.get(k_adj).is_some() {
+                    if burrow[k_adj].is_some() {
                         // cannot move on top of other
                         continue;
                     }
 
                     let adj_room = B::get_room(k_adj);
                     if adj_room == Some(p)
-                        && (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow.get(k_r) == Some(p))
+                        && (k_adj + 1..B::get_room_mx(p)).all(|k_r| burrow[k_r] == Some(p))
                     {
                         // move in own room
                         let weight = steps * B::ENERGIES[p as usize];
@@ -593,8 +647,10 @@ where
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow;
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
-                        // continue search, other positions in the hallway may also be valid adjacents
+                        if !adjacent.is_deadlock() {
+                            search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        }
+                        // continue search, other positions in the hallway may be valid adjacents
                     }
 
                     for k_adj_2 in B::MAP[k_adj] {
@@ -772,7 +828,6 @@ mod tests {
     fn test_burrow_large_from() {
         assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
     }
-
 
     #[test]
     fn test_get_min_cost() {
