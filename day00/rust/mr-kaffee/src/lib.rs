@@ -659,12 +659,12 @@ pub mod day23 {
         let burrow = parse(INPUT);
 
         let timer_1 = Instant::now();
-        let sol_1 = solution_1(burrow);
+        let sol_1 = solution_1(&burrow);
         println!("Solved part 1 in {:?}: {:?}", timer_1.elapsed(), sol_1);
         assert_eq!(EXP_1, sol_1);
 
         let timer_2 = Instant::now();
-        let sol_2 = solution_2(burrow);
+        let sol_2 = solution_2(&burrow);
         println!("Solved part 2 in {:?}: {:?}", timer_2.elapsed(), sol_2);
         assert_eq!(EXP_2, sol_2); // 54171 is too high, // 43775 is too low
 
