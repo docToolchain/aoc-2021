@@ -12,7 +12,15 @@ pub struct BurrowSmall {
     data: [Option<u8>; 11 + 4 * 2],
 }
 
-pub trait Burrow: std::ops::Index<usize, Output = Option<u8>> + std::ops::IndexMut<usize> {
+pub trait Burrow:
+    std::ops::Index<usize, Output = Option<u8>>
+    + std::ops::IndexMut<usize>
+    + Eq
+    + Ord
+    + std::hash::Hash
+    + Copy
+    + std::fmt::Debug
+{
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &'static [&'static [usize]];
@@ -506,8 +514,10 @@ pub struct Search<T> {
     heap: BTreeSet<(usize, usize, T)>,
     settled: HashSet<T>,
     costs: HashMap<T, (usize, usize)>,
-    parents: HashMap<T, (usize, Option<T>)>,
+    parents: HashMap<T, (usize, usize, Option<T>)>,
     trace_path: bool,
+    count_hit: usize,
+    count_decrease_key: usize,
 }
 
 impl<T> Search<T>
@@ -520,7 +530,9 @@ where
             settled: HashSet::new(),
             costs: HashMap::new(),
             parents: HashMap::new(),
-            trace_path: false,
+            trace_path: cfg!(feature = "trace"),
+            count_hit: 0,
+            count_decrease_key: 0,
         };
         search.heap.insert((0, 0, start));
         search.settled.insert(start);
@@ -550,7 +562,9 @@ where
         }
 
         if let Some((cur_bound, cur_cost)) = self.costs.get(&adjacent) {
+            self.count_hit += 1;
             if cost + weight + bound_rem < *cur_bound {
+                self.count_decrease_key += 1;
                 self.heap.remove(&(*cur_bound, *cur_cost, adjacent));
             } else {
                 return false;
@@ -562,18 +576,18 @@ where
         self.costs
             .insert(adjacent, (cost + weight + bound_rem, cost + weight));
         if self.trace_path {
-            self.parents.insert(adjacent, (weight, Some(parent)));
+            self.parents.insert(adjacent, (bound_rem, weight, Some(parent)));
         }
 
         true
     }
 
-    pub fn get_path_to(&self, target: T) -> VecDeque<(usize, T)> {
+    pub fn get_path_to(&self, target: T) -> VecDeque<(usize, usize, T)> {
         let mut path = VecDeque::new();
 
         let mut current = target;
-        while let Some((cost, parent)) = self.parents.get(&current) {
-            path.push_front((*cost, current));
+        while let Some((bound_rem, cost, parent)) = self.parents.get(&current) {
+            path.push_front((*bound_rem, *cost, current));
             if let Some(parent) = parent {
                 current = *parent;
             } else {
@@ -585,9 +599,23 @@ where
     }
 
     pub fn print_path_to(&self, target: T) {
-        for (weight, burrow) in self.get_path_to(target) {
-            println!("==({})==>\n{:?}", weight, burrow);
+        let mut steps = 0;
+        let mut sum = 0;
+        for (bound_rem, weight, burrow) in self.get_path_to(target) {
+            sum += weight;
+            steps += 1;
+            println!("\n{}) {} -> {} (bound: {} -> {}) ==>\n{:?}", steps, weight, sum, bound_rem, sum + bound_rem, burrow);
         }
+    }
+
+    pub fn print_stats(&self) {
+        println!(
+            "heap size: {}, hit: {}, decrease key: {}, settled: {}",
+            self.heap.len(),
+            self.count_hit,
+            self.count_decrease_key,
+            self.settled.len(),
+        );
     }
 }
 // end::search[]
@@ -595,13 +623,19 @@ where
 // tag::solve[]
 pub fn solve<B>(start: B) -> usize
 where
-    B: Burrow + Ord + Eq + std::hash::Hash + Copy + std::fmt::Debug,
+    B: Burrow,
 {
     let mut search = Search::init(start);
 
     while let Some((cost, burrow)) = search.pop() {
         if burrow == B::TARGET {
             // target reached
+
+            if cfg!(feature = "trace") {
+                search.print_path_to(B::TARGET);
+                search.print_stats();
+            }
+
             return cost;
         }
 
