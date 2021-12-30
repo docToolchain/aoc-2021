@@ -519,8 +519,8 @@ pub struct Search<T> {
     costs: HashMap<Rc<T>, (usize, usize)>,
     parents: HashMap<Rc<T>, (usize, usize, Option<Rc<T>>)>,
     trace_path: bool,
-    count_hit: usize,
-    count_decrease_key: usize,
+    hit_count: usize,
+    decr_key_count: usize,
 }
 
 impl<T> Search<T>
@@ -534,8 +534,8 @@ where
             costs: HashMap::new(),
             parents: HashMap::new(),
             trace_path: cfg!(feature = "trace"),
-            count_hit: 0,
-            count_decrease_key: 0,
+            hit_count: 0,
+            decr_key_count: 0,
         };
         let start = Rc::new(start);
         search.heap.insert((0, 0, Rc::clone(&start)));
@@ -571,35 +571,31 @@ where
             return false;
         }
 
-        // if already in queue, check if decrease key required; 
-        // remove from queue if yes, otherwise return false (nothing to be added to queue)
-        if let Some((cur_bound, cur_cost)) = self.costs.get(&adjacent) {
-            self.count_hit += 1;
-            if cost + weight + bound_rem < *cur_bound {
-                self.count_decrease_key += 1;
-                self.heap
-                    .remove(&(*cur_bound, *cur_cost, Rc::clone(&adjacent)));
+        let e = self.costs.entry(adjacent);
+        let adj = Rc::clone(e.key()); // use same instance consistently
+        let (b, c) = e.or_insert((usize::MAX, usize::MAX));
+        if *b < usize::MAX {
+            self.hit_count += 1;
+            // if already in queue, check if decrease key required;
+            // remove from queue if yes, otherwise return false (nothing to be added to queue)
+            if cost + weight + bound_rem < *b {
+                self.decr_key_count += 1;
+                self.heap.remove(&(*b, *c, Rc::clone(&adj)));
             } else {
                 return false;
             }
         }
+        *b = cost + weight + bound_rem;
+        *c = cost + weight;
 
         // keep trace
         if self.trace_path {
             self.parents
-                .insert(Rc::clone(&adjacent), (bound_rem, weight, Some(parent)));
+                .insert(Rc::clone(&adj), (bound_rem, weight, Some(parent)));
         }
 
         // insert to heap
-        self.heap.insert((
-            cost + weight + bound_rem,
-            cost + weight,
-            Rc::clone(&adjacent),
-        ));
-
-        // store cost (to allow for later decrease keys)
-        self.costs
-            .insert(adjacent, (cost + weight + bound_rem, cost + weight));
+        self.heap.insert((*b, *c, adj));
 
         true
     }
@@ -640,11 +636,12 @@ where
 
     pub fn print_stats(&self) {
         println!(
-            "heap size: {}, hit: {}, decrease key: {}, settled: {}",
+            "Item Count\n- heap: {:9}\n- settled: {:6}\n- total: {:8}\nPush Stats\n- hit: {:10}\n- decr key: {:5}",
             self.heap.len(),
-            self.count_hit,
-            self.count_decrease_key,
             self.settled.len(),
+            self.costs.len(),
+            self.hit_count,
+            self.decr_key_count,
         );
     }
 }
