@@ -711,6 +711,9 @@ where
                     stack.push((1, *k_adj));
                 }
 
+                let mut push_later = Vec::new();
+                let mut do_push = true;
+
                 while let Some((steps, k_adj)) = stack.pop() {
                     if burrow[k_adj].is_some() {
                         // cannot move on top of other
@@ -728,7 +731,8 @@ where
                         let bound_rem = adjacent.get_min_cost();
                         search.push(Rc::clone(&burrow), cost, adjacent, weight, bound_rem);
                         // no need to continue to look for other adjacents
-                        continue;
+                        do_push = false;
+                        break;
                     }
 
                     if k_adj < B::HALLWAY_LEN && !B::is_door(k_adj) && cur_room.is_some() {
@@ -738,7 +742,7 @@ where
                         adjacent.move_pod(k, k_adj);
                         if !adjacent.is_deadlock() {
                             let bound_rem = adjacent.get_min_cost();
-                            search.push(Rc::clone(&burrow), cost, adjacent, weight, bound_rem);
+                            push_later.push((Rc::clone(&burrow), cost, adjacent, weight, bound_rem));
                         }
                         // continue search, other positions in the hallway may be valid adjacents
                     }
@@ -748,6 +752,12 @@ where
                             done[*k_adj_2] = true;
                             stack.push((steps + 1, *k_adj_2));
                         }
+                    }
+                }
+
+                if do_push {
+                    for (parent, cost, adjacent, weight, bound_rem) in push_later {
+                        search.push(parent, cost, adjacent, weight, bound_rem);
                     }
                 }
             }
@@ -773,6 +783,8 @@ pub fn solution_2(burrow: &BurrowSmall) -> usize {
 // tag::tests[]
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use super::*;
 
     const CONTENT_1: &str = "#############
