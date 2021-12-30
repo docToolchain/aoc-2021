@@ -527,13 +527,13 @@ impl<T> Search<T>
 where
     T: Eq + Ord + std::hash::Hash + Clone + std::fmt::Debug,
 {
-    pub fn init(start: T) -> Self {
+    pub fn init(start: T, trace_path: bool) -> Self {
         let mut search = Self {
             heap: BTreeSet::new(),
             settled: HashSet::new(),
             costs: HashMap::new(),
             parents: HashMap::new(),
-            trace_path: cfg!(feature = "trace"),
+            trace_path,
             hit_count: 0,
             decr_key_count: 0,
         };
@@ -621,44 +621,71 @@ where
         let mut sum = 0;
         for (bound_rem, weight, burrow) in self.get_path_to(target) {
             sum += weight;
+            if steps == 0 {
+                println!("\nInitial\n{:?}", burrow);
+            } else {
+                println!(
+                    "\n{}) {} -> {} (bound: {} -> {}) ==>\n{:?}",
+                    steps,
+                    weight,
+                    sum,
+                    bound_rem,
+                    sum + bound_rem,
+                    burrow
+                );
+            }
             steps += 1;
-            println!(
-                "\n{}) {} -> {} (bound: {} -> {}) ==>\n{:?}",
-                steps,
-                weight,
-                sum,
-                bound_rem,
-                sum + bound_rem,
-                burrow
-            );
         }
     }
 
     pub fn print_stats(&self) {
+        let mut mx = std::cmp::max(self.costs.len(), self.hit_count) / 1000;
+        let mut w = 3;
+        while mx > 0 {
+            w += 1;
+            mx /= 10;
+        }
+
         println!(
-            "Item Count\n- heap: {:9}\n- settled: {:6}\n- total: {:8}\nPush Stats\n- hit: {:10}\n- decr key: {:5}",
+            "+{blank:-<w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-<w_head$}+\n\
+            |     heap: {:w_field$} |\n\
+            |  settled: {:w_field$} |\n\
+            |    total: {:w_field$} |\n\
+            +{blank:-<w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-<w_head$}+\n\
+            |      hit: {:w_field$} |\n\
+            | decr key: {:w_field$} |\n\
+            +{blank:-<w_head$}+",
+            "Element Count",
             self.heap.len(),
             self.settled.len(),
             self.costs.len(),
+            "Push Stats",
             self.hit_count,
             self.decr_key_count,
+            blank = "",
+            w_field = w,
+            w_head = w + 12
         );
     }
 }
 // end::search[]
 
 // tag::solve[]
-pub fn solve<B>(start: B) -> usize
+pub fn solve<B>(start: B, trace_path: bool) -> usize
 where
     B: Burrow,
 {
-    let mut search = Search::init(start);
+    let mut search = Search::init(start, trace_path);
 
     while let Some((cost, burrow)) = search.pop() {
         if B::TARGET.eq(&burrow) {
             // target reached
 
-            if cfg!(feature = "trace") {
+            if trace_path {
                 search.print_path_to(&B::TARGET);
                 search.print_stats();
             }
@@ -736,11 +763,11 @@ pub fn parse(content: &str) -> BurrowSmall {
 }
 
 pub fn solution_1(burrow: &BurrowSmall) -> usize {
-    solve(burrow.clone())
+    solve(burrow.clone(), cfg!(feature = "trace"))
 }
 
 pub fn solution_2(burrow: &BurrowSmall) -> usize {
-    solve(BurrowLarge::from(burrow))
+    solve(BurrowLarge::from(burrow), cfg!(feature = "trace"))
 }
 
 // tag::tests[]
