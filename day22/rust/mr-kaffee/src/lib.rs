@@ -29,6 +29,17 @@ impl fmt::Debug for Cuboid {
 }
 
 impl Cuboid {
+    // a ``Cuboid`` representing the small world of part 1
+    pub const SMALL_WORLD: Self = Self {
+        on: false,
+        x_mn: -50,
+        x_mx: 50,
+        y_mn: -50,
+        y_mx: 50,
+        z_mn: -50,
+        z_mx: 50,
+    };
+
     /// a ``Cuboid`` spanning the complete _universe_
     /// (very unlikely that the universe is larger than 64bit in any dimension)
     pub const UNIVERSE: Self = Self {
@@ -88,30 +99,6 @@ impl Cuboid {
         0
     }
     // end::magic[]
-
-    /// restrict all ranges to be contained in ``mn..=mx``
-    /// if the resulting cuboid is empty, retun ``None``
-    pub fn clamp(&self, mn: isize, mx: isize) -> Option<Self> {
-        let x_mn = cmp::max(self.x_mn, mn);
-        let x_mx = cmp::min(self.x_mx, mx);
-        let y_mn = cmp::max(self.y_mn, mn);
-        let y_mx = cmp::min(self.y_mx, mx);
-        let z_mn = cmp::max(self.z_mn, mn);
-        let z_mx = cmp::min(self.z_mx, mx);
-        if x_mx < x_mn || y_mx < y_mn || z_mx < z_mn {
-            None
-        } else {
-            Some(Cuboid {
-                on: self.on,
-                x_mn,
-                x_mx,
-                y_mn,
-                y_mx,
-                z_mn,
-                z_mx,
-            })
-        }
-    }
 }
 // end::cuboid[]
 
@@ -166,7 +153,7 @@ pub fn solution_1(cuboids: &[Cuboid]) -> usize {
     get_on_count(
         &cuboids
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&Cuboid::SMALL_WORLD))
             .collect::<Vec<_>>(),
     )
 }
@@ -340,7 +327,7 @@ mod tests {
     fn test_solution_1_2_compare() {
         let cuboids = parse(CONTENT_1)
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&Cuboid::SMALL_WORLD))
             .collect::<Vec<_>>();
 
         for k in 1..cuboids.len() {

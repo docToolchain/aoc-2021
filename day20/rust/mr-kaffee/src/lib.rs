@@ -33,7 +33,7 @@ pub fn parse(content: &str) -> (Vec<bool>, Image) {
     // of the algorithm must not be set
     assert!(
         !algo[0] || !algo[algo.len() - 1],
-        "Algorithm will lit infinitely many pixels forever"
+        "Algorithm will light infinitely many pixels forever"
     );
 
     let mut data = Vec::new();

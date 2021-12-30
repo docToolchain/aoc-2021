@@ -15,7 +15,7 @@ include::src/lib.rs[tags=part1]
 
 === Part 2 ===
 
-Same idea as for part 1. Now discard lines where comparisons fail. What remains in the stack once a line is processed are the characters required to repair the line.
+Same idea as for part 1. Now discard lines where comparisons fail. What remains on the stack, once a line is processed, are the characters required to repair the line.
 
 [source,rust,numbered]
 ----

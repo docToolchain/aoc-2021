@@ -26,7 +26,7 @@ I came up with the idea quite quickly. Still took some time to finish part 2 bec
 include::src/lib.rs[tags=part2_stack]
 ----
 
-Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for each positions / scores it might be player 1's or player 2's turn). Yet, my stack based solution processes ~17 million items from the stack, i.e., on average, each state is pushed to the stack more than 200 times. There seems to be potential for optimization.
+Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for any combination of positions and scores, it might be player 1's or player 2's turn). Yet, my stack based solution processes ~17 million items from the stack, i.e., on average, each state is pushed to the stack more than 200 times. There seems to be potential for optimization.
 
 I created a second solution which is based on a flat list of multiplicities for every possible state. I process each state, sorted by the sum of the scores of both players. Because the total score increases in every round played, I am sure that a state processed once will never occur again. Here is my second solution:
 

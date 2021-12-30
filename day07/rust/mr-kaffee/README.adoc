@@ -11,7 +11,7 @@ Parse input into a vector of numbers
 include::src/lib.rs[tags=parse]
 ----
 
-Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function - mapping distance to cost - as argument; for part 1, this is just the identity)
+Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function -- mapping distance to cost -- as argument; for part 1, this is just the identity)
 
 [source,rust,numbered]
 ----

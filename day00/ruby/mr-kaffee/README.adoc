@@ -26,7 +26,7 @@ The solution is executed with `ruby solution.rb`
 
 === Test ===
 
-To test my code, there will be a `solution_test.rb` file which defines a test class derived from `Test::Unit::TestCase`:
+To test my code, there will be a `solution_test.rb` file, which defines a test class derived from `Test::Unit::TestCase`:
 
 [source,ruby,numbered]
 ----

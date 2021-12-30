@@ -83,4 +83,4 @@ include::src/lib.rs[tags=snail]
 
 === Today I learned ===
 
-... a lot on recursive data structures and the ``Box`` structure in Rust but also how to insert / remove elements from a ``Vec`` as efficiently as possible.
+\... a lot on recursive data structures and the ``Box`` structure in Rust but also how to insert / remove elements from a ``Vec`` as efficiently as possible.

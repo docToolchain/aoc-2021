@@ -4,7 +4,7 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/5[AoC|
 
 === Part 1 & 2 ===
 
-I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples ```(x1, y1, x2, y2)```. When parsing the inputs. 
+I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples ```(x1, y1, x2, y2)``` 
 
 [source,rust,numbered]
 ----

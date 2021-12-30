@@ -8,7 +8,7 @@ Ough! Today's was the biggest headache so far this year.
 
 I was aware when starting part 1 that a solution based on arrays will probably not solve part 2. It was good enough for part 1 though.
 
-But while implementing it, I was sure I will need linked lists for part 2 and I was afraid of it, because I really don't know how to implement linked lists in Rust and the ``LinkedList`` Rust comes with did not help a lot. So I spent quite some time trying to implement a linked list in Rust and - again - failed. Switch to Java, where linked lists are no pain at all just to realize that no list based solution will work at all for today.
+But while implementing it, I was sure I will need linked lists for part 2 and I was afraid of it, because I really don't know how to implement linked lists in Rust and the ``LinkedList`` Rust comes with did not help a lot. So I spent quite some time trying to implement a linked list in Rust and -- again -- failed. Switched to Java, where linked lists are no pain at all, just to realize that no list based solution will work at all for today.
 
 With a little bit of thinking on the problem, I realized that it would be enough to just count the pairs. It does not really matter where they appear in the polymer. With this idea, the solution was not very complicated...
 

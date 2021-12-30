@@ -9,7 +9,7 @@ The optimizations to get down to three seconds include:
 * check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set
 * use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set ``settled = 1``) and continue to settle furhter sets that overlap with sets from the queue.
 
-The final optimization to achieve solution times below 1s are taken from https://github.com/mogron[[Moritz Gronbach]: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.
+The final optimization to achieve solution times below 1s are taken from https://github.com/mogron[Moritz Gronbach]: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.
 
 === Parts 1 & 2 ===
 
@@ -50,7 +50,7 @@ include::src/lib.rs[tags=solution]
 
 === Sanity Check ===
 
-I implemented a sanity check for overlapping scanner regions as follows (see comment for details):
+I implemented a sanity check for overlapping scanner regions as follows (see comments for details):
 
 [source,rust,numbered]
 ----

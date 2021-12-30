@@ -27,7 +27,7 @@ I wanted to keep the overall solution time as small as possible. Up until day 22
 Total time for 25 days: 666.6676ms (26.666704ms per day)
 ----
 
-My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box nightly Rust for this one to be able to use the method ``BTreeSet::pop_first``
+My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box _nightly_ Rust for this one to be able to use the method ``BTreeSet::pop_first``
 
 === Run all Solutions ===
 
