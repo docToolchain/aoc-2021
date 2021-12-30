@@ -142,7 +142,7 @@ pub fn parse(content: &str) -> Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>
 ///
 /// for all beacons seen by scanner 1 / 2, check whether they are also seen by scanner 2 / 1
 /// if and only if they are in range of scanner 2 / 1
-/// 
+///
 /// # Panics
 /// if sanity check fails
 pub fn sanity_check(
@@ -201,16 +201,12 @@ pub fn sanity_check(
 ///
 /// return the transformation ``t`` and the ``center`` position
 pub fn check_overlap(
-    (beacons_settled, _center_settled, distances_settled): &(
+    (beacons_settled, center_settled, distances_settled): &(
         HashSet<Coord>,
         Coord,
         HashMap<usize, usize>,
     ),
-    (beacons_check, _center_check, distances_check): &(
-        HashSet<Coord>,
-        Coord,
-        HashMap<usize, usize>,
-    ),
+    (beacons_check, center_check, distances_check): &(HashSet<Coord>, Coord, HashMap<usize, usize>),
     threshold: usize,
 ) -> Option<(fn(Coord) -> Coord, Coord)> {
     // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
@@ -251,9 +247,9 @@ pub fn check_overlap(
                         if cfg!(feature = "sanity-check") {
                             sanity_check(
                                 beacons_settled,
-                                _center_settled,
+                                center_settled,
                                 beacons_check,
-                                _center_check,
+                                center_check,
                                 t_idx,
                                 d,
                             );
