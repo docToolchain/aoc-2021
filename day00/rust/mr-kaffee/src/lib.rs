@@ -194,8 +194,8 @@ pub mod day06 {
     use std::time::Instant;
 
     const INPUT: &str = include_str!("../../../../day06/rust/mr-kaffee/input.txt");
-    const EXP_1: usize = 376_194;
-    const EXP_2: usize = 1_693_022_481_538;
+    const EXP_1: u64 = 376_194;
+    const EXP_2: u64 = 1_693_022_481_538;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -298,8 +298,8 @@ pub mod day10 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day10/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 387_363;
-    pub const EXP_2: usize = 4_330_777_059;
+    pub const EXP_1: u64 = 387_363;
+    pub const EXP_2: u64 = 4_330_777_059;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -407,8 +407,8 @@ pub mod day14 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day14/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 2_435;
-    pub const EXP_2: usize = 2_587_447_599_164;
+    pub const EXP_1: u64 = 2_435;
+    pub const EXP_2: u64 = 2_587_447_599_164;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -459,8 +459,8 @@ pub mod day16 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day16/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 883;
-    pub const EXP_2: usize = 1_675_198_555_015;
+    pub const EXP_1: u64 = 883;
+    pub const EXP_2: u64 = 1_675_198_555_015;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -591,8 +591,8 @@ pub mod day21 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day21/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 893_700;
-    pub const EXP_2: usize = 568_867_175_661_958;
+    pub const EXP_1: u64 = 893_700;
+    pub const EXP_2: u64 = 568_867_175_661_958;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -617,8 +617,8 @@ pub mod day22 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day22/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 581_108;
-    pub const EXP_2: usize = 1_325_473_814_582_641;
+    pub const EXP_1: u64 = 581_108;
+    pub const EXP_2: u64 = 1_325_473_814_582_641;
 
     pub fn solve() {
         let timer = Instant::now();
@@ -677,8 +677,8 @@ pub mod day24 {
     use std::time::Instant;
 
     pub const INPUT: &str = include_str!("../../../../day24/rust/mr-kaffee/input.txt");
-    pub const EXP_1: usize = 59_996_912_981_939;
-    pub const EXP_2: usize = 17_241_911_811_915;
+    pub const EXP_1: u64 = 59_996_912_981_939;
+    pub const EXP_2: u64 = 17_241_911_811_915;
 
     pub fn solve() {
         let timer = Instant::now();

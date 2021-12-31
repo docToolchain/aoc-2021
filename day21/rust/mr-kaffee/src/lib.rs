@@ -30,7 +30,7 @@ pub fn parse(content: &str) -> (usize, usize) {
 /// play with a deterministic dice, winning threshold: 1000
 ///
 /// return the looser's score times the number the dice was thrown
-pub fn solution_1((mut p1, mut p2): (usize, usize)) -> usize {
+pub fn solution_1((mut p1, mut p2): (usize, usize)) -> u64 {
     let mut s1 = 0;
     let mut s2 = 0;
 
@@ -50,7 +50,7 @@ pub fn solution_1((mut p1, mut p2): (usize, usize)) -> usize {
         t = !t;
     }
 
-    dice * cmp::min(s1, s2)
+    (dice * cmp::min(s1, s2)) as u64
 }
 // end::part1[]
 
@@ -64,14 +64,14 @@ pub fn solution_1((mut p1, mut p2): (usize, usize)) -> usize {
 /// * 7 - 6: (1 3 3) (2 2 3) (2 3 2) (3 1 3) (3 2 2) (3 3 1)
 /// * 8 - 3: (2 3 3) (3 2 3) (3 3 2)
 /// * 9 - 1: (3 3 3)
-pub const DICE_MULTS: [(usize, usize); 7] =
+pub const DICE_MULTS: [(usize, u64); 7] =
     [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
 
 #[cfg(feature = "stack")]
 /// play with dirac quantum dice (stack based)
 ///
 /// return the number of universes won by the player who wins more often
-pub fn solution_2((p1, p2): (usize, usize)) -> usize {
+pub fn solution_2((p1, p2): (usize, usize)) -> u64 {
     // push states with multiplicty on stack
     // since I push to the end and pop from the end, this is depth first search
     let mut stack = Vec::new();
@@ -122,7 +122,7 @@ pub fn solution_2((p1, p2): (usize, usize)) -> usize {
 /// play with dirac quantum dice (state list based)
 ///
 /// return the number of universes won by the player who wins more often
-pub fn solution_2((p1, p2): (usize, usize)) -> usize {
+pub fn solution_2((p1, p2): (usize, usize)) -> u64 {
     // index to state multiplicity list
     const F_IDX: fn(usize, usize, usize, usize, usize) -> usize =
         |p1, p2, s1, s2, t| p1 + 10 * p2 + 100 * s1 + 2100 * s2 + 44100 * t;

@@ -270,7 +270,7 @@ pub fn get_constraints(instructions: &[Inst]) -> Vec<(usize, usize, Val)> {
     constraints
 }
 
-pub fn solution_1(instructions: &[Inst]) -> usize {
+pub fn solution_1(instructions: &[Inst]) -> u64 {
     let inputs = &mut [0; INPUT_LEN];
     for (n1, n2, o) in get_constraints(instructions) {
         inputs[n1] = DIGIT_MAX;
@@ -279,10 +279,10 @@ pub fn solution_1(instructions: &[Inst]) -> usize {
 
     assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as u64)
 }
 
-pub fn solution_2(instructions: &[Inst]) -> usize {
+pub fn solution_2(instructions: &[Inst]) -> u64 {
     let inputs = &mut [0; INPUT_LEN];
     for (n1, n2, o) in get_constraints(instructions) {
         inputs[n1] = DIGIT_MIN + o;
@@ -291,7 +291,7 @@ pub fn solution_2(instructions: &[Inst]) -> usize {
 
     assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as u64)
 }
 // end::solution[]
 

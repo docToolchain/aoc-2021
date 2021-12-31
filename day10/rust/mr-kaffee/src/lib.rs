@@ -6,7 +6,7 @@ pub fn parse<'a>(content: &'a str) -> Vec<&'a str> {
 
 // tag::part1[]
 /// return illegal char's score if any in as ``Some`` value, otherwise ``None``
-pub fn get_illegal_score(line: &str) -> Option<usize> {
+pub fn get_illegal_score(line: &str) -> Option<u64> {
     let mut stack = Vec::new();
     for c in line.chars() {
         match c {
@@ -25,7 +25,7 @@ pub fn get_illegal_score(line: &str) -> Option<usize> {
 }
 
 /// Calculate sum of scores of illegal chars
-pub fn solution_1(lines: &[&str]) -> usize {
+pub fn solution_1(lines: &[&str]) -> u64 {
     lines
         .iter()
         .filter_map(|line| get_illegal_score(line))
@@ -35,7 +35,7 @@ pub fn solution_1(lines: &[&str]) -> usize {
 
 // tag::part2[]
 /// get the repair score if the line is incomplete as a ``Some`` value, otherwise return ``None``
-pub fn get_repair_score(line: &str) -> Option<usize> {
+pub fn get_repair_score(line: &str) -> Option<u64> {
     let mut stack = Vec::new();
     for c in line.chars() {
         match c {
@@ -61,7 +61,7 @@ pub fn get_repair_score(line: &str) -> Option<usize> {
 }
 
 /// get the middle repair score
-pub fn solution_2(lines: &[&str]) -> usize {
+pub fn solution_2(lines: &[&str]) -> u64 {
     let mut scores = lines
         .iter()
         .filter_map(|line| get_repair_score(line))

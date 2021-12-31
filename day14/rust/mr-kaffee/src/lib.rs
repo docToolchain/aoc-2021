@@ -36,12 +36,11 @@ pub fn simulate_rounds(
     template: &[char],
     rules: &HashMap<(char, char), char>,
     rounds: usize,
-) -> usize {
+) -> u64 {
     // map of pairs to number of occurances of those
-    let mut pairs = HashMap::new();
+    let mut pairs: HashMap<_, u64> = HashMap::new();
     for (c1, c2) in template.iter().zip(template.iter().skip(1)) {
-        let cnt = pairs.entry((*c1, *c2)).or_insert(0usize);
-        *cnt += 1;
+        *pairs.entry((*c1, *c2)).or_insert(0) += 1;
     }
 
     // in each round, update pairs
@@ -50,14 +49,11 @@ pub fn simulate_rounds(
         for ((c1, c2), cnt0) in &pairs {
             if let Some(d) = rules.get(&(*c1, *c2)) {
                 // if pair is found in rules, replace (c1, c2) by (c1, d) and (d, c2)
-                let cnt = upd.entry((*c1, *d)).or_insert(0);
-                *cnt += cnt0;
-                let cnt = upd.entry((*d, *c2)).or_insert(0);
-                *cnt += cnt0;
+                *upd.entry((*c1, *d)).or_insert(0) += cnt0;
+                *upd.entry((*d, *c2)).or_insert(0) += cnt0;
             } else {
                 // if pair is not found in rules, keep pair
-                let cnt = upd.entry((*c1, *c2)).or_insert(0);
-                *cnt += cnt0;
+                *upd.entry((*c1, *c2)).or_insert(0) += cnt0;
             }
         }
         pairs = upd;
@@ -71,10 +67,8 @@ pub fn simulate_rounds(
     counts.insert(template[0], 1);
     counts.insert(template[template.len() - 1], 1);
     for ((c1, c2), cnt) in &pairs {
-        let count = counts.entry(*c1).or_insert(0);
-        *count += cnt;
-        let count = counts.entry(*c2).or_insert(0);
-        *count += cnt;
+        *counts.entry(*c1).or_insert(0) += cnt;
+        *counts.entry(*c2).or_insert(0) += cnt;
     }
 
     // get (twice the) count for most and less frequent symbol
@@ -86,11 +80,11 @@ pub fn simulate_rounds(
 }
 // end::simulate_rounds[]
 
-pub fn solution_1(template: &[char], rules: &HashMap<(char, char), char>) -> usize {
+pub fn solution_1(template: &[char], rules: &HashMap<(char, char), char>) -> u64 {
     simulate_rounds(template, rules, 10)
 }
 
-pub fn solution_2(template: &[char], rules: &HashMap<(char, char), char>) -> usize {
+pub fn solution_2(template: &[char], rules: &HashMap<(char, char), char>) -> u64 {
     simulate_rounds(template, rules, 40)
 }
 

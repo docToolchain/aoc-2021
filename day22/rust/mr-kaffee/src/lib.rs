@@ -4,12 +4,12 @@ use std::{cmp, fmt};
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Cuboid {
     on: bool,
-    x_mn: isize,
-    x_mx: isize,
-    y_mn: isize,
-    y_mx: isize,
-    z_mn: isize,
-    z_mx: isize,
+    x_mn: i64,
+    x_mx: i64,
+    y_mn: i64,
+    y_mx: i64,
+    z_mn: i64,
+    z_mx: i64,
 }
 
 impl fmt::Debug for Cuboid {
@@ -44,12 +44,12 @@ impl Cuboid {
     /// (very unlikely that the universe is larger than 64bit in any dimension)
     pub const UNIVERSE: Self = Self {
         on: false,
-        x_mn: isize::MIN,
-        x_mx: isize::MAX,
-        y_mn: isize::MIN,
-        y_mx: isize::MAX,
-        z_mn: isize::MIN,
-        z_mx: isize::MAX,
+        x_mn: i64::MIN,
+        x_mx: i64::MAX,
+        y_mn: i64::MIN,
+        y_mx: i64::MAX,
+        z_mn: i64::MIN,
+        z_mx: i64::MAX,
     };
 
     /// get intersection, on flag is copied from self
@@ -77,7 +77,7 @@ impl Cuboid {
     }
 
     /// count the elements in this cuboid
-    pub fn count(&self) -> isize {
+    pub fn count(&self) -> i64 {
         (self.x_mx - self.x_mn + 1) * (self.y_mx - self.y_mn + 1) * (self.z_mx - self.z_mn + 1)
     }
 
@@ -85,7 +85,7 @@ impl Cuboid {
     /// get count restricted to self recursively as follows
     ///
     /// ``count(cuboids[k] in self) = count(cuboids[k] v self) - sum_i=1^k-1 count(cuboids[i] in (cuboids[k] v self))``
-    pub fn get_count_in(&self, cuboids: &[Self]) -> isize {
+    pub fn get_count_in(&self, cuboids: &[Self]) -> i64 {
         if let Some(other) = cuboids.last() {
             if let Some(i) = other.intersect(self) {
                 let mut count = if i.on { i.count() } else { 0 };
@@ -141,15 +141,15 @@ pub fn parse(content: &str) -> Vec<Cuboid> {
 // end::parse[]
 
 // tag::solve[]
-pub fn get_on_count(cuboids: &[Cuboid]) -> usize {
+pub fn get_on_count(cuboids: &[Cuboid]) -> u64 {
     (0..cuboids.len())
         .map(|k| Cuboid::UNIVERSE.get_count_in(&cuboids[..=k]))
-        .sum::<isize>() as usize
+        .sum::<i64>() as u64
 }
 // end::solve[]
 
 // tag::part1[]
-pub fn solution_1(cuboids: &[Cuboid]) -> usize {
+pub fn solution_1(cuboids: &[Cuboid]) -> u64 {
     get_on_count(
         &cuboids
             .iter()
@@ -160,7 +160,7 @@ pub fn solution_1(cuboids: &[Cuboid]) -> usize {
 // end::part1[]
 
 // tag::part2[]
-pub fn solution_2(cuboids: &[Cuboid]) -> usize {
+pub fn solution_2(cuboids: &[Cuboid]) -> u64 {
     get_on_count(cuboids)
 }
 // tag::part2[]
