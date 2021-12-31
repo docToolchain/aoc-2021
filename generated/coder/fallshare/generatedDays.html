@@ -202,6 +202,26 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_08_python">Day 08: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_9">Python</a>
+<ul class="sectlevel4">
+<li><a href="#_star_1_5">Star 1</a></li>
+<li><a href="#_star_2_2">Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_day_09_python">Day 09: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_10">Python</a>
+<ul class="sectlevel4">
+<li><a href="#_star_1_6">Star 1</a></li>
+<li><a href="#_star_2_3">Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -921,6 +941,202 @@ for current_position in range(closest_crab, furthest_crab):
 print("Start 2")
 print(f"Best position is: {best_position}")
 print(f"Fuel to spend: {min_distance}")</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_python"><a class="anchor" href="#_day_08_python"></a><a class="link" href="#_day_08_python">Day 08: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_9"><a class="anchor" href="#_python_9"></a><a class="link" href="#_python_9">Python</a></h4>
+<div class="sect4">
+<h5 id="_star_1_5"><a class="anchor" href="#_star_1_5"></a><a class="link" href="#_star_1_5">Star 1</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_star_2_2"><a class="anchor" href="#_star_2_2"></a><a class="link" href="#_star_2_2">Star 2</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">file1 = open('input.txt', 'r')
+
+# Star 1
+unique_digits = 0
+for line in file1:
+    output_part = line.split("|")[1]
+    output_digits = output_part.split()
+
+    for digit in output_digits:
+        segment_cnt = len(digit)
+        if (segment_cnt == 2) or (segment_cnt == 4) or (segment_cnt == 3) or (segment_cnt == 7):
+            unique_digits += 1
+
+print(f"Star 1: {unique_digits} unique digits")
+
+# Star 2
+file1 = open('input.txt', 'r')
+output_value_sum = 0
+for line in file1:
+
+    signals = line.split("|")
+    signal_pattern = signals[0].split()
+    output_pattern = signals[1].split()
+
+    digits = dict()
+
+    # Find Digit 1
+    for signal in signal_pattern:
+        if len(signal) == 2:
+            digits[1] = set(signal)
+            break
+    # Find Digit 4
+    for signal in signal_pattern:
+        if len(signal) == 4:
+            digits[4] = set(signal)
+            break
+    # Find Digit 7
+    for signal in signal_pattern:
+        if len(signal) == 3:
+            digits[7] = set(signal)
+            break
+    # Find Digit 8
+    for signal in signal_pattern:
+        if len(signal) == 7:
+            digits[8] = set(signal)
+            break
+    # Find digit 5
+    overlap = digits[4] - digits[1]
+    for signal in signal_pattern:
+        if (len(signal) == 5) and (overlap.issubset(set(signal)) ):
+            digits[5] = set(signal)
+
+    # Find digit 2
+    overlap = digits[8] - digits[5] # 2 ist the oposit of 5. So 2 must contain remaining elemnts that are not in 5
+    for signal in signal_pattern:
+        if (len(signal) == 5) and (overlap.issubset(set(signal)) ):
+            digits[2] = set(signal)
+
+    # Find digit 3
+    for signal in signal_pattern:
+        if (len(signal) == 5) and not (set(signal).issubset(digits[2])) and not (set(signal).issubset(digits[5])):
+            digits[3] = set(signal)
+
+    # Find digit 9
+    for signal in signal_pattern:
+        if (len(signal) == 6) and (digits[4].issubset((set(signal)))): # 4 fits only into 9 (of the digits with 6 characters)
+            digits[9] = set(signal)
+
+    # Find digit 6
+    for signal in signal_pattern:
+        if (len(signal) == 6) and not(digits[1].issubset((set(signal)))):
+            digits[6] = set(signal)
+
+    # Find digit 0
+    for signal in signal_pattern:
+        if (len(signal) == 6) and not (set(signal).issubset(digits[6])) and not (set(signal).issubset(digits[9])):
+            digits[0] = set(signal)
+
+    number_string = ""
+    for digit in output_pattern:
+        digit_string = list(digits.keys())[list(digits.values()).index(set(digit))]
+        number_string = number_string + str(digit_string)
+
+    output_value_sum += int(number_string)
+
+
+print(f"Star 2: Total sum is {output_value_sum}")</code></pre>
+</div>
+</div>
+<a id="day09" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_python"><a class="anchor" href="#_day_09_python"></a><a class="link" href="#_day_09_python">Day 09: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_10"><a class="anchor" href="#_python_10"></a><a class="link" href="#_python_10">Python</a></h4>
+<div class="sect4">
+<h5 id="_star_1_6"><a class="anchor" href="#_star_1_6"></a><a class="link" href="#_star_1_6">Star 1</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_star_2_3"><a class="anchor" href="#_star_2_3"></a><a class="link" href="#_star_2_3">Star 2</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">file1 = open('input.txt', 'r')
+import sys
+print(sys.getrecursionlimit())
+sys.setrecursionlimit(10000)
+heat_map = list()
+
+for line in file1:
+    x_coordinates = list(line.strip())
+    heat_map.append(list(map(int, x_coordinates)))
+
+risk_level_sum = 0
+low_points = list()
+for y in range(len(heat_map)):
+    for x in range(len(heat_map[0])):
+        #print(f"x:{x} , y:{y}, value: {heat_map[y][x]}")
+        smallest_number = True
+        #hoch
+        if (x &gt; 0) and (heat_map[y][x] &gt;= heat_map[y][x - 1]):
+            smallest_number = False
+        #runter
+        if (x &lt; (len(heat_map[0])-1)) and (heat_map[y][x] &gt;= heat_map[y][x + 1]):
+            smallest_number = False
+        #links
+        if (y &gt; 0) and (heat_map[y][x] &gt;= heat_map[y - 1][x]):
+            smallest_number = False
+        #rechts
+        if (y &lt; (len(heat_map)-1)) and (heat_map[y][x] &gt;= heat_map[y + 1][x]):
+            smallest_number = False
+
+        if smallest_number:
+            print(f"Low point found at: {x}-{y}")
+            risk_level_sum += (heat_map[y][x] + 1)
+            low_points.append((x,y))
+
+print(f"Star 1: Risk level sum: {risk_level_sum}")
+
+
+def basin_size(x, y, heat_map):
+    locations = {(x, y)}
+    #links
+    if (x &gt; 0) and (heat_map[y][x] &lt;= heat_map[y][x - 1]) and (heat_map[y][x - 1] != 9):
+        locations.update(basin_size((x - 1), y, heat_map))
+    #rechts
+    if (x &lt; (len(heat_map[0])-1)) and (heat_map[y][x] &lt;= heat_map[y][x + 1]) and (heat_map[y][x + 1] != 9):
+        locations.update(basin_size((x + 1), y, heat_map))
+    #hoch
+    if (y &gt; 0) and (heat_map[y][x] &lt;= heat_map[y - 1][x]) and ( heat_map[y - 1][x] != 9):
+        locations.update(basin_size(x, (y - 1), heat_map))
+    #runter
+    if (y &lt; (len(heat_map)-1)) and (heat_map[y][x] &lt;= heat_map[y + 1][x])  and (heat_map[y + 1][x] != 9):
+        locations.update(basin_size(x, (y + 1), heat_map))
+    return locations
+
+
+basin_sizes = list()
+for low_point in low_points:
+    basin_size_cnt = len(basin_size(low_point[0],low_point[1],heat_map))
+    basin_sizes.append(basin_size_cnt)
+
+basin_sizes.sort()
+largest_basins = basin_sizes[-3:]
+
+basin_product = 1
+for basin in largest_basins:
+    basin_product *= basin
+
+print(f"Star 2: product of largest basins is: {basin_product}")</code></pre>
 </div>
 </div>
 </div>
