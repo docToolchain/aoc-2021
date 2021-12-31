@@ -1,0 +1,12 @@
+Advent of Code 2021
+
+== Python
+
+Use a 2D array to store values. For simplicity keep border of 0s at the edges and only update the inner values. Each time step seperately increment and trigger flashes before setting flashed cells back to 0.
+
+For part 1 simulate first 100 steps and count flash number for part 2, keep track of which cells flashed and compare the number to the size of the board.
+
+[source, python]
+....
+include::eleven.py[]
+....

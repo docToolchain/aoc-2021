@@ -3,7 +3,15 @@ name = "mr-kaffee-2021-00"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+
+lto = true
+codegen-units = 1
+
+[features]
+
+default = ["with-unstable"]
+with-unstable = ["mr-kaffee-2021-23"]
 
 [dependencies]
 
@@ -26,9 +34,13 @@ mr-kaffee-2021-16 = { path = "../../../day16/rust/mr-kaffee" }
 mr-kaffee-2021-17 = { path = "../../../day17/rust/mr-kaffee" }
 mr-kaffee-2021-18 = { path = "../../../day18/rust/mr-kaffee" }
 mr-kaffee-2021-19 = { path = "../../../day19/rust/mr-kaffee" }
-# mr-kaffee-2021-20 = { path = "../../../day20/rust/mr-kaffee" }
-# mr-kaffee-2021-21 = { path = "../../../day21/rust/mr-kaffee" }
-# mr-kaffee-2021-22 = { path = "../../../day22/rust/mr-kaffee" }
-# mr-kaffee-2021-23 = { path = "../../../day23/rust/mr-kaffee" }
-# mr-kaffee-2021-24 = { path = "../../../day24/rust/mr-kaffee" }
-# mr-kaffee-2021-25 = { path = "../../../day25/rust/mr-kaffee" }
+mr-kaffee-2021-20 = { path = "../../../day20/rust/mr-kaffee" }
+mr-kaffee-2021-21 = { path = "../../../day21/rust/mr-kaffee" }
+mr-kaffee-2021-22 = { path = "../../../day22/rust/mr-kaffee" }
+mr-kaffee-2021-24 = { path = "../../../day24/rust/mr-kaffee" }
+mr-kaffee-2021-25 = { path = "../../../day25/rust/mr-kaffee" }
+
+[dependencies.mr-kaffee-2021-23]
+
+optional = true
+path = "../../../day23/rust/mr-kaffee"

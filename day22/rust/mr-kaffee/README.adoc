@@ -1,0 +1,55 @@
+== Day 22: Reactor Reboot ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/22[AoC|2021|22].
+
+Wow. This one took a while. I implemented part one based on a list. Obviously, this does not work for part 2. So a new idea was required.
+
+=== Solution ===
+
+I use a structure ``Cuboid`` with one key function for the solution:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=magic]
+----
+
+This function recursively calculates the contribution of a previous reboot step restricted to the current reboot step. By subtracting all the contributions from previous steps, it essentially undoes the previous steps restricted to the area affected by the current step before applying the current step.
+
+The recursion is necessary, because previous steps will in general overlap. So without the recursion, these overlapping areas would be undone several times.
+
+This is all it takes. With this the solution to both parts is calculated as
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve]
+----
+
+For part 1, I restrict the cuboids to satisfy the given bounds:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+And there is also a parse function, as usual:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=parse]
+----
+
+=== Cuboids Implementation ===
+
+Here is the complete implementation of the ``Cuboid`` structure:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=cuboid]
+----
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----

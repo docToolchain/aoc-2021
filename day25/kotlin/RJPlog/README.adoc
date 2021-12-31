@@ -1,0 +1,26 @@
+==  Day 25: Sea Cucumber  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/25
+
+For execution enter _kotlin day2125_1.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+Puzzle input is read into a map with coordinates as key and cucumbers or free spaces as value. Within a while loop first the cucumbers facing east are considered moving, than the cucumbers facing south. As long as any cucumber has moved, the loop continues.
+
+After no cucumber moves any more, the number of steps is printed out as solution.
+
+[source, kotlin, numbered]
+....
+include::day2125_1.kts[tags=part1]
+....
+
+=== Second Star
+
+How does it work: +
+
+Collect all stars, up to now (25.12.2021, 10:44 CET) I am still missing some of the puzzles :-(

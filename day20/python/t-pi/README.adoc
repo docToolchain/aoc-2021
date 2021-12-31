@@ -1,0 +1,49 @@
+++++
+<style> 
+    ul p, ol p, ul>li p, ol>li p { 
+        line-height: 1.2;
+        margin-top: 0; 
+        margin-bottom: 0;
+    }   
+</style>
+++++
+
+== AoC21-20: Trench Map 
+https://adventofcode.com/2021/day/20
+
+=== Info
+
+Improve 2-bit image with image processing (3x3 sliding window to determine position in image processing table)
+
+* Star1 (*): Amount of pixels after two iterations of image processing
+
+* Star2 (**): Amount of pixels after 50 iterations...
+
+=== HowTo
+
+Data is read from the file 'input<two-digit-day>.txt' line by line and preprocessed into dict of bright pixels (1) and image_processor list. The catch (thanks to reddit!) was, that 9 unlit pixel generate a lit one and vice versa - on an infinite canvas... 🙄. Two things follow:
+
+1. Every uneven iteration leads to an infinite canvas of lit pixels -> an even number of iterations is necessary to have a countable results.
+
+2. By simply iterating the image processing with a growing canvas, the border starts to get ugly from unhandled border conditions and spoil the result.
+
+The approach here is to "pump" the canvas: every uneven iteration grows (by 8 pixels on every side, empiric determination...) to generate a solid border of lit pixels, then every even iteration's canvas gets reduced (by -4 pixels per side, same procedure...) to avoid the ugly border condition and end in a cleanly lit border.
+
+* Star1: Iterate manually twice
+
+* Star2: Further(!) iterate 48 times
+
+Result canvas is plotted.
+
+=== Learned today
+
+* Same bug was found *much* faster this time, that iteration happend 52 times 😁
+
+* Eric can be mean with his puzzles. Reddit can be useful 🙃
+
+=== Source
+
+[source, python]
+....
+include::solution.py[]  
+....

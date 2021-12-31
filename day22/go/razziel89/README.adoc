@@ -1,0 +1,69 @@
+== Day 22: Reactor Reboot ==
+
+This is my implementation for both rounds of the reactor reboot puzzle.
+
+This one was touch to crack, just because I made oh so many mistakes.
+The approaches worked out in the end.
+
+For part 1, simply take a grid of 101x101x101 and mark and unmark points on it
+as needed.
+I've used another lazy grid, but it basically does the same thing.
+
+For part 2, it was clear that tracking all marked points in space was no option.
+Instead, I've decided to track non-verlapping areas in space of positive values.
+I've also decided to use the old "start included, end excluded" way of writing
+down cuboids, so cuboid "on x=10..12,y=10..12,z=10..12" would be "on
+x=10..13,y=10..13,z=10..13" for my code, but encompassing the same space.
+
+When adding a coboid, check for overlaps with existing ones.
+If an overlap is found, split the previous cuboid up into up to 26 cuboids that
+do not overlap with the new one but are fully within the old one.
+Remember those up to 26 cuboids.
+If this was "switching on" operation, also remember the new cuboid.
+Otherwise, don't remember the new cuboid.
+The space overlapping between the new one and the old ones has been forgotten
+anyway.
+
+If there is no overlap, simply remember all cuboids as they are.
+If an existing cuboid is fully within the new one, discard the old one.
+If this is a "switching on" operation, the new one will contain the same space.
+If it is a "switching off" one, the old cuboud would need to be removed anyway.
+
+Sorry if this description is brief, but I won't have much more time to play
+around with the AoC this year.
+Don't be surprised to see no more solutions from me.
+It was fun!
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `grid.go`, which contains a lazy grid mostly taken from
+previosu solutions but extended to 3 dimensions.
+There is also a vector and a cuboid with some helper methods defined here.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`grid.go`
+[source,go,numbered]
+----
+include::grid.go[tags=grid]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

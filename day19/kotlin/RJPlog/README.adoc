@@ -1,0 +1,53 @@
+==  Day 19: Beacon Scanner  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/19
+
+For execution enter _kotlin day2119_1_2.kts_ in the command line.
+
+For the solution of this puzzle at first I created a class which holds for each scan the scanner id, the position of the scanner (which are at the beginning only placeholders) and the raw data. There are three functions for this class, one to flip and rotate the raw data in the 24 different views, one to adapt an offset to the data, and a function to set the position after it is caluclated. The class is implemented with a lot of copy-paste-modify for the flip/rot operations, which are not very elegant, but at the end it worked and I have already put to much time into it. If you are really interested, you can find the code in the repository.
+
+The puzzle input is read and the scans are put into an object of the above described class and put into a list _allScans_. The first one is already move out into a second list _matchedScans with position of the scanner set to (0,0,0).
+[source, kotlin, numbered]
+....
+include::day2119_1_2.kts[tags=read_puzzle_input]
+....
+
+Now for all remaining objects out of _allScans_ an element is picked and a second loop is nested to flip and rotate it in all directions. With each result, all beacons of last _matchedSans_ objects are compared with _allScans_. Therefore over all beacons the offset necessary to match a single beacons is caluclated and the complete dataset of the object is shifted. If then there are 12 or more matches, the object is moved into _matchedScans_ and removed out of _allScans_. At this time already also the absolut position of the new matched object is determined and stored.
+
+At the end the list _matchedScans_ contains all scans flipped and rotated in the right position with their absolute position stored.
+
+[source, kotlin, numbered]
+....
+include::day2119_1_2.kts[tags=matchScans]
+....
+
+=== First Star
+
+How does it work: +
+
+For the first star, all beacons out ouf all scans of _matchesScans_ are stored in a new list without dublicates. The size of the list is result of part 1
+
+[source, kotlin, numbered]
+....
+include::day2119_1_2.kts[tags=part1]
+....
+
+=== Second Star
+
+How does it work: +
+
+For the second star all positions out of all objects in _matchedScans_ are compared to each other by calculating the manhatten distance. The max value is solution for part 2
+
+[source, kotlin, numbered]
+....
+include::day2119_1_2.kts[tags=part2]
+....
+
+At the end, both solutions are printed out. Be patient, it takes around 20 seconds. 
+
+[source, kotlin, numbered]
+....
+include::day2119_1_2.kts[tags=output]
+....

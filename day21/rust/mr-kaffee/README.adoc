@@ -1,0 +1,54 @@
+== Day 21: Dirac Dice ==
+
+https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/21[AoC|2021|21].
+
+=== Part 1 ===
+
+Part 1 is pretty straight forward:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part1]
+----
+
+=== Part 2 ===
+
+For part 2, my first attempt was to use a depth first traversal through play states. I push play states with multiplicities on a stack. 
+
+Each state popped from the stack results in 7 new states for the seven different outcomes of throwing a 3-sided dice three times: (1 x 3, 3 x 4, 6 x 5, 7 x 6, 6 x 7, 3 x 8, 1 x 9).
+
+If a state is a win for either player, the win counter is increased. Otherwise the new state with the new multiplicity is pushed to the stack.
+
+I came up with the idea quite quickly. Still took some time to finish part 2 because of a stupid bug: I updated position and score for the 2nd, 3rd, ... outcome of throwing a dice not based on the current state but based on the 1st, 2nd, ... outcome of throwing a dice...
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2_stack]
+----
+
+Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for each positions / scores it might be player 1's or player 2's turn). Yet, my stack based solution processes ~17 million items from the stack, i.e., on average, each state is pushed to the stack more than 200 times. There seems to be potential for optimization.
+
+I created a second solution which is based on a flat list of multiplicities for every possible state. I process each state, sorted by the sum of the scores of both players. Because the total score increases in every round played, I am sure that a state processed once will never occur again. Here is my second solution:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=part2_list]
+----
+
+Quick runtime comparison:
+
+* Stack based solution: ~450ms
+* List based solution: ~3ms
+
+List based is faster by a factor 150!
+
+Hence, list based is my default ;)
+
+If you still want to run the stack based solution, you can do so with ``cargo run --release --features stack``
+
+=== Tests ===
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=tests]
+----

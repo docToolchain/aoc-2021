@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Represent the number as a tree like structure where the leafs are actually numbers. Implement the operations as recursive operations on the nodes.
+
+[source, python]
+....
+include::eighteen.py[]
+....

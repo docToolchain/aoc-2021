@@ -1,0 +1,77 @@
+== Day 21: Dirac Dice ==
+
+This is my implementation for both rounds of the Dirac dice puzzle.
+
+This one was fun, too.
+The first part was straightforward.
+Simply implement what the task states.
+The only possible pitfalls could be off-by-one errors.
+
+The second part took more thinking.
+It was clear right from the start that following all possible games one at a
+time was not an option.
+Instead, like in some cases before, one would have to track all possible game
+states (i.e. universes) and count how many there were.
+I've decided to use the word "metaverse" for related code :) .
+
+Some back-of-the-napkin math can be used to assess whether tracking all possible
+game states for the duration of the game is viable:
+The board consists of 10 spaces and there are two players.
+Hence, there are 100 possible arrangements of players.
+Then, for each player, there are 30 possible scores before a game ends, 0
+through 29.
+In the worst case, a player with score 20 rolls a 9, arriving at a total winning
+score of 29.
+Thus, there are 900 possible score combinations.
+Overall, there are 900*100 = 90,000 possible game states before a game is
+guaranteed to have ended.
+Assuming you need store all game states and a count of how many universes are in
+each state, that means you need to store 450,000 numbers, 5 integers per game
+state.
+If an Integer is, say, 8 bytes, that's roughly 3.5MB, an amount of storage
+modern hardware can easily handle.
+
+Thus, during each step of the game, for each current game state, the code
+checks what are the 7 possible new game states and counts how many there are
+for each (number of current games times number of die rolls arriving at that
+score).
+After each turn, games where one of the two players has won are counted and
+removed from the metaverse.
+Rinse repeat until the metaverse is empty.
+
+I've also decided to simplify the algorithm a bit by always treating it as if
+player 1 had their turn and swapping the players after every turn.
+There is no actual swapping, it's just that the new game state is build up by
+using player 1's data for player 2 and vice versa.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `metaverse.go`, which contains the code solving part 2.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`metaverse.go`
+[source,go,numbered]
+----
+include::metaverse.go[tags=metaverse]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

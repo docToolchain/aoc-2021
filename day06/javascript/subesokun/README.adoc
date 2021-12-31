@@ -1,0 +1,22 @@
+== Solution ==
+
+Lanternfish
+
+[source, javascript, numbered]
+----
+include::solution.js[tags=input]
+----
+
+=== Part 1
+
+[source, javascript, numbered]
+----
+include::solution.js[tags=star1]
+----
+
+=== Part 2
+
+[source, javascript, numbered]
+----
+include::solution.js[tags=star2]
+----

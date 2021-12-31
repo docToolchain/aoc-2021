@@ -1,0 +1,68 @@
+==  Day 21: Dirac Dice  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/21
+
+For execution enter _kotlin day2121_1_2.kts_ in the command line.
+
+=== First Star
+
+How does it work: +
+
+First the puzzle input is read into variables for further proceeding.
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=read_puzzle_input]
+....
+
+All the calculations are placed into a function, which is called from the main part with the puzzle input:
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=part1]
+....
+
+Inside the function the game and the rules are implemented and if one player wins, the result of player's score multiplied by number of dices thrown is returned:
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=standardDice]
+....
+
+
+=== Second Star
+
+How does it work: +
+
+Here the same puzzle input is used, but for calculation of the result some modifications are necessary. The spedification now asks not for a standardized row of dice
+results, but for a variant tree, starting with (1),(2),(3) and then (1,1),(1,2),(1,3),(2,1)....  Every round of throwing dices you multiply the input vector by 3 -->
+3, 9, 27, 81, 243... .  Each player has it's turn only after 3 times throwing the dices, so you can combine any combination of (1,2,3) to one throw with value 3-9.
+Each value has a number out of which dice combinations it could be reached, which is stored in a map and used to calculate the number of games following that path.
+
+This reduction was not enough, the only idea I had was to split the calculation into separte ones and to add up the result, this is done in the main part, where already
+some of the staring vectors of dices are created, and then it is continued until payer one or two wins, or game ends without win, then new vectors are created with a 
+range of 3 to 9 added to the input vector.
+
+Tryouts have shown, that for beeing able to reach the end, the starting vector has at least to be filled with the first two values.
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=part2]
+....
+
+With these starting vectors the function _diracDice_ is started, if one player wins, the number of different worlds is calculated and summed up, if now player wins, the main
+algorithm will add nine new input vectors to the list for next run.
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=diracDice]
+....
+
+At the end, both solutions are printed out. 
+
+[source, kotlin, numbered]
+....
+include::day2121_1_2.kts[tags=output]
+....

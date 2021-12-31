@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Just a lot of string/bit manipulation
+
+[source, python]
+....
+include::sixteen.py[]
+....

@@ -1,0 +1,22 @@
+== Day 19: Beacon Scanner ==
+
+This solution takes about 6 seconds to run on my system.
+
+Essentially it works as follows:
+Start by finding a scanner k that matches with scanner 0, and transform scanner k coordinates to scanner 0 coordinates.
+Next, find a scanner that either matches with scanner 0 or with scanner k, transform to scanner 0 coordinates -- repeat until all scanners are matched.
+
+For checking if two scanners match, go through all 24 orientations for either of the scanners.
+For each orientation, check how many overlapping beacons you get by transposing any beacon of the second scanner onto any beacon of the first scanner.
+Stop if there are at least 12 overlaps.
+
+The code uses a major optimization which reduces the runtime from 20+ minutes to a few seconds:
+For a given pair of scanner, assume they overlap in at least 12 beacons.
+The distance between beacons is invariant under transposition and rotation.
+So the distances between these 12 beacons will be the same for both scanners.
+There are 66 pairwise distances between 12 beacons.
+So the intersection of the set of all pairwise distances for the first scanner, and the respective set for the second scanner,
+must contain at least 66 elements.
+
+So we can skip a deep comparison for any pair of scanners with less than 65 elements in the pairwise distance intersection.
+For my specific input, this heuristic eliminates all fruitless in-depth matching attempts.

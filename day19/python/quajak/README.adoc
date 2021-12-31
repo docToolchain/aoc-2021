@@ -1,0 +1,10 @@
+Advent of Code 2021
+
+== Python
+
+Represent each scanner as an object with a method to generate all possible variations of the coordinates through rotations. Then brute force search between all scanners where they match up until all scanners relative positions have been found.
+
+[source, python]
+....
+include::nineteen.py[]
+....
