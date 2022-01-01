@@ -35,26 +35,30 @@ for y in range(len(heat_map)):
 print(f"Star 1: Risk level sum: {risk_level_sum}")
 
 
-def basin_size(x, y, heat_map):
+def basin_size(x, y, heat_map, visited_locations):
     locations = {(x, y)}
+
+    visited_locations.update({(x,y)})
     #links
-    if (x > 0) and (heat_map[y][x] <= heat_map[y][x - 1]) and (heat_map[y][x - 1] != 9):
-        locations.update(basin_size((x - 1), y, heat_map))
+    if (x > 0) and (heat_map[y][x] <= heat_map[y][x - 1]) and (heat_map[y][x - 1] != 9) and not {(x-1,y)}.issubset(visited_locations):
+        locations.update(basin_size((x - 1), y, heat_map, visited_locations))
     #rechts
-    if (x < (len(heat_map[0])-1)) and (heat_map[y][x] <= heat_map[y][x + 1]) and (heat_map[y][x + 1] != 9):
-        locations.update(basin_size((x + 1), y, heat_map))        
+    if (x < (len(heat_map[0])-1)) and (heat_map[y][x] <= heat_map[y][x + 1]) and (heat_map[y][x + 1] != 9)and not {(x+1,y)}.issubset(visited_locations):
+        locations.update(basin_size((x + 1), y, heat_map, visited_locations))        
     #hoch
-    if (y > 0) and (heat_map[y][x] <= heat_map[y - 1][x]) and ( heat_map[y - 1][x] != 9):
-        locations.update(basin_size(x, (y - 1), heat_map))
+    if (y > 0) and (heat_map[y][x] <= heat_map[y - 1][x]) and ( heat_map[y - 1][x] != 9) and not {(x,y-1)}.issubset(visited_locations):
+        locations.update(basin_size(x, (y - 1), heat_map, visited_locations))
     #runter
-    if (y < (len(heat_map)-1)) and (heat_map[y][x] <= heat_map[y + 1][x])  and (heat_map[y + 1][x] != 9):
-        locations.update(basin_size(x, (y + 1), heat_map))    
+    if (y < (len(heat_map)-1)) and (heat_map[y][x] <= heat_map[y + 1][x])  and (heat_map[y + 1][x] != 9) and not {(x,y+1)}.issubset(visited_locations):
+        locations.update(basin_size(x, (y + 1), heat_map, visited_locations))
+    
     return locations
 
 
 basin_sizes = list()
 for low_point in low_points: 
-    basin_size_cnt = len(basin_size(low_point[0],low_point[1],heat_map))
+    visited_locations = set()
+    basin_size_cnt = len(basin_size(low_point[0],low_point[1],heat_map, visited_locations))
     basin_sizes.append(basin_size_cnt)
 
 basin_sizes.sort()    
