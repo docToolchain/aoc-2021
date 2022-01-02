@@ -232,6 +232,16 @@
 </li>
 </ul>
 </li>
+<li><a href="#_day_11_python">Day 11: python</a>
+<ul class="sectlevel3">
+<li><a href="#_python_12">Python</a>
+<ul class="sectlevel4">
+<li><a href="#_star_1_8">Star 1</a></li>
+<li><a href="#_star_2_5">Star 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1184,6 +1194,7 @@ syntax_error_map = {
 }
 
 lines = list()
+incomplete_lines = list()
 for line in file1:
     lines.append(list(line.strip()))
 
@@ -1214,20 +1225,134 @@ syntax_error_score = 0
 for line in lines:
     stack = list()
     #print(line)
+    incomplete_line = True
     for bracket in line:
         if isOpeningBracket(bracket):
             stack.append(bracket)
         else:
-            #print(stack)
-            #print(stack[-1:])
             if isMatchingBracket(bracket, stack[-1:]):
                 stack.pop()
             else:
-                print(f"illegal bracket found: {bracket}")
+                #print(f"illegal bracket found: {bracket}")
                 syntax_error_score += syntax_error_map[bracket]
+                incomplete_line = False
                 break
+    if incomplete_line:
+        incomplete_lines.append(line)
 
-print(f"Star 1: Total Syntax error score: {syntax_error_score}")</code></pre>
+
+print(f"Star 1: Total Syntax error score: {syntax_error_score}")
+
+scores = list()
+for line in incomplete_lines:
+    stack = list()
+    for bracket in line:
+        if isOpeningBracket(bracket):
+            stack.append(bracket)
+        else:
+            if isMatchingBracket(bracket, stack[-1:]):
+                stack.pop()
+    score = 0
+    stack.reverse()
+    for bracket in stack:
+        score *= 5
+        if bracket == "(":
+            score += 1
+        if bracket == "[":
+            score += 2
+        if bracket == "{":
+            score += 3
+        if bracket == "&lt;":
+            score += 4
+    scores.append(score)
+
+scores.sort()
+print(f"Star 2: Middle score is: {scores[len(scores)//2]}")</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_python"><a class="anchor" href="#_day_11_python"></a><a class="link" href="#_day_11_python">Day 11: python</a></h3>
+<div class="paragraph">
+<p>Advent of Code 2021</p>
+</div>
+<div class="sect3">
+<h4 id="_python_12"><a class="anchor" href="#_python_12"></a><a class="link" href="#_python_12">Python</a></h4>
+<div class="sect4">
+<h5 id="_star_1_8"><a class="anchor" href="#_star_1_8"></a><a class="link" href="#_star_1_8">Star 1</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_star_2_5"><a class="anchor" href="#_star_2_5"></a><a class="link" href="#_star_2_5">Star 2</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import numpy as np
+
+file1 = open('input.txt', 'r')
+
+lines = list()
+
+for line in file1:
+    lines.append(list(map(int,list(line.strip()))))
+
+grid = np.zeros((10,10), dtype=int)
+for y in range(10):
+    row = list(map(int,list(lines[y])))
+    grid[y] = np.asarray(row, dtype=np.int8)
+
+print(grid)
+
+def power_up_neighbours(x,y,grid,flashed_octopusses):
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            x_n = x + dx
+            y_n = y + dy
+            if (x_n &gt;= 0 and x_n &lt; 10 ) and (y_n &gt;= 0 and y_n &lt; 10 ):
+                if(not flashed_octopusses[y_n][x_n]):
+                    grid[y_n][x_n] += 1
+
+flash_count = 0
+for iteration in range(0,100):
+    flashed_octopusses = np.zeros((10,10), dtype=bool)
+    #increase engery level by one
+    for y in range(0, len(grid)):
+        for x in range(0, len(grid[0])):
+            grid[y][x] += 1
+    #let octopusses lash
+    while((grid &gt; 9).sum() != 0):
+        for y in range(0, len(grid)):
+            for x in range(0, len(grid[0])):
+                if grid[y][x] &gt; 9:
+                    flashed_octopusses[y][x] = True
+                    flash_count += 1
+                    grid[y][x] = 0
+                    power_up_neighbours(x,y,grid,flashed_octopusses)
+
+print(f"Star 1: There have been {flash_count} flashes after 100 itterations")
+itterations = 100
+flashed_octopusses = np.zeros((10,10), dtype=bool)
+while( flashed_octopusses.sum() != 100):
+    flashed_octopusses = np.zeros((10,10), dtype=bool)
+    #increase engery level by one
+    for y in range(0, len(grid)):
+        for x in range(0, len(grid[0])):
+            grid[y][x] += 1
+    #let octopusses flash
+    while((grid &gt; 9).sum() != 0):
+        for y in range(0, len(grid)):
+            for x in range(0, len(grid[0])):
+                if grid[y][x] &gt; 9:
+                    flashed_octopusses[y][x] = True
+                    flash_count += 1
+                    grid[y][x] = 0
+                    power_up_neighbours(x,y,grid,flashed_octopusses)
+
+    itterations += 1
+
+print(f"Star 2: All flash after {itterations} itterations")</code></pre>
 </div>
 </div>
 </div>
