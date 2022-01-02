@@ -25,7 +25,7 @@ def power_up_neighbours(x,y,grid,flashed_octopusses):
 
 flash_count = 0
 for iteration in range(0,100):
-    flashed_octopusses = np.zeros((10,10), dtype=int)
+    flashed_octopusses = np.zeros((10,10), dtype=bool)
     #increase engery level by one
     for y in range(0, len(grid)):
         for x in range(0, len(grid[0])):
@@ -39,6 +39,26 @@ for iteration in range(0,100):
                     flash_count += 1
                     grid[y][x] = 0
                     power_up_neighbours(x,y,grid,flashed_octopusses)
-    #print(grid)
 
 print(f"Star 1: There have been {flash_count} flashes after 100 itterations")
+itterations = 100
+flashed_octopusses = np.zeros((10,10), dtype=bool)
+while( flashed_octopusses.sum() != 100):
+    flashed_octopusses = np.zeros((10,10), dtype=bool)
+    #increase engery level by one
+    for y in range(0, len(grid)):
+        for x in range(0, len(grid[0])):
+            grid[y][x] += 1
+    #let octopusses flash
+    while((grid > 9).sum() != 0):
+        for y in range(0, len(grid)):
+            for x in range(0, len(grid[0])):
+                if grid[y][x] > 9:
+                    flashed_octopusses[y][x] = True
+                    flash_count += 1
+                    grid[y][x] = 0
+                    power_up_neighbours(x,y,grid,flashed_octopusses)
+
+    itterations += 1
+
+print(f"Star 2: All flash after {itterations} itterations")
