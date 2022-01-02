@@ -10,6 +10,7 @@ syntax_error_map = {
 }
 
 lines = list()
+incomplete_lines = list()
 for line in file1:
     lines.append(list(line.strip()))
 
@@ -40,17 +41,46 @@ syntax_error_score = 0
 for line in lines:
     stack = list()
     #print(line)
+    incomplete_line = True
     for bracket in line:
         if isOpeningBracket(bracket):
             stack.append(bracket)
         else:
-            #print(stack)
-            #print(stack[-1:])
             if isMatchingBracket(bracket, stack[-1:]):
                 stack.pop()
             else:
-                print(f"illegal bracket found: {bracket}")
+                #print(f"illegal bracket found: {bracket}")
                 syntax_error_score += syntax_error_map[bracket]
+                incomplete_line = False
                 break
+    if incomplete_line:
+        incomplete_lines.append(line)
+
 
 print(f"Star 1: Total Syntax error score: {syntax_error_score}")
+
+scores = list()
+for line in incomplete_lines:
+    stack = list()
+    for bracket in line:
+        if isOpeningBracket(bracket):
+            stack.append(bracket)
+        else:
+            if isMatchingBracket(bracket, stack[-1:]):
+                stack.pop()
+    score = 0
+    stack.reverse()
+    for bracket in stack:
+        score *= 5
+        if bracket == "(":
+            score += 1
+        if bracket == "[":
+            score += 2
+        if bracket == "{":
+            score += 3
+        if bracket == "<":
+            score += 4
+    scores.append(score)
+
+scores.sort()
+print(f"Star 2: Middle score is: {scores[len(scores)//2]}")
