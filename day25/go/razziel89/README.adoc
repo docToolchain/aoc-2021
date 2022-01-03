@@ -1,0 +1,37 @@
+== Day 24: Sea Cucumber ==
+
+This is my implementation for the single round of the sea cucumber puzzle.
+
+This one was rather simple, just implement what is written in the task.
+The only possible obstacle I noticed was the fact that the east-moving cucumbers
+move first and then the south-moving ones do.
+When implementing the sea floor via an array and creating a new array for each
+step, as in this implementation, you need to check for east-movers in the
+updated array and for south-movers in the old one.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.
+Set the environment variable `PRETTY_PRINT` to `1` if you want to see output
+after each step.
