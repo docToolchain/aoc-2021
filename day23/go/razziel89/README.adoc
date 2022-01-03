@@ -1,0 +1,69 @@
+== Day 23: Amphipod ==
+
+This is my implementation for both rounds of the amphipod puzzle.
+
+This one was a bit tedious, to say the least.
+I did not aim for an optimal solution but only for one that works and finds the
+cheapest paths.
+That it does.
+
+This solution contains quite a few hard-coded values.
+I wanted to make sure to be able to snapshot or copy a game whenever I liked
+without side effects.
+In Go, that's a bit difficult since the ubiquitous slices are basically only
+references to underlying arrays.
+Changing a value in one slice referencing an array changes the same value in all
+other slices referencing the same array.
+Thus, slices were out of the question and I've used arrays of fixed lengths.
+
+The most tedious bit was the implementation of determining possible amphipod
+moves for any given arrangement of amphipods (henceforth shortened to "pods").
+That one is in `game.go`.
+The funciton `moves` determines available moves by iterating over all pods.
+For each pod, it checks whether that pod is in a room or the hallway.
+Then, it checks whether that pod may move anywhere (i.e. the hall if in a room
+and vice versa).
+Once it has determined that a pod may move, it determines all possible
+destinations.
+
+With the list of available moves for each possible pod arrangement, a very
+simple backtracking algorithm is used to find the optiomal solution.
+It takes a while for the larger examples as all possible moves are checked, but
+it does find the solution.
+As little is regenerated as possible by storing values on a stack when exploring
+new moves.
+A function call cache might provide evem more speed-up by avoiding duplicate
+function calls.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `game.go`, which contains the definition of the game board on
+which the amphipods move.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`game.go`
+[source,go,numbered]
+----
+include::game.go[tags=game]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

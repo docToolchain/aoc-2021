@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+// tag::game[]
+
 // Go doesn't have enums, sadly. Use constants with name prefixes instead.
 const (
 	a            = 'A'
@@ -24,7 +26,7 @@ const (
 	lastHallIdx  = 11
 	firstRoomIdx = 11
 	kindToRoom   = 4
-	// Assume there are at least 2 possible moves per situation. This number influences performance
+	// Assume there are at least 16 possible moves per situation. This number influences performance
 	// a bit.
 	buffer = 16
 )
@@ -50,7 +52,7 @@ func getCharForPos(pods [16]pod, pos int) rune {
 			case costD:
 				return d
 			default:
-				log.Fatal("internal error")
+				log.Fatalf("internal error, %v", p)
 			}
 		}
 	}
@@ -377,7 +379,9 @@ func (p pod) String() string {
 	case kindD:
 		name = d
 	default:
-		log.Fatal("internal error")
+		log.Fatalf("internal error, %v, %v, %v", p.cost, p.kind, p.pos)
 	}
 	return fmt.Sprintf("{k: %c, p: %d, c: %d}", name, p.pos, p.cost)
 }
+
+// end::game[]

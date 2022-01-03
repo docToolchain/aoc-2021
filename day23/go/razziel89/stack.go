@@ -13,7 +13,7 @@ type StackedGame struct {
 	moves []move
 }
 
-// Stack is a FIFO.
+// Stack is a LIFO.
 type Stack []StackedGame
 
 // Push puts a value on the stack.
@@ -41,7 +41,7 @@ func (s *Stack) Pop() (game, int, int, []move) {
 	return val.game, val.cost, val.path, val.moves
 }
 
-// Peek returns the top-most entry.
+// Peek returns the top-most entry without removing it.
 func (s *Stack) Peek() *StackedGame {
 	if len(*s) == 0 {
 		return &StackedGame{}

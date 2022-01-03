@@ -1,0 +1,97 @@
+== Day 24: Arithmetic Logic Unit ==
+
+This is my implementation for both rounds of the arighmetic logic unit puzzle.
+
+This one had be baffled for quite a while.
+The first thing I did was to implement the functionality applying the given
+operations (assembler-like instructions) to the ALU (basically CPU registers).
+I was hoping that there would be a great number of zeroes to divive by or
+negative numbers to take the modulus of.
+As these operations have been declared "invalid" by the task, I was hoping to
+exclude many numbers that way.
+No such luck.
+
+Using the existing code to brute-force a solution would work eventually, but a
+quick estimate showed that it would take in excess of 23 days to solve on my
+machine.
+That's too long.
+
+The next thing I did was to take pen and paper and try to decude some properties
+of the intermediate register states and operations.
+Could some operations be kicked out?
+Did some not have to be computed?
+
+It turns out that the list of operations can be divided into 14 very similar
+blocks, each of which starts with an `inp` instruction to the `w` register.
+Using pen and paper, it can easily be seen that the values to the `x` and `y`
+registers don't matter in the long run as only the value of the `z` register is
+kept between blocks.
+As a side note, the same way, it was very obvious that there was never an "is
+equal to " operation but only ever a "is unequal to" one.
+
+Looking at the whole set of instructions in order, they struck me as a form of
+hashing.
+That is, a 14-digit number is mapped to a much smaller one.
+Finding inputs to hashing algorithms that produce a specific output is known to
+be hard, which is why the problem struck me as odd.
+I could not imagine that we were meant to brute-force a solution or that the
+code could be made efficient enough to brute-force one.
+
+Suddenly, I realised that due to the fact that modulo and integer division
+operations are being used, there was a limited number of inputs to each of the
+14 blocks.
+That is, each block has one ouf of 9 digits and the previous state of the ALU
+as input.
+That state can be boiled down to its `z` register, which was a number resulting
+from some modulo and division operations.
+As such, there is a limited number of possible values it can have.
+
+Taking each of the blocks as an individual operation that computed the input to
+the next one, a function cache (a LRU cache associating arguments with return
+values directly) can can be used to avoid computing values more than once.
+Applying this function cache to each of the 14 levels separately helps to skip a
+great number of computations on lower levels.
+Using such a cache, a brute-force approach suddenly becomes very viable.
+It takes less than 10s to compute the result on my decade old harware.
+
+After implementing the above solution, I've seen more optimal ones by others.
+I still keep it as the first time I have been using an LRU cache.
+
+After implementing my solution, I've also updated the code to extract the
+numbers that change between blocks to support arbitrary solution inputs (in
+contrast to the manually extracted values used before due to lack of time).
+That is, based on the list of operations, the 14 functions implementing the 14
+different blocks are contructed automatically.
+
+=== Oveview ===
+
+This solution contains a `solution.go`, which defines the main executable.
+There is also a `utils.go`, which is currently where all helper functions that
+might be re-used later on reside.
+There is also an `ops.go`, which contains the code converting the input ops to
+the actual functions used for the cached brute-force approach.
+
+`solution.go`
+[source,go,numbered]
+----
+include::solution.go[tags=solution]
+----
+
+`utils.go`
+[source,go,numbered]
+----
+include::utils.go[tags=utils]
+----
+
+`ops.go`
+[source,go,numbered]
+----
+include::ops.go[tags=ops]
+----
+
+There are currently no tests.
+
+=== How to run ===
+
+Assuming the required input is in a file `input.dat`, you only need to execute
+`cat input.dat | go run .` to run both solutions.

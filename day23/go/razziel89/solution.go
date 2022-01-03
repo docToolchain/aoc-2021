@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
+
+// tag::solution[]
 
 const (
 	numGames = 1000000
@@ -14,24 +17,12 @@ const (
 //nolint:nestif,funlen
 func main() {
 	// Part 1 stuff has been augmented to fit into the part 2 board by adding pieces that will never
-	// leave their rooms to the very bottom of their destination rooms. Uncomment each array to run.
-	// // Actual riddle part 1.
-	// g := newGame(
-	// 	[16]rune{'D', 'C', 'A', 'A', 'D', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'A', 'C', 'D', 'D'},
-	// )
-	// // Example part 1.
-	// g := newGame(
-	// 	[16]rune{'B', 'A', 'A', 'A', 'C', 'D', 'B', 'B', 'B', 'C', 'C', 'C', 'D', 'A', 'D', 'D'},
-	// )
-	// Actual riddle part 2.
-	g := newGame(
-		[16]rune{'D', 'D', 'D', 'C', 'D', 'C', 'B', 'A', 'B', 'B', 'A', 'B', 'A', 'A', 'C', 'C'},
-	)
-	// Example part 2.
-	// fmt.Println("Example 2")
-	// g := newGame(
-	// 	[16]rune{'B', 'D', 'D', 'A', 'C', 'C', 'B', 'D', 'B', 'B', 'A', 'C', 'D', 'A', 'C', 'A'},
-	// )
+	// leave their rooms to the very bottom of their destination rooms.
+	gameInput, err := ReadLinesAsGame()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	g := newGame(gameInput)
 	// Initialise. Allocate much since we don't know how deep we need to iterate. This uses about
 	// 1.5GB of RAM.
 	stack := make(Stack, 0, numGames)
@@ -79,7 +70,7 @@ func main() {
 						fmt.Println(gam.moves[gam.path-1])
 					}
 					fmt.Println(g.pretty())
-					fmt.Println(cheapest)
+					fmt.Println("New cheapest path shown above found, it has a cost of ", cheapest)
 				}
 			}
 			if len(stack) == 0 {
@@ -90,5 +81,7 @@ func main() {
 			popped = true
 		}
 	}
-	fmt.Println(cheapest)
+	fmt.Println("Cehapest track is the last one shown with cost", cheapest)
 }
+
+// end::solution[]
