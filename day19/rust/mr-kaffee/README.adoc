@@ -2,55 +2,61 @@
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/19[AoC|2021|19].
 
-The solution for today's puzzle takes ~180ms to complete in my current implementation (optimized from 30 seconds in the first version to ~10 and ~3 seconds in intermediate steps).
+The solution for today's puzzle takes ~60ms to complete in my current implementation (optimized from 30 seconds in the first version).
 
-The optimizations to get down to three seconds include:
-
-* check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set
-* use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set ``settled = 1``) and continue to settle furhter sets that overlap with sets from the queue.
-
-The final optimization to achieve solution times below 1s are taken from https://github.com/mogron[Moritz Gronbach]: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.
+The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations and thus do as much as possible on the distances and only figure out the correct transformation late. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from https://github.com/mogron[Moritz Gronbach].
 
 === Parts 1 & 2 ===
 
-To keep the code clean, I created some shortcuts for 3D coordinates:
-
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=coordinate]
-----
-
-The input is read as follows (create sets of beacons and maps of pairwise distances):
+When reading the input, I create a distance map (``dists``) which -- for every beacon in a scanner's set -- creates a map with distances as keys and lists of beacons at that distance as values.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=parse]
 ----
 
-Then I define all 24 possible transformations with inverse transformations.
+This is used in a ``check_overlap`` function, which first finds beacons in two scanner's (``self`` and ``other``) that have at least 12 distances to other scanners in common and stores a list of ``pairs`` of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)
 
-[source,rust,numbered]
-----
-include::src/lib.rs[tags=trafos]
-----
-
-The transformations are used to figure out whether two scanner's ranges (two sets of beacons in their own coordinate systems) overlap:
+Using this list of ``pairs``, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner's.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=check_overlap]
 ----
 
-With these elements, the solution to both parts is calculated as follows:
+The final piece of the solution is to walk through the scanners and check for overlaps until all scanners are settled. This is done by pushing settled scanners to a stack and then repeatedly popping a scanner from the stack and finding scanners with overlapping range to the settled one until everything is settled. While settling the scanners, the largest distance between any two scanners is stored and a list of unique beacons is populated.
 
 [source,rust,numbered]
 ----
 include::src/lib.rs[tags=solution]
 ----
 
-=== Sanity Check ===
+=== Implementation details ===
 
-I implemented a sanity check for overlapping scanner regions as follows (see comments for details):
+Some details of the implementation include:
+
+A ``Coord`` structure (including code to parse/print coordinates)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=coordinate]
+----
+
+A list of valid transformations
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=trafos]
+----
+
+A ``Scanner`` structure (including code to parse/print scanners)
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=scanner]
+----
+
+The ``Scanner`` implementation includes a sanity check for overlapping regions:
 
 [source,rust,numbered]
 ----

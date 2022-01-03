@@ -21,10 +21,10 @@ Run tests with `cargo test` or `cargo test --release`
 
 === Personal Challenges ===
 
-I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this and some build optimizations, my overall solution time is below 700ms on my machine:
+I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is below 600ms on my machine:
 
 ----
-Total time for 25 days: 666.6676ms (26.666704ms per day)
+Total time for 25 days: 560.236ms (22.40944ms per day)
 ----
 
 My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box _nightly_ Rust for this one to be able to use the method ``BTreeSet::pop_first``
