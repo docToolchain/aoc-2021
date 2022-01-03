@@ -24,27 +24,36 @@ pub const X: C = 0;
 pub fn step(grid: &[C], w: usize) -> Option<Vec<C>> {
     let mut grid_upd = vec![X; grid.len()];
     let mut moved = false;
+    let h = grid.len() / w;
 
-    for k in 0..grid.len() {
-        if grid[k] == E {
-            let k_upd = (k + 1) % w + w * (k / w);
-            if grid[k_upd] == X {
-                grid_upd[k_upd] = E;
-                moved = true;
-            } else {
-                grid_upd[k] = E;
+    for x in 0..w {
+        let x_upd = (x + 1) % w;
+        for y in 0..h {
+            let k = x + w * y;
+            if grid[k] == E {
+                let k_upd = x_upd + w * y;
+                if grid[k_upd] == X {
+                    grid_upd[k_upd] = E;
+                    moved = true;
+                } else {
+                    grid_upd[k] = E;
+                }
             }
         }
     }
 
-    for k in 0..grid.len() {
-        if grid[k] == S {
-            let k_upd = (k + w) % grid.len();
-            if grid[k_upd] != S && grid_upd[k_upd] == X {
-                grid_upd[k_upd] = S;
-                moved = true;
-            } else {
-                grid_upd[k] = S;
+    for y in 0..h {
+        let y_upd = (y + 1) % h;
+        for x in 0..w {
+            let k = x + w * y;
+            if grid[k] == S {
+                let k_upd = x + w * y_upd;
+                if grid[k_upd] != S && grid_upd[k_upd] == X {
+                    grid_upd[k_upd] = S;
+                    moved = true;
+                } else {
+                    grid_upd[k] = S;
+                }
             }
         }
     }

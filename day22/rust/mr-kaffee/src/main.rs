@@ -2,8 +2,8 @@ use mr_kaffee_2021_22::*;
 use std::time::Instant;
 
 pub const INPUT: &str = include_str!("../input.txt");
-pub const EXP_1: usize = 581_108;
-pub const EXP_2: usize = 1_325_473_814_582_641;
+pub const EXP_1: u64 = 581_108;
+pub const EXP_2: u64 = 1_325_473_814_582_641;
 
 fn main() {
     let timer = Instant::now();

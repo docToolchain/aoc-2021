@@ -14,14 +14,12 @@ pub trait VentsCount {
 
 impl VentsCount for HashMap<(isize, isize), usize> {
     fn increment(&mut self, coord: (isize, isize)) {
-        // get entry, create and initialize with value 0 if not yet present
-        let count = self.entry(coord).or_insert(0);
-        // increment
-        *count += 1;
+        // get or insert entry and increment
+        *self.entry(coord).or_insert(0) += 1;
     }
 
     fn count_dangerous(&self) -> usize {
-        self.values().filter(|count| **count > 1).count()
+        self.values().filter(|&count| *count > 1).count()
     }
 }
 

@@ -1,328 +1,314 @@
 use std::{
     cmp,
     collections::{HashMap, HashSet},
-    ops::RangeInclusive,
+    str::FromStr,
 };
 
 // tag::coordinate[]
 /// type alias for 3D coordinate
-pub type Coord = (isize, isize, isize);
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+pub struct Coord(isize, isize, isize);
 
-/// basic math operations for coordinates
-pub trait CoordMath {
-    fn add(self, rhs: &Self) -> Self;
-    fn sub(self, rhs: &Self) -> Self;
-    fn abs(&self) -> usize;
-}
-
-impl CoordMath for Coord {
-    fn add(mut self, rhs: &Self) -> Self {
+impl Coord {
+    pub fn add(mut self, rhs: &Self) -> Self {
         self.0 += rhs.0;
         self.1 += rhs.1;
         self.2 += rhs.2;
         self
     }
 
-    fn sub(mut self, rhs: &Self) -> Self {
+    pub fn sub(mut self, rhs: &Self) -> Self {
         self.0 -= rhs.0;
         self.1 -= rhs.1;
         self.2 -= rhs.2;
         self
     }
 
-    fn abs(&self) -> usize {
+    pub fn abs(&self) -> usize {
         (self.0.abs() + self.1.abs() + self.2.abs()) as usize
+    }
+}
+
+impl FromStr for Coord {
+    type Err = Box<dyn std::error::Error>;
+
+    /// parse 3D coordinate
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut vals = s.split(',').map(|v| v.parse());
+        let x = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no x value", s))??;
+        let y = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no y value", s))??;
+        let z = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no z value", s))??;
+        Ok(Coord(x, y, z))
+    }
+}
+
+impl std::fmt::Display for Coord {
+    /// print 3D coordinate
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{},{},{}", self.0, self.1, self.2)
     }
 }
 // end::coordinate[]
 
+/// range of scanner
+const RANGE: std::ops::RangeInclusive<isize> = -1000..=1000;
+
 // tag::trafos[]
 /// transformation functions for all 24 possible transformations
 pub const TRAFOS: [fn(Coord) -> Coord; 24] = [
-    |(x, y, z)| (x, y, z),
-    |(x, y, z)| (x, -y, -z),
-    |(x, y, z)| (x, z, -y),
-    |(x, y, z)| (x, -z, y),
-    |(x, y, z)| (-x, y, -z),
-    |(x, y, z)| (-x, -y, z),
-    |(x, y, z)| (-x, z, y),
-    |(x, y, z)| (-x, -z, -y),
-    |(x, y, z)| (y, x, -z),
-    |(x, y, z)| (y, -x, z),
-    |(x, y, z)| (y, z, x),
-    |(x, y, z)| (y, -z, -x),
-    |(x, y, z)| (-y, x, z),
-    |(x, y, z)| (-y, -x, -z),
-    |(x, y, z)| (-y, z, -x),
-    |(x, y, z)| (-y, -z, x),
-    |(x, y, z)| (z, x, y),
-    |(x, y, z)| (z, -x, -y),
-    |(x, y, z)| (z, y, -x),
-    |(x, y, z)| (z, -y, x),
-    |(x, y, z)| (-z, x, -y),
-    |(x, y, z)| (-z, -x, y),
-    |(x, y, z)| (-z, y, x),
-    |(x, y, z)| (-z, -y, -x),
-];
-
-/// inverse transformation functions for all 24 possible transformations
-pub const INV_TRAFOS: [fn(Coord) -> Coord; 24] = [
-    |(x, y, z)| (x, y, z),
-    |(x, y, z)| (x, -y, -z),
-    |(x, y, z)| (x, -z, y),
-    |(x, y, z)| (x, z, -y),
-    |(x, y, z)| (-x, y, -z),
-    |(x, y, z)| (-x, -y, z),
-    |(x, y, z)| (-x, z, y),
-    |(x, y, z)| (-x, -z, -y),
-    |(x, y, z)| (y, x, -z),
-    |(x, y, z)| (-y, x, z),
-    |(x, y, z)| (z, x, y),
-    |(x, y, z)| (-z, x, -y),
-    |(x, y, z)| (y, -x, z),
-    |(x, y, z)| (-y, -x, -z),
-    |(x, y, z)| (-z, -x, y),
-    |(x, y, z)| (z, -x, -y),
-    |(x, y, z)| (y, z, x),
-    |(x, y, z)| (-y, -z, x),
-    |(x, y, z)| (-z, y, x),
-    |(x, y, z)| (z, -y, x),
-    |(x, y, z)| (y, -z, -x),
-    |(x, y, z)| (-y, z, -x),
-    |(x, y, z)| (z, y, -x),
-    |(x, y, z)| (-z, -y, -x),
+    |Coord(x, y, z)| Coord(x, y, z),
+    |Coord(x, y, z)| Coord(x, -y, -z),
+    |Coord(x, y, z)| Coord(x, z, -y),
+    |Coord(x, y, z)| Coord(x, -z, y),
+    |Coord(x, y, z)| Coord(-x, y, -z),
+    |Coord(x, y, z)| Coord(-x, -y, z),
+    |Coord(x, y, z)| Coord(-x, z, y),
+    |Coord(x, y, z)| Coord(-x, -z, -y),
+    |Coord(x, y, z)| Coord(y, x, -z),
+    |Coord(x, y, z)| Coord(y, -x, z),
+    |Coord(x, y, z)| Coord(y, z, x),
+    |Coord(x, y, z)| Coord(y, -z, -x),
+    |Coord(x, y, z)| Coord(-y, x, z),
+    |Coord(x, y, z)| Coord(-y, -x, -z),
+    |Coord(x, y, z)| Coord(-y, z, -x),
+    |Coord(x, y, z)| Coord(-y, -z, x),
+    |Coord(x, y, z)| Coord(z, x, y),
+    |Coord(x, y, z)| Coord(z, -x, -y),
+    |Coord(x, y, z)| Coord(z, y, -x),
+    |Coord(x, y, z)| Coord(z, -y, x),
+    |Coord(x, y, z)| Coord(-z, x, -y),
+    |Coord(x, y, z)| Coord(-z, -x, y),
+    |Coord(x, y, z)| Coord(-z, y, x),
+    |Coord(x, y, z)| Coord(-z, -y, -x),
 ];
 // end::trafos[]
 
-/// range of scanner
-const RANGE: RangeInclusive<isize> = -1000..=1000;
-
-// tag::parse[]
-/// parse the input into a vector of scanners
-///
-/// each scanner is a hash set of coordinates in the scanner's local
-/// coordinate system and a hashmap of pairwise distances as keys and number of
-/// occurance of this distance as value
-pub fn parse(content: &str) -> Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>)> {
-    let mut scanners: Vec<(HashSet<Coord>, Coord, HashMap<usize, usize>)> = Vec::new();
-
-    let mut beacons = HashSet::new();
-    let mut distances = HashMap::new();
-    for line in content.lines().map(|l| l.trim()).filter(|l| l.len() > 0) {
-        if line.starts_with("---") {
-            if !beacons.is_empty() {
-                scanners.push((beacons, (0, 0, 0), distances));
-                beacons = HashSet::new();
-                distances = HashMap::new();
-            }
-        } else {
-            let mut parts = line.split(',');
-            let b_new = (
-                parts.next().unwrap().parse().unwrap(),
-                parts.next().unwrap().parse().unwrap(),
-                parts.next().unwrap().parse().unwrap(),
-            );
-            for b_old in &beacons {
-                // update pairwise distances
-                *distances.entry(b_old.sub(&b_new).abs()).or_insert(0) += 1;
-            }
-            beacons.insert(b_new);
-        }
-    }
-    if !beacons.is_empty() {
-        scanners.push((beacons, (0, 0, 0), distances));
-    }
-
-    scanners
+// tag::scanner[]
+#[derive(Debug, Clone)]
+pub struct Scanner {
+    id: usize,
+    pos: Coord,
+    beacons: Vec<Coord>,
+    dists: Vec<HashMap<usize, Vec<usize>>>,
 }
-// end::parse[]
 
-// tag::sanity[]
-/// sanity check for overlapping scanner regions
-///
-/// for all beacons seen by scanner 1 / 2, check whether they are also seen by scanner 2 / 1
-/// if and only if they are in range of scanner 2 / 1
-/// 
-/// # Panics
-/// if sanity check fails
-pub fn sanity_check(
-    beacons1: &HashSet<Coord>,
-    center1: &Coord,
-    beacons2: &HashSet<Coord>,
-    center2: &Coord,
-    t_idx: usize,
-    d: Coord,
-) {
-    // => b1 = t(b2) + d
-    // => b2 = t^-1(b1 - d)
+impl Scanner {
+    const THRESHOLD: usize = 12;
 
-    // transform center2 in 1's coordinates
-    let center2 = TRAFOS[t_idx](*center2).add(&d);
+    pub fn len(&self) -> usize {
+        self.beacons.len()
+    }
 
-    for b1 in beacons1 {
-        // distance vec
-        let (dx, dy, dz) = center2.sub(b1);
-
-        let in_range = RANGE.contains(&dx) && RANGE.contains(&dy) && RANGE.contains(&dz);
-        // transform in 2's coordinates for check
-        let contained = beacons2.contains(&INV_TRAFOS[t_idx](b1.sub(&d)));
-        if in_range != contained {
-            panic!(
-                "{:?} is in range of 2nd scanner at {:?}, but not contained in set",
-                b1, center2
-            );
+    pub fn transform(&mut self, t: fn(Coord) -> Coord, o: &Coord) {
+        self.pos = t(self.pos).add(o);
+        for k in 0..self.len() {
+            self.beacons[k] = t(self.beacons[k]).add(o);
         }
     }
 
-    // loop over beacons seen by scanner 2 in 1's coordinates
-    for b2 in beacons2.iter().map(|b2| TRAFOS[t_idx](*b2).add(&d)) {
-        // distance vec
-        let (dx, dy, dz) = center1.sub(&b2);
+    // tag::sanity[]
+    /// sanity check for overlapping scanner regions
+    ///
+    /// for all beacons seen by self / other, check whether they are also seen by other / self
+    /// if and only if they are in range of other / self
+    ///
+    /// # Panics
+    /// if sanity check fails
+    pub fn sanity_check(&self, other: &Self, t: fn(Coord) -> Coord, o: &Coord) {
+        // create a copy of other in self's coordinates
+        let mut other = other.to_owned();
+        other.transform(t, o);
 
-        let in_range = RANGE.contains(&dx) && RANGE.contains(&dy) && RANGE.contains(&dz);
-        let contained = beacons1.contains(&b2);
-        if in_range != contained {
-            panic!(
-                "{:?} is in range of 1st scanner at {:?}, but not contained in set",
-                b2, center1
-            );
+        // loop over beacons seen by self
+        for b1 in &self.beacons {
+            let d = other.pos.sub(b1);
+            let in_range = RANGE.contains(&d.0) && RANGE.contains(&d.1) && RANGE.contains(&d.2);
+            let contained = other.beacons.contains(b1);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 2nd scanner {} at {}, but not contained in set or vice versa",
+                    b1, other.id, other.pos
+                );
+            }
+        }
+
+        // loop over beacons seen by other
+        for b2 in &other.beacons {
+            let d = self.pos.sub(b2);
+            let in_range = RANGE.contains(&d.0) && RANGE.contains(&d.1) && RANGE.contains(&d.2);
+            let contained = self.beacons.contains(b2);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 1st scanner {} at {}, but not contained in set or vice versa",
+                    b2, self.id, self.pos
+                );
+            }
         }
     }
-}
-// end::sanity[]
+    // end::sanity[]
 
-// tag::check_overlap[]
-/// check whether two sets of beacons overlap
-///
-/// find the transformation ``t`` for the ``beacons_check`` set, and the ``center`` position
-/// of the corresponding scanner in the ``beacons_settled``'s coordinate system so that at
-/// least ``threshold`` pairs of beacons (b1, b2) in the two sets exist that satisfy
-/// ``t(b2) - center = b1``
-///
-/// return the transformation ``t`` and the ``center`` position
-pub fn check_overlap(
-    (beacons_settled, _center_settled, distances_settled): &(
-        HashSet<Coord>,
-        Coord,
-        HashMap<usize, usize>,
-    ),
-    (beacons_check, _center_check, distances_check): &(
-        HashSet<Coord>,
-        Coord,
-        HashMap<usize, usize>,
-    ),
-    threshold: usize,
-) -> Option<(fn(Coord) -> Coord, Coord)> {
-    // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
-    let mut common_distances = 0;
-    for (distance, count) in distances_settled {
-        common_distances += cmp::min(distances_check.get(distance).unwrap_or(&0), count);
-        if common_distances >= threshold * (threshold - 1) / 2 {
-            break;
-        }
-    }
-    if common_distances < threshold * (threshold - 1) / 2 {
-        return None; // not enough common distances, no overlap possible
-    }
+    // tag::check_overlap[]
+    /// check whether ``self`` overlaps with ``other``
+    ///
+    /// find the transformation ``t`` and the offset ``o`` such that the coordinate system
+    /// of ``other`` is transformed into the coordinate system of ``self`` as ``t(c) + o``,
+    /// i.e., after calling ``other.transform(t, &o)``, the same beacons have the same
+    /// coordinates in both scanners.
+    pub fn check_overlap(&self, other: &Self) -> Option<(fn(Coord) -> Coord, Coord)> {
+        for i1 in 0..=self.len() - Self::THRESHOLD {
+            for j1 in 0..=other.len() - Self::THRESHOLD {
+                let mut cnt = 0;
+                let mut pairs = Vec::new();
 
-    for t_idx in 0..24 {
-        // find all beacons with the same distance as b1[k1] to b2[k2]
-        for b1 in beacons_settled {
-            for b2 in beacons_check {
-                // d = b1 - t(b2)
-                // => b1 = t(b2) + d
-                // => b2 = t^-1(b1 - d)
-                let d = b1.sub(&TRAFOS[t_idx](*b2));
-
-                // filter for scanner range prior to lookup
-                // settled beacons are in transformed coordinate (scanner is not necessarily at origin)
-                // => need to check range in beacons_check via inverse transform
-                // (possible optimization: use actual bounding box of beacons)
-                let mut count = 0;
-                for _ in beacons_settled
-                    .iter()
-                    .map(|b1| INV_TRAFOS[t_idx](b1.sub(&d)))
-                    .filter(|(x, y, z)| RANGE.contains(x) && RANGE.contains(y) && RANGE.contains(z))
-                    .filter(|b1| beacons_check.contains(b1))
-                {
-                    // don't use iter.count() to avoid checking more elements once threshold is reached
-                    count += 1;
-                    if count >= threshold {
-                        if cfg!(feature = "sanity-check") {
-                            sanity_check(
-                                beacons_settled,
-                                _center_settled,
-                                beacons_check,
-                                _center_check,
-                                t_idx,
-                                d,
-                            );
+                for (d, is) in &self.dists[i1] {
+                    if let Some(js) = other.dists[j1].get(d) {
+                        cnt += cmp::min(is.len(), js.len());
+                        for i2 in is {
+                            for j2 in js {
+                                pairs.push((*i2, *j2));
+                            }
                         }
-                        return Some((TRAFOS[t_idx], d));
+                    }
+                }
+
+                if cnt < Self::THRESHOLD {
+                    continue;
+                }
+
+                // beacon i1 from self and beacon j1 from other have at least Self::THRESHOLD
+                // distances to other beacons in common
+                for t in TRAFOS {
+                    for k0 in 0..=pairs.len() - Self::THRESHOLD {
+                        let o = self.beacons[pairs[k0].0].sub(&t(other.beacons[pairs[k0].1]));
+                        let cnt = pairs
+                            .iter()
+                            .filter(|(i, j)| self.beacons[*i] == t(other.beacons[*j]).add(&o))
+                            .count();
+                        if cnt >= Self::THRESHOLD {
+                            if cfg!(feature = "sanity-check") {
+                                self.sanity_check(other, t, &o);
+                            }
+                            return Some((t, o));
+                        }
                     }
                 }
             }
         }
-    }
 
-    None // no solution found
+        None
+    }
+    // end::check_overlap[]
 }
-// end::check_overlap[]
+
+impl FromStr for Scanner {
+    type Err = Box<dyn std::error::Error>;
+
+    // tag::parse[]
+    /// parse scanner
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut lines = s.lines().map(|l| l.trim()).filter(|l| l.len() > 0);
+
+        let trimchars: &[char] = &[' ', '-'];
+        let head = lines.next().ok_or("Empty content")?.trim_matches(trimchars);
+        let id = head
+            .strip_prefix("scanner ")
+            .ok_or_else(|| format!("Illegal header: {}", head))?
+            .parse()?;
+
+        let pos = Coord(0, 0, 0);
+
+        let mut beacons = Vec::new();
+        for line in lines {
+            beacons.push(line.parse::<Coord>()?);
+        }
+
+        let mut dists = Vec::with_capacity(beacons.len());
+        for k1 in 0..beacons.len() {
+            let mut map = HashMap::new();
+            for k2 in 0..beacons.len() {
+                let d = beacons[k2].sub(&beacons[k1]).abs();
+                (*map.entry(d).or_insert(Vec::new())).push(k2);
+            }
+            dists.push(map);
+        }
+
+        Ok(Scanner {
+            id,
+            pos,
+            beacons,
+            dists,
+        })
+    }
+    // end::parse[]
+}
+
+impl std::fmt::Display for Scanner {
+    /// print scanner (without offset)
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "--- scanner {} ---", self.id)?;
+        for k in 0..self.len() {
+            self.beacons[k].sub(&self.pos).fmt(f)?;
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}
+// end::scanner[]
+
+pub fn parse(content: &str) -> Vec<Scanner> {
+    content.split("\n--").map(|s| s.parse().unwrap()).collect()
+}
 
 // tag::solution[]
-/// determine number of unique beacons and max Manhatten distance between
-/// any two scanners
-pub fn solution_1_2(scanners: &[(HashSet<Coord>, Coord, HashMap<usize, usize>)]) -> (usize, usize) {
+pub fn solution_1_2(scanners: &[Scanner]) -> (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
-    // holds flags for settled scanners
-    // 0 - not settled
-    // 1 - settled, enqueued for furhter extension of settled scanners
-    // 2 - fully processed (dequeued)
-    let mut settled = vec![0; scanners.len()];
-    settled[0] = 1u8; // start with first scanner settled
-
+    // state
+    let mut stack = Vec::with_capacity(scanners.len());
+    let mut settled = vec![false; scanners.len()];
     let mut transformed = Vec::with_capacity(scanners.len());
-    transformed.push(0usize);
+    let mut beacons: HashSet<Coord> = HashSet::new();
 
-    // Used to calculate largest distance between any two scanners.
+    // init (start with scanner 0)
+    stack.push(0);
+    settled[0] = true;
+    transformed.push(0);
+    beacons.extend(&scanners[0].beacons);
+
     let mut max_dist = 0;
 
-    // holds all settled beacons. Start with beacons in range of scanner 1
-    let mut beacons: HashSet<Coord> = scanners[0].0.clone();
-
-    while let Some(k1) = settled.iter().position(|s| s == &1) {
-        for k2 in 0..settled.len() {
-            if settled[k2] != 0 {
-                continue; // already settled
+    while let Some(k1) = stack.pop() {
+        for k2 in 0..scanners.len() {
+            if settled[k2] {
+                continue;
             }
 
-            if let Some((t, d)) = check_overlap(&scanners[k1], &scanners[k2], 12) {
+            if let Some((t, o)) = scanners[k1].check_overlap(&scanners[k2]) {
                 // update scanner to settled coordinates
-                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).add(&d)).collect();
-                scanners[k2].1 = t(scanners[k2].1).add(&d);
-
-                // add beacons to unique set
-                beacons.extend(&scanners[k2].0);
-
-                // update settled to 1 = enqueue
-                settled[k2] = 1;
+                scanners[k2].transform(t, &o);
 
                 // update max distance
                 for k_t in &transformed {
-                    let dist = scanners[k2].1.sub(&scanners[*k_t].1).abs();
+                    let dist = scanners[k2].pos.sub(&scanners[*k_t].pos).abs();
                     if dist > max_dist {
                         max_dist = dist;
                     }
                 }
 
+                // push k2 to stack, set settled, add to list of transformed and extend unique beacons
+                stack.push(k2);
+                settled[k2] = true;
                 transformed.push(k2);
+                beacons.extend(&scanners[k2].beacons);
             }
         }
-
-        // update settled to 2 = fully processed
-        settled[k1] = 2;
     }
 
     // return number of beacons and largest distance between any two scanners
@@ -341,43 +327,35 @@ mod tests {
     fn test_parse() {
         let scanners = parse(CONTENT);
         assert_eq!(5, scanners.len());
-        assert!(scanners[2].0.contains(&(-644, 584, -595)));
-        assert!(scanners[4].0.contains(&(30, -46, -14)));
+        assert!(scanners[2].beacons.contains(&Coord(-644, 584, -595)));
+        assert!(scanners[4].beacons.contains(&Coord(30, -46, -14)));
     }
 
     #[test]
-    fn test_compare() {
+    fn test_parse_format() {
         let scanners = parse(CONTENT);
-        let r = check_overlap(&scanners[0], &scanners[1], 12);
+        let text = scanners
+            .iter()
+            .map(|s| format!("{}\n", s))
+            .collect::<String>();
+        assert_eq!(CONTENT.trim(), text.trim());
+    }
+
+    #[test]
+    fn test_check_overlap() {
+        let scanners = parse(CONTENT);
+        let r = scanners[0].check_overlap(&scanners[1]);
         assert!(r.is_some(), "No transformation found");
         let (t, d) = r.unwrap();
 
-        assert_eq!((68, -1246, -43), d);
-        assert_eq!((-618, -824, -621), t((686, 422, 578)).add(&d));
+        assert_eq!(Coord(68, -1246, -43), d);
+        assert_eq!(Coord(-618, -824, -621), t(Coord(686, 422, 578)).add(&d));
     }
 
     #[test]
     fn test_solution_1_2() {
         let scanners = parse(CONTENT);
         assert_eq!((79, 3621), solution_1_2(&scanners));
-    }
-
-    #[test]
-    fn test_trafos() {
-        for k in 0..24 {
-            assert_eq!(
-                (1, 2, 3),
-                TRAFOS[k](INV_TRAFOS[k]((1, 2, 3))),
-                "Failed trafo after inverse at {}",
-                k
-            );
-            assert_eq!(
-                (1, 2, 3),
-                INV_TRAFOS[k](TRAFOS[k]((1, 2, 3))),
-                "Failed inverse after trafo at {}",
-                k
-            );
-        }
     }
 }
 // end::tests[]

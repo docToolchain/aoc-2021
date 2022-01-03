@@ -1,18 +1,29 @@
 #![feature(map_first_last)]
-use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use std::{
+    collections::{BTreeSet, HashMap, HashSet, VecDeque},
+    rc::Rc,
+};
 
 // tag::burrow[]
-#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+#[derive(PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct BurrowLarge {
     data: [Option<u8>; 11 + 4 * 4],
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+#[derive(PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct BurrowSmall {
     data: [Option<u8>; 11 + 4 * 2],
 }
 
-pub trait Burrow: std::ops::Index<usize, Output = Option<u8>> + std::ops::IndexMut<usize> {
+pub trait Burrow:
+    std::ops::Index<usize, Output = Option<u8>>
+    + std::ops::IndexMut<usize>
+    + Eq
+    + Ord
+    + std::hash::Hash
+    + Clone
+    + std::fmt::Debug
+{
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &'static [&'static [usize]];
@@ -472,7 +483,7 @@ impl BurrowSmall {
 }
 
 impl BurrowLarge {
-    pub fn from(burrow: BurrowSmall) -> Self {
+    pub fn from(burrow: &BurrowSmall) -> Self {
         let mut data = [None; Self::LEN];
 
         for k in 0..Self::HALLWAY_LEN {
@@ -503,34 +514,41 @@ impl BurrowLarge {
 // tag::search[]
 #[derive(Debug)]
 pub struct Search<T> {
-    heap: BTreeSet<(usize, usize, T)>,
-    settled: HashSet<T>,
-    costs: HashMap<T, (usize, usize)>,
-    parents: HashMap<T, (usize, Option<T>)>,
+    heap: BTreeSet<(usize, usize, Rc<T>)>,
+    settled: HashSet<Rc<T>>,
+    costs: HashMap<Rc<T>, (usize, usize)>,
+    parents: HashMap<Rc<T>, (usize, usize, Option<Rc<T>>)>,
     trace_path: bool,
+    hit_count: usize,
+    decr_key_count: usize,
 }
 
 impl<T> Search<T>
 where
-    T: Eq + Ord + std::hash::Hash + Copy + std::fmt::Debug,
+    T: Eq + Ord + std::hash::Hash + Clone + std::fmt::Debug,
 {
-    pub fn init(start: T) -> Self {
+    pub fn init(start: T, trace_path: bool) -> Self {
         let mut search = Self {
             heap: BTreeSet::new(),
             settled: HashSet::new(),
             costs: HashMap::new(),
             parents: HashMap::new(),
-            trace_path: false,
+            trace_path,
+            hit_count: 0,
+            decr_key_count: 0,
         };
-        search.heap.insert((0, 0, start));
-        search.settled.insert(start);
+        let start = Rc::new(start);
+        search.heap.insert((0, 0, Rc::clone(&start)));
+        if search.trace_path {
+            search.parents.insert(Rc::clone(&start), (0, 0, None));
+        }
         search.costs.insert(start, (0, 0));
         search
     }
 
-    pub fn pop(&mut self) -> Option<(usize, T)> {
+    pub fn pop(&mut self) -> Option<(usize, Rc<T>)> {
         if let Some((_, cost, burrow)) = self.heap.pop_first() {
-            self.settled.insert(burrow);
+            self.settled.insert(Rc::clone(&burrow));
             Some((cost, burrow))
         } else {
             None
@@ -539,43 +557,57 @@ where
 
     pub fn push(
         &mut self,
+        parent: Rc<T>,
         cost: usize,
-        parent: T,
+        adjacent: T,
         weight: usize,
         bound_rem: usize,
-        adjacent: T,
     ) -> bool {
+        // wrap in Rc
+        let adjacent = Rc::new(adjacent);
+
+        // skip if settled
         if self.settled.contains(&adjacent) {
             return false;
         }
 
-        if let Some((cur_bound, cur_cost)) = self.costs.get(&adjacent) {
-            if cost + weight + bound_rem < *cur_bound {
-                self.heap.remove(&(*cur_bound, *cur_cost, adjacent));
+        let e = self.costs.entry(adjacent);
+        let adj = Rc::clone(e.key()); // use same instance consistently
+        let (b, c) = e.or_insert((usize::MAX, usize::MAX));
+        if *b < usize::MAX {
+            self.hit_count += 1;
+            // if already in queue, check if decrease key required;
+            // remove from queue if yes, otherwise return false (nothing to be added to queue)
+            if cost + weight + bound_rem < *b {
+                self.decr_key_count += 1;
+                self.heap.remove(&(*b, *c, Rc::clone(&adj)));
             } else {
                 return false;
             }
         }
+        *b = cost + weight + bound_rem;
+        *c = cost + weight;
 
-        self.heap
-            .insert((cost + weight + bound_rem, cost + weight, adjacent));
-        self.costs
-            .insert(adjacent, (cost + weight + bound_rem, cost + weight));
+        // keep trace
         if self.trace_path {
-            self.parents.insert(adjacent, (weight, Some(parent)));
+            self.parents
+                .insert(Rc::clone(&adj), (bound_rem, weight, Some(parent)));
         }
+
+        // insert to heap
+        self.heap.insert((*b, *c, adj));
 
         true
     }
 
-    pub fn get_path_to(&self, target: T) -> VecDeque<(usize, T)> {
+    pub fn get_path_to(&self, target: &T) -> VecDeque<(usize, usize, T)> {
         let mut path = VecDeque::new();
 
-        let mut current = target;
-        while let Some((cost, parent)) = self.parents.get(&current) {
-            path.push_front((*cost, current));
+        let mut current = target.clone();
+        while let Some((bound_rem, cost, parent)) = self.parents.get(&current) {
+            path.push_front((*bound_rem, *cost, current.clone()));
             if let Some(parent) = parent {
-                current = *parent;
+                current = parent.as_ref().clone();
             } else {
                 break;
             }
@@ -584,24 +616,80 @@ where
         path
     }
 
-    pub fn print_path_to(&self, target: T) {
-        for (weight, burrow) in self.get_path_to(target) {
-            println!("==({})==>\n{:?}", weight, burrow);
+    pub fn print_path_to(&self, target: &T) {
+        let mut steps = 0;
+        let mut sum = 0;
+        for (bound_rem, weight, burrow) in self.get_path_to(target) {
+            sum += weight;
+            if steps == 0 {
+                println!("\nInitial\n{:?}", burrow);
+            } else {
+                println!(
+                    "\n{}) {} -> {} (bound: {} -> {}) ==>\n{:?}",
+                    steps,
+                    weight,
+                    sum,
+                    bound_rem,
+                    sum + bound_rem,
+                    burrow
+                );
+            }
+            steps += 1;
         }
+    }
+
+    pub fn print_stats(&self) {
+        let mut mx = std::cmp::max(self.costs.len(), self.hit_count) / 1000;
+        let mut w = 3;
+        while mx > 0 {
+            w += 1;
+            mx /= 10;
+        }
+
+        println!(
+            "+{blank:-<w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-<w_head$}+\n\
+            |     heap: {:w_field$} |\n\
+            |  settled: {:w_field$} |\n\
+            |    total: {:w_field$} |\n\
+            +{blank:-<w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-<w_head$}+\n\
+            |      hit: {:w_field$} |\n\
+            | decr key: {:w_field$} |\n\
+            +{blank:-<w_head$}+",
+            "Element Count",
+            self.heap.len(),
+            self.settled.len(),
+            self.costs.len(),
+            "Push Stats",
+            self.hit_count,
+            self.decr_key_count,
+            blank = "",
+            w_field = w,
+            w_head = w + 12
+        );
     }
 }
 // end::search[]
 
 // tag::solve[]
-pub fn solve<B>(start: B) -> usize
+pub fn solve<B>(start: B, trace_path: bool) -> usize
 where
-    B: Burrow + Ord + Eq + std::hash::Hash + Copy + std::fmt::Debug,
+    B: Burrow,
 {
-    let mut search = Search::init(start);
+    let mut search = Search::init(start, trace_path);
 
     while let Some((cost, burrow)) = search.pop() {
-        if burrow == B::TARGET {
+        if B::TARGET.eq(&burrow) {
             // target reached
+
+            if trace_path {
+                search.print_path_to(&B::TARGET);
+                search.print_stats();
+            }
+
             return cost;
         }
 
@@ -623,6 +711,9 @@ where
                     stack.push((1, *k_adj));
                 }
 
+                let mut push_later = Vec::new();
+                let mut do_push = true;
+
                 while let Some((steps, k_adj)) = stack.pop() {
                     if burrow[k_adj].is_some() {
                         // cannot move on top of other
@@ -635,20 +726,23 @@ where
                     {
                         // move in own room
                         let weight = steps * B::ENERGIES[p as usize];
-                        let mut adjacent = burrow;
+                        let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        let bound_rem = adjacent.get_min_cost();
+                        search.push(Rc::clone(&burrow), cost, adjacent, weight, bound_rem);
                         // no need to continue to look for other adjacents
-                        continue;
+                        do_push = false;
+                        break;
                     }
 
                     if k_adj < B::HALLWAY_LEN && !B::is_door(k_adj) && cur_room.is_some() {
                         // move from room to hallway
                         let weight = steps * B::ENERGIES[p as usize];
-                        let mut adjacent = burrow;
+                        let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
                         if !adjacent.is_deadlock() {
-                            search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                            let bound_rem = adjacent.get_min_cost();
+                            push_later.push((Rc::clone(&burrow), cost, adjacent, weight, bound_rem));
                         }
                         // continue search, other positions in the hallway may be valid adjacents
                     }
@@ -658,6 +752,12 @@ where
                             done[*k_adj_2] = true;
                             stack.push((steps + 1, *k_adj_2));
                         }
+                    }
+                }
+
+                if do_push {
+                    for (parent, cost, adjacent, weight, bound_rem) in push_later {
+                        search.push(parent, cost, adjacent, weight, bound_rem);
                     }
                 }
             }
@@ -672,17 +772,19 @@ pub fn parse(content: &str) -> BurrowSmall {
     BurrowSmall::parse(content)
 }
 
-pub fn solution_1(burrow: BurrowSmall) -> usize {
-    solve(burrow)
+pub fn solution_1(burrow: &BurrowSmall) -> usize {
+    solve(burrow.clone(), cfg!(feature = "trace"))
 }
 
-pub fn solution_2(burrow: BurrowSmall) -> usize {
-    solve(BurrowLarge::from(burrow))
+pub fn solution_2(burrow: &BurrowSmall) -> usize {
+    solve(BurrowLarge::from(burrow), cfg!(feature = "trace"))
 }
 
 // tag::tests[]
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use super::*;
 
     const CONTENT_1: &str = "#############
@@ -814,24 +916,24 @@ mod tests {
         ];
 
         for k in (0..1).rev() {
-            let act_cost = solution_1(burrows[k]);
+            let act_cost = solution_1(&burrows[k]);
             assert_eq!(exp_costs[k], act_cost);
         }
     }
 
     #[test]
     fn test_solution_2() {
-        assert_eq!(44169, solution_2(BURROW_1));
+        assert_eq!(44169, solution_2(&BURROW_1));
     }
 
     #[test]
     fn test_burrow_large_from() {
-        assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
+        assert_eq!(BURROW_2, BurrowLarge::from(&BURROW_1));
     }
 
     #[test]
     fn test_get_min_cost() {
-        let burrow = BurrowLarge::from(parse(
+        let burrow = BurrowLarge::from(&parse(
             "#############    
 #...........#    
 ###A#D#C#A###    

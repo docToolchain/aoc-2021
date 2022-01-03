@@ -29,10 +29,10 @@ impl Packets {
         }
     }
 
-    pub fn read_number(&mut self, len: usize) -> usize {
-        let mut v = 0usize;
+    pub fn read_number(&mut self, len: usize) -> u64 {
+        let mut v = 0;
         for _ in 0..len {
-            v = v << 1 | ((self.data[self.pos >> 2] >> (!self.pos & 3)) & 1) as usize;
+            v = v << 1 | ((self.data[self.pos >> 2] >> (!self.pos & 3)) & 1) as u64;
             self.pos += 1;
         }
 
@@ -66,10 +66,10 @@ pub fn parse(content: &str) -> Packets {
 // end::parse[]
 
 // tag::sum_versions[]
-pub fn sum_versions(packets: &mut Packets) -> usize {
+pub fn sum_versions(packets: &mut Packets) -> u64 {
     let mut versions_sum = packets.read_number(Packets::N_VERSION);
 
-    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    let type_id = packets.read_number(Packets::N_TYPE_ID) as usize;
     if type_id == Packets::VALUE {
         loop {
             let flag = packets.read_number(Packets::N_FLAG);
@@ -80,8 +80,8 @@ pub fn sum_versions(packets: &mut Packets) -> usize {
             }
         }
     } else {
-        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
-        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID) as usize;
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]) as usize;
 
         if length_type_id == 1 {
             for _ in 0..length {
@@ -100,10 +100,10 @@ pub fn sum_versions(packets: &mut Packets) -> usize {
 // end::sum_versions[]
 
 // tag::process_packet[]
-pub fn process_packet(packets: &mut Packets) -> usize {
+pub fn process_packet(packets: &mut Packets) -> u64 {
     packets.skip(Packets::N_VERSION); // skip version
 
-    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    let type_id = packets.read_number(Packets::N_TYPE_ID) as usize;
     if type_id == 4 {
         let mut value = 0;
         loop {
@@ -116,8 +116,8 @@ pub fn process_packet(packets: &mut Packets) -> usize {
         }
         value
     } else {
-        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
-        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID) as usize;
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]) as usize;
 
         let mut values = Vec::new();
         if length_type_id == 1 {
@@ -136,20 +136,20 @@ pub fn process_packet(packets: &mut Packets) -> usize {
             Packets::PRODUCT => values.iter().product(),
             Packets::MIN => *values.iter().min().expect("No min"),
             Packets::MAX => *values.iter().max().expect("No max"),
-            Packets::GREATER => (values[0] > values[1]) as usize,
-            Packets::LESS => (values[0] < values[1]) as usize,
-            Packets::EQUAL => (values[0] == values[1]) as usize,
+            Packets::GREATER => (values[0] > values[1]) as u64,
+            Packets::LESS => (values[0] < values[1]) as u64,
+            Packets::EQUAL => (values[0] == values[1]) as u64,
             _ => panic!("Illegal type ID: {}", type_id),
         }
     }
 }
 // end::process_packet[]
 
-pub fn solution_1(packets: &Packets) -> usize {
+pub fn solution_1(packets: &Packets) -> u64 {
     sum_versions(&mut packets.clone())
 }
 
-pub fn solution_2(packets: &Packets) -> usize {
+pub fn solution_2(packets: &Packets) -> u64 {
     process_packet(&mut packets.clone())
 }
 
@@ -168,11 +168,11 @@ mod tests {
         6, 2, 0, 0, 8, 0, 0, 0, 1, 6, 1, 1, 5, 6, 2, 0xC, 8, 8, 0, 2, 1, 1, 8, 0xE, 3, 4,
     ];
 
-    const SUM_0: usize = 6;
-    const SUM_1: usize = 16;
-    const SUM_2: usize = 12;
-    const SUM_3: usize = 23;
-    const SUM_4: usize = 31;
+    const SUM_0: u64 = 6;
+    const SUM_1: u64 = 16;
+    const SUM_2: u64 = 12;
+    const SUM_3: u64 = 23;
+    const SUM_4: u64 = 31;
 
     #[test]
     fn test_parse() {

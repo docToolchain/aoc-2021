@@ -12,3 +12,4 @@ edition = "2021"
 default = ["a-star", "deadlock-check"]
 a-star = []
 deadlock-check = []
+trace = []

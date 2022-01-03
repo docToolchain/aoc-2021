@@ -5,7 +5,7 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/6[AoC|
 
 === Parts 1 & 2 ===
 
-The key is to not keep a list of fishes but a list of timer values. 
+The key is to not keep a list of timer vealues for each fish but a list of fish counts for each timer values. 
 
 Parsing the input is done as follows
 [source,rust,numbered]
@@ -51,7 +51,7 @@ The characteristic equation of A is
  
  z^9 - z^2 - 1 = 0
 
-which https://maxima.sourceforge.io/[Maxima] is not able to solve :( - so no explicit solution that I would be able to come up with
+which https://maxima.sourceforge.io/[Maxima] is not able to solve :( -- so no explicit solution that I would be able to come up with
 
 For a big number of rounds, it might be interesting to calculate powers of the above matrix using https://en.wikipedia.org/wiki/Exponentiation_by_squaring[exponentiation by squaring], but for 256 rounds, a direct approach is certainly more efficient.
 

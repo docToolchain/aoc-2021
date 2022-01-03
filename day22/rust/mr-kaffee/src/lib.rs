@@ -4,12 +4,12 @@ use std::{cmp, fmt};
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Cuboid {
     on: bool,
-    x_mn: isize,
-    x_mx: isize,
-    y_mn: isize,
-    y_mx: isize,
-    z_mn: isize,
-    z_mx: isize,
+    x_mn: i64,
+    x_mx: i64,
+    y_mn: i64,
+    y_mx: i64,
+    z_mn: i64,
+    z_mx: i64,
 }
 
 impl fmt::Debug for Cuboid {
@@ -29,16 +29,27 @@ impl fmt::Debug for Cuboid {
 }
 
 impl Cuboid {
+    // a ``Cuboid`` representing the small world of part 1
+    pub const SMALL_WORLD: Self = Self {
+        on: false,
+        x_mn: -50,
+        x_mx: 50,
+        y_mn: -50,
+        y_mx: 50,
+        z_mn: -50,
+        z_mx: 50,
+    };
+
     /// a ``Cuboid`` spanning the complete _universe_
     /// (very unlikely that the universe is larger than 64bit in any dimension)
     pub const UNIVERSE: Self = Self {
         on: false,
-        x_mn: isize::MIN,
-        x_mx: isize::MAX,
-        y_mn: isize::MIN,
-        y_mx: isize::MAX,
-        z_mn: isize::MIN,
-        z_mx: isize::MAX,
+        x_mn: i64::MIN,
+        x_mx: i64::MAX,
+        y_mn: i64::MIN,
+        y_mx: i64::MAX,
+        z_mn: i64::MIN,
+        z_mx: i64::MAX,
     };
 
     /// get intersection, on flag is copied from self
@@ -66,7 +77,7 @@ impl Cuboid {
     }
 
     /// count the elements in this cuboid
-    pub fn count(&self) -> isize {
+    pub fn count(&self) -> i64 {
         (self.x_mx - self.x_mn + 1) * (self.y_mx - self.y_mn + 1) * (self.z_mx - self.z_mn + 1)
     }
 
@@ -74,7 +85,7 @@ impl Cuboid {
     /// get count restricted to self recursively as follows
     ///
     /// ``count(cuboids[k] in self) = count(cuboids[k] v self) - sum_i=1^k-1 count(cuboids[i] in (cuboids[k] v self))``
-    pub fn get_count_in(&self, cuboids: &[Self]) -> isize {
+    pub fn get_count_in(&self, cuboids: &[Self]) -> i64 {
         if let Some(other) = cuboids.last() {
             if let Some(i) = other.intersect(self) {
                 let mut count = if i.on { i.count() } else { 0 };
@@ -88,30 +99,6 @@ impl Cuboid {
         0
     }
     // end::magic[]
-
-    /// restrict all ranges to be contained in ``mn..=mx``
-    /// if the resulting cuboid is empty, retun ``None``
-    pub fn clamp(&self, mn: isize, mx: isize) -> Option<Self> {
-        let x_mn = cmp::max(self.x_mn, mn);
-        let x_mx = cmp::min(self.x_mx, mx);
-        let y_mn = cmp::max(self.y_mn, mn);
-        let y_mx = cmp::min(self.y_mx, mx);
-        let z_mn = cmp::max(self.z_mn, mn);
-        let z_mx = cmp::min(self.z_mx, mx);
-        if x_mx < x_mn || y_mx < y_mn || z_mx < z_mn {
-            None
-        } else {
-            Some(Cuboid {
-                on: self.on,
-                x_mn,
-                x_mx,
-                y_mn,
-                y_mx,
-                z_mn,
-                z_mx,
-            })
-        }
-    }
 }
 // end::cuboid[]
 
@@ -154,26 +141,26 @@ pub fn parse(content: &str) -> Vec<Cuboid> {
 // end::parse[]
 
 // tag::solve[]
-pub fn get_on_count(cuboids: &[Cuboid]) -> usize {
+pub fn get_on_count(cuboids: &[Cuboid]) -> u64 {
     (0..cuboids.len())
         .map(|k| Cuboid::UNIVERSE.get_count_in(&cuboids[..=k]))
-        .sum::<isize>() as usize
+        .sum::<i64>() as u64
 }
 // end::solve[]
 
 // tag::part1[]
-pub fn solution_1(cuboids: &[Cuboid]) -> usize {
+pub fn solution_1(cuboids: &[Cuboid]) -> u64 {
     get_on_count(
         &cuboids
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&Cuboid::SMALL_WORLD))
             .collect::<Vec<_>>(),
     )
 }
 // end::part1[]
 
 // tag::part2[]
-pub fn solution_2(cuboids: &[Cuboid]) -> usize {
+pub fn solution_2(cuboids: &[Cuboid]) -> u64 {
     get_on_count(cuboids)
 }
 // tag::part2[]
@@ -340,7 +327,7 @@ mod tests {
     fn test_solution_1_2_compare() {
         let cuboids = parse(CONTENT_1)
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&Cuboid::SMALL_WORLD))
             .collect::<Vec<_>>();
 
         for k in 1..cuboids.len() {

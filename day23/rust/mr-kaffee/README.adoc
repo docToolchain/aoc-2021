@@ -50,7 +50,7 @@ include::src/lib.rs[tags=burrow]
 
 ==== Search State ====
 
-The search state is modeled as a separate struct:
+The search state is modeled as a separate struct. Initially, I used copy semantics for ``BurrowSmall`` and ``BurrowLarge`` resulting in burrow data being copied into the different collections (``heap``, ``settled``, ``costs``, and ``parents``). My current implementation uses reference counting pointers instead. This did not result in any significant runtime changes. It should result in lower memory usage, which I can however not measure...
 
 [source,rust,numbered]
 ----
