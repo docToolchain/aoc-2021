@@ -385,7 +385,7 @@
 <li><a href="#_day_19_beacon_scanner">Day 19: Beacon Scanner</a>
 <ul class="sectlevel4">
 <li><a href="#_parts_1_2_2">Parts 1 &amp; 2</a></li>
-<li><a href="#_sanity_check">Sanity Check</a></li>
+<li><a href="#_implementation_details">Implementation details</a></li>
 <li><a href="#_tests_18">Tests</a></li>
 </ul>
 </li>
@@ -526,15 +526,15 @@ development, e.g., based on the examples given in the puzzles.</p>
 <div class="sect4">
 <h5 id="_personal_challenges"><a class="anchor" href="#_personal_challenges"></a><a class="link" href="#_personal_challenges">Personal Challenges</a></h5>
 <div class="paragraph">
-<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this and some build optimizations, my overall solution time is below 700ms on my machine:</p>
+<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is below 600ms on my machine:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Total time for 25 days: 666.6676ms (26.666704ms per day)</pre>
+<pre>Total time for 25 days: 560.236ms (22.40944ms per day)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box nightly Rust for this one to be able to use the method <code>BTreeSet::pop_first</code></p>
+<p>My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box <em>nightly</em> Rust for this one to be able to use the method <code>BTreeSet::pop_first</code></p>
 </div>
 </div>
 <div class="sect4">
@@ -645,7 +645,7 @@ end</code></pre>
 <div class="sect4">
 <h5 id="_test"><a class="anchor" href="#_test"></a><a class="link" href="#_test">Test</a></h5>
 <div class="paragraph">
-<p>To test my code, there will be a <code>solution_test.rb</code> file which defines a test class derived from <code>Test::Unit::TestCase</code>:</p>
+<p>To test my code, there will be a <code>solution_test.rb</code> file, which defines a test class derived from <code>Test::Unit::TestCase</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1453,7 +1453,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_part_1_2_3"><a class="anchor" href="#_part_1_2_3"></a><a class="link" href="#_part_1_2_3">Part 1 &amp; 2</a></h5>
 <div class="paragraph">
-<p>I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples <code><code>(x1, y1, x2, y2)</code></code>. When parsing the inputs.</p>
+<p>I played around a little bit how to best represent lines. Eventually, I decided to simply represent them as tuples <code><code>(x1, y1, x2, y2)</code></code></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1531,14 +1531,12 @@ pub trait VentsCount {
 
 impl VentsCount for HashMap&lt;(isize, isize), usize&gt; {
     fn increment(&amp;mut self, coord: (isize, isize)) {
-        // get entry, create and initialize with value 0 if not yet present
-        let count = self.entry(coord).or_insert(0);
-        // increment
-        *count += 1;
+        // get or insert entry and increment
+        *self.entry(coord).or_insert(0) += 1;
     }
 
     fn count_dangerous(&amp;self) -&gt; usize {
-        self.values().filter(|count| **count &gt; 1).count()
+        self.values().filter(|&amp;count| *count &gt; 1).count()
     }
 }
 
@@ -1702,7 +1700,7 @@ mod tests {
 <div class="sect4">
 <h5 id="_parts_1_2"><a class="anchor" href="#_parts_1_2"></a><a class="link" href="#_parts_1_2">Parts 1 &amp; 2</a></h5>
 <div class="paragraph">
-<p>The key is to not keep a list of fishes but a list of timer values.</p>
+<p>The key is to not keep a list of timer vealues for each fish but a list of fish counts for each timer values.</p>
 </div>
 <div class="paragraph">
 <p>Parsing the input is done as follows</p>
@@ -1717,14 +1715,15 @@ mod tests {
 /// # use mr_kaffee_2021_06::*;
 /// assert_eq!(vec![0, 1, 1, 2, 1, 0, 0, 0, 0], parse("3,4,3,1,2"));
 /// ```
-pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
-    let mut fishes = vec![0; 9];
-
-    for age in content.trim().split(',') {
-        fishes[age.parse::&lt;usize&gt;().expect("Could not parse fish")] += 1;
-    }
-
-    fishes
+pub fn parse(content: &amp;str) -&gt; Vec&lt;u64&gt; {
+    content
+        .trim()
+        .split(',')
+        .map(|age| age.parse::&lt;usize&gt;().expect("Could not parse fish"))
+        .fold(vec![0; 9], |mut fishes, age| {
+            fishes[age] += 1;
+            fishes
+        })
 }</code></pre>
 </div>
 </div>
@@ -1737,7 +1736,7 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;usize&gt; {
 ///
 /// the timer values of all fishes are decreased by one. If the timer value is 0,
 /// it is reset to 6 and the same amount of fishes with time value 8 is added.
-pub fn simulate(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; Vec&lt;usize&gt; {
+pub fn simulate(mut fishes: Vec&lt;u64&gt;, days: usize) -&gt; Vec&lt;u64&gt; {
     for _ in 0..days {
         let new_fishes = fishes[0];
         for k in 1..fishes.len() {
@@ -1750,7 +1749,7 @@ pub fn simulate(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; Vec&lt;usize&gt
 }
 
 /// simulate given number of rounds and return sum
-pub fn simulate_and_count(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; usize {
+pub fn simulate_and_count(mut fishes: Vec&lt;u64&gt;, days: usize) -&gt; u64 {
     fishes = simulate(fishes, days);
     fishes.iter().sum()
 }</code></pre>
@@ -1765,7 +1764,7 @@ pub fn simulate_and_count(mut fishes: Vec&lt;usize&gt;, days: usize) -&gt; usize
 mod tests {
     use super::*;
 
-    const DATA: &amp;'static [usize] = &amp;[0, 1, 1, 2, 1, 0, 0, 0, 0];
+    const DATA: &amp;'static [u64] = &amp;[0, 1, 1, 2, 1, 0, 0, 0, 0];
 
     #[test]
     fn test_simulate() {
@@ -1827,7 +1826,7 @@ A = | 0 0 0 0 0 1 0 0 0 |
 </div>
 </div>
 <div class="paragraph">
-<p>which <a href="https://maxima.sourceforge.io/">Maxima</a> is not able to solve :( - so no explicit solution that I would be able to come up with</p>
+<p>which <a href="https://maxima.sourceforge.io/">Maxima</a> is not able to solve :(&#8201;&#8212;&#8201;so no explicit solution that I would be able to come up with</p>
 </div>
 <div class="paragraph">
 <p>For a big number of rounds, it might be interesting to calculate powers of the above matrix using <a href="https://en.wikipedia.org/wiki/Exponentiation_by_squaring">exponentiation by squaring</a>, but for 256 rounds, a direct approach is certainly more efficient.</p>
@@ -1843,13 +1842,13 @@ count[256] = ( 6703087164 6206821033 5617089148 5217223242 4726100874 4368232009
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">const CA_80: &amp;'static [usize] = &amp;[1421, 1401, 1191, 1154, 1034, 950, 905, 779, 768];
-const CA_256: &amp;'static [usize] = &amp;[
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">const CA_80: &amp;'static [u64] = &amp;[1421, 1401, 1191, 1154, 1034, 950, 905, 779, 768];
+const CA_256: &amp;'static [u64] = &amp;[
     6703087164, 6206821033, 5617089148, 5217223242, 4726100874, 4368232009, 3989468462, 3649885552,
     3369186778,
 ];
 
-pub fn solve_direct(fishes: &amp;[usize], days: usize) -&gt; usize {
+pub fn solve_direct(fishes: &amp;[u64], days: usize) -&gt; u64 {
     fishes
         .iter()
         .zip(
@@ -1928,7 +1927,7 @@ mod direct_solution_test {
 </div>
 </div>
 <div class="paragraph">
-<p>Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function - mapping distance to cost - as argument; for part 1, this is just the identity)</p>
+<p>Create a function that calculates the fuel need for a given alignment position (after refactoring for part 2, this contains a cost function&#8201;&#8212;&#8201;mapping distance to cost&#8201;&#8212;&#8201;as argument; for part 1, this is just the identity)</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2635,7 +2634,7 @@ mod tests {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// return illegal char's score if any in as ``Some`` value, otherwise ``None``
-pub fn get_illegal_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
+pub fn get_illegal_score(line: &amp;str) -&gt; Option&lt;u64&gt; {
     let mut stack = Vec::new();
     for c in line.chars() {
         match c {
@@ -2654,7 +2653,7 @@ pub fn get_illegal_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
 }
 
 /// Calculate sum of scores of illegal chars
-pub fn solution_1(lines: &amp;[&amp;str]) -&gt; usize {
+pub fn solution_1(lines: &amp;[&amp;str]) -&gt; u64 {
     lines
         .iter()
         .filter_map(|line| get_illegal_score(line))
@@ -2666,12 +2665,12 @@ pub fn solution_1(lines: &amp;[&amp;str]) -&gt; usize {
 <div class="sect4">
 <h5 id="_part_2_8"><a class="anchor" href="#_part_2_8"></a><a class="link" href="#_part_2_8">Part 2</a></h5>
 <div class="paragraph">
-<p>Same idea as for part 1. Now discard lines where comparisons fail. What remains in the stack once a line is processed are the characters required to repair the line.</p>
+<p>Same idea as for part 1. Now discard lines where comparisons fail. What remains on the stack, once a line is processed, are the characters required to repair the line.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// get the repair score if the line is incomplete as a ``Some`` value, otherwise return ``None``
-pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
+pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;u64&gt; {
     let mut stack = Vec::new();
     for c in line.chars() {
         match c {
@@ -2697,7 +2696,7 @@ pub fn get_repair_score(line: &amp;str) -&gt; Option&lt;usize&gt; {
 }
 
 /// get the middle repair score
-pub fn solution_2(lines: &amp;[&amp;str]) -&gt; usize {
+pub fn solution_2(lines: &amp;[&amp;str]) -&gt; u64 {
     let mut scores = lines
         .iter()
         .filter_map(|line| get_repair_score(line))
@@ -3562,7 +3561,7 @@ fold along x=5";
 <p>I was aware when starting part 1 that a solution based on arrays will probably not solve part 2. It was good enough for part 1 though.</p>
 </div>
 <div class="paragraph">
-<p>But while implementing it, I was sure I will need linked lists for part 2 and I was afraid of it, because I really don&#8217;t know how to implement linked lists in Rust and the <code>LinkedList</code> Rust comes with did not help a lot. So I spent quite some time trying to implement a linked list in Rust and - again - failed. Switch to Java, where linked lists are no pain at all just to realize that no list based solution will work at all for today.</p>
+<p>But while implementing it, I was sure I will need linked lists for part 2 and I was afraid of it, because I really don&#8217;t know how to implement linked lists in Rust and the <code>LinkedList</code> Rust comes with did not help a lot. So I spent quite some time trying to implement a linked list in Rust and&#8201;&#8212;&#8201;again&#8201;&#8212;&#8201;failed. Switched to Java, where linked lists are no pain at all, just to realize that no list based solution will work at all for today.</p>
 </div>
 <div class="paragraph">
 <p>With a little bit of thinking on the problem, I realized that it would be enough to just count the pairs. It does not really matter where they appear in the polymer. With this idea, the solution was not very complicated&#8230;&#8203;</p>
@@ -3611,12 +3610,11 @@ pub fn simulate_rounds(
     template: &amp;[char],
     rules: &amp;HashMap&lt;(char, char), char&gt;,
     rounds: usize,
-) -&gt; usize {
+) -&gt; u64 {
     // map of pairs to number of occurances of those
-    let mut pairs = HashMap::new();
+    let mut pairs: HashMap&lt;_, u64&gt; = HashMap::new();
     for (c1, c2) in template.iter().zip(template.iter().skip(1)) {
-        let cnt = pairs.entry((*c1, *c2)).or_insert(0usize);
-        *cnt += 1;
+        *pairs.entry((*c1, *c2)).or_insert(0) += 1;
     }
 
     // in each round, update pairs
@@ -3625,14 +3623,11 @@ pub fn simulate_rounds(
         for ((c1, c2), cnt0) in &amp;pairs {
             if let Some(d) = rules.get(&amp;(*c1, *c2)) {
                 // if pair is found in rules, replace (c1, c2) by (c1, d) and (d, c2)
-                let cnt = upd.entry((*c1, *d)).or_insert(0);
-                *cnt += cnt0;
-                let cnt = upd.entry((*d, *c2)).or_insert(0);
-                *cnt += cnt0;
+                *upd.entry((*c1, *d)).or_insert(0) += cnt0;
+                *upd.entry((*d, *c2)).or_insert(0) += cnt0;
             } else {
                 // if pair is not found in rules, keep pair
-                let cnt = upd.entry((*c1, *c2)).or_insert(0);
-                *cnt += cnt0;
+                *upd.entry((*c1, *c2)).or_insert(0) += cnt0;
             }
         }
         pairs = upd;
@@ -3646,10 +3641,8 @@ pub fn simulate_rounds(
     counts.insert(template[0], 1);
     counts.insert(template[template.len() - 1], 1);
     for ((c1, c2), cnt) in &amp;pairs {
-        let count = counts.entry(*c1).or_insert(0);
-        *count += cnt;
-        let count = counts.entry(*c2).or_insert(0);
-        *count += cnt;
+        *counts.entry(*c1).or_insert(0) += cnt;
+        *counts.entry(*c2).or_insert(0) += cnt;
     }
 
     // get (twice the) count for most and less frequent symbol
@@ -3757,7 +3750,7 @@ CN -&gt; C";
 <p>Hence, as a second step, I implemented Dijkstra. This works as well (obvisouly) but performs worse than my initial solution. For my Dijkstra implementation, A* (with the length of the shortest path to the target <code>width - 1 - x + height - 1 - y</code> as heuristic) does not perform any better.</p>
 </div>
 <div class="paragraph">
-<p>The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by using feature <code>dijkstra_panic_decrease</code> which results the program to panic on an attempt to decrease a key. Run puzzle with <code>cargo run --release --features dijkstra_panic_release</code>.</p>
+<p>The reason why my first solution works is the structure of the problem: the weight of an edge to any coordinate (x, y) is independent of the neighbor from where we reach the coordinate. Hence, if a coordinate is reached once in the algorithm, it is not possible to reach it later on with a lower overall risk. That essentially means: there will never be any decrease keys. This can be confirmed in the Dijkstra implementation by using feature <code>dijkstra_panic_decrease</code> which causes the program to panic on an attempt to decrease a key. Run puzzle with <code>cargo run --release --features dijkstra_panic_release</code>.</p>
 </div>
 <div class="sect5">
 <h6 id="_simple_algorithm"><a class="anchor" href="#_simple_algorithm"></a><a class="link" href="#_simple_algorithm">Simple Algorithm</a></h6>
@@ -4008,10 +4001,10 @@ impl Packets {
         }
     }
 
-    pub fn read_number(&amp;mut self, len: usize) -&gt; usize {
-        let mut v = 0usize;
+    pub fn read_number(&amp;mut self, len: usize) -&gt; u64 {
+        let mut v = 0;
         for _ in 0..len {
-            v = v &lt;&lt; 1 | ((self.data[self.pos &gt;&gt; 2] &gt;&gt; (!self.pos &amp; 3)) &amp; 1) as usize;
+            v = v &lt;&lt; 1 | ((self.data[self.pos &gt;&gt; 2] &gt;&gt; (!self.pos &amp; 3)) &amp; 1) as u64;
             self.pos += 1;
         }
 
@@ -4053,10 +4046,10 @@ pub fn parse(content: &amp;str) -&gt; Packets {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn sum_versions(packets: &amp;mut Packets) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn sum_versions(packets: &amp;mut Packets) -&gt; u64 {
     let mut versions_sum = packets.read_number(Packets::N_VERSION);
 
-    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    let type_id = packets.read_number(Packets::N_TYPE_ID) as usize;
     if type_id == Packets::VALUE {
         loop {
             let flag = packets.read_number(Packets::N_FLAG);
@@ -4067,8 +4060,8 @@ pub fn parse(content: &amp;str) -&gt; Packets {
             }
         }
     } else {
-        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
-        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID) as usize;
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]) as usize;
 
         if length_type_id == 1 {
             for _ in 0..length {
@@ -4094,10 +4087,10 @@ pub fn parse(content: &amp;str) -&gt; Packets {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn process_packet(packets: &amp;mut Packets) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn process_packet(packets: &amp;mut Packets) -&gt; u64 {
     packets.skip(Packets::N_VERSION); // skip version
 
-    let type_id = packets.read_number(Packets::N_TYPE_ID);
+    let type_id = packets.read_number(Packets::N_TYPE_ID) as usize;
     if type_id == 4 {
         let mut value = 0;
         loop {
@@ -4110,8 +4103,8 @@ pub fn parse(content: &amp;str) -&gt; Packets {
         }
         value
     } else {
-        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID);
-        let length = packets.read_number(Packets::N_LENGTH[length_type_id]);
+        let length_type_id = packets.read_number(Packets::N_LENGTH_TYPE_ID) as usize;
+        let length = packets.read_number(Packets::N_LENGTH[length_type_id]) as usize;
 
         let mut values = Vec::new();
         if length_type_id == 1 {
@@ -4130,9 +4123,9 @@ pub fn parse(content: &amp;str) -&gt; Packets {
             Packets::PRODUCT =&gt; values.iter().product(),
             Packets::MIN =&gt; *values.iter().min().expect("No min"),
             Packets::MAX =&gt; *values.iter().max().expect("No max"),
-            Packets::GREATER =&gt; (values[0] &gt; values[1]) as usize,
-            Packets::LESS =&gt; (values[0] &lt; values[1]) as usize,
-            Packets::EQUAL =&gt; (values[0] == values[1]) as usize,
+            Packets::GREATER =&gt; (values[0] &gt; values[1]) as u64,
+            Packets::LESS =&gt; (values[0] &lt; values[1]) as u64,
+            Packets::EQUAL =&gt; (values[0] == values[1]) as u64,
             _ =&gt; panic!("Illegal type ID: {}", type_id),
         }
     }
@@ -4158,11 +4151,11 @@ mod tests {
         6, 2, 0, 0, 8, 0, 0, 0, 1, 6, 1, 1, 5, 6, 2, 0xC, 8, 8, 0, 2, 1, 1, 8, 0xE, 3, 4,
     ];
 
-    const SUM_0: usize = 6;
-    const SUM_1: usize = 16;
-    const SUM_2: usize = 12;
-    const SUM_3: usize = 23;
-    const SUM_4: usize = 31;
+    const SUM_0: u64 = 6;
+    const SUM_1: u64 = 16;
+    const SUM_2: u64 = 12;
+    const SUM_3: u64 = 23;
+    const SUM_4: u64 = 31;
 
     #[test]
     fn test_parse() {
@@ -5065,12 +5058,8 @@ mod tests {
 </div>
 <div class="sect4">
 <h5 id="_today_i_learned_9"><a class="anchor" href="#_today_i_learned_9"></a><a class="link" href="#_today_i_learned_9">Today I learned</a></h5>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>a lot on recursive data structures and the <code>Box</code> structure in Rust but also how to insert / remove elements from a <code>Vec</code> as efficiently as possible.</p>
-</li>
-</ol>
+<div class="paragraph">
+<p>... a lot on recursive data structures and the <code>Box</code> structure in Rust but also how to insert / remove elements from a <code>Vec</code> as efficiently as possible.</p>
 </div>
 <a id="day19" />
 </div>
@@ -5084,308 +5073,162 @@ mod tests {
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/19">AoC|2021|19</a>.</p>
 </div>
 <div class="paragraph">
-<p>The solution for today&#8217;s puzzle takes ~180ms to complete in my current implementation (optimized from 30 seconds in the first version to ~10 and ~3 seconds in intermediate steps).</p>
+<p>The solution for today&#8217;s puzzle takes ~60ms to complete in my current implementation (optimized from 30 seconds in the first version).</p>
 </div>
 <div class="paragraph">
-<p>The optimizations to get down to three seconds include:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>check for the bounding box (scanner range) before looking up whether a specific beacon exists in another set</p>
-</li>
-<li>
-<p>use a kind of breadth first search for checking overlaps: start with first set, enqueue all sets which overlap with the first set (set <code>settled = 1</code>) and continue to settle furhter sets that overlap with sets from the queue.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The final optimization to achieve solution times below 1s are taken from <a href="https://github.com/mogron">[Moritz Gronbach</a>: The distances between beacons are invariant under coordinate transformations. So if two scanners have overlapping ranges, they must have at least 12 beacons which have to same distances to each other. Comparing those distances is much cheaper than looping through all the transformations and comparing coordinates.</p>
+<p>The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations and thus do as much as possible on the distances and only figure out the correct transformation late. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from <a href="https://github.com/mogron">Moritz Gronbach</a>.</p>
 </div>
 <div class="sect4">
 <h5 id="_parts_1_2_2"><a class="anchor" href="#_parts_1_2_2"></a><a class="link" href="#_parts_1_2_2">Parts 1 &amp; 2</a></h5>
 <div class="paragraph">
-<p>To keep the code clean, I created some shortcuts for 3D coordinates:</p>
+<p>When reading the input, I create a distance map (<code>dists</code>) which&#8201;&#8212;&#8201;for every beacon in a scanner&#8217;s set&#8201;&#8212;&#8201;creates a map with distances as keys and lists of beacons at that distance as values.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// type alias for 3D coordinate
-pub type Coord = (isize, isize, isize);
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    /// parse scanner
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        let mut lines = s.lines().map(|l| l.trim()).filter(|l| l.len() &gt; 0);
 
-/// basic math operations for coordinates
-pub trait CoordMath {
-    fn add(self, rhs: &amp;Self) -&gt; Self;
-    fn sub(self, rhs: &amp;Self) -&gt; Self;
-    fn abs(&amp;self) -&gt; usize;
-}
+        let trimchars: &amp;[char] = &amp;[' ', '-'];
+        let head = lines.next().ok_or("Empty content")?.trim_matches(trimchars);
+        let id = head
+            .strip_prefix("scanner ")
+            .ok_or_else(|| format!("Illegal header: {}", head))?
+            .parse()?;
 
-impl CoordMath for Coord {
-    fn add(mut self, rhs: &amp;Self) -&gt; Self {
-        self.0 += rhs.0;
-        self.1 += rhs.1;
-        self.2 += rhs.2;
-        self
-    }
+        let pos = Coord(0, 0, 0);
 
-    fn sub(mut self, rhs: &amp;Self) -&gt; Self {
-        self.0 -= rhs.0;
-        self.1 -= rhs.1;
-        self.2 -= rhs.2;
-        self
-    }
-
-    fn abs(&amp;self) -&gt; usize {
-        (self.0.abs() + self.1.abs() + self.2.abs()) as usize
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The input is read as follows (create sets of beacons and maps of pairwise distances):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// parse the input into a vector of scanners
-///
-/// each scanner is a hash set of coordinates in the scanner's local
-/// coordinate system and a hashmap of pairwise distances as keys and number of
-/// occurance of this distance as value
-pub fn parse(content: &amp;str) -&gt; Vec&lt;(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)&gt; {
-    let mut scanners: Vec&lt;(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)&gt; = Vec::new();
-
-    let mut beacons = HashSet::new();
-    let mut distances = HashMap::new();
-    for line in content.lines().map(|l| l.trim()).filter(|l| l.len() &gt; 0) {
-        if line.starts_with("---") {
-            if !beacons.is_empty() {
-                scanners.push((beacons, (0, 0, 0), distances));
-                beacons = HashSet::new();
-                distances = HashMap::new();
-            }
-        } else {
-            let mut parts = line.split(',');
-            let b_new = (
-                parts.next().unwrap().parse().unwrap(),
-                parts.next().unwrap().parse().unwrap(),
-                parts.next().unwrap().parse().unwrap(),
-            );
-            for b_old in &amp;beacons {
-                // update pairwise distances
-                *distances.entry(b_old.sub(&amp;b_new).abs()).or_insert(0) += 1;
-            }
-            beacons.insert(b_new);
+        let mut beacons = Vec::new();
+        for line in lines {
+            beacons.push(line.parse::&lt;Coord&gt;()?);
         }
-    }
-    if !beacons.is_empty() {
-        scanners.push((beacons, (0, 0, 0), distances));
-    }
 
-    scanners
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then I define all 24 possible transformations with inverse transformations.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// transformation functions for all 24 possible transformations
-pub const TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
-    |(x, y, z)| (x, y, z),
-    |(x, y, z)| (x, -y, -z),
-    |(x, y, z)| (x, z, -y),
-    |(x, y, z)| (x, -z, y),
-    |(x, y, z)| (-x, y, -z),
-    |(x, y, z)| (-x, -y, z),
-    |(x, y, z)| (-x, z, y),
-    |(x, y, z)| (-x, -z, -y),
-    |(x, y, z)| (y, x, -z),
-    |(x, y, z)| (y, -x, z),
-    |(x, y, z)| (y, z, x),
-    |(x, y, z)| (y, -z, -x),
-    |(x, y, z)| (-y, x, z),
-    |(x, y, z)| (-y, -x, -z),
-    |(x, y, z)| (-y, z, -x),
-    |(x, y, z)| (-y, -z, x),
-    |(x, y, z)| (z, x, y),
-    |(x, y, z)| (z, -x, -y),
-    |(x, y, z)| (z, y, -x),
-    |(x, y, z)| (z, -y, x),
-    |(x, y, z)| (-z, x, -y),
-    |(x, y, z)| (-z, -x, y),
-    |(x, y, z)| (-z, y, x),
-    |(x, y, z)| (-z, -y, -x),
-];
-
-/// inverse transformation functions for all 24 possible transformations
-pub const INV_TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
-    |(x, y, z)| (x, y, z),
-    |(x, y, z)| (x, -y, -z),
-    |(x, y, z)| (x, -z, y),
-    |(x, y, z)| (x, z, -y),
-    |(x, y, z)| (-x, y, -z),
-    |(x, y, z)| (-x, -y, z),
-    |(x, y, z)| (-x, z, y),
-    |(x, y, z)| (-x, -z, -y),
-    |(x, y, z)| (y, x, -z),
-    |(x, y, z)| (-y, x, z),
-    |(x, y, z)| (z, x, y),
-    |(x, y, z)| (-z, x, -y),
-    |(x, y, z)| (y, -x, z),
-    |(x, y, z)| (-y, -x, -z),
-    |(x, y, z)| (-z, -x, y),
-    |(x, y, z)| (z, -x, -y),
-    |(x, y, z)| (y, z, x),
-    |(x, y, z)| (-y, -z, x),
-    |(x, y, z)| (-z, y, x),
-    |(x, y, z)| (z, -y, x),
-    |(x, y, z)| (y, -z, -x),
-    |(x, y, z)| (-y, z, -x),
-    |(x, y, z)| (z, y, -x),
-    |(x, y, z)| (-z, -y, -x),
-];</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The transformations are used to figure out whether two scanner&#8217;s ranges (two sets of beacons in their own coordinate systems) overlap:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// check whether two sets of beacons overlap
-///
-/// find the transformation ``t`` for the ``beacons_check`` set, and the ``center`` position
-/// of the corresponding scanner in the ``beacons_settled``'s coordinate system so that at
-/// least ``threshold`` pairs of beacons (b1, b2) in the two sets exist that satisfy
-/// ``t(b2) - center = b1``
-///
-/// return the transformation ``t`` and the ``center`` position
-pub fn check_overlap(
-    (beacons_settled, _center_settled, distances_settled): &amp;(
-        HashSet&lt;Coord&gt;,
-        Coord,
-        HashMap&lt;usize, usize&gt;,
-    ),
-    (beacons_check, _center_check, distances_check): &amp;(
-        HashSet&lt;Coord&gt;,
-        Coord,
-        HashMap&lt;usize, usize&gt;,
-    ),
-    threshold: usize,
-) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
-    // first check pairwise distances (idea taken from Moritz Gronbach, https://github.com/mogron)
-    let mut common_distances = 0;
-    for (distance, count) in distances_settled {
-        common_distances += cmp::min(distances_check.get(distance).unwrap_or(&amp;0), count);
-        if common_distances &gt;= threshold * (threshold - 1) / 2 {
-            break;
+        let mut dists = Vec::with_capacity(beacons.len());
+        for k1 in 0..beacons.len() {
+            let mut map = HashMap::new();
+            for k2 in 0..beacons.len() {
+                let d = beacons[k2].sub(&amp;beacons[k1]).abs();
+                (*map.entry(d).or_insert(Vec::new())).push(k2);
+            }
+            dists.push(map);
         }
-    }
-    if common_distances &lt; threshold * (threshold - 1) / 2 {
-        return None; // not enough common distances, no overlap possible
-    }
 
-    for t_idx in 0..24 {
-        // find all beacons with the same distance as b1[k1] to b2[k2]
-        for b1 in beacons_settled {
-            for b2 in beacons_check {
-                // d = b1 - t(b2)
-                // =&gt; b1 = t(b2) + d
-                // =&gt; b2 = t^-1(b1 - d)
-                let d = b1.sub(&amp;TRAFOS[t_idx](*b2));
+        Ok(Scanner {
+            id,
+            pos,
+            beacons,
+            dists,
+        })
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is used in a <code>check_overlap</code> function, which first finds beacons in two scanner&#8217;s (<code>self</code> and <code>other</code>) that have at least 12 distances to other scanners in common and stores a list of <code>pairs</code> of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)</p>
+</div>
+<div class="paragraph">
+<p>Using this list of <code>pairs</code>, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner&#8217;s.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    /// check whether ``self`` overlaps with ``other``
+    ///
+    /// find the transformation ``t`` and the offset ``o`` such that the coordinate system
+    /// of ``other`` is transformed into the coordinate system of ``self`` as ``t(c) + o``,
+    /// i.e., after calling ``other.transform(t, &amp;o)``, the same beacons have the same
+    /// coordinates in both scanners.
+    pub fn check_overlap(&amp;self, other: &amp;Self) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
+        for i1 in 0..=self.len() - Self::THRESHOLD {
+            for j1 in 0..=other.len() - Self::THRESHOLD {
+                let mut cnt = 0;
+                let mut pairs = Vec::new();
 
-                // filter for scanner range prior to lookup
-                // settled beacons are in transformed coordinate (scanner is not necessarily at origin)
-                // =&gt; need to check range in beacons_check via inverse transform
-                // (possible optimization: use actual bounding box of beacons)
-                let mut count = 0;
-                for _ in beacons_settled
-                    .iter()
-                    .map(|b1| INV_TRAFOS[t_idx](b1.sub(&amp;d)))
-                    .filter(|(x, y, z)| RANGE.contains(x) &amp;&amp; RANGE.contains(y) &amp;&amp; RANGE.contains(z))
-                    .filter(|b1| beacons_check.contains(b1))
-                {
-                    // don't use iter.count() to avoid checking more elements once threshold is reached
-                    count += 1;
-                    if count &gt;= threshold {
-                        if cfg!(feature = "sanity-check") {
-                            sanity_check(
-                                beacons_settled,
-                                _center_settled,
-                                beacons_check,
-                                _center_check,
-                                t_idx,
-                                d,
-                            );
+                for (d, is) in &amp;self.dists[i1] {
+                    if let Some(js) = other.dists[j1].get(d) {
+                        cnt += cmp::min(is.len(), js.len());
+                        for i2 in is {
+                            for j2 in js {
+                                pairs.push((*i2, *j2));
+                            }
                         }
-                        return Some((TRAFOS[t_idx], d));
+                    }
+                }
+
+                if cnt &lt; Self::THRESHOLD {
+                    continue;
+                }
+
+                // beacon i1 from self and beacon j1 from other have at least Self::THRESHOLD
+                // distances to other beacons in common
+                for t in TRAFOS {
+                    for k0 in 0..=pairs.len() - Self::THRESHOLD {
+                        let o = self.beacons[pairs[k0].0].sub(&amp;t(other.beacons[pairs[k0].1]));
+                        let cnt = pairs
+                            .iter()
+                            .filter(|(i, j)| self.beacons[*i] == t(other.beacons[*j]).add(&amp;o))
+                            .count();
+                        if cnt &gt;= Self::THRESHOLD {
+                            if cfg!(feature = "sanity-check") {
+                                self.sanity_check(other, t, &amp;o);
+                            }
+                            return Some((t, o));
+                        }
                     }
                 }
             }
         }
-    }
 
-    None // no solution found
-}</code></pre>
+        None
+    }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With these elements, the solution to both parts is calculated as follows:</p>
+<p>The final piece of the solution is to walk through the scanners and check for overlaps until all scanners are settled. This is done by pushing settled scanners to a stack and then repeatedly popping a scanner from the stack and finding scanners with overlapping range to the settled one until everything is settled. While settling the scanners, the largest distance between any two scanners is stored and a list of unique beacons is populated.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// determine number of unique beacons and max Manhatten distance between
-/// any two scanners
-pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usize, usize&gt;)]) -&gt; (usize, usize) {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_1_2(scanners: &amp;[Scanner]) -&gt; (usize, usize) {
     // use my own mutable copy of the scanners
     let mut scanners = scanners.to_owned();
 
-    // holds flags for settled scanners
-    // 0 - not settled
-    // 1 - settled, enqueued for furhter extension of settled scanners
-    // 2 - fully processed (dequeued)
-    let mut settled = vec![0; scanners.len()];
-    settled[0] = 1u8; // start with first scanner settled
-
+    // state
+    let mut stack = Vec::with_capacity(scanners.len());
+    let mut settled = vec![false; scanners.len()];
     let mut transformed = Vec::with_capacity(scanners.len());
-    transformed.push(0usize);
+    let mut beacons: HashSet&lt;Coord&gt; = HashSet::new();
 
-    // Used to calculate largest distance between any two scanners.
+    // init (start with scanner 0)
+    stack.push(0);
+    settled[0] = true;
+    transformed.push(0);
+    beacons.extend(&amp;scanners[0].beacons);
+
     let mut max_dist = 0;
 
-    // holds all settled beacons. Start with beacons in range of scanner 1
-    let mut beacons: HashSet&lt;Coord&gt; = scanners[0].0.clone();
-
-    while let Some(k1) = settled.iter().position(|s| s == &amp;1) {
-        for k2 in 0..settled.len() {
-            if settled[k2] != 0 {
-                continue; // already settled
+    while let Some(k1) = stack.pop() {
+        for k2 in 0..scanners.len() {
+            if settled[k2] {
+                continue;
             }
 
-            if let Some((t, d)) = check_overlap(&amp;scanners[k1], &amp;scanners[k2], 12) {
+            if let Some((t, o)) = scanners[k1].check_overlap(&amp;scanners[k2]) {
                 // update scanner to settled coordinates
-                scanners[k2].0 = scanners[k2].0.iter().map(|b| t(*b).add(&amp;d)).collect();
-                scanners[k2].1 = t(scanners[k2].1).add(&amp;d);
-
-                // add beacons to unique set
-                beacons.extend(&amp;scanners[k2].0);
-
-                // update settled to 1 = enqueue
-                settled[k2] = 1;
+                scanners[k2].transform(t, &amp;o);
 
                 // update max distance
                 for k_t in &amp;transformed {
-                    let dist = scanners[k2].1.sub(&amp;scanners[*k_t].1).abs();
+                    let dist = scanners[k2].pos.sub(&amp;scanners[*k_t].pos).abs();
                     if dist &gt; max_dist {
                         max_dist = dist;
                     }
                 }
 
+                // push k2 to stack, set settled, add to list of transformed and extend unique beacons
+                stack.push(k2);
+                settled[k2] = true;
                 transformed.push(k2);
+                beacons.extend(&amp;scanners[k2].beacons);
             }
         }
-
-        // update settled to 2 = fully processed
-        settled[k1] = 2;
     }
 
     // return number of beacons and largest distance between any two scanners
@@ -5395,63 +5238,313 @@ pub fn solution_1_2(scanners: &amp;[(HashSet&lt;Coord&gt;, Coord, HashMap&lt;usi
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sanity_check"><a class="anchor" href="#_sanity_check"></a><a class="link" href="#_sanity_check">Sanity Check</a></h5>
+<h5 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a><a class="link" href="#_implementation_details">Implementation details</a></h5>
 <div class="paragraph">
-<p>I implemented a sanity check for overlapping scanner regions as follows (see comment for details):</p>
+<p>Some details of the implementation include:</p>
+</div>
+<div class="paragraph">
+<p>A <code>Coord</code> structure (including code to parse/print coordinates)</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// sanity check for overlapping scanner regions
-///
-/// for all beacons seen by scanner 1 / 2, check whether they are also seen by scanner 2 / 1
-/// if and only if they are in range of scanner 2 / 1
-///
-/// # Panics
-/// if sanity check fails
-pub fn sanity_check(
-    beacons1: &amp;HashSet&lt;Coord&gt;,
-    center1: &amp;Coord,
-    beacons2: &amp;HashSet&lt;Coord&gt;,
-    center2: &amp;Coord,
-    t_idx: usize,
-    d: Coord,
-) {
-    // =&gt; b1 = t(b2) + d
-    // =&gt; b2 = t^-1(b1 - d)
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// type alias for 3D coordinate
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+pub struct Coord(isize, isize, isize);
 
-    // transform center2 in 1's coordinates
-    let center2 = TRAFOS[t_idx](*center2).add(&amp;d);
-
-    for b1 in beacons1 {
-        // distance vec
-        let (dx, dy, dz) = center2.sub(b1);
-
-        let in_range = RANGE.contains(&amp;dx) &amp;&amp; RANGE.contains(&amp;dy) &amp;&amp; RANGE.contains(&amp;dz);
-        // transform in 2's coordinates for check
-        let contained = beacons2.contains(&amp;INV_TRAFOS[t_idx](b1.sub(&amp;d)));
-        if in_range != contained {
-            panic!(
-                "{:?} is in range of 2nd scanner at {:?}, but not contained in set",
-                b1, center2
-            );
-        }
+impl Coord {
+    pub fn add(mut self, rhs: &amp;Self) -&gt; Self {
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
+        self
     }
 
-    // loop over beacons seen by scanner 2 in 1's coordinates
-    for b2 in beacons2.iter().map(|b2| TRAFOS[t_idx](*b2).add(&amp;d)) {
-        // distance vec
-        let (dx, dy, dz) = center1.sub(&amp;b2);
+    pub fn sub(mut self, rhs: &amp;Self) -&gt; Self {
+        self.0 -= rhs.0;
+        self.1 -= rhs.1;
+        self.2 -= rhs.2;
+        self
+    }
 
-        let in_range = RANGE.contains(&amp;dx) &amp;&amp; RANGE.contains(&amp;dy) &amp;&amp; RANGE.contains(&amp;dz);
-        let contained = beacons1.contains(&amp;b2);
-        if in_range != contained {
-            panic!(
-                "{:?} is in range of 1st scanner at {:?}, but not contained in set",
-                b2, center1
-            );
-        }
+    pub fn abs(&amp;self) -&gt; usize {
+        (self.0.abs() + self.1.abs() + self.2.abs()) as usize
+    }
+}
+
+impl FromStr for Coord {
+    type Err = Box&lt;dyn std::error::Error&gt;;
+
+    /// parse 3D coordinate
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        let mut vals = s.split(',').map(|v| v.parse());
+        let x = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no x value", s))??;
+        let y = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no y value", s))??;
+        let z = vals
+            .next()
+            .ok_or_else(|| format!("Illegal coordinate: {}; no z value", s))??;
+        Ok(Coord(x, y, z))
+    }
+}
+
+impl std::fmt::Display for Coord {
+    /// print 3D coordinate
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
+        write!(f, "{},{},{}", self.0, self.1, self.2)
     }
 }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A list of valid transformations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// transformation functions for all 24 possible transformations
+pub const TRAFOS: [fn(Coord) -&gt; Coord; 24] = [
+    |Coord(x, y, z)| Coord(x, y, z),
+    |Coord(x, y, z)| Coord(x, -y, -z),
+    |Coord(x, y, z)| Coord(x, z, -y),
+    |Coord(x, y, z)| Coord(x, -z, y),
+    |Coord(x, y, z)| Coord(-x, y, -z),
+    |Coord(x, y, z)| Coord(-x, -y, z),
+    |Coord(x, y, z)| Coord(-x, z, y),
+    |Coord(x, y, z)| Coord(-x, -z, -y),
+    |Coord(x, y, z)| Coord(y, x, -z),
+    |Coord(x, y, z)| Coord(y, -x, z),
+    |Coord(x, y, z)| Coord(y, z, x),
+    |Coord(x, y, z)| Coord(y, -z, -x),
+    |Coord(x, y, z)| Coord(-y, x, z),
+    |Coord(x, y, z)| Coord(-y, -x, -z),
+    |Coord(x, y, z)| Coord(-y, z, -x),
+    |Coord(x, y, z)| Coord(-y, -z, x),
+    |Coord(x, y, z)| Coord(z, x, y),
+    |Coord(x, y, z)| Coord(z, -x, -y),
+    |Coord(x, y, z)| Coord(z, y, -x),
+    |Coord(x, y, z)| Coord(z, -y, x),
+    |Coord(x, y, z)| Coord(-z, x, -y),
+    |Coord(x, y, z)| Coord(-z, -x, y),
+    |Coord(x, y, z)| Coord(-z, y, x),
+    |Coord(x, y, z)| Coord(-z, -y, -x),
+];</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A <code>Scanner</code> structure (including code to parse/print scanners)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug, Clone)]
+pub struct Scanner {
+    id: usize,
+    pos: Coord,
+    beacons: Vec&lt;Coord&gt;,
+    dists: Vec&lt;HashMap&lt;usize, Vec&lt;usize&gt;&gt;&gt;,
+}
+
+impl Scanner {
+    const THRESHOLD: usize = 12;
+
+    pub fn len(&amp;self) -&gt; usize {
+        self.beacons.len()
+    }
+
+    pub fn transform(&amp;mut self, t: fn(Coord) -&gt; Coord, o: &amp;Coord) {
+        self.pos = t(self.pos).add(o);
+        for k in 0..self.len() {
+            self.beacons[k] = t(self.beacons[k]).add(o);
+        }
+    }
+
+    /// sanity check for overlapping scanner regions
+    ///
+    /// for all beacons seen by self / other, check whether they are also seen by other / self
+    /// if and only if they are in range of other / self
+    ///
+    /// # Panics
+    /// if sanity check fails
+    pub fn sanity_check(&amp;self, other: &amp;Self, t: fn(Coord) -&gt; Coord, o: &amp;Coord) {
+        // create a copy of other in self's coordinates
+        let mut other = other.to_owned();
+        other.transform(t, o);
+
+        // loop over beacons seen by self
+        for b1 in &amp;self.beacons {
+            let d = other.pos.sub(b1);
+            let in_range = RANGE.contains(&amp;d.0) &amp;&amp; RANGE.contains(&amp;d.1) &amp;&amp; RANGE.contains(&amp;d.2);
+            let contained = other.beacons.contains(b1);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 2nd scanner {} at {}, but not contained in set or vice versa",
+                    b1, other.id, other.pos
+                );
+            }
+        }
+
+        // loop over beacons seen by other
+        for b2 in &amp;other.beacons {
+            let d = self.pos.sub(b2);
+            let in_range = RANGE.contains(&amp;d.0) &amp;&amp; RANGE.contains(&amp;d.1) &amp;&amp; RANGE.contains(&amp;d.2);
+            let contained = self.beacons.contains(b2);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 1st scanner {} at {}, but not contained in set or vice versa",
+                    b2, self.id, self.pos
+                );
+            }
+        }
+    }
+
+    /// check whether ``self`` overlaps with ``other``
+    ///
+    /// find the transformation ``t`` and the offset ``o`` such that the coordinate system
+    /// of ``other`` is transformed into the coordinate system of ``self`` as ``t(c) + o``,
+    /// i.e., after calling ``other.transform(t, &amp;o)``, the same beacons have the same
+    /// coordinates in both scanners.
+    pub fn check_overlap(&amp;self, other: &amp;Self) -&gt; Option&lt;(fn(Coord) -&gt; Coord, Coord)&gt; {
+        for i1 in 0..=self.len() - Self::THRESHOLD {
+            for j1 in 0..=other.len() - Self::THRESHOLD {
+                let mut cnt = 0;
+                let mut pairs = Vec::new();
+
+                for (d, is) in &amp;self.dists[i1] {
+                    if let Some(js) = other.dists[j1].get(d) {
+                        cnt += cmp::min(is.len(), js.len());
+                        for i2 in is {
+                            for j2 in js {
+                                pairs.push((*i2, *j2));
+                            }
+                        }
+                    }
+                }
+
+                if cnt &lt; Self::THRESHOLD {
+                    continue;
+                }
+
+                // beacon i1 from self and beacon j1 from other have at least Self::THRESHOLD
+                // distances to other beacons in common
+                for t in TRAFOS {
+                    for k0 in 0..=pairs.len() - Self::THRESHOLD {
+                        let o = self.beacons[pairs[k0].0].sub(&amp;t(other.beacons[pairs[k0].1]));
+                        let cnt = pairs
+                            .iter()
+                            .filter(|(i, j)| self.beacons[*i] == t(other.beacons[*j]).add(&amp;o))
+                            .count();
+                        if cnt &gt;= Self::THRESHOLD {
+                            if cfg!(feature = "sanity-check") {
+                                self.sanity_check(other, t, &amp;o);
+                            }
+                            return Some((t, o));
+                        }
+                    }
+                }
+            }
+        }
+
+        None
+    }
+}
+
+impl FromStr for Scanner {
+    type Err = Box&lt;dyn std::error::Error&gt;;
+
+    /// parse scanner
+    fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+        let mut lines = s.lines().map(|l| l.trim()).filter(|l| l.len() &gt; 0);
+
+        let trimchars: &amp;[char] = &amp;[' ', '-'];
+        let head = lines.next().ok_or("Empty content")?.trim_matches(trimchars);
+        let id = head
+            .strip_prefix("scanner ")
+            .ok_or_else(|| format!("Illegal header: {}", head))?
+            .parse()?;
+
+        let pos = Coord(0, 0, 0);
+
+        let mut beacons = Vec::new();
+        for line in lines {
+            beacons.push(line.parse::&lt;Coord&gt;()?);
+        }
+
+        let mut dists = Vec::with_capacity(beacons.len());
+        for k1 in 0..beacons.len() {
+            let mut map = HashMap::new();
+            for k2 in 0..beacons.len() {
+                let d = beacons[k2].sub(&amp;beacons[k1]).abs();
+                (*map.entry(d).or_insert(Vec::new())).push(k2);
+            }
+            dists.push(map);
+        }
+
+        Ok(Scanner {
+            id,
+            pos,
+            beacons,
+            dists,
+        })
+    }
+}
+
+impl std::fmt::Display for Scanner {
+    /// print scanner (without offset)
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
+        writeln!(f, "--- scanner {} ---", self.id)?;
+        for k in 0..self.len() {
+            self.beacons[k].sub(&amp;self.pos).fmt(f)?;
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Scanner</code> implementation includes a sanity check for overlapping regions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    /// sanity check for overlapping scanner regions
+    ///
+    /// for all beacons seen by self / other, check whether they are also seen by other / self
+    /// if and only if they are in range of other / self
+    ///
+    /// # Panics
+    /// if sanity check fails
+    pub fn sanity_check(&amp;self, other: &amp;Self, t: fn(Coord) -&gt; Coord, o: &amp;Coord) {
+        // create a copy of other in self's coordinates
+        let mut other = other.to_owned();
+        other.transform(t, o);
+
+        // loop over beacons seen by self
+        for b1 in &amp;self.beacons {
+            let d = other.pos.sub(b1);
+            let in_range = RANGE.contains(&amp;d.0) &amp;&amp; RANGE.contains(&amp;d.1) &amp;&amp; RANGE.contains(&amp;d.2);
+            let contained = other.beacons.contains(b1);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 2nd scanner {} at {}, but not contained in set or vice versa",
+                    b1, other.id, other.pos
+                );
+            }
+        }
+
+        // loop over beacons seen by other
+        for b2 in &amp;other.beacons {
+            let d = self.pos.sub(b2);
+            let in_range = RANGE.contains(&amp;d.0) &amp;&amp; RANGE.contains(&amp;d.1) &amp;&amp; RANGE.contains(&amp;d.2);
+            let contained = self.beacons.contains(b2);
+            if in_range != contained {
+                panic!(
+                    "{} is in range of 1st scanner {} at {}, but not contained in set or vice versa",
+                    b2, self.id, self.pos
+                );
+            }
+        }
+    }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5472,43 +5565,35 @@ mod tests {
     fn test_parse() {
         let scanners = parse(CONTENT);
         assert_eq!(5, scanners.len());
-        assert!(scanners[2].0.contains(&amp;(-644, 584, -595)));
-        assert!(scanners[4].0.contains(&amp;(30, -46, -14)));
+        assert!(scanners[2].beacons.contains(&amp;Coord(-644, 584, -595)));
+        assert!(scanners[4].beacons.contains(&amp;Coord(30, -46, -14)));
     }
 
     #[test]
-    fn test_compare() {
+    fn test_parse_format() {
         let scanners = parse(CONTENT);
-        let r = check_overlap(&amp;scanners[0], &amp;scanners[1], 12);
+        let text = scanners
+            .iter()
+            .map(|s| format!("{}\n", s))
+            .collect::&lt;String&gt;();
+        assert_eq!(CONTENT.trim(), text.trim());
+    }
+
+    #[test]
+    fn test_check_overlap() {
+        let scanners = parse(CONTENT);
+        let r = scanners[0].check_overlap(&amp;scanners[1]);
         assert!(r.is_some(), "No transformation found");
         let (t, d) = r.unwrap();
 
-        assert_eq!((68, -1246, -43), d);
-        assert_eq!((-618, -824, -621), t((686, 422, 578)).add(&amp;d));
+        assert_eq!(Coord(68, -1246, -43), d);
+        assert_eq!(Coord(-618, -824, -621), t(Coord(686, 422, 578)).add(&amp;d));
     }
 
     #[test]
     fn test_solution_1_2() {
         let scanners = parse(CONTENT);
         assert_eq!((79, 3621), solution_1_2(&amp;scanners));
-    }
-
-    #[test]
-    fn test_trafos() {
-        for k in 0..24 {
-            assert_eq!(
-                (1, 2, 3),
-                TRAFOS[k](INV_TRAFOS[k]((1, 2, 3))),
-                "Failed trafo after inverse at {}",
-                k
-            );
-            assert_eq!(
-                (1, 2, 3),
-                INV_TRAFOS[k](TRAFOS[k]((1, 2, 3))),
-                "Failed inverse after trafo at {}",
-                k
-            );
-        }
     }
 }</code></pre>
 </div>
@@ -5570,7 +5655,7 @@ pub fn parse(content: &amp;str) -&gt; (Vec&lt;bool&gt;, Image) {
     // of the algorithm must not be set
     assert!(
         !algo[0] || !algo[algo.len() - 1],
-        "Algorithm will lit infinitely many pixels forever"
+        "Algorithm will light infinitely many pixels forever"
     );
 
     let mut data = Vec::new();
@@ -5759,7 +5844,7 @@ mod tests {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">/// play with a deterministic dice, winning threshold: 1000
 ///
 /// return the looser's score times the number the dice was thrown
-pub fn solution_1((mut p1, mut p2): (usize, usize)) -&gt; usize {
+pub fn solution_1((mut p1, mut p2): (usize, usize)) -&gt; u64 {
     let mut s1 = 0;
     let mut s2 = 0;
 
@@ -5779,7 +5864,7 @@ pub fn solution_1((mut p1, mut p2): (usize, usize)) -&gt; usize {
         t = !t;
     }
 
-    dice * cmp::min(s1, s2)
+    (dice * cmp::min(s1, s2)) as u64
 }</code></pre>
 </div>
 </div>
@@ -5809,14 +5894,14 @@ pub fn solution_1((mut p1, mut p2): (usize, usize)) -&gt; usize {
 /// * 7 - 6: (1 3 3) (2 2 3) (2 3 2) (3 1 3) (3 2 2) (3 3 1)
 /// * 8 - 3: (2 3 3) (3 2 3) (3 3 2)
 /// * 9 - 1: (3 3 3)
-pub const DICE_MULTS: [(usize, usize); 7] =
+pub const DICE_MULTS: [(usize, u64); 7] =
     [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
 
 #[cfg(feature = "stack")]
 /// play with dirac quantum dice (stack based)
 ///
 /// return the number of universes won by the player who wins more often
-pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
+pub fn solution_2((p1, p2): (usize, usize)) -&gt; u64 {
     // push states with multiplicty on stack
     // since I push to the end and pop from the end, this is depth first search
     let mut stack = Vec::new();
@@ -5863,7 +5948,7 @@ pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
 </div>
 </div>
 <div class="paragraph">
-<p>Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for each positions / scores it might be player 1&#8217;s or player 2&#8217;s turn). Yet, my stack based solution processes ~17 million items from the stack, i.e., on average, each state is pushed to the stack more than 200 times. There seems to be potential for optimization.</p>
+<p>Looking at the solution a bit closer, I figured out, that there are a total of 88200 different play states possible (10 positions per player times 21 scores per player times 2 because for any combination of positions and scores, it might be player 1&#8217;s or player 2&#8217;s turn). Yet, my stack based solution processes ~17 million items from the stack, i.e., on average, each state is pushed to the stack more than 200 times. There seems to be potential for optimization.</p>
 </div>
 <div class="paragraph">
 <p>I created a second solution which is based on a flat list of multiplicities for every possible state. I process each state, sorted by the sum of the scores of both players. Because the total score increases in every round played, I am sure that a state processed once will never occur again. Here is my second solution:</p>
@@ -5874,7 +5959,7 @@ pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
 /// play with dirac quantum dice (state list based)
 ///
 /// return the number of universes won by the player who wins more often
-pub fn solution_2((p1, p2): (usize, usize)) -&gt; usize {
+pub fn solution_2((p1, p2): (usize, usize)) -&gt; u64 {
     // index to state multiplicity list
     const F_IDX: fn(usize, usize, usize, usize, usize) -&gt; usize =
         |p1, p2, s1, s2, t| p1 + 10 * p2 + 100 * s1 + 2100 * s2 + 44100 * t;
@@ -5995,7 +6080,7 @@ mod tests {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">    /// get count restricted to self recursively as follows
     ///
     /// ``count(cuboids[k] in self) = count(cuboids[k] v self) - sum_i=1^k-1 count(cuboids[i] in (cuboids[k] v self))``
-    pub fn get_count_in(&amp;self, cuboids: &amp;[Self]) -&gt; isize {
+    pub fn get_count_in(&amp;self, cuboids: &amp;[Self]) -&gt; i64 {
         if let Some(other) = cuboids.last() {
             if let Some(i) = other.intersect(self) {
                 let mut count = if i.on { i.count() } else { 0 };
@@ -6021,10 +6106,10 @@ mod tests {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_on_count(cuboids: &amp;[Cuboid]) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn get_on_count(cuboids: &amp;[Cuboid]) -&gt; u64 {
     (0..cuboids.len())
         .map(|k| Cuboid::UNIVERSE.get_count_in(&amp;cuboids[..=k]))
-        .sum::&lt;isize&gt;() as usize
+        .sum::&lt;i64&gt;() as u64
 }</code></pre>
 </div>
 </div>
@@ -6033,11 +6118,11 @@ mod tests {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_1(cuboids: &amp;[Cuboid]) -&gt; usize {
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solution_1(cuboids: &amp;[Cuboid]) -&gt; u64 {
     get_on_count(
         &amp;cuboids
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&amp;Cuboid::SMALL_WORLD))
             .collect::&lt;Vec&lt;_&gt;&gt;(),
     )
 }</code></pre>
@@ -6096,12 +6181,12 @@ mod tests {
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Cuboid {
     on: bool,
-    x_mn: isize,
-    x_mx: isize,
-    y_mn: isize,
-    y_mx: isize,
-    z_mn: isize,
-    z_mx: isize,
+    x_mn: i64,
+    x_mx: i64,
+    y_mn: i64,
+    y_mx: i64,
+    z_mn: i64,
+    z_mx: i64,
 }
 
 impl fmt::Debug for Cuboid {
@@ -6121,16 +6206,27 @@ impl fmt::Debug for Cuboid {
 }
 
 impl Cuboid {
+    // a ``Cuboid`` representing the small world of part 1
+    pub const SMALL_WORLD: Self = Self {
+        on: false,
+        x_mn: -50,
+        x_mx: 50,
+        y_mn: -50,
+        y_mx: 50,
+        z_mn: -50,
+        z_mx: 50,
+    };
+
     /// a ``Cuboid`` spanning the complete _universe_
     /// (very unlikely that the universe is larger than 64bit in any dimension)
     pub const UNIVERSE: Self = Self {
         on: false,
-        x_mn: isize::MIN,
-        x_mx: isize::MAX,
-        y_mn: isize::MIN,
-        y_mx: isize::MAX,
-        z_mn: isize::MIN,
-        z_mx: isize::MAX,
+        x_mn: i64::MIN,
+        x_mx: i64::MAX,
+        y_mn: i64::MIN,
+        y_mx: i64::MAX,
+        z_mn: i64::MIN,
+        z_mx: i64::MAX,
     };
 
     /// get intersection, on flag is copied from self
@@ -6158,14 +6254,14 @@ impl Cuboid {
     }
 
     /// count the elements in this cuboid
-    pub fn count(&amp;self) -&gt; isize {
+    pub fn count(&amp;self) -&gt; i64 {
         (self.x_mx - self.x_mn + 1) * (self.y_mx - self.y_mn + 1) * (self.z_mx - self.z_mn + 1)
     }
 
     /// get count restricted to self recursively as follows
     ///
     /// ``count(cuboids[k] in self) = count(cuboids[k] v self) - sum_i=1^k-1 count(cuboids[i] in (cuboids[k] v self))``
-    pub fn get_count_in(&amp;self, cuboids: &amp;[Self]) -&gt; isize {
+    pub fn get_count_in(&amp;self, cuboids: &amp;[Self]) -&gt; i64 {
         if let Some(other) = cuboids.last() {
             if let Some(i) = other.intersect(self) {
                 let mut count = if i.on { i.count() } else { 0 };
@@ -6177,30 +6273,6 @@ impl Cuboid {
         }
 
         0
-    }
-
-    /// restrict all ranges to be contained in ``mn..=mx``
-    /// if the resulting cuboid is empty, retun ``None``
-    pub fn clamp(&amp;self, mn: isize, mx: isize) -&gt; Option&lt;Self&gt; {
-        let x_mn = cmp::max(self.x_mn, mn);
-        let x_mx = cmp::min(self.x_mx, mx);
-        let y_mn = cmp::max(self.y_mn, mn);
-        let y_mx = cmp::min(self.y_mx, mx);
-        let z_mn = cmp::max(self.z_mn, mn);
-        let z_mx = cmp::min(self.z_mx, mx);
-        if x_mx &lt; x_mn || y_mx &lt; y_mn || z_mx &lt; z_mn {
-            None
-        } else {
-            Some(Cuboid {
-                on: self.on,
-                x_mn,
-                x_mx,
-                y_mn,
-                y_mx,
-                z_mn,
-                z_mx,
-            })
-        }
     }
 }</code></pre>
 </div>
@@ -6371,7 +6443,7 @@ mod tests {
     fn test_solution_1_2_compare() {
         let cuboids = parse(CONTENT_1)
             .iter()
-            .filter_map(|c| c.clamp(-50, 50))
+            .filter_map(|c| c.intersect(&amp;Cuboid::SMALL_WORLD))
             .collect::&lt;Vec&lt;_&gt;&gt;();
 
         for k in 1..cuboids.len() {
@@ -6449,15 +6521,21 @@ mod tests {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve&lt;B&gt;(start: B) -&gt; usize
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub fn solve&lt;B&gt;(start: B, trace_path: bool) -&gt; usize
 where
-    B: Burrow + Ord + Eq + std::hash::Hash + Copy + std::fmt::Debug,
+    B: Burrow,
 {
-    let mut search = Search::init(start);
+    let mut search = Search::init(start, trace_path);
 
     while let Some((cost, burrow)) = search.pop() {
-        if burrow == B::TARGET {
+        if B::TARGET.eq(&amp;burrow) {
             // target reached
+
+            if trace_path {
+                search.print_path_to(&amp;B::TARGET);
+                search.print_stats();
+            }
+
             return cost;
         }
 
@@ -6479,6 +6557,9 @@ where
                     stack.push((1, *k_adj));
                 }
 
+                let mut push_later = Vec::new();
+                let mut do_push = true;
+
                 while let Some((steps, k_adj)) = stack.pop() {
                     if burrow[k_adj].is_some() {
                         // cannot move on top of other
@@ -6491,20 +6572,23 @@ where
                     {
                         // move in own room
                         let weight = steps * B::ENERGIES[p as usize];
-                        let mut adjacent = burrow;
+                        let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
-                        search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                        let bound_rem = adjacent.get_min_cost();
+                        search.push(Rc::clone(&amp;burrow), cost, adjacent, weight, bound_rem);
                         // no need to continue to look for other adjacents
-                        continue;
+                        do_push = false;
+                        break;
                     }
 
                     if k_adj &lt; B::HALLWAY_LEN &amp;&amp; !B::is_door(k_adj) &amp;&amp; cur_room.is_some() {
                         // move from room to hallway
                         let weight = steps * B::ENERGIES[p as usize];
-                        let mut adjacent = burrow;
+                        let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
                         if !adjacent.is_deadlock() {
-                            search.push(cost, burrow, weight, adjacent.get_min_cost(), adjacent);
+                            let bound_rem = adjacent.get_min_cost();
+                            push_later.push((Rc::clone(&amp;burrow), cost, adjacent, weight, bound_rem));
                         }
                         // continue search, other positions in the hallway may be valid adjacents
                     }
@@ -6514,6 +6598,12 @@ where
                             done[*k_adj_2] = true;
                             stack.push((steps + 1, *k_adj_2));
                         }
+                    }
+                }
+
+                if do_push {
+                    for (parent, cost, adjacent, weight, bound_rem) in push_later {
+                        search.push(parent, cost, adjacent, weight, bound_rem);
                     }
                 }
             }
@@ -6535,17 +6625,25 @@ where
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct BurrowLarge {
     data: [Option&lt;u8&gt;; 11 + 4 * 4],
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+#[derive(PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct BurrowSmall {
     data: [Option&lt;u8&gt;; 11 + 4 * 2],
 }
 
-pub trait Burrow: std::ops::Index&lt;usize, Output = Option&lt;u8&gt;&gt; + std::ops::IndexMut&lt;usize&gt; {
+pub trait Burrow:
+    std::ops::Index&lt;usize, Output = Option&lt;u8&gt;&gt;
+    + std::ops::IndexMut&lt;usize&gt;
+    + Eq
+    + Ord
+    + std::hash::Hash
+    + Clone
+    + std::fmt::Debug
+{
     const ROOM_LEN: usize;
     const LEN: usize;
     const MAP: &amp;'static [&amp;'static [usize]];
@@ -7005,7 +7103,7 @@ impl BurrowSmall {
 }
 
 impl BurrowLarge {
-    pub fn from(burrow: BurrowSmall) -&gt; Self {
+    pub fn from(burrow: &amp;BurrowSmall) -&gt; Self {
         let mut data = [None; Self::LEN];
 
         for k in 0..Self::HALLWAY_LEN {
@@ -7037,40 +7135,47 @@ impl BurrowLarge {
 <div class="sect5">
 <h6 id="_search_state"><a class="anchor" href="#_search_state"></a><a class="link" href="#_search_state">Search State</a></h6>
 <div class="paragraph">
-<p>The search state is modeled as a separate struct:</p>
+<p>The search state is modeled as a separate struct. Initially, I used copy semantics for <code>BurrowSmall</code> and <code>BurrowLarge</code> resulting in burrow data being copied into the different collections (<code>heap</code>, <code>settled</code>, <code>costs</code>, and <code>parents</code>). My current implementation uses reference counting pointers instead. This did not result in any significant runtime changes. It should result in lower memory usage, which I can however not measure&#8230;&#8203;</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug)]
 pub struct Search&lt;T&gt; {
-    heap: BTreeSet&lt;(usize, usize, T)&gt;,
-    settled: HashSet&lt;T&gt;,
-    costs: HashMap&lt;T, (usize, usize)&gt;,
-    parents: HashMap&lt;T, (usize, Option&lt;T&gt;)&gt;,
+    heap: BTreeSet&lt;(usize, usize, Rc&lt;T&gt;)&gt;,
+    settled: HashSet&lt;Rc&lt;T&gt;&gt;,
+    costs: HashMap&lt;Rc&lt;T&gt;, (usize, usize)&gt;,
+    parents: HashMap&lt;Rc&lt;T&gt;, (usize, usize, Option&lt;Rc&lt;T&gt;&gt;)&gt;,
     trace_path: bool,
+    hit_count: usize,
+    decr_key_count: usize,
 }
 
 impl&lt;T&gt; Search&lt;T&gt;
 where
-    T: Eq + Ord + std::hash::Hash + Copy + std::fmt::Debug,
+    T: Eq + Ord + std::hash::Hash + Clone + std::fmt::Debug,
 {
-    pub fn init(start: T) -&gt; Self {
+    pub fn init(start: T, trace_path: bool) -&gt; Self {
         let mut search = Self {
             heap: BTreeSet::new(),
             settled: HashSet::new(),
             costs: HashMap::new(),
             parents: HashMap::new(),
-            trace_path: false,
+            trace_path,
+            hit_count: 0,
+            decr_key_count: 0,
         };
-        search.heap.insert((0, 0, start));
-        search.settled.insert(start);
+        let start = Rc::new(start);
+        search.heap.insert((0, 0, Rc::clone(&amp;start)));
+        if search.trace_path {
+            search.parents.insert(Rc::clone(&amp;start), (0, 0, None));
+        }
         search.costs.insert(start, (0, 0));
         search
     }
 
-    pub fn pop(&amp;mut self) -&gt; Option&lt;(usize, T)&gt; {
+    pub fn pop(&amp;mut self) -&gt; Option&lt;(usize, Rc&lt;T&gt;)&gt; {
         if let Some((_, cost, burrow)) = self.heap.pop_first() {
-            self.settled.insert(burrow);
+            self.settled.insert(Rc::clone(&amp;burrow));
             Some((cost, burrow))
         } else {
             None
@@ -7079,43 +7184,57 @@ where
 
     pub fn push(
         &amp;mut self,
+        parent: Rc&lt;T&gt;,
         cost: usize,
-        parent: T,
+        adjacent: T,
         weight: usize,
         bound_rem: usize,
-        adjacent: T,
     ) -&gt; bool {
+        // wrap in Rc
+        let adjacent = Rc::new(adjacent);
+
+        // skip if settled
         if self.settled.contains(&amp;adjacent) {
             return false;
         }
 
-        if let Some((cur_bound, cur_cost)) = self.costs.get(&amp;adjacent) {
-            if cost + weight + bound_rem &lt; *cur_bound {
-                self.heap.remove(&amp;(*cur_bound, *cur_cost, adjacent));
+        let e = self.costs.entry(adjacent);
+        let adj = Rc::clone(e.key()); // use same instance consistently
+        let (b, c) = e.or_insert((usize::MAX, usize::MAX));
+        if *b &lt; usize::MAX {
+            self.hit_count += 1;
+            // if already in queue, check if decrease key required;
+            // remove from queue if yes, otherwise return false (nothing to be added to queue)
+            if cost + weight + bound_rem &lt; *b {
+                self.decr_key_count += 1;
+                self.heap.remove(&amp;(*b, *c, Rc::clone(&amp;adj)));
             } else {
                 return false;
             }
         }
+        *b = cost + weight + bound_rem;
+        *c = cost + weight;
 
-        self.heap
-            .insert((cost + weight + bound_rem, cost + weight, adjacent));
-        self.costs
-            .insert(adjacent, (cost + weight + bound_rem, cost + weight));
+        // keep trace
         if self.trace_path {
-            self.parents.insert(adjacent, (weight, Some(parent)));
+            self.parents
+                .insert(Rc::clone(&amp;adj), (bound_rem, weight, Some(parent)));
         }
+
+        // insert to heap
+        self.heap.insert((*b, *c, adj));
 
         true
     }
 
-    pub fn get_path_to(&amp;self, target: T) -&gt; VecDeque&lt;(usize, T)&gt; {
+    pub fn get_path_to(&amp;self, target: &amp;T) -&gt; VecDeque&lt;(usize, usize, T)&gt; {
         let mut path = VecDeque::new();
 
-        let mut current = target;
-        while let Some((cost, parent)) = self.parents.get(&amp;current) {
-            path.push_front((*cost, current));
+        let mut current = target.clone();
+        while let Some((bound_rem, cost, parent)) = self.parents.get(&amp;current) {
+            path.push_front((*bound_rem, *cost, current.clone()));
             if let Some(parent) = parent {
-                current = *parent;
+                current = parent.as_ref().clone();
             } else {
                 break;
             }
@@ -7124,10 +7243,60 @@ where
         path
     }
 
-    pub fn print_path_to(&amp;self, target: T) {
-        for (weight, burrow) in self.get_path_to(target) {
-            println!("==({})==&gt;\n{:?}", weight, burrow);
+    pub fn print_path_to(&amp;self, target: &amp;T) {
+        let mut steps = 0;
+        let mut sum = 0;
+        for (bound_rem, weight, burrow) in self.get_path_to(target) {
+            sum += weight;
+            if steps == 0 {
+                println!("\nInitial\n{:?}", burrow);
+            } else {
+                println!(
+                    "\n{}) {} -&gt; {} (bound: {} -&gt; {}) ==&gt;\n{:?}",
+                    steps,
+                    weight,
+                    sum,
+                    bound_rem,
+                    sum + bound_rem,
+                    burrow
+                );
+            }
+            steps += 1;
         }
+    }
+
+    pub fn print_stats(&amp;self) {
+        let mut mx = std::cmp::max(self.costs.len(), self.hit_count) / 1000;
+        let mut w = 3;
+        while mx &gt; 0 {
+            w += 1;
+            mx /= 10;
+        }
+
+        println!(
+            "+{blank:-&lt;w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-&lt;w_head$}+\n\
+            |     heap: {:w_field$} |\n\
+            |  settled: {:w_field$} |\n\
+            |    total: {:w_field$} |\n\
+            +{blank:-&lt;w_head$}+\n\
+            |{:^w_head$}|\n\
+            +{blank:-&lt;w_head$}+\n\
+            |      hit: {:w_field$} |\n\
+            | decr key: {:w_field$} |\n\
+            +{blank:-&lt;w_head$}+",
+            "Element Count",
+            self.heap.len(),
+            self.settled.len(),
+            self.costs.len(),
+            "Push Stats",
+            self.hit_count,
+            self.decr_key_count,
+            blank = "",
+            w_field = w,
+            w_head = w + 12
+        );
     }
 }</code></pre>
 </div>
@@ -7140,6 +7309,8 @@ where
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use super::*;
 
     const CONTENT_1: &amp;str = "#############
@@ -7271,24 +7442,24 @@ mod tests {
         ];
 
         for k in (0..1).rev() {
-            let act_cost = solution_1(burrows[k]);
+            let act_cost = solution_1(&amp;burrows[k]);
             assert_eq!(exp_costs[k], act_cost);
         }
     }
 
     #[test]
     fn test_solution_2() {
-        assert_eq!(44169, solution_2(BURROW_1));
+        assert_eq!(44169, solution_2(&amp;BURROW_1));
     }
 
     #[test]
     fn test_burrow_large_from() {
-        assert_eq!(BURROW_2, BurrowLarge::from(BURROW_1));
+        assert_eq!(BURROW_2, BurrowLarge::from(&amp;BURROW_1));
     }
 
     #[test]
     fn test_get_min_cost() {
-        let burrow = BurrowLarge::from(parse(
+        let burrow = BurrowLarge::from(&amp;parse(
             "#############
 #...........#
 ###A#D#C#A###
@@ -7463,7 +7634,7 @@ pub fn get_constraints(instructions: &amp;[Inst]) -&gt; Vec&lt;(usize, usize, Va
     constraints
 }
 
-pub fn solution_1(instructions: &amp;[Inst]) -&gt; usize {
+pub fn solution_1(instructions: &amp;[Inst]) -&gt; u64 {
     let inputs = &amp;mut [0; INPUT_LEN];
     for (n1, n2, o) in get_constraints(instructions) {
         inputs[n1] = DIGIT_MAX;
@@ -7472,10 +7643,10 @@ pub fn solution_1(instructions: &amp;[Inst]) -&gt; usize {
 
     assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as u64)
 }
 
-pub fn solution_2(instructions: &amp;[Inst]) -&gt; usize {
+pub fn solution_2(instructions: &amp;[Inst]) -&gt; u64 {
     let inputs = &amp;mut [0; INPUT_LEN];
     for (n1, n2, o) in get_constraints(instructions) {
         inputs[n1] = DIGIT_MIN + o;
@@ -7484,7 +7655,7 @@ pub fn solution_2(instructions: &amp;[Inst]) -&gt; usize {
 
     assert_eq!(0, execute(instructions, inputs));
 
-    inputs.iter().fold(0, |v, d| 10 * v + *d as usize)
+    inputs.iter().fold(0, |v, d| 10 * v + *d as u64)
 }</code></pre>
 </div>
 </div>
@@ -7722,27 +7893,36 @@ pub const X: C = 0;
 pub fn step(grid: &amp;[C], w: usize) -&gt; Option&lt;Vec&lt;C&gt;&gt; {
     let mut grid_upd = vec![X; grid.len()];
     let mut moved = false;
+    let h = grid.len() / w;
 
-    for k in 0..grid.len() {
-        if grid[k] == E {
-            let k_upd = (k + 1) % w + w * (k / w);
-            if grid[k_upd] == X {
-                grid_upd[k_upd] = E;
-                moved = true;
-            } else {
-                grid_upd[k] = E;
+    for x in 0..w {
+        let x_upd = (x + 1) % w;
+        for y in 0..h {
+            let k = x + w * y;
+            if grid[k] == E {
+                let k_upd = x_upd + w * y;
+                if grid[k_upd] == X {
+                    grid_upd[k_upd] = E;
+                    moved = true;
+                } else {
+                    grid_upd[k] = E;
+                }
             }
         }
     }
 
-    for k in 0..grid.len() {
-        if grid[k] == S {
-            let k_upd = (k + w) % grid.len();
-            if grid[k_upd] != S &amp;&amp; grid_upd[k_upd] == X {
-                grid_upd[k_upd] = S;
-                moved = true;
-            } else {
-                grid_upd[k] = S;
+    for y in 0..h {
+        let y_upd = (y + 1) % h;
+        for x in 0..w {
+            let k = x + w * y;
+            if grid[k] == S {
+                let k_upd = x + w * y_upd;
+                if grid[k_upd] != S &amp;&amp; grid_upd[k_upd] == X {
+                    grid_upd[k_upd] = S;
+                    moved = true;
+                } else {
+                    grid_upd[k] = S;
+                }
             }
         }
     }
