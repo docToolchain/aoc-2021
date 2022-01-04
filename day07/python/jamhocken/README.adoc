@@ -1,0 +1,26 @@
+
+Day 7 of year 2021
+https://adventofcode.com/2021/day/7
+
+== What I learned
+
+. Straightforward.
+
+== Approach
+
+. I parse the line and convert to integers.
+. For star 1, it's just statistics.
+.. The optimal spot is the median.
+. For star 2
+.. If you start going through all possible values, it might take a while.
+.. So, I used the median as my starting point and looked if the fuel consumption is improved by increasing or decreasing from there.
+.. Then, I just iterate through until I come to the other side of the global optimum and take the value before that.
+. It's probably not optimized, but it only takes a few seconds to run.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
