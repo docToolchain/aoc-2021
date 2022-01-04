@@ -5076,7 +5076,7 @@ mod tests {
 <p>The solution for today&#8217;s puzzle takes ~60ms to complete in my current implementation (optimized from 30 seconds in the first version).</p>
 </div>
 <div class="paragraph">
-<p>The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations and thus do as much as possible on the distances and only figure out the correct transformation late. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from <a href="https://github.com/mogron">Moritz Gronbach</a>.</p>
+<p>The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations. Hence, it is possible to determine scanner range overlaps based on distances and only identify the correct transformation afterwards. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from <a href="https://github.com/mogron">Moritz Gronbach</a>.</p>
 </div>
 <div class="sect4">
 <h5 id="_parts_1_2_2"><a class="anchor" href="#_parts_1_2_2"></a><a class="link" href="#_parts_1_2_2">Parts 1 &amp; 2</a></h5>
@@ -5123,10 +5123,10 @@ mod tests {
 </div>
 </div>
 <div class="paragraph">
-<p>This is used in a <code>check_overlap</code> function, which first finds beacons in two scanner&#8217;s (<code>self</code> and <code>other</code>) that have at least 12 distances to other scanners in common and stores a list of <code>pairs</code> of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)</p>
+<p>This is used in a <code>check_overlap</code> function, which first finds beacons in two scanner&#8217;s (<code>self</code> and <code>other</code>) ranges, that have at least 12 distances to other beacons in common and stores a list of <code>pairs</code> of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)</p>
 </div>
 <div class="paragraph">
-<p>Using this list of <code>pairs</code>, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner&#8217;s.</p>
+<p>Using this list of <code>pairs</code>, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner&#8217;s ranges.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -7494,19 +7494,19 @@ mod tests {
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/24">AoC|2021|24</a>.</p>
 </div>
 <div class="paragraph">
-<p>I don&#8217;t get the idea of today&#8217;s puzzle. I essentially solved it manually. From my point of view, a well posed problem allows to implement a solution without looking at the puzzle input data and than compute a solution based on the puzzle input. For today&#8217;s problem, I don&#8217;t think there is a way to find a solution without analyzing the puzzle input.</p>
+<p>I don&#8217;t get the idea of today&#8217;s puzzle. I essentially solved it manually. From my point of view, a well posed problem allows to implement a solution based on the description only without considering the specific puzzle input and then run that solution on the specific input. For today&#8217;s problem, I don&#8217;t think there is a way to find a solution without analyzing the puzzle input.</p>
 </div>
 <div class="paragraph">
-<p>I reverse engineered the MONAD (puzzle input) to figure out what actually happens. The content in variable z can essentially be interpreted as a stack od input digits with offsets. To add stack elements, the current content is multiplied with 26 (in case of my puzzle input) and than the next element is added. This constrains an element to be in the range 0 to 25 (inclusive). Since input digits are in the range 0 to 9 (inclusive), offsets shall be in the range 0 to 16 (inclusive).</p>
+<p>I reverse engineered the MONAD (puzzle input) to figure out what actually happens. The content in variable z can essentially be interpreted as a stack of input digits with offsets. To add stack elements, the current content is multiplied with 26 (in case of my puzzle input) and than the next element is added. This constrains an element to be in the range 0 to 25 (inclusive). Since input digits are in the range 0 to 9 (inclusive), offsets shall be in the range 0 to 16 (inclusive).</p>
 </div>
 <div class="paragraph">
-<p>The MONAD contains of 14 blocks (one for every input digit), which evaluate a condition and based on the outcome push a new element to the stack (the z variable).</p>
+<p>The MONAD consists of 14 similar blocks of instructions (one for every input digit), which evaluate a condition and based on the outcome do or do not push a new element on the stack (the z variable).</p>
 </div>
 <div class="paragraph">
-<p>In seven of the blocks, the condition evaluates to true independently of the input digit. In the remaining seven blocks, a new element is pushed to the stack if <code>dX != dY + o</code>. For stack to be empty at the end and thus the variable <code>z</code> to equal zero, elements shall not be pushed to the stack, i.e., <code>dX = dY + o</code>, where <code>dX</code> and <code>dY</code> are digits of the serial number to be checked and <code>o &gt;= 0</code> is an offset.</p>
+<p>In seven of the blocks, the condition evaluates to true independently of the input digit. In the remaining seven blocks, a new element is pushed to the stack if <code>dX != dY + o</code>. For the stack to be empty at the end and thus the variable <code>z</code> to equal zero, elements shall not be pushed to the stack, i.e., <code>dX = dY + o</code>, where <code>dX</code> and <code>dY</code> are input digits (digitis of the serial number to be checked) and <code>o &gt;= 0</code> is an offset.</p>
 </div>
 <div class="paragraph">
-<p>For the equalities to be satisfied, <code>dY &gt;= 1</code> and <code>dY &#8656; 9 - o</code> need to be satisfied.</p>
+<p>For the equalities to be satisfied, <code>dY &gt;= 1</code> and <code>dY &lt;= 9 - o</code> need to be satisfied. The first constraint yields the smallest valid serial number (<code>dY = 1</code> with corresponding <code>dX = 1 + o</code>), the second constraint yields the largest valid serial number (<code>dY = 9 - o</code> with corresponding <code>dX = 9</code>).</p>
 </div>
 <div class="sect4">
 <h5 id="_solution_6"><a class="anchor" href="#_solution_6"></a><a class="link" href="#_solution_6">Solution</a></h5>
