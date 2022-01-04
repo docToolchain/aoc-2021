@@ -159,6 +159,20 @@
 <li><a href="#_run_script_2">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_03_python">Day 03: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_3">What I learned</a></li>
+<li><a href="#_approach_3">Approach</a></li>
+<li><a href="#_run_script_3">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_04_python">Day 04: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_4">What I learned</a></li>
+<li><a href="#_approach_4">Approach</a></li>
+<li><a href="#_run_script_4">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -342,6 +356,283 @@ def main():
             aim += directions[1]
 
     print(horizontal, depth, depth*horizontal)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day03" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_03_python"><a class="anchor" href="#_day_03_python"></a><a class="link" href="#_day_03_python">Day 03: python</a></h3>
+<div class="paragraph">
+<p>Day 3 of year 2021
+<a href="https://adventofcode.com/2021/day/3" class="bare">https://adventofcode.com/2021/day/3</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_3"><a class="anchor" href="#_what_i_learned_3"></a><a class="link" href="#_what_i_learned_3">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Somehow I don&#8217;t understand slices with lists in Python, but at least I do understand it for matrices with Numpy.</p>
+</li>
+<li>
+<p>The whole thing isn&#8217;t very elegant, I&#8217;m afraid.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_3"><a class="anchor" href="#_approach_3"></a><a class="link" href="#_approach_3">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and put all of the codes into a list of lists.</p>
+</li>
+<li>
+<p>For star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I take that list of lists and turned it into a Numpy matrix. I then sum each digit over all
+codes and compare that sum to half of the number of codes to find the majority digit for Gamma.</p>
+</li>
+<li>
+<p>I then used some modula arithmetic to find the inverse Epsilon.</p>
+</li>
+<li>
+<p>Converted to strings, joined it and converted to integers.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I go through each digit and cull out the codes that don&#8217;t belong to the majority / minority.</p>
+</li>
+<li>
+<p>I recalculate the majority / minority evey run through the loop with a Numpy matrix again.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_3"><a class="anchor" href="#_run_script_3"></a><a class="link" href="#_run_script_3">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import numpy as np
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    bin_digits = [[int(j) for j in list(code)] for code in lines_stripped]
+
+    return bin_digits
+
+def main():
+    with open("input.txt",'r') as diagnostic_file:
+        diagnostic_lines = diagnostic_file.readlines()
+
+    diagnostics = process_input(diagnostic_lines)
+
+    diag_matrix = np.matrix(diagnostics)
+    matrix_size = diag_matrix.shape
+    no_codes = matrix_size[0]
+    sum_diag = diag_matrix.sum(0)
+    sum_diag = sum_diag.tolist()[0]
+
+    gamma = int(''.join([str(int(j // (no_codes/2))) for j in sum_diag]),2)
+    epsilon = int(''.join([str(int(j // (no_codes/2)+1)%2) for j in sum_diag]),2)
+
+    print(gamma, epsilon, gamma*epsilon)
+
+    if gamma&lt;2**(matrix_size[1]-1):
+        majority_oxy = 0
+        majority_co2 = 1
+    else:
+        majority_oxy = 1
+        majority_co2 = 0
+
+    candidates_oxy = diagnostics.copy()
+    candidates_co2 = diagnostics.copy()
+    i = 0
+
+    while len(candidates_oxy)!=1 or len(candidates_co2)!=1:
+        oxy_temp = candidates_oxy.copy()
+        co2_temp = candidates_co2.copy()
+        if len(candidates_oxy) != 1:
+            for code in oxy_temp:
+                if code[i]!=majority_oxy:
+                    candidates_oxy.remove(code)
+        if len(candidates_co2) != 1:
+            for code in co2_temp:
+                if code[i]!=majority_co2:
+                    candidates_co2.remove(code)
+        if i != matrix_size[1]-1:
+            i += 1
+            oxy_matrix = np.matrix(candidates_oxy)
+            sum_oxy = oxy_matrix.sum(0)
+            sum_oxy = sum_oxy.tolist()[0]
+
+            co2_matrix = np.matrix(candidates_co2)
+            sum_co2 = co2_matrix.sum(0)
+            sum_co2 = sum_co2.tolist()[0]
+
+            if sum_oxy[i] &gt;= len(candidates_oxy)/2:
+                majority_oxy = 1
+            else:
+                majority_oxy = 0
+            if sum_co2[i] &lt; len(candidates_co2)/2:
+                majority_co2 = 1
+            else:
+                majority_co2 = 0
+
+    c_oxy = int(''.join([str(i) for i in candidates_oxy[0]]),2)
+    c_co2 = int(''.join([str(i) for i in candidates_co2[0]]),2)
+
+    print(c_oxy, c_co2, c_oxy*c_co2)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day04" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_04_python"><a class="anchor" href="#_day_04_python"></a><a class="link" href="#_day_04_python">Day 04: python</a></h3>
+<div class="paragraph">
+<p>Day 4 of year 2021
+<a href="https://adventofcode.com/2021/day/4" class="bare">https://adventofcode.com/2021/day/4</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_4"><a class="anchor" href="#_what_i_learned_4"></a><a class="link" href="#_what_i_learned_4">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I tried out some new functions in Numpy</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_4"><a class="anchor" href="#_approach_4"></a><a class="link" href="#_approach_4">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Create a list of the numbers called</p>
+</li>
+<li>
+<p>Create a list of all of the bingo cards as well as a "marker" card for each of the bingo cards</p>
+</li>
+<li>
+<p>The marker cards are initialized to have the value 1 everywhere.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I go through the numbers called and for each bingo card that has that number,
+I put a zero on the appropriate spot on the marker card.</p>
+</li>
+<li>
+<p>I then check if any of the columns or rows of that marker card are now filled with zeros.</p>
+</li>
+<li>
+<p>If it is the first card to get bingo, I set the "bingo" flag and print out the value for Star 1.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I only had to slightly modify the code.</p>
+</li>
+<li>
+<p>I added a set of all of the cards that haven&#8217;t won yet. If a card wins, I remove it from the set.</p>
+</li>
+<li>
+<p>I iterate through until the last card has won. And then exit the loop and do the calculation for the answer.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_4"><a class="anchor" href="#_run_script_4"></a><a class="link" href="#_run_script_4">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import numpy as np
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    numbers_called = [int(x) for x in lines_stripped[0].split(",")]
+    cards = []
+
+    i = 2
+    while i &lt; len(lines_stripped):
+        bingo_card = []
+        marker_card = []
+        for j in range(5):
+            bingo_card.append([int(x) for x in lines_stripped[i+j].split()])
+            marker_card.append([1]*5)
+        cards.append([bingo_card,marker_card])
+        i += 6
+
+    return numbers_called, cards
+
+def main():
+    with open("input.txt",'r') as bingo_file:
+        bingo_lines = bingo_file.readlines()
+
+    (numbers_called, cards) = process_input(bingo_lines)
+
+    card_arrays = [[np.array(bingo_card),np.array(marker_card)] for bingo_card, marker_card in cards]
+    bingo = 0
+    j = -1
+    non_winners = set(range(len(card_arrays)))
+    nw_temp = non_winners.copy()
+
+    while len(non_winners)&gt;0:
+        j += 1
+        for i in non_winners:
+            card_arrays[i][1] = np.where(card_arrays[i][0]==numbers_called[j],0,card_arrays[i][1])
+            if (~card_arrays[i][1].any(axis=0)).any() or (~card_arrays[i][1].any(axis=1)).any():
+               if bingo == 0:
+                   bingo = 1
+                   winning_card = i
+                   print(np.sum(np.multiply(card_arrays[winning_card][0],card_arrays[winning_card][1]))*numbers_called[j])
+               if len(non_winners)==1:
+                   losing_card = i
+               nw_temp.remove(i)
+        non_winners = nw_temp.copy()
+
+    print(np.sum(np.multiply(card_arrays[losing_card][0],card_arrays[losing_card][1]))*numbers_called[j])
 
 main()</code></pre>
 </div>
