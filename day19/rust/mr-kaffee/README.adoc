@@ -4,7 +4,7 @@ https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/19[AoC
 
 The solution for today's puzzle takes ~60ms to complete in my current implementation (optimized from 30 seconds in the first version).
 
-The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations and thus do as much as possible on the distances and only figure out the correct transformation late. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from https://github.com/mogron[Moritz Gronbach].
+The key for these optimizations is to realize that distances between beacons are invariant under coordinate transformations. Hence, it is possible to determine scanner range overlaps based on distances and only identify the correct transformation afterwards. I have to admit that I did not come up with this idea myself but had to look at other solutions. I took the idea from https://github.com/mogron[Moritz Gronbach].
 
 === Parts 1 & 2 ===
 
@@ -15,9 +15,9 @@ When reading the input, I create a distance map (``dists``) which -- for every b
 include::src/lib.rs[tags=parse]
 ----
 
-This is used in a ``check_overlap`` function, which first finds beacons in two scanner's (``self`` and ``other``) that have at least 12 distances to other scanners in common and stores a list of ``pairs`` of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)
+This is used in a ``check_overlap`` function, which first finds beacons in two scanner's (``self`` and ``other``) ranges, that have at least 12 distances to other beacons in common and stores a list of ``pairs`` of beacons that are potentially the same (a bit of extra thinking is required for the case that more than one beacon is at the same distance)
 
-Using this list of ``pairs``, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner's.
+Using this list of ``pairs``, I then search for a matching transformation / offset to map at least 12 beacons in the two scanner's ranges.
 
 [source,rust,numbered]
 ----
