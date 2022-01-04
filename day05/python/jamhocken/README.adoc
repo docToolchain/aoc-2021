@@ -1,0 +1,27 @@
+
+Day 5 of year 2021
+https://adventofcode.com/2021/day/5
+
+== What I learned
+
+. I refreshed regex for myself (again).
+
+== Approach
+
+. I parse the file with a regex and create a list of all of the vectors.
+. For star 1
+.. I check if the line is vertical and iterate the value in a dictionary for each coordinate on the line.
+.. I then check if it is horizontal and do the same.
+.. I then check the dictionary for any values more than 1 and sum over the number of those entries.
+. For star 2
+.. I still do the horizontal and vertical checks.
+.. And then do the diagonal lines.
+.. I think this could be simplified / shortened, but I didn't bother.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
