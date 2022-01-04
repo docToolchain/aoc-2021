@@ -1,0 +1,28 @@
+
+Day 3 of year 2021
+https://adventofcode.com/2021/day/3
+
+== What I learned
+
+. Somehow I don't understand slices with lists in Python, but at least I do understand it for matrices with Numpy.
+. The whole thing isn't very elegant, I'm afraid.
+
+== Approach
+
+. I parse the file and put all of the codes into a list of lists.
+. For star 1
+.. I take that list of lists and turned it into a Numpy matrix. I then sum each digit over all
+codes and compare that sum to half of the number of codes to find the majority digit for Gamma.
+.. I then used some modula arithmetic to find the inverse Epsilon.
+.. Converted to strings, joined it and converted to integers.
+. For star 2
+.. I go through each digit and cull out the codes that don't belong to the majority / minority.
+.. I recalculate the majority / minority evey run through the loop with a Numpy matrix again.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

@@ -1,0 +1,31 @@
+
+Day 4 of year 2021
+https://adventofcode.com/2021/day/4
+
+== What I learned
+
+. I tried out some new functions in Numpy
+
+== Approach
+
+. I parse the file and
+.. Create a list of the numbers called
+.. Create a list of all of the bingo cards as well as a "marker" card for each of the bingo cards
+.. The marker cards are initialized to have the value 1 everywhere. 
+. For star 1
+.. I go through the numbers called and for each bingo card that has that number,
+I put a zero on the appropriate spot on the marker card.
+.. I then check if any of the columns or rows of that marker card are now filled with zeros.
+.. If it is the first card to get bingo, I set the "bingo" flag and print out the value for Star 1.
+. For star 2
+.. I only had to slightly modify the code.
+.. I added a set of all of the cards that haven't won yet. If a card wins, I remove it from the set.
+.. I iterate through until the last card has won. And then exit the loop and do the calculation for the answer.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
