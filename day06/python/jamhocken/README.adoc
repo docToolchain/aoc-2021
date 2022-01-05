@@ -1,0 +1,24 @@
+
+Day 6 of year 2021
+https://adventofcode.com/2021/day/6
+
+== What I learned
+
+. It is straightforward as soon as you see that you only have to count the fish.
+
+== Approach
+
+. I parse the line and convert to integers.
+. Then I count how many fish are in each of the possible fish states (9 of them).
+. For both stars, you just create a loop with the right number of days.
+.. You write the number in state 0 into state 8.
+.. You add the number from state 7 to the number from state 0 and put it into state 6.
+.. All others follow the rule state n is written to state n-1.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
