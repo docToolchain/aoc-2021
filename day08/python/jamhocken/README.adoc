@@ -1,0 +1,26 @@
+
+Day 8 of year 2021
+https://adventofcode.com/2021/day/8
+
+== What I learned
+
+. Frozen sets and some basic set manipulation in Python.
+
+== Approach
+
+. I parse the line and create 2 lists with the input and output strings
+. For star 1, i just flatten the output list and count all entries with 2,3,4 or 7 letters.
+. For star 2
+.. I turned the input and output entries (strings) into frozen sets to avoid messing with ordering.
+.. I also sorted the input strings for every entry according to their lengths to minimize searching later.
+.. For each input line, I immediately map 1, 7, 4 and 8 since these are only length dependent (I used a dict to hold the mapping).
+.. You can logically derive the other ones by using length + looking at which other known numbers are subsets.
+.. Then, you just use the dictionary to find the output digits, concatenate them and sum over all lines
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
