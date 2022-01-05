@@ -180,6 +180,20 @@
 <li><a href="#_run_script_5">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_06_python">Day 06: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_6">What I learned</a></li>
+<li><a href="#_approach_6">Approach</a></li>
+<li><a href="#_run_script_6">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_07_python">Day 07: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_7">What I learned</a></li>
+<li><a href="#_approach_7">Approach</a></li>
+<li><a href="#_run_script_7">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -801,6 +815,219 @@ def main():
     vents = star2(vectors)
     critical = sum([1 if value&gt;1 else 0 for value in vents.values()])
     print(critical)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day06" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_06_python"><a class="anchor" href="#_day_06_python"></a><a class="link" href="#_day_06_python">Day 06: python</a></h3>
+<div class="paragraph">
+<p>Day 6 of year 2021
+<a href="https://adventofcode.com/2021/day/6" class="bare">https://adventofcode.com/2021/day/6</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_6"><a class="anchor" href="#_what_i_learned_6"></a><a class="link" href="#_what_i_learned_6">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>It is straightforward as soon as you see that you only have to count the fish.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_6"><a class="anchor" href="#_approach_6"></a><a class="link" href="#_approach_6">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the line and convert to integers.</p>
+</li>
+<li>
+<p>Then I count how many fish are in each of the possible fish states (9 of them).</p>
+</li>
+<li>
+<p>For both stars, you just create a loop with the right number of days.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>You write the number in state 0 into state 8.</p>
+</li>
+<li>
+<p>You add the number from state 7 to the number from state 0 and put it into state 6.</p>
+</li>
+<li>
+<p>All others follow the rule state n is written to state n-1.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_6"><a class="anchor" href="#_run_script_6"></a><a class="link" href="#_run_script_6">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    fish = [int(i) for i in lines_stripped[0].split(",")]
+
+    fish_states = [0]*9
+
+    for lf in fish:
+        fish_states[lf] += 1
+
+    return fish_states
+
+def main():
+    with open("input.txt",'r') as fish_file:
+        fish_lines = fish_file.readlines()
+
+    fish_states = process_input(fish_lines)
+
+    for day in range(256):
+        fish_states_temp = fish_states.copy()
+        for states in range(len(fish_states)):
+            if states == 0:
+                fish_states_temp[8] = fish_states[0]
+                fish_states_temp[6] = fish_states[0]
+            elif states == 7:
+                fish_states_temp[6] += fish_states[7]
+            else:
+                fish_states_temp[states-1] = fish_states[states]
+        fish_states = fish_states_temp
+        if day == 79:
+            print(sum(fish_states))
+
+    print(sum(fish_states))
+
+main()</code></pre>
+</div>
+</div>
+<a id="day07" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_07_python"><a class="anchor" href="#_day_07_python"></a><a class="link" href="#_day_07_python">Day 07: python</a></h3>
+<div class="paragraph">
+<p>Day 7 of year 2021
+<a href="https://adventofcode.com/2021/day/7" class="bare">https://adventofcode.com/2021/day/7</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_7"><a class="anchor" href="#_what_i_learned_7"></a><a class="link" href="#_what_i_learned_7">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Straightforward.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_7"><a class="anchor" href="#_approach_7"></a><a class="link" href="#_approach_7">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the line and convert to integers.</p>
+</li>
+<li>
+<p>For star 1, it&#8217;s just statistics.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>The optimal spot is the median.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If you start going through all possible values, it might take a while.</p>
+</li>
+<li>
+<p>So, I used the median as my starting point and looked if the fuel consumption is improved by increasing or decreasing from there.</p>
+</li>
+<li>
+<p>Then, I just iterate through until I come to the other side of the global optimum and take the value before that.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>It&#8217;s probably not optimized, but it only takes a few seconds to run.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_7"><a class="anchor" href="#_run_script_7"></a><a class="link" href="#_run_script_7">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import statistics
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    crabs = [int(i) for i in lines_stripped[0].split(",")]
+
+    return crabs
+
+def main():
+    with open("input.txt",'r') as crab_file:
+        crab_lines = crab_file.readlines()
+
+    crabs = process_input(crab_lines)
+
+    # The optimal position is the median for star 1
+    center = int(statistics.median(crabs))
+
+    fuel = 0
+    for crab in crabs:
+        fuel += abs(crab-center)
+    print(fuel)
+
+    # The median is a good starting point for star 2
+    fuel = 0
+    for crab in crabs:
+        for i in range(abs(crab-center)):
+            fuel += i+1
+
+    # Is the optimal answer more or less than the median?
+    fuel_old = fuel
+    fuel = 0
+    center_temp = center - 1
+    for crab in crabs:
+        for i in range(abs(crab-center_temp)):
+            fuel += i+1
+    if fuel &lt; fuel_old:
+        iterator = -1
+    else:
+        iterator = 1
+
+    # Iterate until the values start to increase
+    fuel = fuel_old
+    while fuel&lt;=fuel_old:
+        fuel_old = fuel
+        fuel = 0
+        center = center + iterator
+        for crab in crabs:
+            for i in range(abs(crab-center)):
+                fuel += i+1
+
+    print(fuel_old)
 
 main()</code></pre>
 </div>
