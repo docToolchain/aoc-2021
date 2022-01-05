@@ -47,6 +47,15 @@ Here is the complete implementation of the ``Cuboid`` structure:
 include::src/lib.rs[tags=cuboid]
 ----
 
+=== Solution variant: loop vs. recursion ===
+
+Instead of a recursive function, it is also possible to create an explicit stack which is processed in a while loop. This solution requires fewer code and is slightly faster for me:
+
+[source,rust,numbered]
+----
+include::src/lib.rs[tags=solve_loop]
+----
+
 === Tests ===
 
 [source,rust,numbered]

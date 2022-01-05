@@ -140,7 +140,21 @@ pub fn parse(content: &str) -> Vec<Cuboid> {
 }
 // end::parse[]
 
+// tag::solve_loop[]
+#[cfg(not(feature = "recursion"))]
+pub fn get_on_count(cuboids: &[Cuboid]) -> u64 {
+    let mut count = 0;
+    let mut stack: Vec<_> = (0..cuboids.len()).map(|k| (cuboids[k], k, 1)).collect();
+    while let Some((c, k, sign)) = stack.pop() {
+        count += (c.on as i64) * sign * c.count();
+        stack.extend((0..k).filter_map(|k| cuboids[k].intersect(&c).map(|c| (c, k, -sign))));
+    }
+    count as u64
+}
+// end::solve_loop[]
+
 // tag::solve[]
+#[cfg(feature = "recursion")]
 pub fn get_on_count(cuboids: &[Cuboid]) -> u64 {
     (0..cuboids.len())
         .map(|k| Cuboid::UNIVERSE.get_count_in(&cuboids[..=k]))
