@@ -194,6 +194,13 @@
 <li><a href="#_run_script_7">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_08_python">Day 08: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_8">What I learned</a></li>
+<li><a href="#_approach_8">Approach</a></li>
+<li><a href="#_run_script_8">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1028,6 +1035,118 @@ def main():
                 fuel += i+1
 
     print(fuel_old)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day08" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_08_python"><a class="anchor" href="#_day_08_python"></a><a class="link" href="#_day_08_python">Day 08: python</a></h3>
+<div class="paragraph">
+<p>Day 8 of year 2021
+<a href="https://adventofcode.com/2021/day/8" class="bare">https://adventofcode.com/2021/day/8</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_8"><a class="anchor" href="#_what_i_learned_8"></a><a class="link" href="#_what_i_learned_8">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Frozen sets and some basic set manipulation in Python.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_8"><a class="anchor" href="#_approach_8"></a><a class="link" href="#_approach_8">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the line and create 2 lists with the input and output strings</p>
+</li>
+<li>
+<p>For star 1, i just flatten the output list and count all entries with 2,3,4 or 7 letters.</p>
+</li>
+<li>
+<p>For star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I turned the input and output entries (strings) into frozen sets to avoid messing with ordering.</p>
+</li>
+<li>
+<p>I also sorted the input strings for every entry according to their lengths to minimize searching later.</p>
+</li>
+<li>
+<p>For each input line, I immediately map 1, 7, 4 and 8 since these are only length dependent (I used a dict to hold the mapping).</p>
+</li>
+<li>
+<p>You can logically derive the other ones by using length + looking at which other known numbers are subsets.</p>
+</li>
+<li>
+<p>Then, you just use the dictionary to find the output digits, concatenate them and sum over all lines</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_8"><a class="anchor" href="#_run_script_8"></a><a class="link" href="#_run_script_8">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    inputs = [lines.split("|")[0].split() for lines in lines_stripped]
+    outputs = [lines.split("|")[1].split() for lines in lines_stripped]
+
+    return inputs, outputs
+
+def main():
+    with open("input.txt",'r') as segment_file:
+        segment_lines = segment_file.readlines()
+
+    inputs,outputs = process_input(segment_lines)
+
+    #star 1
+    uniques = 0
+    flat_list = [item for sublist in outputs for item in sublist]
+    for item in flat_list:
+        if len(item) in [2,3,4,7]:
+            uniques += 1
+    print(uniques)
+
+    #star 2
+    inputs = [sorted([frozenset(segment) for segment in i],key=len) for i in inputs]
+    outputs = [[frozenset(segment) for segment in i] for i in outputs]
+
+    sum_digits = 0
+    for j in range(len(inputs)):
+        mapping = {inputs[j][0]:1,inputs[j][1]:7,inputs[j][2]:4,inputs[j][9]:8}
+        for i in [3,4,5]:
+            if inputs[j][1].issubset(inputs[j][i]):
+                mapping[inputs[j][i]] = 3
+            elif (inputs[j][2]- inputs[j][0]).issubset(inputs[j][i]):
+                mapping[inputs[j][i]] = 5
+            else:
+                mapping[inputs[j][i]] = 2
+        for i in [6,7,8]:
+            if inputs[j][2].issubset(inputs[j][i]):
+                mapping[inputs[j][i]] = 9
+            elif inputs[j][0].issubset(inputs[j][i]):
+                mapping[inputs[j][i]] = 0
+            else:
+                mapping[inputs[j][i]] = 6
+        digits = int("".join([str(mapping[item]) for item in outputs[j]]))
+        sum_digits += digits
+
+    print(sum_digits)
 
 main()</code></pre>
 </div>
