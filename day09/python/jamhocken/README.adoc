@@ -1,0 +1,31 @@
+
+Day 9 of year 2021
+https://adventofcode.com/2021/day/9
+
+== What I learned
+
+. I got the recursion right the first time. (Nothing that I learned, but it's probably the first time ever for me.)
+
+== Approach
+
+. I parse the file and create a list of lists with all of the integers (e.g. a matrix)
+. Star 1
+.. I take each integer from the matrix and check if its 4 neighbors are all bigger than it.
+.. If yes, it's a lowest point and its location gets added to a list as a tuple.
+.. And I go ahead and sum up the risk within this loop as well.
+.. The messy part is taking care that you aren't in the first or last column or first or last row.
+.. In those cases, you only check 3 neighbors (or 2 if its one of the 4 corners)
+. Star 2
+.. It seemed to be a clear case for a recursive function.
+.. I take each of the lowest points and create a "basin" set with the lowest point in it.
+.. Then I call a function that checks all 4 directions from that point out. If the value found is not 9 and the point is not yet in the set, add it to the set and recursively call the function with that point.
+.. Again, the messy part is making sure that you are not at any of the edges.
+
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
