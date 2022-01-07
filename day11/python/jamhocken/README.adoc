@@ -1,0 +1,33 @@
+
+Day 11 of year 2021
+https://adventofcode.com/2021/day/11
+
+== What I learned
+
+. Brushed up on modula arithmetic.
+
+== Approach
+
+. I parse the file and strip the carriage returns from the lines.
+. I put everything into a single flat list of integers.
+. I created a function to do one step and used it for both stars.
+.. Basically, I just use a set for the indexes of octopuses that flash.
+.. I add one to the octopuses and see if anything flashes.
+.. If so, I add those indexes to the set.
+.. I then start a loop.
+.. And then I add one to their neighbors (lots of code to check the edges) and check if any of them are more than 9 *and* not already flashed.
+.. Repeat until no new flashes occur. Return the new state and the number of flashes that occured.
+
+. Star 1
+.. Do 100 steps and add up the flashes.
+
+. Star 2
+.. Loop until all Octopuses are 0.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
