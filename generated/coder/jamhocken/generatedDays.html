@@ -201,6 +201,13 @@
 <li><a href="#_run_script_8">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_09_python">Day 09: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_9">What I learned</a></li>
+<li><a href="#_approach_9">Approach</a></li>
+<li><a href="#_run_script_9">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1147,6 +1154,177 @@ def main():
         sum_digits += digits
 
     print(sum_digits)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day09" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_09_python"><a class="anchor" href="#_day_09_python"></a><a class="link" href="#_day_09_python">Day 09: python</a></h3>
+<div class="paragraph">
+<p>Day 9 of year 2021
+<a href="https://adventofcode.com/2021/day/9" class="bare">https://adventofcode.com/2021/day/9</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_9"><a class="anchor" href="#_what_i_learned_9"></a><a class="link" href="#_what_i_learned_9">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I got the recursion right the first time. (Nothing that I learned, but it&#8217;s probably the first time ever for me.)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_9"><a class="anchor" href="#_approach_9"></a><a class="link" href="#_approach_9">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and create a list of lists with all of the integers (e.g. a matrix)</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I take each integer from the matrix and check if its 4 neighbors are all bigger than it.</p>
+</li>
+<li>
+<p>If yes, it&#8217;s a lowest point and its location gets added to a list as a tuple.</p>
+</li>
+<li>
+<p>And I go ahead and sum up the risk within this loop as well.</p>
+</li>
+<li>
+<p>The messy part is taking care that you aren&#8217;t in the first or last column or first or last row.</p>
+</li>
+<li>
+<p>In those cases, you only check 3 neighbors (or 2 if its one of the 4 corners)</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>It seemed to be a clear case for a recursive function.</p>
+</li>
+<li>
+<p>I take each of the lowest points and create a "basin" set with the lowest point in it.</p>
+</li>
+<li>
+<p>Then I call a function that checks all 4 directions from that point out. If the value found is not 9 and the point is not yet in the set, add it to the set and recursively call the function with that point.</p>
+</li>
+<li>
+<p>Again, the messy part is making sure that you are not at any of the edges.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_9"><a class="anchor" href="#_run_script_9"></a><a class="link" href="#_run_script_9">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    floor_plan = [[int(i) for i in list(line)] for line in lines_stripped]
+
+    return floor_plan
+
+def extend_basin(point,map_floor,basin):
+    if point[0] != 0:
+        if map_floor[point[0]-1][point[1]] != 9:
+            if (point[0]-1,point[1]) not in basin:
+                basin.add((point[0]-1,point[1]))
+                basin = extend_basin((point[0]-1,point[1]),map_floor,basin)
+    if point[0] != len(map_floor)-1:
+        if map_floor[point[0]+1][point[1]] != 9:
+            if (point[0]+1,point[1]) not in basin:
+                basin.add((point[0]+1,point[1]))
+                basin = extend_basin((point[0]+1,point[1]),map_floor,basin)
+    if point[1] != 0:
+        if map_floor[point[0]][point[1]-1] != 9:
+            if (point[0],point[1]-1) not in basin:
+                basin.add((point[0],point[1]-1))
+                basin = extend_basin((point[0],point[1]-1),map_floor,basin)
+    if point[1] != len(map_floor[0])-1:
+        if map_floor[point[0]][point[1]+1] != 9:
+            if (point[0],point[1]+1) not in basin:
+                basin.add((point[0],point[1]+1))
+                basin = extend_basin((point[0],point[1]+1),map_floor,basin)
+
+    return basin
+
+def main():
+    with open("input.txt",'r') as floor_file:
+        floor_lines = floor_file.readlines()
+
+    map_floor = process_input(floor_lines)
+
+    #star 1
+    low_points = []
+    sum_risk = 0
+    for i in range(len(map_floor)):
+        for j in range(len(map_floor[i])):
+            if i == 0:
+                if j == 0:
+                    if map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i+1][j]:
+                        sum_risk += 1+map_floor[i][j]
+                        low_points.append((i,j))
+                elif j == len(map_floor[i])-1:
+                    if map_floor[i][j]&lt;map_floor[i][j-1] and map_floor[i][j]&lt;map_floor[i+1][j]:
+                        sum_risk += 1+map_floor[i][j]
+                        low_points.append((i,j))
+                elif map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i+1][j] and map_floor[i][j]&lt;map_floor[i][j-1]:
+                    sum_risk += 1+map_floor[i][j]
+                    low_points.append((i,j))
+            elif i == len(map_floor)-1:
+                if j == 0:
+                    if map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i-1][j]:
+                        sum_risk += 1+map_floor[i][j]
+                        low_points.append((i,j))
+                elif j == len(map_floor[i])-1:
+                    if map_floor[i][j]&lt;map_floor[i][j-1] and map_floor[i][j]&lt;map_floor[i-1][j]:
+                        sum_risk += 1+map_floor[i][j]
+                        low_points.append((i,j))
+                elif map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i-1][j] and map_floor[i][j]&lt;map_floor[i][j-1]:
+                    sum_risk += 1+map_floor[i][j]
+                    low_points.append((i,j))
+            elif j == 0:
+                if map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i+1][j] and map_floor[i][j]&lt;map_floor[i-1][j]:
+                    sum_risk += 1+map_floor[i][j]
+                    low_points.append((i,j))
+            elif j == len(map_floor[i])-1:
+                if map_floor[i][j]&lt;map_floor[i][j-1] and map_floor[i][j]&lt;map_floor[i-1][j] and map_floor[i][j]&lt;map_floor[i+1][j]:
+                    sum_risk += 1+map_floor[i][j]
+                    low_points.append((i,j))
+            elif map_floor[i][j]&lt;map_floor[i][j+1] and map_floor[i][j]&lt;map_floor[i+1][j] and map_floor[i][j]&lt;map_floor[i-1][j] and map_floor[i][j]&lt;map_floor[i][j-1]:
+                    sum_risk += 1+map_floor[i][j]
+                    low_points.append((i,j))
+
+    print(sum_risk)
+
+    #star 2
+    size_basin = []
+    for i in low_points:
+        basin = set()
+        basin.add(i)
+        basin = extend_basin(i,map_floor,basin)
+        size_basin.append(len(basin))
+    size_basin.sort(reverse=True)
+
+    print(size_basin[0]*size_basin[1]*size_basin[2])
 
 main()</code></pre>
 </div>
