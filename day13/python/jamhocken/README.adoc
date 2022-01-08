@@ -1,0 +1,29 @@
+
+Day 13 of year 2021
+https://adventofcode.com/2021/day/13
+
+== What I learned
+
+. This one was actually straightforward
+
+== Approach
+
+. I parse the file and create a list with all instrucions and a set with all coordinates.
+. Both Stars
+.. I look at each coordinate and compare it to the cutting line.
+.. If it's above or to the left of the line (depending on vertical or horizontal cutting line), I put the coordinate into the new set.
+.. If it's not, I mirror it to the right spot and put it into the set.
+. Star 1
+.. Do the first instruction and find the length of the resulting set.
+. Star 2
+.. Do all of the instructions.
+.. Print the coordinates in a grid. (# for present, . for absent). Read the letters in the ASCII graphic.
+.. I didn't right a parser to read the 8 letters, but did it manually. :-)
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
