@@ -1,0 +1,31 @@
+
+Day 12 of year 2021
+https://adventofcode.com/2021/day/12
+
+== What I learned
+
+. I read up on first depth search.
+. I also understood better what happens when you pass a list to a function in Python.
+. Overall, this was the first day this year that gave me bigger headaches, but I think the solution is pretty ok. :-)
+
+== Approach
+
+. I parse the file and create a dictionary with the vertices as keys. The values are sets containing all adjacent vertices.
+. Star 1
+.. I do a modified first depth search. I implemented it recursively.
+.. The difference to a more standard first depth search is that I don't note the nodes I've visited but rather only keep track of any lower case vertex that I've visited.
+.. I tried with first breadth search, but somehow I got my head around first depth search easier.
+. Star 2
+.. You just have to modify the way you handle "doubles".
+... You note "start" and "end" as soon you reach them.
+... You note any lower case vertex *if* your list of doubles already has at least 3 elements.
+... You note any lower case vertex *if* it already occurred in the path.
+.. You need some extra logic in the loop for the child vertices to avoid visiting more than one lower case vertex twice.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

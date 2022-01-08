@@ -1,0 +1,34 @@
+
+Day 10 of year 2021
+https://adventofcode.com/2021/day/10
+
+== What I learned
+
+. Another day of recursion with only minor mishaps.
+
+== Approach
+
+. I parse the file and strip the carriage returns from the lines. I leave the lines as strings.
+. Star 1
+.. I created 2 functions. One to check the status of the line in total and one to check if 2 characters match.
+.. For each of the lines, I call the check line function.
+.. It checks the first 2 digits in the line against each other.
+.. The matcher function checks if they "match" (one closes the other) or if they are both "openers" or if they are a mismatch.
+.. In the case of a mismatch, we have a corruption and done.
+.. If we have 2 openers, we check the second opener against the rest of the string with a recursive call of the line checker function.
+.. If we have a match, we remove the match and continue / return.
+.. When that's all done, you add up the error value according to the formula for the corrupted entries.
+. Star 2
+.. I only needed minor additions / modifications.
+.. You now keep a stack of the openers and for the incomplete lines, you know what has to be closed at the end.
+.. Then you just reverse the order, use the formula, sort and find the middle value.
+
+.. After doing star 2, I think I could simplify the whole thing since the whole recursion is just pushing and popping stuff from a stack...
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
