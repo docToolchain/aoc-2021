@@ -208,6 +208,27 @@
 <li><a href="#_run_script_9">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_10_python">Day 10: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_10">What I learned</a></li>
+<li><a href="#_approach_10">Approach</a></li>
+<li><a href="#_run_script_10">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_11_python">Day 11: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_11">What I learned</a></li>
+<li><a href="#_approach_11">Approach</a></li>
+<li><a href="#_run_script_11">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_12_python">Day 12: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_12">What I learned</a></li>
+<li><a href="#_approach_12">Approach</a></li>
+<li><a href="#_run_script_12">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1325,6 +1346,517 @@ def main():
     size_basin.sort(reverse=True)
 
     print(size_basin[0]*size_basin[1]*size_basin[2])
+
+main()</code></pre>
+</div>
+</div>
+<a id="day10" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_10_python"><a class="anchor" href="#_day_10_python"></a><a class="link" href="#_day_10_python">Day 10: python</a></h3>
+<div class="paragraph">
+<p>Day 10 of year 2021
+<a href="https://adventofcode.com/2021/day/10" class="bare">https://adventofcode.com/2021/day/10</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_10"><a class="anchor" href="#_what_i_learned_10"></a><a class="link" href="#_what_i_learned_10">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Another day of recursion with only minor mishaps.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_10"><a class="anchor" href="#_approach_10"></a><a class="link" href="#_approach_10">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and strip the carriage returns from the lines. I leave the lines as strings.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I created 2 functions. One to check the status of the line in total and one to check if 2 characters match.</p>
+</li>
+<li>
+<p>For each of the lines, I call the check line function.</p>
+</li>
+<li>
+<p>It checks the first 2 digits in the line against each other.</p>
+</li>
+<li>
+<p>The matcher function checks if they "match" (one closes the other) or if they are both "openers" or if they are a mismatch.</p>
+</li>
+<li>
+<p>In the case of a mismatch, we have a corruption and done.</p>
+</li>
+<li>
+<p>If we have 2 openers, we check the second opener against the rest of the string with a recursive call of the line checker function.</p>
+</li>
+<li>
+<p>If we have a match, we remove the match and continue / return.</p>
+</li>
+<li>
+<p>When that&#8217;s all done, you add up the error value according to the formula for the corrupted entries.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I only needed minor additions / modifications.</p>
+</li>
+<li>
+<p>You now keep a stack of the openers and for the incomplete lines, you know what has to be closed at the end.</p>
+</li>
+<li>
+<p>Then you just reverse the order, use the formula, sort and find the middle value.</p>
+</li>
+<li>
+<p>After doing star 2, I think I could simplify the whole thing since the whole recursion is just pushing and popping stuff from a stack&#8230;&#8203;</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_10"><a class="anchor" href="#_run_script_10"></a><a class="link" href="#_run_script_10">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    return lines_stripped
+
+def check_line(navicode,opener,stack):
+    status = ""
+    corruptor = ""
+    while len(navicode) &gt; 1 and len(status)==0:
+        navicode = navicode[1:]
+        status = check_match(opener,navicode[0])
+        if status == "corrupt":
+            return navicode, "corrupt", navicode[0],stack
+        elif status == "match":
+            if len(stack[:-1])&gt;0:
+                return navicode, "", "", stack[:-1]
+            else:
+                stack = stack[:-1]
+                status = ""
+        else:
+            stack += status
+            (navicode,status,corruptor,stack) = check_line(navicode,navicode[0],stack)
+
+    return navicode, status, corruptor, stack
+
+def check_match(opener,candidate):
+    if candidate in ["(","[","&lt;","{"]:
+        status = candidate
+    else:
+        if opener == "(":
+            if candidate == ")":
+                status = "match"
+            else:
+                status = "corrupt"
+        elif opener == "[":
+            if candidate == "]":
+                status = "match"
+            else:
+                status = "corrupt"
+        elif opener == "{":
+            if candidate == "}":
+                status = "match"
+            else:
+                status = "corrupt"
+        else:
+            if candidate == "&gt;":
+                status = "match"
+            else:
+                status = "corrupt"
+
+    return status
+
+def main():
+    with open("input.txt",'r') as navi_file:
+        navi_lines = navi_file.readlines()
+
+    navigation = process_input(navi_lines)
+
+    #star 1
+    syntax_error = 0
+    incompletes = []
+    for navi in navigation:
+        (navicode,status,corruptor,stack) = check_line(navi,navi[0],navi[0])
+        if status == "corrupt":
+            if corruptor == ")":
+                syntax_error += 3
+            elif corruptor == "]":
+                syntax_error += 57
+            elif corruptor == "}":
+                syntax_error += 1197
+            else:
+                syntax_error += 25137
+        else:
+            incompletes.append(stack)
+
+    print(syntax_error)
+
+    #star 2
+    scores = []
+    for incomplete in incompletes:
+        score = 0
+        for closer in incomplete[::-1]:
+            score *= 5
+            if closer == "(":
+                score += 1
+            elif closer == "[":
+                score += 2
+            elif closer == "{":
+                score += 3
+            else:
+                score += 4
+        scores.append(score)
+
+    scores.sort()
+    print(scores[(len(scores)-1)//2])
+
+main()</code></pre>
+</div>
+</div>
+<a id="day11" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_11_python"><a class="anchor" href="#_day_11_python"></a><a class="link" href="#_day_11_python">Day 11: python</a></h3>
+<div class="paragraph">
+<p>Day 11 of year 2021
+<a href="https://adventofcode.com/2021/day/11" class="bare">https://adventofcode.com/2021/day/11</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_11"><a class="anchor" href="#_what_i_learned_11"></a><a class="link" href="#_what_i_learned_11">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Brushed up on modula arithmetic.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_11"><a class="anchor" href="#_approach_11"></a><a class="link" href="#_approach_11">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and strip the carriage returns from the lines.</p>
+</li>
+<li>
+<p>I put everything into a single flat list of integers.</p>
+</li>
+<li>
+<p>I created a function to do one step and used it for both stars.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Basically, I just use a set for the indexes of octopuses that flash.</p>
+</li>
+<li>
+<p>I add one to the octopuses and see if anything flashes.</p>
+</li>
+<li>
+<p>If so, I add those indexes to the set.</p>
+</li>
+<li>
+<p>I then start a loop.</p>
+</li>
+<li>
+<p>And then I add one to their neighbors (lots of code to check the edges) and check if any of them are more than 9 <strong>and</strong> not already flashed.</p>
+</li>
+<li>
+<p>Repeat until no new flashes occur. Return the new state and the number of flashes that occured.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Do 100 steps and add up the flashes.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Loop until all Octopuses are 0.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_11"><a class="anchor" href="#_run_script_11"></a><a class="link" href="#_run_script_11">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    octos = [int(i) for lines in lines_stripped for i in lines]
+
+    return octos
+
+def iterate_octos(flashes,octos):
+    flashed = set()
+    flashed_temp = flashed.copy()
+    octos = [octo + 1 for octo in octos]
+    if any([octo == 10 for octo in octos]):
+        flash_locations = [i for i, e in enumerate(octos) if e &gt;9]
+        flashed_temp.update(flash_locations)
+    while flashed != flashed_temp:
+        for octo in flashed_temp-flashed:
+            if octo &gt; 9:
+                octos[octo-10] += 1
+                if octo % 10 != 0:
+                    octos[octo-11] += 1
+                if (octo+1) % 10 != 0:
+                    octos[octo-9] += 1
+            if octo &lt; 90:
+                octos[octo+10] += 1
+                if octo % 10 != 0:
+                    octos[octo+9] += 1
+                if (octo+1) % 10 != 0:
+                    octos[octo+11] += 1
+            if octo % 10 != 0:
+                octos[octo-1] +=1
+            if (octo+1) % 10 != 0:
+                    octos[octo+1] += 1
+        flashed = flashed_temp.copy()
+        if any([octo &gt; 9 for octo in octos]):
+            flash_locations = [i for i, e in enumerate(octos) if e &gt;9]
+            flashed_temp.update(flash_locations)
+
+    flashes += sum([1 if octo&gt;9 else 0 for octo in octos])
+    octos = [octo if octo &lt;10 else 0 for octo in octos]
+
+    return flashes,octos
+
+def main():
+    with open("input.txt",'r') as octo_file:
+        octo_lines = octo_file.readlines()
+
+    octos = process_input(octo_lines)
+    octos_temp = octos.copy()
+    flashes = 0
+
+    #star 1
+    for i in range(100):
+        flashes,octos = iterate_octos(flashes,octos)
+
+    print(flashes)
+
+    #star 2
+    count = 0
+    octos = octos_temp
+    while octos != [0]*100:
+        flashes,octos = iterate_octos(flashes,octos)
+        count += 1
+
+    print(count)
+
+main()</code></pre>
+</div>
+</div>
+<a id="day12" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_12_python"><a class="anchor" href="#_day_12_python"></a><a class="link" href="#_day_12_python">Day 12: python</a></h3>
+<div class="paragraph">
+<p>Day 12 of year 2021
+<a href="https://adventofcode.com/2021/day/12" class="bare">https://adventofcode.com/2021/day/12</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_12"><a class="anchor" href="#_what_i_learned_12"></a><a class="link" href="#_what_i_learned_12">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I read up on first depth search.</p>
+</li>
+<li>
+<p>I also understood better what happens when you pass a list to a function in Python.</p>
+</li>
+<li>
+<p>Overall, this was the first day this year that gave me bigger headaches, but I think the solution is pretty ok. :-)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_12"><a class="anchor" href="#_approach_12"></a><a class="link" href="#_approach_12">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I parse the file and create a dictionary with the vertices as keys. The values are sets containing all adjacent vertices.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I do a modified first depth search. I implemented it recursively.</p>
+</li>
+<li>
+<p>The difference to a more standard first depth search is that I don&#8217;t note the nodes I&#8217;ve visited but rather only keep track of any lower case vertex that I&#8217;ve visited.</p>
+</li>
+<li>
+<p>I tried with first breadth search, but somehow I got my head around first depth search easier.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>You just have to modify the way you handle "doubles".</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>You note "start" and "end" as soon you reach them.</p>
+</li>
+<li>
+<p>You note any lower case vertex <strong>if</strong> your list of doubles already has at least 3 elements.</p>
+</li>
+<li>
+<p>You note any lower case vertex <strong>if</strong> it already occurred in the path.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>You need some extra logic in the loop for the child vertices to avoid visiting more than one lower case vertex twice.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_12"><a class="anchor" href="#_run_script_12"></a><a class="link" href="#_run_script_12">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    paths_dict = {}
+    for line in lines_stripped:
+        vertices = line.split("-")
+        if vertices[0] in paths_dict:
+            temp = paths_dict[vertices[0]]
+            temp.add(vertices[1])
+            paths_dict[vertices[0]] = temp
+        else:
+            paths_dict[vertices[0]] = {vertices[1]}
+        if vertices[1] in paths_dict:
+            temp = paths_dict[vertices[1]]
+            temp.add(vertices[0])
+            paths_dict[vertices[1]] = temp
+        else:
+            paths_dict[vertices[1]] = {vertices[0]}
+
+    return paths_dict
+
+def traverse_graph_star1(paths,start,end,path,doubles,found_paths):
+    path.append(start)
+    if start[0]&gt;"Z":
+        doubles.add(start)
+    if start == end:
+        found_paths.append(path.copy())
+    else:
+        for child in paths[start].difference(doubles):
+            traverse_graph_star1(paths,child,end,path,doubles,found_paths)
+    path.pop()
+    if start[0]&gt;"Z":
+        doubles.remove(start)
+
+    return
+
+def traverse_graph_star2(paths,start,end,path,doubles,found_paths):
+    flag = 0
+    if start=="end" or start=="start":
+        doubles.add(start)
+        flag = 1
+    elif start[0]&gt;"Z" and len(doubles)&gt;2:
+        doubles.add(start)
+        flag = 1
+    elif start[0]&gt;"Z" and start in path:
+        doubles.add(start)
+        flag = 1
+    path.append(start)
+    if start == end:
+        found_paths.append(path.copy())
+    else:
+        for child in paths[start].difference(doubles):
+            if len(doubles)&lt;2 or child[0]&lt;"a" or child not in path:
+                traverse_graph_star2(paths,child,end,path,doubles,found_paths)
+    path.pop()
+
+    if flag == 1:
+        doubles.remove(start)
+
+    return
+
+def main():
+    with open("input.txt",'r') as paths_file:
+        path_lines = paths_file.readlines()
+
+    paths = process_input(path_lines)
+
+    #star 1
+    start = "start"
+    end = "end"
+    path = []
+    doubles = set()
+    found_paths = []
+
+    traverse_graph_star1(paths,start,end,path,doubles,found_paths)
+
+    print(len(found_paths))
+
+    #star 2
+    path = []
+    doubles = set()
+    found_paths = []
+
+    traverse_graph_star2(paths,start,end,path,doubles,found_paths)
+
+    print(len(found_paths))
 
 main()</code></pre>
 </div>
