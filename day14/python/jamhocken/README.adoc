@@ -1,0 +1,26 @@
+
+Day 14 of year 2021
+https://adventofcode.com/2021/day/14
+
+== What I learned
+
+. I practiced with linked lists, but you can't see that here since it only works for star 1.
+
+== Approach
+
+. I parse the file and create
+.. A list containing the initial pairs of letters. 
+.. A dictionary with the letter pairs as key and the values are the two new letter pairs created by the letter insertion. 
+.. A set containing all of the valid letter pairs.
+. Both Stars
+.. I initially solved star 1 with a linked list and brute force. That works fine for up to about 20 iterations, but then you get into major trouble.
+.. So, after some thought, I noticed that there are a finite number of letter pairs that can occur. Each of these letter pairs breeds exactly two pairs of letters in the next step. So, you just have to keep track of how many of each pairs you have and you know how many of each pair you have in the next step.
+.. Then, you just have to do some math to turn the number of pairs in the final line into the number of corresponding letters.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
