@@ -1,0 +1,21 @@
+
+Day 16 of year 2021
+https://adventofcode.com/2021/day/16
+
+== What I learned
+
+. Hex and Bin manipulation in Python
+
+== Approach
+
+. I take the line from the file and turn it in to a binary string.
+. To decode the transmission and find the sums and the versions, you basically just follow the instructions.
+. Honestly, it's mostly just reading the requirements closely and not creating any unnecessary bugs in the code.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
