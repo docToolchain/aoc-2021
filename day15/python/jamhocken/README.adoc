@@ -1,0 +1,29 @@
+
+Day 15 of year 2021
+https://adventofcode.com/2021/day/15
+
+== What I learned
+
+. I understood Dijsktra's algorithm.
+
+== Approach
+
+. I parse the file and create a list containing each node of the graph.
+. For each node, I hold it's index, risk, distance to start, neighbors and parent.
+. Initially, the distance is "Inf" and the parent is 0 (as a placeholder).
+. It turns out that I didn't need the parent, but you never know what Star2 might bring...
+. Star 1
+.. I implemented Dijkstra's algorithm to find the shortest path.
+.. The distance is already computed, so the answer is then readily available.
+. Star 2
+.. I decided to re-read the data in and create the bigger grid from scratch.
+.. The distance calculation is principally the same. My first implementation was not efficient enough. After 20 minutes without an answer, I decided to improve it.
+.. The key seems to be that I now have 2 sets. One for the visited nodes and one for the nodes with a non-Inf value that are not visited yet. It seems to have massively speeded up the search for the next node. (Finding min distance and the corresponding node is much faster this way).
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

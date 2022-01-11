@@ -1,0 +1,25 @@
+
+Day 17 of year 2021
+https://adventofcode.com/2021/day/17
+
+== What I learned
+
+. Some basic math. :-)
+
+== Approach
+
+. I take the line from the file and use a regex to extract the 4 numbers and put them into a list.
+. Star 1
+.. This is just math. If the probe goes up with a certain velocity, it is guaranteed to come back down through and exactly hit zero.
+.. The velocity when it hits zero will be negative and its magnitude is the initial velocity + 1.
+.. So, the max velocity is the absolute value of the bottom edge of the target area minus 1. And the maximum height is then also clear.
+. Star 2
+.. Maybe there is a cool math solution, but I didn't find it, so I just brute force this by trying all theoretically possible initial velocity combinations and playing it through for each.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
