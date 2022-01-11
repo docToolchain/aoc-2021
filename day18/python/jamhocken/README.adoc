@@ -1,0 +1,29 @@
+
+Day 18 of year 2021
+https://adventofcode.com/2021/day/18
+
+== What I learned
+
+. Working with match objects from regex
+
+== Approach
+
+. I just read in the lines and strip them and put them into a list.
+. Star 1
+.. After some thought, I didn't have any better idea than to leave everything as a string and parse it.
+.. I setup a loop that stops if neither condition is met.
+.. For explode
+...I regex to find the pairs that could explode. And then count up the [ to the left (subtracting closers if any).
+... If more than 4, then it explodes. I scan through to see if there are any numbers to the left or right and do the addition and substition.
+.. For split
+... It's actually easy. I just check for any double digits and do the substition.
+. Star 2
+.. I use the same code as before and just run 2 nested loops and keep the max magnitude while running through.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
