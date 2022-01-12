@@ -50,51 +50,33 @@ pub fn parse(content: &str) -> Vec<Vec<Token>> {
 ///
 /// returns true if any explode performed, otherwise false
 pub fn explode(snail: &mut Vec<Token>) -> bool {
-    let mut level = 0;
-    let mut last_val = 0;
-    let mut number_seen = false;
+    let mut state = (None, 0);
     for k in 0..snail.len() {
-        match snail[k] {
-            Token::Op => {
-                number_seen = false;
-                level += 1;
-            }
-            Token::Cl => {
-                number_seen = false;
-                level -= 1;
-            }
-            Token::Val(val) => {
-                if number_seen && level == 5 {
-                    if let Some((j, x)) = (0..k - 2).rev().find_map(|j| {
-                        if let Token::Val(v) = snail[j] {
-                            Some((j, v))
-                        } else {
-                            None
-                        }
-                    }) {
-                        snail[j] = Token::Val(x + last_val);
-                    }
-
-                    if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| {
-                        if let Token::Val(v) = snail[j] {
-                            Some((j, v))
-                        } else {
-                            None
-                        }
-                    }) {
-                        snail[j] = Token::Val(x + val);
-                    }
-
-                    // remove elements k-1, k, k+1
-                    snail.drain(k - 1..k + 2);
-                    snail[k - 2] = Token::Val(0);
-
-                    return true;
-                } else {
-                    last_val = val;
-                    number_seen = true;
+        state = match snail[k] {
+            Token::Op => (None, state.1 + 1),
+            Token::Cl => (None, state.1 - 1),
+            Token::Val(val) if state.0.is_some() && state.1 == 5 => {
+                if let Some((j, x)) = (0..k - 2).rev().find_map(|j| match snail[j] {
+                    Token::Val(v) => Some((j, Token::Val(v + state.0.unwrap()))),
+                    _ => None,
+                }) {
+                    snail[j] = x;
                 }
+
+                if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| match snail[j] {
+                    Token::Val(v) => Some((j, Token::Val(v + val))),
+                    _ => None,
+                }) {
+                    snail[j] = x;
+                }
+
+                // remove elements k-1, k, k+1
+                snail.drain(k - 1..k + 2);
+                snail[k - 2] = Token::Val(0);
+
+                return true;
             }
+            Token::Val(val) => (Some(val), state.1),
         }
     }
 
@@ -107,16 +89,9 @@ pub fn explode(snail: &mut Vec<Token>) -> bool {
 ///
 /// returns true if any split performed, otherwise false
 pub fn split(snail: &mut Vec<Token>) -> bool {
-    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, e)| {
-        if let Token::Val(v) = e {
-            if v > &9 {
-                Some((k, v))
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, &e)| match e {
+        Token::Val(v) if v > 9 => Some((k, v)),
+        _ => None,
     }) {
         let a = v >> 1;
         let b = v - a;
@@ -125,10 +100,10 @@ pub fn split(snail: &mut Vec<Token>) -> bool {
             [Token::Op, Token::Val(a), Token::Val(b), Token::Cl],
         );
 
-        true
-    } else {
-        false
+        return true;
     }
+
+    false
 }
 // end::split[]
 
@@ -145,9 +120,7 @@ pub fn sum(snail: &[Vec<Token>], mut indices: impl Iterator<Item = usize>) -> Ve
     let mut sum = snail[indices.next().expect("Empty indices")].to_owned();
     for k in indices {
         sum.insert(0, Token::Op);
-        for e in &snail[k] {
-            sum.push(*e);
-        }
+        sum.extend(&snail[k]);
         sum.push(Token::Cl);
         reduce(&mut sum);
     }
@@ -206,7 +179,6 @@ pub fn solution_2(snails: &[Vec<Token>]) -> usize {
 }
 // end::part2[]
 
-
 #[cfg(feature = "recursive")]
 pub fn parse(content: &str) -> Vec<recursive::Snail> {
     recursive::parse(content)
@@ -221,7 +193,6 @@ pub fn solution_1(snails: &[recursive::Snail]) -> usize {
 pub fn solution_2(snails: &[recursive::Snail]) -> usize {
     recursive::solution_2(snails)
 }
-
 
 // tag::tests[]
 #[cfg(test)]
