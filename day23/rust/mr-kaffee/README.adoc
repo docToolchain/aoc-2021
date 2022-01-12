@@ -2,10 +2,6 @@
 
 https://rust-lang.org[Rust] solution to https://adventofcode.com/2021/day/23[AoC|2021|23].
 
-****
-This solution uses nightly Rust features (specifically the function ``BTreeSet::pop_first``). It will not compile on the Rust stable toolchain.
-****
-
 === Part 1 ===
 
 My initial idea was to use Dijkstra. The first challenge was to come up with a way to model the data. After some tries, I decided to model the burrows as a list of ``Option<u8>``s. The first 11 entries model the hallway. The remaining elements model the rooms one after the other. A ``None`` value represents open space, a ``Some(p)`` value represents a space occupied by amphipod, ``A`` for ``p = 0`` to ``D`` for ``p = 3``.

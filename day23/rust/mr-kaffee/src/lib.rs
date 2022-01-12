@@ -1,4 +1,3 @@
-#![feature(map_first_last)]
 use std::{
     collections::{BinaryHeap, HashMap, VecDeque},
     rc::Rc,
