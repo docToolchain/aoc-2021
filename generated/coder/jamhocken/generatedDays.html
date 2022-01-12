@@ -264,6 +264,13 @@
 <li><a href="#_run_script_17">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_18_python">Day 18: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_18">What I learned</a></li>
+<li><a href="#_approach_18">Approach</a></li>
+<li><a href="#_run_script_18">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2605,6 +2612,185 @@ def main():
             hits += landed(x,y,area)
     print(hits)
 
+main()</code></pre>
+</div>
+</div>
+<a id="day18" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_18_python"><a class="anchor" href="#_day_18_python"></a><a class="link" href="#_day_18_python">Day 18: python</a></h3>
+<div class="paragraph">
+<p>Day 18 of year 2021
+<a href="https://adventofcode.com/2021/day/18" class="bare">https://adventofcode.com/2021/day/18</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_18"><a class="anchor" href="#_what_i_learned_18"></a><a class="link" href="#_what_i_learned_18">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Working with match objects from regex</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_18"><a class="anchor" href="#_approach_18"></a><a class="link" href="#_approach_18">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I just read in the lines and strip them and put them into a list.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>After some thought, I didn&#8217;t have any better idea than to leave everything as a string and parse it.</p>
+</li>
+<li>
+<p>I setup a loop that stops if neither condition is met.</p>
+</li>
+<li>
+<p>For explode
+&#8230;&#8203;I regex to find the pairs that could explode. And then count up the [ to the left (subtracting closers if any).</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>If more than 4, then it explodes. I scan through to see if there are any numbers to the left or right and do the addition and substition.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For split</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>It&#8217;s actually easy. I just check for any double digits and do the substition.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I use the same code as before and just run 2 nested loops and keep the max magnitude while running through.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_18"><a class="anchor" href="#_run_script_18"></a><a class="link" href="#_run_script_18">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import regex as re
+import math
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    return lines_stripped
+
+def explode(snail):
+    for m in re.finditer("(\d+),(\d+)", snail):
+        parenths = 0
+        for character in snail[:m.start()]:
+            if character == "[":
+                parenths += 1
+            elif character == "]":
+                parenths -= 1
+        if parenths &gt; 4:
+            cl = ""
+            cr = ""
+            for i, character in enumerate(snail[0:m.start()]):
+                if character.isnumeric():
+                    cl = character
+                    il = i
+                    if snail[i-1].isnumeric():
+                        cl = snail[i-1]+cl
+            for i, character in enumerate(snail[m.end():]):
+                if character.isnumeric():
+                    cr = character
+                    ir = i
+                    if snail[m.end()+i+1].isnumeric():
+                        cr = cr + snail[m.end()+i+1]
+                    break
+
+            if bool(cr):
+                snail = snail[:m.end()+ir]+str(int(cr)+int(m.group(2)))+snail[m.end()+ir+len(cr):]
+            snail = snail[:m.start()-1]+"0"+snail[m.end()+1:]
+            if bool(cl):
+                snail = snail[:il-len(cl)+1]+str(int(cl)+int(m.group(1)))+snail[il+1:]
+
+            break
+
+    return snail
+
+def split(snail):
+    pattern = re.compile("\d\d")
+    m = pattern.search(snail)
+    if m:
+        num_to_split = int(m.group(0))
+        left = math.floor(int(num_to_split)/2)
+        right = math.ceil(int(num_to_split)/2)
+        snail = snail[:m.start()]+"["+str(left)+","+str(right)+"]"+snail[m.end():]
+
+    return snail
+
+def main():
+    with open("input.txt",'r') as snail_file:
+        snail_lines = snail_file.readlines()
+
+    snails = process_input(snail_lines)
+
+    # star 1
+    snail = snails[0]
+    for snail_temp in snails[1:]:
+        snail = "["+snail+","+snail_temp+"]"
+        snail_temp = ""
+        while snail_temp != snail:
+            snail_temp = snail
+            snail = explode(snail)
+            if snail == snail_temp:
+                snail = split(snail)
+
+    pattern = re.compile("\[(\d+),(\d+)\]")
+    while not snail.isnumeric():
+        m = pattern.search(snail)
+        snail = snail[:m.start()]+str(int(m.group(1))*3+int(m.group(2))*2)+snail[m.end():]
+
+    print(snail)
+
+    # star 2
+    max_mag = 0
+    for snail1 in snails:
+        for snail2 in snails:
+            snail = "["+snail1+","+snail2+"]"
+            snail_temp = ""
+            while snail_temp != snail:
+                snail_temp = snail
+                snail = explode(snail)
+                if snail == snail_temp:
+                    snail = split(snail)
+            pattern = re.compile("\[(\d+),(\d+)\]")
+            while not snail.isnumeric():
+                m = pattern.search(snail)
+                snail = snail[:m.start()]+str(int(m.group(1))*3+int(m.group(2))*2)+snail[m.end():]
+            max_mag = max(max_mag,int(snail))
+
+    print(max_mag)
 main()</code></pre>
 </div>
 </div>
