@@ -50,7 +50,7 @@ include::src/lib.rs[tags=burrow]
 
 ==== Search State ====
 
-The search state is modeled as a separate struct. Initially, I used copy semantics for ``BurrowSmall`` and ``BurrowLarge`` resulting in burrow data being copied into the different collections (``heap``, ``settled``, ``costs``, and ``parents``). My current implementation uses reference counting pointers instead. This did not result in any significant runtime changes. It should result in lower memory usage, which I can however not measure...
+The search state is modeled as a separate struct. It contains a list of all nodes as tuples ((cost bound, cost), parent node index wrapped in an ``Option``, settled flag, burrow). To find a node for a given burrow, a map with burrows as keys and indices to the list as values is maintained. A binary heap is used for the graph traversal. Since ``BinaryHeap`` is a max heap, the costs are inverted (because I use unsigned types, this can be done with a bitwise not). I do not use decrease key when pushing to the heap but instead discard items popped from the heap if the corresponding node is already settled.
 
 [source,rust,numbered]
 ----
