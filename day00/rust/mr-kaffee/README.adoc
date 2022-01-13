@@ -21,13 +21,13 @@ Run tests with `cargo test` or `cargo test --release`
 
 === Personal Challenges ===
 
-I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is below 600ms on my machine:
+I wanted to keep the overall solution time as small as possible and after two thirds of the puzzles were done, I set my personal target to 500ms. The biggest challange was to reduce the runtime to solve day23. After several iterations, I finally came down to slightly above 200ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is now just below 500ms on my machine:
 
 ----
-Total time for 25 days: 560.236ms (22.40944ms per day)
+Total time for 25 days: 487.5843ms (19.503372ms per day)
 ----
 
-My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box _nightly_ Rust for this one to be able to use the method ``BTreeSet::pop_first``
+My second challange was to only use out of the box Rust features. This one I achieved.
 
 === Run all Solutions ===
 
@@ -39,5 +39,3 @@ include::src/lib.rs[tags=solve]
 ----
 
 To run all solutions, use ``cargo run --release \-- --from 1 --to 25``. The command line options ``--from <day>`` and ``--to <day>`` specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.
-
-Because day23 uses the unstable function ``BTreeSet::pop_first``, this will only compile on the rust nightly channel. If you want to run all the other solutions, use ``cargo run --release --no-default-features \-- --from 1 --to 25``.

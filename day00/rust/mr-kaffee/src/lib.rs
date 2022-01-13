@@ -638,14 +638,6 @@ pub mod day22 {
     }
 }
 
-#[cfg(not(feature = "with-unstable"))]
-pub mod day23 {
-    pub fn solve() {
-        println!("Use feature 'with-unstable' to run day23 solution\n")
-    }
-}
-
-#[cfg(feature = "with-unstable")]
 pub mod day23 {
     use mr_kaffee_2021_23::*;
     use std::time::Instant;
