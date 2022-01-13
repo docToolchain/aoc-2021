@@ -521,7 +521,7 @@ pub struct Search<T> {
 
 impl<T> Search<T>
 where
-    T: Eq + Ord + std::hash::Hash + Clone + std::fmt::Debug,
+    T: Eq + std::hash::Hash + std::fmt::Debug,
 {
     pub fn init(start: T, heuristic: fn(&T) -> usize) -> Self {
         let mut search = Self {
@@ -580,13 +580,13 @@ where
         false
     }
 
-    pub fn get_path_to(&self, target: usize) -> VecDeque<(usize, usize, T)> {
+    pub fn get_path_to(&self, target: usize) -> VecDeque<(usize, usize, Rc<T>)> {
         let mut path = VecDeque::new();
 
         let mut current = target;
         loop {
             let ((bound, cost), parent, _, node) = &self.nodes[current];
-            path.push_front((!bound, !cost, node.as_ref().clone()));
+            path.push_front((!bound, !cost, Rc::clone(node)));
             if let Some(parent) = parent {
                 current = *parent;
             } else {
@@ -601,9 +601,9 @@ where
         let mut steps = 0;
         for (bound, cost, item) in self.get_path_to(target) {
             if steps == 0 {
-                println!("\nInitial\n{:?}", item);
+                println!("\nInitial\n{:?}", item.as_ref());
             } else {
-                println!("\n{}) {} (bound: {}) ==>\n{:?}", steps, cost, bound, item);
+                println!("\n{}) {} (bound: {}) ==>\n{:?}", steps, cost, bound, item.as_ref());
             }
             steps += 1;
         }
