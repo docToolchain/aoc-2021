@@ -527,15 +527,15 @@ development, e.g., based on the examples given in the puzzles.</p>
 <div class="sect4">
 <h5 id="_personal_challenges"><a class="anchor" href="#_personal_challenges"></a><a class="link" href="#_personal_challenges">Personal Challenges</a></h5>
 <div class="paragraph">
-<p>I wanted to keep the overall solution time as small as possible. Up until day 22, I thought I could end up below 500ms. Then came day 23 where I started with a solution time of several seconds for part 1 and infinite solution time for part 2 on my machine. After several iterations, I finally came down to ~300ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is below 600ms on my machine:</p>
+<p>I wanted to keep the overall solution time as small as possible and after two thirds of the puzzles were done, I set my personal target to 500ms. The biggest challange was to reduce the runtime to solve day23. After several iterations, I finally came down to slightly above 200ms. With this, some improvements on day 19, and some build optimizations, my overall solution time is now just below 500ms on my machine:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>Total time for 25 days: 560.236ms (22.40944ms per day)</pre>
+<pre>Total time for 25 days: 487.5843ms (19.503372ms per day)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>My second challange was to only use out of the box Rust features. This one I almost achieved. Again day23 is a slight exception. I use out of the box <em>nightly</em> Rust for this one to be able to use the method <code>BTreeSet::pop_first</code></p>
+<p>My second challange was to only use out of the box Rust features. This one I achieved.</p>
 </div>
 </div>
 <div class="sect4">
@@ -595,9 +595,6 @@ pub fn solve(indices: impl Iterator&lt;Item = usize&gt;) {
 </div>
 <div class="paragraph">
 <p>To run all solutions, use <code>cargo run --release -- --from 1 --to 25</code>. The command line options <code>--from &lt;day&gt;</code> and <code>--to &lt;day&gt;</code> specify the range of days to run (bounds included). The default is to run all days from 1 to 25 (inclusive). If a day is not yet implemented, the program panics.</p>
-</div>
-<div class="paragraph">
-<p>Because day23 uses the unstable function <code>BTreeSet::pop_first</code>, this will only compile on the rust nightly channel. If you want to run all the other solutions, use <code>cargo run --release --no-default-features -- --from 1 --to 25</code>.</p>
 </div>
 <a id="day00" />
 </div>
@@ -4596,51 +4593,33 @@ pub fn parse(content: &amp;str) -&gt; Vec&lt;Vec&lt;Token&gt;&gt; {
 ///
 /// returns true if any explode performed, otherwise false
 pub fn explode(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
-    let mut level = 0;
-    let mut last_val = 0;
-    let mut number_seen = false;
+    let mut state = (None, 0);
     for k in 0..snail.len() {
-        match snail[k] {
-            Token::Op =&gt; {
-                number_seen = false;
-                level += 1;
-            }
-            Token::Cl =&gt; {
-                number_seen = false;
-                level -= 1;
-            }
-            Token::Val(val) =&gt; {
-                if number_seen &amp;&amp; level == 5 {
-                    if let Some((j, x)) = (0..k - 2).rev().find_map(|j| {
-                        if let Token::Val(v) = snail[j] {
-                            Some((j, v))
-                        } else {
-                            None
-                        }
-                    }) {
-                        snail[j] = Token::Val(x + last_val);
-                    }
-
-                    if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| {
-                        if let Token::Val(v) = snail[j] {
-                            Some((j, v))
-                        } else {
-                            None
-                        }
-                    }) {
-                        snail[j] = Token::Val(x + val);
-                    }
-
-                    // remove elements k-1, k, k+1
-                    snail.drain(k - 1..k + 2);
-                    snail[k - 2] = Token::Val(0);
-
-                    return true;
-                } else {
-                    last_val = val;
-                    number_seen = true;
+        state = match snail[k] {
+            Token::Op =&gt; (None, state.1 + 1),
+            Token::Cl =&gt; (None, state.1 - 1),
+            Token::Val(val) if state.0.is_some() &amp;&amp; state.1 == 5 =&gt; {
+                if let Some((j, x)) = (0..k - 2).rev().find_map(|j| match snail[j] {
+                    Token::Val(v) =&gt; Some((j, Token::Val(v + state.0.unwrap()))),
+                    _ =&gt; None,
+                }) {
+                    snail[j] = x;
                 }
+
+                if let Some((j, x)) = (k + 2..snail.len()).find_map(|j| match snail[j] {
+                    Token::Val(v) =&gt; Some((j, Token::Val(v + val))),
+                    _ =&gt; None,
+                }) {
+                    snail[j] = x;
+                }
+
+                // remove elements k-1, k, k+1
+                snail.drain(k - 1..k + 2);
+                snail[k - 2] = Token::Val(0);
+
+                return true;
             }
+            Token::Val(val) =&gt; (Some(val), state.1),
         }
     }
 
@@ -4654,16 +4633,9 @@ pub fn explode(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
 ///
 /// returns true if any split performed, otherwise false
 pub fn split(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
-    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, e)| {
-        if let Token::Val(v) = e {
-            if v &gt; &amp;9 {
-                Some((k, v))
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+    if let Some((k, v)) = snail.iter().enumerate().find_map(|(k, &amp;e)| match e {
+        Token::Val(v) if v &gt; 9 =&gt; Some((k, v)),
+        _ =&gt; None,
     }) {
         let a = v &gt;&gt; 1;
         let b = v - a;
@@ -4672,10 +4644,10 @@ pub fn split(snail: &amp;mut Vec&lt;Token&gt;) -&gt; bool {
             [Token::Op, Token::Val(a), Token::Val(b), Token::Cl],
         );
 
-        true
-    } else {
-        false
+        return true;
     }
+
+    false
 }</code></pre>
 </div>
 </div>
@@ -4697,9 +4669,7 @@ pub fn sum(snail: &amp;[Vec&lt;Token&gt;], mut indices: impl Iterator&lt;Item = 
     let mut sum = snail[indices.next().expect("Empty indices")].to_owned();
     for k in indices {
         sum.insert(0, Token::Op);
-        for e in &amp;snail[k] {
-            sum.push(*e);
-        }
+        sum.extend(&amp;snail[k]);
         sum.push(Token::Cl);
         reduce(&amp;mut sum);
     }
@@ -6497,13 +6467,6 @@ mod tests {
 <div class="paragraph">
 <p><a href="https://rust-lang.org">Rust</a> solution to <a href="https://adventofcode.com/2021/day/23">AoC|2021|23</a>.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="paragraph">
-<p>This solution uses nightly Rust features (specifically the function <code>BTreeSet::pop_first</code>). It will not compile on the Rust stable toolchain.</p>
-</div>
-</div>
-</div>
 <div class="sect4">
 <h5 id="_part_1_15"><a class="anchor" href="#_part_1_15"></a><a class="link" href="#_part_1_15">Part 1</a></h5>
 <div class="paragraph">
@@ -6547,18 +6510,17 @@ mod tests {
 where
     B: Burrow,
 {
-    let mut search = Search::init(start, trace_path);
+    let mut search = Search::init(start, B::get_min_cost);
 
-    while let Some((cost, burrow)) = search.pop() {
-        if B::TARGET.eq(&amp;burrow) {
+    while let Some((idx, burrow)) = search.pop() {
+        if B::TARGET.eq(burrow.as_ref()) {
             // target reached
 
             if trace_path {
-                search.print_path_to(&amp;B::TARGET);
-                search.print_stats();
+                search.print_path_to(idx);
             }
 
-            return cost;
+            return search.cost(idx);
         }
 
         for k in 0..B::LEN {
@@ -6596,8 +6558,7 @@ where
                         let weight = steps * B::ENERGIES[p as usize];
                         let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
-                        let bound_rem = adjacent.get_min_cost();
-                        search.push(Rc::clone(&amp;burrow), cost, adjacent, weight, bound_rem);
+                        search.push(idx, adjacent, weight);
                         // no need to continue to look for other adjacents
                         do_push = false;
                         break;
@@ -6609,8 +6570,7 @@ where
                         let mut adjacent = burrow.as_ref().clone();
                         adjacent.move_pod(k, k_adj);
                         if !adjacent.is_deadlock() {
-                            let bound_rem = adjacent.get_min_cost();
-                            push_later.push((Rc::clone(&amp;burrow), cost, adjacent, weight, bound_rem));
+                            push_later.push((idx, adjacent, weight));
                         }
                         // continue search, other positions in the hallway may be valid adjacents
                     }
@@ -6624,8 +6584,8 @@ where
                 }
 
                 if do_push {
-                    for (parent, cost, adjacent, weight, bound_rem) in push_later {
-                        search.push(parent, cost, adjacent, weight, bound_rem);
+                    for (parent_idx, adjacent, weight) in push_later {
+                        search.push(parent_idx, adjacent, weight);
                     }
                 }
             }
@@ -7157,106 +7117,88 @@ impl BurrowLarge {
 <div class="sect5">
 <h6 id="_search_state"><a class="anchor" href="#_search_state"></a><a class="link" href="#_search_state">Search State</a></h6>
 <div class="paragraph">
-<p>The search state is modeled as a separate struct. Initially, I used copy semantics for <code>BurrowSmall</code> and <code>BurrowLarge</code> resulting in burrow data being copied into the different collections (<code>heap</code>, <code>settled</code>, <code>costs</code>, and <code>parents</code>). My current implementation uses reference counting pointers instead. This did not result in any significant runtime changes. It should result in lower memory usage, which I can however not measure&#8230;&#8203;</p>
+<p>The search state is modeled as a separate struct. It contains a list of all nodes as tuples ((cost bound, cost), parent node index wrapped in an <code>Option</code>, settled flag, burrow). To find a node for a given burrow, a map with burrows as keys and indices to the list as values is maintained. A binary heap is used for the graph traversal. Since <code>BinaryHeap</code> is a max heap, the costs are inverted (because I use unsigned types, this can be done with a bitwise not). I do not use decrease key when pushing to the heap but instead discard items popped from the heap if the corresponding node is already settled.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[derive(Debug)]
-pub struct Search&lt;T&gt; {
-    heap: BTreeSet&lt;(usize, usize, Rc&lt;T&gt;)&gt;,
-    settled: HashSet&lt;Rc&lt;T&gt;&gt;,
-    costs: HashMap&lt;Rc&lt;T&gt;, (usize, usize)&gt;,
-    parents: HashMap&lt;Rc&lt;T&gt;, (usize, usize, Option&lt;Rc&lt;T&gt;&gt;)&gt;,
-    trace_path: bool,
-    hit_count: usize,
-    decr_key_count: usize,
+<pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">pub struct Search&lt;T&gt; {
+    /// ((bound, cost), parent index, settled, item
+    nodes: Vec&lt;((usize, usize), Option&lt;usize&gt;, bool, Rc&lt;T&gt;)&gt;,
+    heap: BinaryHeap&lt;((usize, usize), usize)&gt;,
+    map: HashMap&lt;Rc&lt;T&gt;, usize&gt;,
+    heuristic: fn(&amp;T) -&gt; usize,
 }
 
 impl&lt;T&gt; Search&lt;T&gt;
 where
-    T: Eq + Ord + std::hash::Hash + Clone + std::fmt::Debug,
+    T: Eq + std::hash::Hash + std::fmt::Debug,
 {
-    pub fn init(start: T, trace_path: bool) -&gt; Self {
+    pub fn init(start: T, heuristic: fn(&amp;T) -&gt; usize) -&gt; Self {
         let mut search = Self {
-            heap: BTreeSet::new(),
-            settled: HashSet::new(),
-            costs: HashMap::new(),
-            parents: HashMap::new(),
-            trace_path,
-            hit_count: 0,
-            decr_key_count: 0,
+            nodes: Vec::new(),
+            heap: BinaryHeap::new(),
+            map: HashMap::new(),
+            heuristic,
         };
+
         let start = Rc::new(start);
-        search.heap.insert((0, 0, Rc::clone(&amp;start)));
-        if search.trace_path {
-            search.parents.insert(Rc::clone(&amp;start), (0, 0, None));
-        }
-        search.costs.insert(start, (0, 0));
+
+        search
+            .nodes
+            .push(((!0, !0), None, false, Rc::clone(&amp;start)));
+        search.heap.push(((!0, !0), 0));
+        search.map.insert(start, 0);
+
         search
     }
 
-    pub fn pop(&amp;mut self) -&gt; Option&lt;(usize, Rc&lt;T&gt;)&gt; {
-        if let Some((_, cost, burrow)) = self.heap.pop_first() {
-            self.settled.insert(Rc::clone(&amp;burrow));
-            Some((cost, burrow))
-        } else {
-            None
-        }
+    pub fn cost(&amp;self, idx: usize) -&gt; usize {
+        !self.nodes[idx].0 .1
     }
 
-    pub fn push(
-        &amp;mut self,
-        parent: Rc&lt;T&gt;,
-        cost: usize,
-        adjacent: T,
-        weight: usize,
-        bound_rem: usize,
-    ) -&gt; bool {
-        // wrap in Rc
-        let adjacent = Rc::new(adjacent);
+    pub fn pop(&amp;mut self) -&gt; Option&lt;(usize, Rc&lt;T&gt;)&gt; {
+        while let Some((_, idx)) = self.heap.pop() {
+            if !self.nodes[idx].2 {
+                self.nodes[idx].2 = true;
+                return Some((idx, Rc::clone(&amp;self.nodes[idx].3)));
+            }
+        }
 
-        // skip if settled
-        if self.settled.contains(&amp;adjacent) {
+        None
+    }
+
+    pub fn push(&amp;mut self, parent_idx: usize, adjacent: T, weight: usize) -&gt; bool {
+        let adjacent = Rc::new(adjacent);
+        let idx = *self.map.entry(Rc::clone(&amp;adjacent)).or_insert_with(|| {
+            self.nodes.push(((0, 0), None, false, adjacent));
+            self.nodes.len() - 1
+        });
+
+        if self.nodes[idx].2 {
             return false;
         }
 
-        let e = self.costs.entry(adjacent);
-        let adj = Rc::clone(e.key()); // use same instance consistently
-        let (b, c) = e.or_insert((usize::MAX, usize::MAX));
-        if *b &lt; usize::MAX {
-            self.hit_count += 1;
-            // if already in queue, check if decrease key required;
-            // remove from queue if yes, otherwise return false (nothing to be added to queue)
-            if cost + weight + bound_rem &lt; *b {
-                self.decr_key_count += 1;
-                self.heap.remove(&amp;(*b, *c, Rc::clone(&amp;adj)));
-            } else {
-                return false;
-            }
-        }
-        *b = cost + weight + bound_rem;
-        *c = cost + weight;
-
-        // keep trace
-        if self.trace_path {
-            self.parents
-                .insert(Rc::clone(&amp;adj), (bound_rem, weight, Some(parent)));
+        let cost = self.cost(parent_idx) + weight;
+        let comp_cost = (!(cost + (self.heuristic)(&amp;self.nodes[idx].3)), !cost);
+        if comp_cost &gt; self.nodes[idx].0 {
+            self.nodes[idx].0 = comp_cost;
+            self.nodes[idx].1 = Some(parent_idx);
+            self.heap.push((comp_cost, idx));
+            return true;
         }
 
-        // insert to heap
-        self.heap.insert((*b, *c, adj));
-
-        true
+        false
     }
 
-    pub fn get_path_to(&amp;self, target: &amp;T) -&gt; VecDeque&lt;(usize, usize, T)&gt; {
+    pub fn get_path_to(&amp;self, target: usize) -&gt; VecDeque&lt;(usize, usize, Rc&lt;T&gt;)&gt; {
         let mut path = VecDeque::new();
 
-        let mut current = target.clone();
-        while let Some((bound_rem, cost, parent)) = self.parents.get(&amp;current) {
-            path.push_front((*bound_rem, *cost, current.clone()));
+        let mut current = target;
+        loop {
+            let ((bound, cost), parent, _, node) = &amp;self.nodes[current];
+            path.push_front((!bound, !cost, Rc::clone(node)));
             if let Some(parent) = parent {
-                current = parent.as_ref().clone();
+                current = *parent;
             } else {
                 break;
             }
@@ -7265,60 +7207,16 @@ where
         path
     }
 
-    pub fn print_path_to(&amp;self, target: &amp;T) {
+    pub fn print_path_to(&amp;self, target: usize) {
         let mut steps = 0;
-        let mut sum = 0;
-        for (bound_rem, weight, burrow) in self.get_path_to(target) {
-            sum += weight;
+        for (bound, cost, item) in self.get_path_to(target) {
             if steps == 0 {
-                println!("\nInitial\n{:?}", burrow);
+                println!("\nInitial\n{:?}", item.as_ref());
             } else {
-                println!(
-                    "\n{}) {} -&gt; {} (bound: {} -&gt; {}) ==&gt;\n{:?}",
-                    steps,
-                    weight,
-                    sum,
-                    bound_rem,
-                    sum + bound_rem,
-                    burrow
-                );
+                println!("\n{}) {} (bound: {}) ==&gt;\n{:?}", steps, cost, bound, item.as_ref());
             }
             steps += 1;
         }
-    }
-
-    pub fn print_stats(&amp;self) {
-        let mut mx = std::cmp::max(self.costs.len(), self.hit_count) / 1000;
-        let mut w = 3;
-        while mx &gt; 0 {
-            w += 1;
-            mx /= 10;
-        }
-
-        println!(
-            "+{blank:-&lt;w_head$}+\n\
-            |{:^w_head$}|\n\
-            +{blank:-&lt;w_head$}+\n\
-            |     heap: {:w_field$} |\n\
-            |  settled: {:w_field$} |\n\
-            |    total: {:w_field$} |\n\
-            +{blank:-&lt;w_head$}+\n\
-            |{:^w_head$}|\n\
-            +{blank:-&lt;w_head$}+\n\
-            |      hit: {:w_field$} |\n\
-            | decr key: {:w_field$} |\n\
-            +{blank:-&lt;w_head$}+",
-            "Element Count",
-            self.heap.len(),
-            self.settled.len(),
-            self.costs.len(),
-            "Push Stats",
-            self.hit_count,
-            self.decr_key_count,
-            blank = "",
-            w_field = w,
-            w_head = w + 12
-        );
     }
 }</code></pre>
 </div>
@@ -7331,8 +7229,6 @@ where
 <div class="content">
 <pre class="prettyprint highlight linenums"><code class="language-rust" data-lang="rust">#[cfg(test)]
 mod tests {
-    use std::time::Instant;
-
     use super::*;
 
     const CONTENT_1: &amp;str = "#############
