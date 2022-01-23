@@ -1,0 +1,30 @@
+
+Day 22 of year 2021
+https://adventofcode.com/2021/day/22
+
+== What I learned
+
+. To make sure that you know if your representation of the geometry is correct before anything else.
+. I also created some tests this time since it was hard to easily verify otherwise which parts were working.
+
+== Approach
+
+. I read in each line and use a simple regex to fish out the numbers.
+. I put the "on" or "off" and the numbers into a tuple for each line and put the whole thing into a list.
+. *Important*: I added one to the right number for each axis. Otherwise, the math doesn't work out later.
+. Star 1
+.. I brute forced this one initially, but that really doesn't scale. So, I just added an if statement to star 2 to only add up the cubes in the right region.
+. Star 2
+.. I take each reboot step. If it is "off", I ignore it.
+.. If it is "on", I take it and "subtract" each of the following instructions from it. That avoids double counting.
+.. I add any cubes still remaining after this to the total count.
+.. My subtraction is just transposing the 2 cubes and if they overlap, creating up to 6 new boxes that cover the original box minus each of the further boxes in the list.
+.. My implementation creates a lot of boxes that are all the same. So, I turn them into a set and back into a list in the loop. Without this, I quckly ran out of memory.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

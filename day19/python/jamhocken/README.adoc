@@ -1,0 +1,36 @@
+
+Day 19 of year 2021
+https://adventofcode.com/2021/day/19
+
+== What I learned
+
+. I am not fond of puzzles with multiple geometric transformations.
+
+== Approach
+
+. I use regex to fish out the integers and create a scanners dictionary with the scanner as the key and a list of beacons as value.
+. I then calculate a vector of the distances between pairs of beacons of each scanner.
+. Star 1
+.. I make a set containing scanner 0. And another set with all of the other scanners.
+.. I loop through until the second set is empty.
+.. For each member of the second set, I check it against scanners that are already mapped.
+.. To find possible overlapping beacons between scanners, I use the distance vectors. If 12 beacons of one scanner have the same relative vectors as the another scanners, these are probably common beacons.
+... In that case, I first sort out the x, y and z coordinates to match the order of the already mapped scanner.
+... Then, I see if the axis has been inverted (e.g. -x) and correct that.
+... Then, I figure out the distance between the 2 scanners and shift the second scanner.
+.. In the end, I take the now shifted lists of beacons, put them into a set to eliminate duplicates and check how many items the set has.
+. Star 2
+.. You reuse everythin from Star 1.
+.. And you just have to keep track of those distances between the scanners on the way.
+.. And you calculate the distance between all scanners and take the max.
+
+. I am pretty sure that this can be done much or elegantly. But, I have trouble with geometry sometimes and was able to work it out best with "divide and conquer".
+. The data structures were also kind of messy and suboptimal, but after I got it working, I didn't want to mess with them.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

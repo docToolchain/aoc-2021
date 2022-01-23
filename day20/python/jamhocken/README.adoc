@@ -1,0 +1,27 @@
+
+Day 20 of year 2021
+https://adventofcode.com/2021/day/20
+
+== What I learned
+
+. How to do the equivalent of elif in a list comprehension.
+
+== Approach
+
+. I read in the enhancer and just leave it as a string.
+. I put the trench values into a dictionary with the x,y coordinates in a tuple as the key
+. Both Stars
+.. I create a loop.
+.. First, I add a frame of entries to my dictionary around the current grid of the current dictionary.
+.. Since the parts outside of the grid could be "#" (the zero value in my enhancer was "#"), you have to be careful here.
+.. Then you just find the values for all of the neighbors, join it to be a binary string and use the decimal conversion as an index into the enhancer string.
+.. At the end, you just add up the lit squares.
+.. It's not super efficient, but it still runs in a few seconds.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
