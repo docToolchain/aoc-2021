@@ -271,6 +271,34 @@
 <li><a href="#_run_script_18">Run script</a></li>
 </ul>
 </li>
+<li><a href="#_day_19_python">Day 19: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_19">What I learned</a></li>
+<li><a href="#_approach_19">Approach</a></li>
+<li><a href="#_run_script_19">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_20_python">Day 20: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_20">What I learned</a></li>
+<li><a href="#_approach_20">Approach</a></li>
+<li><a href="#_run_script_20">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_21_python">Day 21: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_21">What I learned</a></li>
+<li><a href="#_approach_21">Approach</a></li>
+<li><a href="#_run_script_21">Run script</a></li>
+</ul>
+</li>
+<li><a href="#_day_22_python">Day 22: python</a>
+<ul class="sectlevel3">
+<li><a href="#_what_i_learned_22">What I learned</a></li>
+<li><a href="#_approach_22">Approach</a></li>
+<li><a href="#_run_script_22">Run script</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2791,6 +2819,643 @@ def main():
             max_mag = max(max_mag,int(snail))
 
     print(max_mag)
+main()</code></pre>
+</div>
+</div>
+<a id="day19" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_19_python"><a class="anchor" href="#_day_19_python"></a><a class="link" href="#_day_19_python">Day 19: python</a></h3>
+<div class="paragraph">
+<p>Day 19 of year 2021
+<a href="https://adventofcode.com/2021/day/19" class="bare">https://adventofcode.com/2021/day/19</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_19"><a class="anchor" href="#_what_i_learned_19"></a><a class="link" href="#_what_i_learned_19">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I am not fond of puzzles with multiple geometric transformations.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_19"><a class="anchor" href="#_approach_19"></a><a class="link" href="#_approach_19">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I use regex to fish out the integers and create a scanners dictionary with the scanner as the key and a list of beacons as value.</p>
+</li>
+<li>
+<p>I then calculate a vector of the distances between pairs of beacons of each scanner.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I make a set containing scanner 0. And another set with all of the other scanners.</p>
+</li>
+<li>
+<p>I loop through until the second set is empty.</p>
+</li>
+<li>
+<p>For each member of the second set, I check it against scanners that are already mapped.</p>
+</li>
+<li>
+<p>To find possible overlapping beacons between scanners, I use the distance vectors. If 12 beacons of one scanner have the same relative vectors as the another scanners, these are probably common beacons.</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>In that case, I first sort out the x, y and z coordinates to match the order of the already mapped scanner.</p>
+</li>
+<li>
+<p>Then, I see if the axis has been inverted (e.g. -x) and correct that.</p>
+</li>
+<li>
+<p>Then, I figure out the distance between the 2 scanners and shift the second scanner.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>In the end, I take the now shifted lists of beacons, put them into a set to eliminate duplicates and check how many items the set has.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>You reuse everythin from Star 1.</p>
+</li>
+<li>
+<p>And you just have to keep track of those distances between the scanners on the way.</p>
+</li>
+<li>
+<p>And you calculate the distance between all scanners and take the max.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>I am pretty sure that this can be done much or elegantly. But, I have trouble with geometry sometimes and was able to work it out best with "divide and conquer".</p>
+</li>
+<li>
+<p>The data structures were also kind of messy and suboptimal, but after I got it working, I didn&#8217;t want to mess with them.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_19"><a class="anchor" href="#_run_script_19"></a><a class="link" href="#_run_script_19">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import regex as re
+import collections
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    scanners = dict()
+    scanner_pattern = re.compile("(\d+)")
+    beacon_pattern = re.compile("(-?\d+),(-?\d+),(-?\d+)")
+    for line in lines_stripped:
+        if len(line)&gt;0 and line[1] == "-":
+            scanner_match = re.search(scanner_pattern,line)
+            scanner = int(scanner_match.group(0))
+            beacons = list()
+        elif len(line)&gt;0:
+            beacon_match = re.match(beacon_pattern,line)
+            beacon = [int(beacon_match.group(i)) for i in [1,2,3]]
+            beacons.append(beacon)
+        else:
+            scanners[scanner] = beacons
+
+    scanners[scanner] = beacons
+
+    return scanners
+
+def find_distance(scanners):
+    distance_dict = dict()
+    for key,value in scanners.items():
+        distances = dict()
+        for i in range(len(value)):
+            for j in range(i+1,len(value)):
+                distances[(i,j)] = [abs(value[i][k]-value[j][k]) for k in [0,1,2]]
+        distance_dict[key] = distances
+
+    return distance_dict
+
+def find_matches(mapped,unmapped,distances,scanners,scan_translation):
+    new_unmapped = unmapped.copy()
+    new_mapped = mapped.copy()
+    for key_unmapped in unmapped:
+        # find all distances between beacons that match for both scanners
+        for key_mapped in mapped:
+            matches = list()
+            beacon_unmapped = set()
+            beacon_mapped = set()
+            for pair_mapped,distance_mapped in distances[key_mapped].items():
+                for pair_unmapped,distance_unmapped in distances[key_unmapped].items():
+                    if set(distance_mapped) == set(distance_unmapped):
+                        matches.append([pair_mapped,pair_unmapped])
+                        beacon_unmapped.update(pair_unmapped)
+                        beacon_mapped.update(pair_mapped)
+            #find the matching pairs of beacons
+            beacon_mapping = dict()
+            for beacon in beacon_mapped:
+                other_beacon = set()
+                for match in matches:
+                    if beacon in match[0]:
+                        if not other_beacon:
+                            other_beacon = set(match[1])
+                        else:
+                            other_beacon = other_beacon.intersection(match[1])
+                beacon_mapping[beacon] = other_beacon.pop()
+
+            # If there are at least 12 beacon matches
+            if len(beacon_mapping)&gt;11:
+                #First we sort out the x,y,z coordinates so that both scanners have the same definition
+                flagx = sum([1 if distances[key_mapped][matches[j][0]][0] == distances[key_unmapped][matches[j][1]][0] else 0 for j in range(len(matches))])
+                flagy = sum([1 if distances[key_mapped][matches[j][0]][0] == distances[key_unmapped][matches[j][1]][1] else 0 for j in range(len(matches))])
+                flagz = sum([1 if distances[key_mapped][matches[j][0]][0] == distances[key_unmapped][matches[j][1]][2] else 0 for j in range(len(matches))])
+                if flagy &gt;= flagx and flagy &gt;= flagz:
+                    distances[key_unmapped] = {key:[value[1],value[0],value[2]] for key,value in distances[key_unmapped].items()}
+                    scanners[key_unmapped] = [[value[1],value[0],value[2]] for value in scanners[key_unmapped]]
+                elif flagz &gt;= flagx and flagz &gt;= flagy:
+                    distances[key_unmapped] = {key:[value[2],value[1],value[0]] for key,value in distances[key_unmapped].items()}
+                    scanners[key_unmapped] = [[value[2],value[1],value[0]] for value in scanners[key_unmapped]]
+                flagy = sum([1 if distances[key_mapped][match[0]][1] == distances[key_unmapped][match[1]][1] else 0 for match in matches])
+                flagz = sum([1 if distances[key_mapped][match[0]][1] == distances[key_unmapped][match[1]][2] else 0 for match in matches])
+                if flagz &gt;= flagy:
+                    distances[key_unmapped] = {key:[value[0],value[2],value[1]] for key,value in distances[key_unmapped].items()}
+                    scanners[key_unmapped] = [[value[0],value[2],value[1]] for value in scanners[key_unmapped]]
+                # Then we see if any x,y,z is inverted
+
+                # First though we have to reorder our matching list to keep beacon pairs consistent
+                temp_matches = list()
+                for match in matches:
+                    if match[1][0] != beacon_mapping[match[0][0]]:
+                        temp_matches.append([match[0],(match[1][1],match[1][0])])
+                    else:
+                        temp_matches.append(match)
+                matches = temp_matches
+                invertx = sum([1 if scanners[key_mapped][match[0][0]][0] - scanners[key_mapped][match[0][1]][0] == scanners[key_unmapped][match[1][0]][0] - scanners[key_unmapped][match[1][1]][0] else -1 for match in matches])
+                inverty = sum([1 if scanners[key_mapped][match[0][0]][1] - scanners[key_mapped][match[0][1]][1] == scanners[key_unmapped][match[1][0]][1] - scanners[key_unmapped][match[1][1]][1] else -1 for match in matches])
+                invertz = sum([1 if scanners[key_mapped][match[0][0]][2] - scanners[key_mapped][match[0][1]][2] == scanners[key_unmapped][match[1][0]][2] - scanners[key_unmapped][match[1][1]][2] else -1 for match in matches])
+
+                if invertx &lt; 0:
+                    scanners[key_unmapped] = [[-1*value[0],value[1],value[2]] for value in scanners[key_unmapped]]
+                if inverty &lt; 0:
+                    scanners[key_unmapped] = [[value[0],-1*value[1],value[2]] for value in scanners[key_unmapped]]
+                if invertz &lt; 0:
+                    scanners[key_unmapped] = [[value[0],value[1],-1*value[2]] for value in scanners[key_unmapped]]
+
+                # And finally we shift the scanner to overlap with the other one
+                translation = [(scanners[key_mapped][match[0][0]][0] - scanners[key_unmapped][match[1][0]][0],scanners[key_mapped][match[0][0]][1] - scanners[key_unmapped][match[1][0]][1],scanners[key_mapped][match[0][0]][2] - scanners[key_unmapped][match[1][0]][2]) for match in matches]
+                translation = collections.Counter(translation).most_common(1)[0][0]
+
+                scanners[key_unmapped] = [[value[0]+translation[0],value[1]+translation[1],value[2]+translation[2]] for value in scanners[key_unmapped]]
+
+                if key_unmapped in new_unmapped:
+                    new_unmapped.remove(key_unmapped)
+                new_mapped.add(key_unmapped)
+                scan_translation.append(translation)
+
+    return new_mapped, new_unmapped
+
+def main():
+    with open("input.txt",'r') as beacon_file:
+        beacon_lines = beacon_file.readlines()
+
+    scanners = process_input(beacon_lines)
+    distances = find_distance(scanners)
+
+    keys = list(scanners.keys())
+    mapped = {keys[0]}
+    unmapped = set(keys[1:])
+    translation = list()
+
+    while unmapped:
+        (new_mapped, new_unmapped) = find_matches(mapped,unmapped,distances,scanners,translation)
+        mapped = new_mapped
+        unmapped = new_unmapped
+
+    # Star 1
+    beacons = set()
+    for key,value in scanners.items():
+        for beacon in value:
+            beacons.add(tuple(beacon))
+    print(len(beacons))
+
+    # Star 2
+    max_distance = 0
+    for i in range(len(translation)):
+        for j in range(i+1,len(translation)):
+            max_distance = max(max_distance,sum([abs(translation[i][k]-translation[j][k]) for k in [0,1,2]]))
+
+    print(max_distance)
+main()</code></pre>
+</div>
+</div>
+<a id="day20" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_20_python"><a class="anchor" href="#_day_20_python"></a><a class="link" href="#_day_20_python">Day 20: python</a></h3>
+<div class="paragraph">
+<p>Day 20 of year 2021
+<a href="https://adventofcode.com/2021/day/20" class="bare">https://adventofcode.com/2021/day/20</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_20"><a class="anchor" href="#_what_i_learned_20"></a><a class="link" href="#_what_i_learned_20">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>How to do the equivalent of elif in a list comprehension.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_20"><a class="anchor" href="#_approach_20"></a><a class="link" href="#_approach_20">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I read in the enhancer and just leave it as a string.</p>
+</li>
+<li>
+<p>I put the trench values into a dictionary with the x,y coordinates in a tuple as the key</p>
+</li>
+<li>
+<p>Both Stars</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I create a loop.</p>
+</li>
+<li>
+<p>First, I add a frame of entries to my dictionary around the current grid of the current dictionary.</p>
+</li>
+<li>
+<p>Since the parts outside of the grid could be "<mark>" (the zero value in my enhancer was "</mark>"), you have to be careful here.</p>
+</li>
+<li>
+<p>Then you just find the values for all of the neighbors, join it to be a binary string and use the decimal conversion as an index into the enhancer string.</p>
+</li>
+<li>
+<p>At the end, you just add up the lit squares.</p>
+</li>
+<li>
+<p>It&#8217;s not super efficient, but it still runs in a few seconds.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_20"><a class="anchor" href="#_run_script_20"></a><a class="link" href="#_run_script_20">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    enhancer = lines_stripped[0]
+    trench = dict()
+    for j,line in enumerate(lines_stripped[2:]):
+        for i,character in enumerate(line):
+            trench[(i,j)] = character
+
+    return enhancer, trench
+
+def main():
+    with open("input.txt",'r') as trench_file:
+        trench_lines = trench_file.readlines()
+
+    (enhancer, trench) = process_input(trench_lines)
+    size_trench = max(trench.keys())[0]+1
+
+    neighbors = [(-1,-1),(0,-1),(1,-1),(-1,0),(0,0),(1,0),(-1,1),(0,1),(1,1)]
+
+    for i in range(50):
+        for j in range(-1-i,size_trench+i):
+            if i%2 == 0:
+                trench[(j,-1-i)] = "."
+                trench[(j,size_trench+i)] = "."
+                trench[(-1-i,j)] = "."
+                trench[(size_trench+i,j)] = "."
+                trench[(size_trench+i,size_trench+i)] = "."
+            else:
+                trench[(j,-1-i)] = enhancer[0]
+                trench[(j,size_trench+i)] = enhancer[0]
+                trench[(-1-i,j)] = enhancer[0]
+                trench[(size_trench+i,j)] = enhancer[0]
+                trench[(size_trench+i,size_trench+i)] = enhancer[0]
+
+        trench_temp = trench.copy()
+        for key,value in trench.items():
+            grid = [tuple(map(sum,zip(key,neighbor))) for neighbor in neighbors]
+            code = ''.join([trench[grid_item] if grid_item in trench else '.' if i%2 == 0 else enhancer[0] for grid_item in grid])
+            code = ''.join(["1" if character == "#" else "0" for character in code])
+            trench_temp[key] = enhancer[int(code,2)]
+        trench = trench_temp
+        if i == 1:
+            print(sum([1 if i == "#" else 0 for key,i in trench.items()]))
+
+    print(sum([1 if i == "#" else 0 for key,i in trench.items()]))
+main()</code></pre>
+</div>
+</div>
+<a id="day21" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_21_python"><a class="anchor" href="#_day_21_python"></a><a class="link" href="#_day_21_python">Day 21: python</a></h3>
+<div class="paragraph">
+<p>Day 21 of year 2021
+<a href="https://adventofcode.com/2021/day/21" class="bare">https://adventofcode.com/2021/day/21</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_21"><a class="anchor" href="#_what_i_learned_21"></a><a class="link" href="#_what_i_learned_21">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Used a deque</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_21"><a class="anchor" href="#_approach_21"></a><a class="link" href="#_approach_21">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I read in the 2 positions and put them into a list.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I used a deque to represent the die.</p>
+</li>
+<li>
+<p>You just iterate through until one of the players reaches the score.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I realized that there are 27 different die roles for 3 dice. But, there are of course not 27 different sums of the three.</p>
+</li>
+<li>
+<p>I created a dictionary with the keys being the possible sums and the values being how often they occur. e.g. 3 happens only once. 6 happens 7 times.</p>
+</li>
+<li>
+<p>I created a dictionary with the score and position of both players as the key. And how often that combo occurs as the value.</p>
+</li>
+<li>
+<p>Then, it&#8217;s pretty straightforward. It just loops through figuring out all combos on each turn. If one of the player wins, we add the universes to its win sum value.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_21"><a class="anchor" href="#_run_script_21"></a><a class="link" href="#_run_script_21">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import collections
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+    position = list()
+    position.append(int(lines_stripped[0][-1]))
+    position.append(int(lines_stripped[1][-1]))
+
+    return position
+
+def main():
+    with open("input.txt",'r') as player_file:
+        player_lines = player_file.readlines()
+
+    position = process_input(player_lines)
+
+    # star 1
+    score = [0,0]
+    die = collections.deque([i for i in range(1,101)])
+    i = 0
+    j = 0
+
+    while max(score)&lt;1000:
+        player = 0
+        for k in range(3):
+            player += die[0]
+            die.rotate(-1)
+        position[i] = (position[i]+player-1)%10+1
+        score[i] += position[i]
+        i = (i+1)%2
+        j += 3
+
+    print(j*min(score))
+
+    position = process_input(player_lines)
+    # star 2
+    adder_dict = dict()
+    for i in range(1,4):
+        for j in range(1,4):
+            for k in range(1,4):
+                if i+j+k in adder_dict:
+                    adder_dict[i+j+k] += 1
+                else:
+                    adder_dict[i+j+k] = 1
+
+    sp1_sp2_dict = dict()
+    for key1, value1 in adder_dict.items():
+        for key2, value2 in adder_dict.items():
+            score1 = (position[0]+key1-1)%10+1
+            score2 = (position[1]+key2-1)%10+1
+            sp1_sp2_dict[(score1,score1,score2,score2)] = value1*value2
+
+    player1_wins = 0
+    player2_wins = 0
+    while sp1_sp2_dict:
+        sp1_sp2_dict_temp = dict()
+        for key,value in sp1_sp2_dict.items():
+            for key1,value1 in adder_dict.items():
+                position1 = (key[1]+key1-1)%10+1
+                score1 = key[0]+position1
+                if score1&gt;=21:
+                    player1_wins += value*value1
+                else:
+                    for key2,value2 in adder_dict.items():
+                        position2 = (key[3]+key2-1)%10+1
+                        score2 = key[2]+position2
+                        if score2 &gt;= 21:
+                            player2_wins += value*value1*value2
+                        elif (score1,position1,score2,position2) in sp1_sp2_dict_temp:
+                            sp1_sp2_dict_temp[(score1,position1,score2,position2)] = sp1_sp2_dict_temp[(score1,position1,score2,position2)] + value*value1*value2
+                        else:
+                            sp1_sp2_dict_temp[(score1,position1,score2,position2)] = value*value1*value2
+        sp1_sp2_dict = sp1_sp2_dict_temp
+
+    print(max(player1_wins,player2_wins))
+
+main()</code></pre>
+</div>
+</div>
+<a id="day22" />
+</div>
+</div>
+<div class="sect2">
+<h3 id="_day_22_python"><a class="anchor" href="#_day_22_python"></a><a class="link" href="#_day_22_python">Day 22: python</a></h3>
+<div class="paragraph">
+<p>Day 22 of year 2021
+<a href="https://adventofcode.com/2021/day/22" class="bare">https://adventofcode.com/2021/day/22</a></p>
+</div>
+<div class="sect3">
+<h4 id="_what_i_learned_22"><a class="anchor" href="#_what_i_learned_22"></a><a class="link" href="#_what_i_learned_22">What I learned</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>To make sure that you know if your representation of the geometry is correct before anything else.</p>
+</li>
+<li>
+<p>I also created some tests this time since it was hard to easily verify otherwise which parts were working.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_approach_22"><a class="anchor" href="#_approach_22"></a><a class="link" href="#_approach_22">Approach</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>I read in each line and use a simple regex to fish out the numbers.</p>
+</li>
+<li>
+<p>I put the "on" or "off" and the numbers into a tuple for each line and put the whole thing into a list.</p>
+</li>
+<li>
+<p><strong>Important</strong>: I added one to the right number for each axis. Otherwise, the math doesn&#8217;t work out later.</p>
+</li>
+<li>
+<p>Star 1</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I brute forced this one initially, but that really doesn&#8217;t scale. So, I just added an if statement to star 2 to only add up the cubes in the right region.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Star 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>I take each reboot step. If it is "off", I ignore it.</p>
+</li>
+<li>
+<p>If it is "on", I take it and "subtract" each of the following instructions from it. That avoids double counting.</p>
+</li>
+<li>
+<p>I add any cubes still remaining after this to the total count.</p>
+</li>
+<li>
+<p>My subtraction is just transposing the 2 cubes and if they overlap, creating up to 6 new boxes that cover the original box minus each of the further boxes in the list.</p>
+</li>
+<li>
+<p>My implementation creates a lot of boxes that are all the same. So, I turn them into a set and back into a list in the loop. Without this, I quckly ran out of memory.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run_script_22"><a class="anchor" href="#_run_script_22"></a><a class="link" href="#_run_script_22">Run script</a></h4>
+<div class="paragraph">
+<p>Run the solution with <code>python solution.py</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import regex as re
+
+def process_input(file_contents):
+    lines_stripped = [line.strip() for line in file_contents]
+
+    cube = list()
+    pattern = re.compile("(-?\d+)")
+    for line in lines_stripped:
+        numbers = re.findall(pattern,line)
+        cube.append((line[0:2],int(numbers[0]),int(numbers[1])+1,int(numbers[2]),int(numbers[3])+1,int(numbers[4]),int(numbers[5])+1))
+
+    return cube
+
+def cut_cube(cube_in, cube_cut):
+    cubes = list()
+    cubes.append((min(cube_in[1],cube_cut[1]),cube_in[1],cube_in[2],cube_in[3],cube_in[4],cube_in[5]))
+    cubes.append((cube_in[0],max(cube_cut[0],cube_in[0]),cube_in[2],cube_in[3],cube_in[4],cube_in[5]))
+    cubes.append((max(cube_in[0],cube_cut[0]),min(cube_in[1],cube_cut[1]),min(cube_in[3],cube_cut[3]),cube_in[3],cube_in[4],cube_in[5]))
+    cubes.append((max(cube_in[0],cube_cut[0]),min(cube_in[1],cube_cut[1]),cube_in[2],max(cube_in[2],cube_cut[2]),cube_in[4],cube_in[5]))
+    cubes.append((max(cube_in[0],cube_cut[0]),min(cube_in[1],cube_cut[1]),max(cube_in[2],cube_cut[2]),min(cube_in[3],cube_cut[3]),min(cube_in[5],cube_cut[5]),cube_in[5]))
+    cubes.append((max(cube_in[0],cube_cut[0]),min(cube_in[1],cube_cut[1]),max(cube_in[2],cube_cut[2]),min(cube_in[3],cube_cut[3]),cube_in[4],max(cube_cut[4],cube_in[4])))
+
+    return cubes
+
+def main():
+    with open("input.txt",'r') as player_file:
+        player_lines = player_file.readlines()
+
+    insts = process_input(player_lines)
+
+    cubes = 0
+    cubes_star1 = 0
+    for i,inst in enumerate(insts):
+        if inst[0] != "of":
+            space = [inst[1:]]
+            for inst1 in insts[i+1:]:
+                space_temp = list()
+                for cube in space:
+                    if inst1[2] &gt;= cube[0] and inst1[4]&gt;= cube[2] and inst1[6] &gt;= cube[4] and inst1[1] &lt;= cube[1] and inst1[3] &lt;= cube[3] and inst1[5]&lt;=cube[5]:
+                        if inst1[1]&lt;=cube[0] and inst1[2]&gt;=cube[1] and inst1[3]&lt;=cube[2] and inst1[4]&gt;=cube[3] and inst1[5]&lt;=cube[4] and inst1[6]&gt;=cube[5]:
+                            pass
+                        else:
+                            [space_temp.append(i) for i in cut_cube(cube,inst1[1:])]
+                    else:
+                        space_temp.append(cube)
+                space = list(set(space_temp))
+            cubes += sum([(spa[1]-spa[0])*(spa[3]-spa[2])*(spa[5]-spa[4]) for spa in space])
+            if inst[2] &gt;= -50 and inst[4]&gt;= -50 and inst[6] &gt;= -50 and inst[1] &lt;= 50 and inst[3] &lt;= 50 and inst[5]&lt;=50:
+                cubes_star1 += sum([(spa[1]-spa[0])*(spa[3]-spa[2])*(spa[5]-spa[4]) for spa in space])
+
+    print(cubes_star1)
+    print(cubes)
+
 main()</code></pre>
 </div>
 </div>
