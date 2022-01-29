@@ -1,0 +1,33 @@
+
+Day 23 of year 2021
+https://adventofcode.com/2021/day/23
+
+== What I learned
+
+. Some data representations are better (easier to read and debug) then others
+
+== Approach
+
+This one was kind of a mess. Initially, I actually just solved star 1 by hand and then
+created code. I am pretty sure my data represenation is not so optimal and the
+code takes a while to solve it, but it works. Both stars are essentially the same
+approach.
+
+1. I create a tuple with the relevant locations. Those are of course the rooms. And some
+of the hallway spots. The space in the hallway right in front of a room is never used to
+park since it would block the room.
+2. I created a dictionary with the final destinations of each letter as a set.
+3. I also created 2 further dictionaries with the spaces on the path between any two relevant
+pairs of locations. And the distance between those 2 locations.
+4. I then run it through Dijkstra's algorithm to find the solution.
+
+I am sure there are much better ways to find the "neighbors" and my representation made it
+hard to fill the paths and distance dictionaries.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....

@@ -1,0 +1,23 @@
+
+Day 25 of year 2021
+https://adventofcode.com/2021/day/25
+
+== What I learned
+
+. Deepcopy on lists of lists. (Although I already knew this theoretically)
+
+== Approach
+
+It's actually straightforward. I put the input into a list of lists.
+I iterate over the lists of lists and check for ">"'s  and move them to the right if possible and wrap if necessary.
+I do the same then for the "v"'s.
+I set a flag if anything moves in a round. And leave the while loop as soon as nothing has moved in the round.
+I count the rounds on the way. That's it.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
