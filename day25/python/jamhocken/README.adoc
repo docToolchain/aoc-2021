@@ -1,23 +1,18 @@
 
-Day 3 of year 2021
-https://adventofcode.com/2021/day/3
+Day 25 of year 2021
+https://adventofcode.com/2021/day/25
 
 == What I learned
 
-. Somehow I don't understand slices with lists in Python, but at least I do understand it for matrices with Numpy.
-. The whole thing isn't very elegant, I'm afraid.
+. Deepcopy on lists of lists. (Although I already knew this theoretically)
 
 == Approach
 
-. I parse the file and put all of the codes into a list of lists.
-. For star 1
-.. I take that list of lists and turned it into a Numpy matrix. I then sum each digit over all
-codes and compare that sum to half of the number of codes to find the majority digit for Gamma.
-.. I then used some modula arithmetic to find the inverse Epsilon.
-.. Converted to strings, joined it and converted to integers.
-. For star 2
-.. I go through each digit and cull out the codes that don't belong to the majority / minority.
-.. I recalculate the majority / minority evey run through the loop with a Numpy matrix again.
+It's actually straightforward. I put the input into a list of lists.
+I iterate over the lists of lists and check for ">"'s  and move them to the right if possible and wrap if necessary.
+I do the same then for the "v"'s.
+I set a flag if anything moves in a round. And leave the while loop as soon as nothing has moved in the round.
+I count the rounds on the way. That's it.
 
 == Run script
 Run the solution with `python solution.py`
