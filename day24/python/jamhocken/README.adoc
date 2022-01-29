@@ -1,0 +1,32 @@
+
+Day 24 of year 2021
+https://adventofcode.com/2021/day/24
+
+== What I learned
+
+. Sometimes you are faster by hand...
+
+== Approach
+
+I let it run brute force for a bit to see how long it would take. I am guessing days to weeks.
+
+So, I stepped back and went through my input to see what it is doing and if there is a pattern.
+And in fact there was a pattern. There are 14 blocks of equal length. There are 2 kinds of blocks.
+. The previous value of z is multipled by 26 and the new character from the input is added to it with an offset.
+. The current character with an offset is compared to the z mod 26.
+Essentially, the multiplying and modula with 26 is creating a stack and the comparison will give you a relationship between exactly
+2 of the input characters. So, you have at the end 7 pairs with an offset. If all 7 are satisfied,
+then z = 0.
+
+I did write some code to double check the answers that I did on paper.
+I guess you could write code to parse the input and derive the answer, but it would take much more time than just doing it by hand.
+And, this problem was strange somehow since I can't see a way to get to an answer without using human intelligence to analyze the
+input and notice the pattern in the first place.
+
+== Run script
+Run the solution with `python solution.py`
+
+[source, python]
+....
+include::solution.py[]
+....
