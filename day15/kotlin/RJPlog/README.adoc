@@ -1,0 +1,27 @@
+==  Day 15: Chiton  ==
+
+This solution is written in Kotlin.
+
+The original puzzle can be found at https://adventofcode.com/2021/day/15
+
+For execution enter _kotlin day2115_1_2.kts_ in the command line.
+
+=== Today I learned
+
+Today I started very fast with adapting solution of day12, creating a list of possible segment changes and creating all possible pathes through the grid only visiting every place once. For very small solutions it worked well, but already the given example with 10x10 was not able to calculate in proper time. 
+
+So I have to rethink my approach. First, I still believe in the general approach and add some modifications to improve timing, change all string based operations to int based operations, let's see how far it will get me.
+
+Second try with rework all the string operations to lists, but still it does not work. Next part would be to calculate totalRisklevel while generating new pathes and add a rule to not add the path when exceeding already reached totalRisks with other pathes. Initvalue could be puzzle input straight from left to right and down.
+
+Third try with additional rule if path has a total risk level of (width*height-1)*9 now worked for the 10x10 example. But the puzzle input is oviosely to big. Next improvement would be to set the init value not on (width*height-1)*9 but as above described based on puzzle input from left to rigth and then down, second improvement will be to just dynamically adapt the totalRiskMin to already reached min pathes.
+
+Several optimizations later, I don't know how to proceed. Taking break. Current status: Works for 10x10.
+
+Finally first part is solved. Takes 5min to run through, but it works. Definitely no good idea for second part, so at the end I again have to rethink my strategy. Obivous is, that example and puzzle input take no left or up steps, so I will try to use this in the next approach.
+
+New approach, much faster and way more efficent, now I have to add part 2. Part 2 added, for the example it works well, but for the real input not. So I have to start debugging.
+
+
+Update after severall months: After studiing Dijkstra algorithm I completly reworked this solution. Now it works for both parts.
+
