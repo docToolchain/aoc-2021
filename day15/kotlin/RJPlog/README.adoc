@@ -22,3 +22,6 @@ Finally first part is solved. Takes 5min to run through, but it works. Definitel
 
 New approach, much faster and way more efficent, now I have to add part 2. Part 2 added, for the example it works well, but for the real input not. So I have to start debugging.
 
+
+Update after severall months: After studiing Dijkstra algorithm I completly reworked this solution. Now it works for both parts.
+
